@@ -1,0 +1,1 @@
+echo Code:  && find . -iname "*.java" -and -not -iregex ".*test.*\\|.*debug.*" | xargs wc -l | sort -n -r | head -6 && echo Tests:  && find . -iname "*.java" -and -iregex ".*test.*\\|.*debug.*" | xargs wc -l | sort -n -r | head -6 && echo Overall:  && find . -iname "*.java" | xargs wc -l | tail -1

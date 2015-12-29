@@ -1,0 +1,1 @@
+start ansicon-x86/ansicon.exe java -Xms2048m -Xmx2384m -jar OpenTafl.jar

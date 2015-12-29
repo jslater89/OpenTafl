@@ -1,0 +1,5 @@
+Tafl To-Do
+
+1. Aspiration windows (i.e. initial alpha-beta in a window around last iterative deepening)
+2. Killer-move heuristic (array indexed by: ply, fromindex, toindex to track counts, list of: ply, move for moves)
+3. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)

@@ -1,0 +1,18 @@
+syntax: glob
+
+OpenTafl.jar
+OpenTafl.zip
+hprof.txt
+bin*
+.settings*
+profile*
+debug-positions*
+out*
+
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/gradle.xml
+**/.idea/dictionaries/**xml
+
+**~
+**local.properties
