@@ -9,10 +9,10 @@ profile*
 debug-positions*
 out*
 
-**/.idea/workspace.xml
-**/.idea/tasks.xml
-**/.idea/gradle.xml
-**/.idea/dictionaries/**xml
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/dictionaries/**xml
 
 **~
 **local.properties
