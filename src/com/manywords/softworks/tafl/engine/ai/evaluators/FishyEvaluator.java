@@ -35,7 +35,7 @@ public class FishyEvaluator implements Evaluator {
 
         Board board = state.getBoard();
 
-        /*
+
         if(depth == 5 && Math.random() < 0.001) {
             debug = true;
         }
@@ -51,7 +51,6 @@ public class FishyEvaluator implements Evaluator {
 		if(depth == 1 && Math.random() < 0.1) {
 			debug = true;
 		}
-		*/
 
         int remainingDepth = maxDepth - depth;
 
@@ -61,19 +60,19 @@ public class FishyEvaluator implements Evaluator {
             RawTerminal.enableColor();
         }
 
-        // The concept: 500 is an attacker win, -500 is a defender win.
+        // The concept: 5000 is an attacker win, -5000 is a defender win.
         // Closer victories are worth more. Give wins a little edge over
         // states that evaluate to almost-win to make them tastier.
 
         if (victory == GameState.ATTACKER_WIN) {
             if (debug) debugOutputString += "Attacker win at depth " + depth + "\n";
-            value = (short)(Evaluator.ATTACKER_WIN * (remainingDepth + 1));
-            if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth, debugId);
+            value = (short)(Evaluator.ATTACKER_WIN + (500 * (remainingDepth + 1)));
+            if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
         } else if (victory == GameState.DEFENDER_WIN) {
             if (debug) debugOutputString += "Defender win at depth " + depth + "\n";
-            value = (short)(Evaluator.DEFENDER_WIN * (remainingDepth + 1));
-            if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth, debugId);
+            value = (short)(Evaluator.DEFENDER_WIN - (500 * (remainingDepth + 1)));
+            if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
         }
 
@@ -167,23 +166,23 @@ public class FishyEvaluator implements Evaluator {
             if (board.getSpaceGroupFor(dest) == SpaceGroup.CORNER) kingCorners++;
         }
 
-        if (edgeEscape) { // block max: defender 0.4, attacker 0.0
+        if (edgeEscape) { // block max: defender 0.75, attacker 0.0
             if (kingEdges >= 2) {
                 if (debug) debugOutputString += "Defender win--two ways to an edge\n";
-                value = (short)(Evaluator.DEFENDER_WIN * (remainingDepth + 1));
-                if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth, debugId);
+                value = (short)(Evaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
+                if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
                 return value;
             }
 
             if (kingEdges == 1) {
                 if (debug) debugOutputString += "King has edge access: " + KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.4;
-                value += KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.4;
+                value += KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.75;
             }
         } else if (cornerEscape) { // block max: defender 0.4, attacker 0.0
             if (kingCorners >= 2) {
                 if (debug) debugOutputString += "Defender win--two ways to a corner\n";
-                value = (short)(Evaluator.DEFENDER_WIN * (remainingDepth + 1));
-                if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth, debugId);
+                value = (short)(Evaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
+                if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
                 return value;
             }
 
@@ -295,11 +294,11 @@ public class FishyEvaluator implements Evaluator {
         value += attackersLost * attackerValue * GameTreeState.DEFENDER;
         value += defendersLost * defenderValue * GameTreeState.ATTACKER;
 
-        if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth, debugId);
+        if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
         return value;
     }
 
-    private static void printDebug(String debugString, double value, boolean isAttackingSide, int depth, int debugId) {
+    private static void printDebug(String debugString, double value, boolean isAttackingSide, int depth) {
         debugString += "\n\nFinal evaluation " + value;
 
 
@@ -308,7 +307,7 @@ public class FishyEvaluator implements Evaluator {
         // 2. mBranch.getCurrentSide().isAttackingSide() == false! (because the turn advances).
         // 3. The move we're evaluating is an attacker move.
         String filename = (isAttackingSide ? "position-defenders-" : "position-attackers-") + "depth" + depth + "-" + ++debugId + ".txt";
-        File f = new File("/home/jay/Documents/guiltyspark-games/TaflEngine/debug-positions/" + filename);
+        File f = new File("debug-positions/" + filename);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))) {
             writer.write(debugString, 0, debugString.length());

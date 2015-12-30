@@ -36,7 +36,7 @@ public class Test {
                 System.out.println(test.getClass().getSimpleName() + ": passed");
             } catch (AssertionError e) {
                 System.out.println(test.getClass().getSimpleName() + ": FAILED");
-                //System.exit(0);
+                System.exit(0);
             }
         }
     }

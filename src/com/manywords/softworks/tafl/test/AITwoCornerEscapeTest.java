@@ -30,43 +30,33 @@ class AITwoCornerEscapeTest extends TaflTest implements UiCallback {
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
 
-        state = game.getCurrentState();
-        AiWorkspace workspace = new AiWorkspace(game, state, 5);
-        workspace.explore(4);
-        MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
-        state.makeMove(nextMove);
+        int victory = GameState.NO_WIN;
+        int value = 0;
 
-        state = game.getCurrentState();
-        workspace = new AiWorkspace(game, state, 5);
-        workspace.explore(4);
-        nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
-        state.makeMove(nextMove);
+        for(int i = 0; i < 4; i++) {
+            //RawTerminal.renderGameState(state);
+            AiWorkspace workspace = new AiWorkspace(game, state, 5);
+            //workspace.chatty = true;
+            workspace.explore(4);
+            MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
+            value = workspace.getTreeRoot().getBestChild().getValue();
+            //System.out.println("value: " + value);
 
-        state = game.getCurrentState();
-        workspace = new AiWorkspace(game, state, 5);
-        workspace.explore(4);
-        nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
-        state.makeMove(nextMove);
+            victory = state.checkVictory();
+            if(victory != GameState.NO_WIN) {
+                break;
+            }
+            else {
+                state.makeMove(nextMove);
+            }
 
-        state = game.getCurrentState();
-        workspace = new AiWorkspace(game, state, 5);
-        workspace.explore(4);
-        nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
-        state.makeMove(nextMove);
+            state = game.getCurrentState();
+        }
 
-        state = game.getCurrentState();
-        workspace = new AiWorkspace(game, state, 5);
-        workspace.explore(4);
-        nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
-        state.makeMove(nextMove);
+        victory = state.checkVictory();
+        //RawTerminal.renderGameState(state);
 
-        state = game.getCurrentState();
-        workspace = new AiWorkspace(game, state, 5);
-        workspace.explore(4);
-        nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
-        state.makeMove(nextMove);
-
-        assert game.getCurrentState().checkVictory() == GameState.DEFENDER_WIN;
+        assert victory == GameState.DEFENDER_WIN;
     }
 
 }
