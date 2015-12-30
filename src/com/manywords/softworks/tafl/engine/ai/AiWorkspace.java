@@ -61,7 +61,7 @@ public class AiWorkspace extends Game {
 
             long start = System.currentTimeMillis();
             mStartingState = new GameTreeState(this, new GameState(mOriginalStartingState));
-            mStartingState.explore(depth, maxDepth, (short) -5000, (short) 5000, mThreadPool);
+            mStartingState.explore(depth, maxDepth, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool);
             long finish = System.currentTimeMillis();
 
             double timeTaken = (finish - start) / 1000d;
