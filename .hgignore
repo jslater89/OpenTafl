@@ -13,6 +13,7 @@ out*
 .idea/tasks.xml
 .idea/gradle.xml
 .idea/dictionaries/**xml
+.idea/vcs.xml
 
 **~
 **local.properties
