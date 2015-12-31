@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class MinimalGameTreeNode implements GameTreeNode {
-    public final GameTreeNode mParent;
+    public GameTreeNode mParent;
     public final int mDepth;
     public final MoveRecord mEnteringMove;
     public short mAlpha;
@@ -169,6 +169,10 @@ public class MinimalGameTreeNode implements GameTreeNode {
                 break;
             }
         }
+    }
+
+    public void setParent(GameTreeNode newParent) {
+        mParent = newParent;
     }
 
     public int countChildren() {

@@ -35,6 +35,8 @@ public interface GameTreeNode {
 
     public abstract void replaceChild(GameTreeNode oldNode, GameTreeNode newNode);
 
+    public abstract void setParent(GameTreeNode newParent);
+
     public abstract int countChildren();
 
     public abstract int getDepth();

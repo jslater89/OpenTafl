@@ -25,7 +25,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public static final int DEFENDER = -1;
     public static final int ATTACKER = 1;
 
-    public final GameTreeNode mParent;
+    public GameTreeNode mParent;
     public final int mDepth;
     public int mCurrentMaxDepth;
     public short mAlpha;
@@ -221,6 +221,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 break;
             }
         }
+    }
+
+    public void setParent(GameTreeNode newParent) {
+        mParent = newParent;
     }
 
     public MoveRecord getEnteringMove() {
@@ -497,9 +501,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
             mTaflmanMoveCache = null;
 
             // All moves explored; minify this state
-            MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
+            MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
             if (mParent != null) {
-                mParent.replaceChild(GameTreeState.this, smallChild);
+                mParent.replaceChild(GameTreeState.this, minifiedNode);
+            }
+            for(GameTreeNode branch : mBranches) {
+                branch.setParent(minifiedNode);
             }
         }
 
