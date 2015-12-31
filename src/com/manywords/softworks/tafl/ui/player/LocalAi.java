@@ -53,7 +53,7 @@ public class LocalAi implements Player {
             System.out.println("\t" + node.getEnteringMove());
         }
         System.out.println("End of best path scored " + bestMove.getValue());
-        System.out.println("Best path zobrist: " + bestMove.getZobrist());
+        //System.out.println("Best path zobrist: " + bestMove.getZobrist());
 
         return bestMove.getRootMove();
     }

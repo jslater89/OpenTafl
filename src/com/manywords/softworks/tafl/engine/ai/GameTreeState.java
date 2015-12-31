@@ -78,7 +78,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             return nextState;
         }
         else {
-            System.out.println("Bad move " + result);
+            //System.out.println("Bad move " + result);
             return null;
         }
     }
