@@ -7,7 +7,7 @@ import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
  */
 public class TranspositionTable {
     private static final int DISCARD_AFTER_PLIES = 10;
-    private static final int ENTRY_SIZE = 21;
+    private static final int ENTRY_SIZE = 32; // observed for a 64-bit JVM
     //  8 bytes overhead
     //  8 bytes zobrist
     //  2 bytes value
@@ -27,6 +27,7 @@ public class TranspositionTable {
     }
 
     private int mMaxSize = (1024 * 1024 * 500) / ENTRY_SIZE; // 500 mb, 20 bytes per entry
+    private int mRequestedSize = 0;
     private Entry[] mTranspositionTable;
 
     /**
@@ -34,6 +35,7 @@ public class TranspositionTable {
      * @param size Size of the table in megabytes.
      */
     public TranspositionTable(int size) {
+        mRequestedSize = size;
         mMaxSize = size * 1024 * 1024 / ENTRY_SIZE;
 
         mTranspositionTable = new Entry[mMaxSize];
@@ -43,7 +45,7 @@ public class TranspositionTable {
     }
 
     public int size() {
-        return mMaxSize;
+        return mRequestedSize;
     }
 
     public void putValue(long zobrist, short value, int searchedToDepth, int gameLength) {

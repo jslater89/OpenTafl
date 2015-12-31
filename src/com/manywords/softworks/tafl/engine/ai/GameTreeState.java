@@ -308,9 +308,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             // Put the value in tables
             workspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
-            if (mCurrentMaxDepth != overallMaxDepth) {
-                workspace.getDeepeningTable().putEntry(mDepth, getZobrist(), mValue);
-            }
 
             // Replace small child
             MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
@@ -408,17 +405,17 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     long o1Zobrist = updateZobristHash(mZobristHash, getBoard(), o1);
                     long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o2);
 
-                    short o1Entry = workspace.getDeepeningTable().getEntryDeeperThan(mDepth, o1Zobrist);
-                    short o2Entry = workspace.getDeepeningTable().getEntryDeeperThan(mDepth, o2Zobrist);
+                    short o1Entry = workspace.transpositionTable.getValue(o1Zobrist, mCurrentMaxDepth - mDepth, mGameLength);
+                    short o2Entry = workspace.transpositionTable.getValue(o2Zobrist, mCurrentMaxDepth - mDepth, mGameLength);
 
-                    // No deepening table entries? Sort the one with more captures first.
+                    // No transposition table entries? Sort the one with more captures first.
                     if(o1Entry == Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
                         if(o1CaptureCount > o2CaptureCount) return -1;
                         else if(o2CaptureCount > o1CaptureCount) return 1;
                         else return 0;
                     }
 
-                    // if one has a deepening table entry and the other doesn't,
+                    // if one has a transposition table entry and the other doesn't,
                     // put the one with the entry first.
                     if (o1Entry != Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
                         return -1;

@@ -4,7 +4,6 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
-import com.manywords.softworks.tafl.engine.ai.tables.DeepeningTable;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
 
 import java.text.DecimalFormat;
@@ -25,7 +24,6 @@ public class AiWorkspace extends Game {
     public long[] mBetaCutoffDistances;
 
     private AiThreadPool mThreadPool;
-    private DeepeningTable mDeepeningTable;
     private GameState mOriginalStartingState;
 
     public boolean chatty = false;
@@ -43,17 +41,12 @@ public class AiWorkspace extends Game {
         }
     }
 
-    public DeepeningTable getDeepeningTable() {
-        return mDeepeningTable;
-    }
-
     final int AVERAGE_BRANCHING = 50;
 
     public void explore(int maxDepth) {
         //mThreadPool.start();
 
         for (int depth = 1; depth <= maxDepth; depth++) {
-            mDeepeningTable = new DeepeningTable(maxDepth + 1);
             mAlphaCutoffs = new long[maxDepth];
             mAlphaCutoffDistances = new long[maxDepth];
             mBetaCutoffs = new long[maxDepth];
