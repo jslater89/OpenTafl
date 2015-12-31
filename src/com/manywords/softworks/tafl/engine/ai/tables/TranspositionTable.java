@@ -7,14 +7,15 @@ import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
  */
 public class TranspositionTable {
     private static final int DISCARD_AFTER_PLIES = 10;
-    private static final int ENTRY_SIZE = 32; // observed for a 64-bit JVM
-    //  8 bytes overhead
+    private static final int ENTRY_SIZE = 32;
+    // 16 bytes overhead
     //  8 bytes zobrist
     //  2 bytes value
     //  1 byte  depth
-    //+ 2 bytes age
+    //  2 bytes age
+    //+ 3 bytes to get to an 8-byte boundary
     //---------------
-    // 21 bytes total
+    // 32 bytes total
     public class Entry {
         public long zobrist;
         public short value;

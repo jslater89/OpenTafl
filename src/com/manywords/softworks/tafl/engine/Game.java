@@ -44,6 +44,8 @@ public class Game {
     }
 
     public final long[][] mZobristConstants;
+    public double mAverageBranchingFactor = 0;
+    public int mAverageBranchingFactorCount = 0;
     private UiCallback mCallback;
     private Rules mGameRules;
     private GameState mCurrentState;

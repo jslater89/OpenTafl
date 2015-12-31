@@ -58,21 +58,24 @@ public class AiWorkspace extends Game {
             long finish = System.currentTimeMillis();
 
             double timeTaken = (finish - start) / 1000d;
+
             int size = getGameTreeSize();
-
-            int branches = mStartingState.getBranches().size();
-            List<GameTreeNode> bestPath = mStartingState.getBestPath();
-            for (GameTreeNode node : bestPath) {
-                branches += node.getBranches().size();
-            }
-
             double statesPerSec = size / ((finish - start) / 1000d);
-            double observedBranching = (double) branches / (double) depth;
 
             if (chatty) {
-                System.out.println("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + statesPerSec + "/sec");
-                System.out.println("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(size, 1d / depth)));
+                System.out.println("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
             }
+        }
+
+        int nodes = getGameTreeSize();
+        int size = getTreeRoot().mBranches.size();
+        double observedBranching = ((mGame.mAverageBranchingFactor * mGame.mAverageBranchingFactorCount) + size) / (++mGame.mAverageBranchingFactorCount);
+        //System.out.println(size + " " + mGame.mAverageBranchingFactor + " " + mGame.mAverageBranchingFactorCount + " " + observedBranching);
+        mGame.mAverageBranchingFactorCount += 1;
+        mGame.mAverageBranchingFactor = observedBranching;
+
+        if(chatty) {
+            System.out.println("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / maxDepth)));
         }
     }
 
