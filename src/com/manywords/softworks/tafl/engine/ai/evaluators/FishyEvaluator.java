@@ -36,6 +36,7 @@ public class FishyEvaluator implements Evaluator {
         Board board = state.getBoard();
 
 
+        /*
         if(depth == 5 && Math.random() < 0.001) {
             debug = true;
         }
@@ -51,6 +52,7 @@ public class FishyEvaluator implements Evaluator {
 		if(depth == 1 && Math.random() < 0.1) {
 			debug = true;
 		}
+		*/
 
         int remainingDepth = maxDepth - depth;
 
