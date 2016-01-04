@@ -46,7 +46,7 @@ public abstract class Rules {
      * or group of squares?
      *
      * @param piece
-     * @param spaces
+     * @param space
      * @return
      */
     public abstract boolean canTaflmanMoveThrough(Board board, char piece, Coord space);
@@ -56,7 +56,7 @@ public abstract class Rules {
      * group of squares?
      *
      * @param piece
-     * @param spaces
+     * @param space
      * @return
      */
     public abstract boolean canTaflmanStopOn(Board board, char piece, Coord space);
