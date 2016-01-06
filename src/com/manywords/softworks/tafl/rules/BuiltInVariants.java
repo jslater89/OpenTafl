@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
+import com.manywords.softworks.tafl.rules.tawlbwrdd.Tawlbwrdd;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +17,8 @@ public class BuiltInVariants {
             Copenhagen.newCopenhagen11(),
             Copenhagen.newCopenhagen11RelaxedShieldwall(),
             Berserk.newBerserk11(),
-            Brandub.newBrandub7()
+            Brandub.newBrandub7(),
+            Tawlbwrdd.newTawlbwrdd11()
     );
 
     public static List<String> rulesDescriptions = Arrays.asList(
@@ -25,6 +27,7 @@ public class BuiltInVariants {
             "3. Copenhagen 11x11",
             "4. Copenhagen 11x11 (relaxed shieldwall variant)",
             "5. Berserk 11x11",
-            "6. Brandub 7x7"
+            "6. Brandub 7x7",
+            "7. Tawlbwrdd 11x11"
     );
 }
