@@ -1,5 +1,14 @@
 README
 
+OpenTafl is the old-fashioned computer implementation of the old-fashioned
+Norse boardgame.
+
+v0.1.3b (released 01/06/16):
+- Fix Windows 32-bit memory size arguments (32-bit Windows can manage only
+  about 1.5gb)
+- Add license and readme files
+- Add Tawlbwrdd, using the Bell layout given at Cyningstan.
+
 v0.1.2b (released 12/31/15):
 - Turn off evaluation function debug output.
 

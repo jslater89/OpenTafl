@@ -1,0 +1,159 @@
+Copyright Jay Slater, 2014-
+
+OpenTafl is licensed under the Stout Free-As-In-Beer License (http://softworks.many-words.com/the-free-as-in-beer-license), and is a product of Jay Slater and Many Words Softworks:
+
+Stout Free-As-In-Beer License, v0.1:
+
+1. Definitions
+
+	a. Licensor means the individuals or entities granting rights according
+	   to the terms of this license.
+	b. Licensee means the individuals or entities exercising rights granted
+	   by this license.
+	c. You means Licensee. Your is used with the corresponding meaning.
+	d. Application means the piece of software covered by this license,
+	   comprising the Source Code, any required Library or Libraries, and,
+	   potentially, any Binary or Binaries compiled from the Source Code.
+	e. Compilation means the process of creating a standalone, executable
+	   version of the Application, or any packaged, monolithic version of
+	   the Application. Compile is used with the corresponding meaning.
+	f. Runtime means the time at which the Application is run, whether by
+	   executing Compiled Binaries, or by interpreting a copy of the Source
+	   Code on the fly. Run is used with the corresponding meaning.
+	g. Source Code means all uncompiled source files required to compile or
+	   run the Application.
+	h. Library means any pre-compiled component required during Compilation
+	   or at Runtime.
+	i. Binary means any standalone executable or packaged version of the
+	   Application, created by Compilation.
+	j. Sell means require that money be transferred to You in exchange for
+	   something, such as the Source Code or Binaries.
+	k. Software means any Compiled or interpreted piece of software not
+	   covered by this license.
+
+2. License grant
+
+	a. Subject to the conditions of this license, the Licensor grants You a
+	   worldwide, royalty-free, non-sublicenseable, irrevocable, non-
+	   exclusive license to:
+		i. Reproduce, copy, and redistribute copies of the Source Code
+		   and any compiled Binaries.
+		ii. Modify the Source Code to create derivative works.
+
+3. Conditions
+
+Your exercise of the rights granted by this license is subject to the following
+conditions.
+
+	a. Attribution
+		i. If You create any Software derived from or including Source
+		   Code or Binaries covered by this license, You must:
+			1. Retain identification of the creators of this
+			   Application, if present.
+			2. Provide a URI or hyperlink to the original,
+			   unmodified version of this Application.
+			3. Provide a copy of this license, or a URI or
+			   hyperlink to this license.
+			4. Indicate if You modified this Application, and
+			   retain any notice included with this Application
+			   under this term.
+
+	b. Licensing
+		i. Any Software derived from or including Source Code or
+		   Binaries covered by this license must be licensed under:
+			1. This or any future version of the Stout
+			   Free-As-In-Beer License;
+			2. A license which does not contradict any terms of
+			   this license.
+
+	c. Sale of the Application and Source Code Availability
+		i. The Source Code must be made available in an electronic
+		   format to any individual, individuals, entity, or entities
+		   that request access to the Source Code under the terms of
+		   this license.
+		ii. You may not Sell the Source Code.
+		iii. You may accept donations to cover the cost of transmitting
+		     the Source Code electronically, provided that the Source
+		     Code remains available free of charge. 
+		iv. You may Sell physical media containing the Source Code,
+		    provided that the Source Code remains available free of
+		    charge in an electronic format.
+		v. You may Sell Binaries, provided that the Source Code remains
+		   available free of charge in an electronic format.
+
+	e. Libraries
+		i. Libraries required to Compile or Run this Application must
+		   be available free of charge, unless:
+			1. An alternative library is available free of charge,
+			   and
+			2. A URI or hyperlink to a free-of-charge alternative
+			   is included with the Source Code.
+
+4. Disclaimer of Warranties and Limitation of Liability
+
+	a. Unless separately undertaken by the Licensor, the Licensor offers
+	   this Application as-is, without any representation or warranty of
+	   any kind, whether express, implied, statutory, or other.
+	b. In no event (including, without limitation, negligence) will the
+	   Licensor be liable to You for any costs, losses, damages, or
+	   expenses arising from the use of this Application.
+	c. The disclaimer of warranties and limitation of liability provided
+	   above shall be interpreted in a manner that, to the extent possible,
+	   most closely approximates an absolute disclaimer and waiver of all
+	   liability.
+
+5. Term
+
+	a. This license applies for the term of the copyright and similar
+	   rights licensed here. If You fail to comply with this license, 
+	   then Your rights under this license terminate automatically.
+		i. Sections 4, 5, and 6 survive termination of this license.
+
+6. Other Terms and Conditions
+
+	a. To the extent possible, if any provision of this license is deemed
+	   unenforceable, it shall be automatically reformed to the minimum
+	   extent necessary to make it enforceable. If the provision cannot be
+	   reformed, it shall be severed from this license without affecting
+	   the enforceability of the remaining terms and conditions.
+	b. No term or condition of this license will be waived and no failure
+	   to comply consented to unless expressly agreed to by the Licensor.
+
+##############################################################
+
+JLine is provided under the BSD license:
+
+Copyright (c) 2002-2006, Marc Prud'hommeaux <mwp1@cornell.edu>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the following
+conditions are met:
+
+Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with
+the distribution.
+
+Neither the name of JLine nor the names of its contributors
+may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGE.
+
+##############################################################
