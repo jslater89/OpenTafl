@@ -24,8 +24,8 @@ public class GameState {
             mCurrentSide = mDefenders;
         }
 
-        mTaflmanMoveCache = new TaflmanMoveCache();
         mZobristHash = zobristHash();
+        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
     }
 
     public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist) {
@@ -44,7 +44,7 @@ public class GameState {
         mExitingMove = copyState.getExitingMove();
         mEnteringMove = copyState.getEnteringMove();
         mBerserkingTaflman = copyState.getBerserkingTaflman();
-        mTaflmanMoveCache = new TaflmanMoveCache();
+        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getGameRules().howManyAttackers(), (byte) mGame.getGameRules().howManyDefenders());
     }
 
     public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist, boolean autoChangeSides) {
@@ -69,7 +69,7 @@ public class GameState {
             mZobristHash = updateZobristHash(previousState.mZobristHash, previousState.getBoard(), previousState.getExitingMove());
         }
 
-        mTaflmanMoveCache = new TaflmanMoveCache();
+        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getGameRules().howManyAttackers(), (byte) mGame.getGameRules().howManyDefenders());
     }
 
     public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, char berserkingTaflman) {
@@ -173,42 +173,42 @@ public class GameState {
 
     public void setCachedAllowableMovesForTaflman(char taflman, List<Coord> moves) {
         if (mTaflmanMoveCache == null) return;
-        mTaflmanMoveCache.setCachedAllowableMovesForTaflman(taflman, moves);
+        mTaflmanMoveCache.setCachedAllowableMovesForTaflman(mZobristHash, taflman, moves);
     }
 
     public void setCachedAllowableDestinationsForTaflman(char taflman, List<Coord> moves) {
         if (mTaflmanMoveCache == null) return;
-        mTaflmanMoveCache.setCachedAllowableDestinationsForTaflman(taflman, moves);
+        mTaflmanMoveCache.setCachedAllowableDestinationsForTaflman(mZobristHash, taflman, moves);
     }
 
     public void setCachedCapturingMovesForTaflman(char taflman, List<Coord> moves) {
         if (mTaflmanMoveCache == null) return;
-        mTaflmanMoveCache.setCachedCapturingMovesForTaflman(taflman, moves);
+        mTaflmanMoveCache.setCachedCapturingMovesForTaflman(mZobristHash, taflman, moves);
     }
 
-    public void setCachedReachableSpacesForTaflman(char taflman, Set<Coord> moves) {
+    public void setCachedReachableSpacesForTaflman(char taflman, List<Coord> moves) {
         if (mTaflmanMoveCache == null) return;
-        mTaflmanMoveCache.setCachedReachableSpacesForTaflman(taflman, moves);
+        mTaflmanMoveCache.setCachedReachableSpacesForTaflman(mZobristHash, taflman, moves);
     }
 
     public List<Coord> getCachedAllowableMovesForTaflman(char taflman) {
         if (mTaflmanMoveCache == null) return null;
-        return mTaflmanMoveCache.getCachedAllowableMovesForTaflman(taflman);
+        return mTaflmanMoveCache.getCachedAllowableMovesForTaflman(mZobristHash, taflman);
     }
 
     public List<Coord> getCachedAllowableDestinationsForTaflman(char taflman) {
         if (mTaflmanMoveCache == null) return null;
-        return mTaflmanMoveCache.getCachedAllowableDestinationsForTaflman(taflman);
+        return mTaflmanMoveCache.getCachedAllowableDestinationsForTaflman(mZobristHash, taflman);
     }
 
     public List<Coord> getCachedCapturingMovesForTaflman(char taflman) {
         if (mTaflmanMoveCache == null) return null;
-        return mTaflmanMoveCache.getCachedCapturingMovesForTaflman(taflman);
+        return mTaflmanMoveCache.getCachedCapturingMovesForTaflman(mZobristHash, taflman);
     }
 
-    public Set<Coord> getCachedReachableSpacesForTaflman(char taflman) {
+    public List<Coord> getCachedReachableSpacesForTaflman(char taflman) {
         if (mTaflmanMoveCache == null) return null;
-        return mTaflmanMoveCache.getCachedReachableSpacesForTaflman(taflman);
+        return mTaflmanMoveCache.getCachedReachableSpacesForTaflman(mZobristHash, taflman);
     }
 
     public static final int GOOD_MOVE = 0;
@@ -397,7 +397,7 @@ public class GameState {
             // reach an edge. (He must also be allowed to move, but
             // if he can reach an edge from not an edge, he can clearly
             // move.)
-            Set<Coord> kingReachable = Taflman.getReachableSpaces(this, king, false);
+            List<Coord> kingReachable = Taflman.getReachableSpaces(this, king, false);
 
             boolean edgeReachable = false;
             for (Coord space : kingReachable) {

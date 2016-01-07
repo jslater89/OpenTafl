@@ -1,7 +1,7 @@
 package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.engine.TaflmanCoordMap;
+import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
 
 import java.util.HashMap;
 import java.util.List;

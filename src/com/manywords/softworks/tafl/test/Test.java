@@ -7,12 +7,12 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
+        tests.add(new StrongKingCaptureTest());
         tests.add(new AIMatchingZobristTest());
         tests.add(new AICertainKingCaptureTest());
         tests.add(new AITwoCornerEscapeTest());
         tests.add(new AITwoEdgeEscapeTest());
         tests.add(new AIMoveRepetitionTest());
-        tests.add(new StrongKingCaptureTest());
         tests.add(new DoubleCaptureTest());
         tests.add(new CaptureTest());
         tests.add(new EdgeVictoryTest());

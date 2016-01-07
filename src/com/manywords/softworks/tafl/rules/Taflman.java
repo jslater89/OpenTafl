@@ -333,12 +333,12 @@ public class Taflman {
         return false;
     }
 
-    public static Set<Coord> getReachableSpaces(GameState state, char taflman) {
+    public static List<Coord> getReachableSpaces(GameState state, char taflman) {
         return getReachableSpaces(state, taflman, true);
     }
 
-    public static Set<Coord> getReachableSpaces(GameState state, char taflman, boolean withJump) {
-        Set<Coord> cachedMoves = state.getCachedReachableSpacesForTaflman(taflman);
+    public static List<Coord> getReachableSpaces(GameState state, char taflman, boolean withJump) {
+        List<Coord> cachedMoves = state.getCachedReachableSpacesForTaflman(taflman);
         if (cachedMoves != null) return cachedMoves;
 
         // For sanity in surrounding checking, a piece can always reach the space it's already on
@@ -389,8 +389,9 @@ public class Taflman {
             if (temporarySpaces.size() == 0) break;
         }
 
-        state.setCachedReachableSpacesForTaflman(taflman, reachableSpaces);
-        return reachableSpaces;
+        List<Coord> spaces = new ArrayList<Coord>(reachableSpaces);
+        state.setCachedReachableSpacesForTaflman(taflman, spaces);
+        return spaces;
     }
 
     // Returns null, or a list of spaces captured
