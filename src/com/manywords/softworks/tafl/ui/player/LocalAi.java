@@ -16,7 +16,7 @@ public class LocalAi implements Player {
     public MoveRecord getNextMove(RawTerminal ui, Game game, int searchDepth) {
         System.out.println("Waiting for computer move.");
 
-        AiWorkspace workspace = new AiWorkspace(game, game.getCurrentState(), 500);
+        AiWorkspace workspace = new AiWorkspace(game, game.getCurrentState(), 50);
         workspace.chatty = true;
 
         workspace.explore(searchDepth);
