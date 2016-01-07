@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.TaflmanCoordMap;
 
 import java.util.*;
 
@@ -35,17 +36,17 @@ public abstract class BoardImpl extends Board {
 
         mCenterSpace = board.getCenterSpace();
         mCorners = board.getCorners();
-        if (board.getCachedTaflmanLocations() == null) {
+        if (board.getCachedTaflmanLocations() == null && getState() != null) {
             initializeTaflmanLocations();
-        } else {
-            mCachedTaflmanLocations = new HashMap<Character, Coord>(board.getCachedTaflmanLocations());
+        } else if(board.getCachedTaflmanLocations() != null){
+            mCachedTaflmanLocations = new TaflmanCoordMap(board.getCachedTaflmanLocations());
         }
     }
 
     // [y][x]
     private char[] mBoardArray;
     //TODO: privatize
-    public Map<Character, Coord> mCachedTaflmanLocations = null;
+    public TaflmanCoordMap mCachedTaflmanLocations = null;
     private Coord mCenterSpace;
     private List<Coord> mCorners;
     private Rules mRules;
@@ -65,16 +66,14 @@ public abstract class BoardImpl extends Board {
     }
 
     private void initializeTaflmanLocations() {
-        mCachedTaflmanLocations = new HashMap<Character, Coord>();
+        byte defenderCount = (byte) getState().mGame.getGameRules().howManyDefenders();
+        byte attackerCount = (byte) getState().mGame.getGameRules().howManyAttackers();
+        mCachedTaflmanLocations = new TaflmanCoordMap(attackerCount, defenderCount);
         for (int i = 0; i < mBoardArray.length; i++) {
             if (mBoardArray[i] != Taflman.EMPTY) {
-                mCachedTaflmanLocations.put(mBoardArray[i], getCoordForIndex(i));
+                mCachedTaflmanLocations.put(mBoardArray[i], Coord.getCoordForIndex(i));
             }
         }
-    }
-
-    public Coord getCoordForIndex(int i) {
-        return Coord.get(i % getBoardDimension(), i / getBoardDimension());
     }
 
     public int getIndex(Coord c) {
@@ -92,7 +91,7 @@ public abstract class BoardImpl extends Board {
     public List<Character> getTaflmenWithMask(char mask, char value) {
         List<Character> taflmen = new ArrayList<Character>();
 
-        for(char taflman : mCachedTaflmanLocations.keySet()) {
+        for(char taflman : mCachedTaflmanLocations.getTaflmen()) {
             if(taflman != Taflman.EMPTY && (taflman & mask) == value) {
                 taflmen.add(taflman);
             }
@@ -237,7 +236,7 @@ public abstract class BoardImpl extends Board {
     }
 
     @Override
-    public Map<Character, Coord> getCachedTaflmanLocations() {
+    public TaflmanCoordMap getCachedTaflmanLocations() {
         return mCachedTaflmanLocations;
     }
 

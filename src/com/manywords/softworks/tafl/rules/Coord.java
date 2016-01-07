@@ -19,6 +19,7 @@ public class Coord {
     }
 
     private static Coord[][] mCoords;
+    private static int mDimension;
     private static Map<Coord, List<Coord>> mAdjacentCoords;
     private static Map<Coord, List<Coord>> mDiagonalCoords;
     private static Map<Coord, List<List<Coord>>> mRankAndFileCoords;
@@ -29,6 +30,7 @@ public class Coord {
     private static List<Coord> mAllEdges;
 
     public static void initialize(int dimension) {
+        mDimension = dimension;
         mCoords = new Coord[dimension][dimension];
 
         for (int y = 0; y < dimension; y++) {
@@ -170,6 +172,14 @@ public class Coord {
                 mRankAndFileCoords.put(space, rankAndFileCoords);
             }
         }
+    }
+
+    public static Coord getCoordForIndex(int i) {
+        return Coord.get(i % mDimension, i / mDimension);
+    }
+
+    public static int getIndex(Coord c) {
+        return c.y * mDimension + c.x;
     }
 
     public static List<Coord> getAdjacentSpace(Coord c) {

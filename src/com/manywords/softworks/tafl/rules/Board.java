@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.TaflmanCoordMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,7 @@ public abstract class Board {
 
     public abstract Coord findTaflmanSpace(char taflman);
 
-    public abstract Map<Character, Coord> getCachedTaflmanLocations();
+    public abstract TaflmanCoordMap getCachedTaflmanLocations();
 
     public abstract List<Character> getTaflmenWithMask(char mask, char value);
 
