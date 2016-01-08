@@ -549,7 +549,6 @@ public class RawTerminal implements UiCallback {
     }
 
     public static String getGameStateString(GameState state) {
-        char[] board = state.getBoard().getBoard();
         List<Coord> specialSpaces = new ArrayList<Coord>();
         specialSpaces.add(state.getBoard().getCenterSpace());
 

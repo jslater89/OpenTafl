@@ -3,6 +3,8 @@ package com.manywords.softworks.tafl.engine.collections;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 
+import java.util.List;
+
 /**
  * Created by jay on 1/7/16.
  */
@@ -57,6 +59,17 @@ public class TaflmanCoordMap {
         }
     }
 
+    public char getTaflman(Coord c) {
+        return getTaflman(Coord.getIndex(c));
+    }
+
+    public char getTaflman(int c) {
+        for(int i = 0; i < mCoords.length; i++) {
+            if(mCoords[i] == c) return mTaflmen[i];
+        }
+        return Taflman.EMPTY;
+    }
+
     public void remove(char taflman) {
         char taflmanSide = Taflman.getPackedSide(taflman);
         byte taflmanId = Taflman.getPackedId(taflman);
@@ -82,4 +95,5 @@ public class TaflmanCoordMap {
     public char[] getTaflmen() {
         return mTaflmen;
     }
+    public List<Coord> getOccupiedSpaces() { return null; }
 }

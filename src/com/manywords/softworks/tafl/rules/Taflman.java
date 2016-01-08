@@ -411,7 +411,6 @@ public class Taflman {
             List<Coord> jumps = getJumpsFrom(state, taflman, getCurrentSpace(state, taflman));
 
             Coord start = getCurrentSpace(state, taflman);
-            getBoard(state).setOccupier(start, EMPTY);
             getBoard(state).setOccupier(destination, taflman);
             getSide(taflman).onTaflmanMoved(taflman, destination);
 
@@ -627,7 +626,7 @@ public class Taflman {
      * @return
      */
     public static boolean capturedBy(GameState state, char taflman, char capturer, Coord capturingMove, boolean byJump) {
-        getBoard(state).setOccupier(Taflman.getCurrentSpace(state, taflman), EMPTY);
+        getBoard(state).unsetOccupier(taflman);
         return true;
     }
 
