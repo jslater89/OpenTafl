@@ -41,9 +41,13 @@ public abstract class Board {
     public abstract List<Character> getTaflmenWithMask(char mask, char value);
 
     /**
-     * Set the occupier of a certain coordinate to the given taflman.
+     * Set the occupier of a certain coordinate to the given, non-empty taflman.
      */
     public abstract void setOccupier(Coord space, char taflman);
+
+    /**
+     * Remove a taflman from the game.
+     */
 
     /**
      * Get the square at the center of the board.

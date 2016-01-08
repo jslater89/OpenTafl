@@ -215,14 +215,12 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public void setOccupier(Coord space, char taflman) {
-        char originalTaflman = mBoardArray[getIndex(space)];
-        mBoardArray[getIndex(space)] = taflman;
-        if(taflman != Taflman.EMPTY) {
-            mCachedTaflmanLocations.put(taflman, space);
-        }
-        else {
-            mCachedTaflmanLocations.remove(originalTaflman);
-        }
+        mCachedTaflmanLocations.put(taflman, space);
+    }
+
+    @Override
+    public void unsetOccupier(Coord space, char taflman) {
+        mCachedTaflmanLocations.remove(taflman);
     }
 
     @Override
