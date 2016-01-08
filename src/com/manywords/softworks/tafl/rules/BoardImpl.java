@@ -8,11 +8,6 @@ import java.util.*;
 public abstract class BoardImpl extends Board {
     public BoardImpl() {
         Coord.initialize(getBoardDimension());
-        mBoardArray = new char[getBoardDimension() * getBoardDimension()];
-
-        for (int y = 0; y < getBoardDimension(); y++) {
-            mBoardArray[y] = 0;
-        }
 
         int center = (getBoardDimension() - 1) / 2;
         mCenterSpace = Coord.get(center, center);
@@ -30,23 +25,18 @@ public abstract class BoardImpl extends Board {
     }
 
     public BoardImpl(Board board) {
-        mBoardArray = new char[getBoardDimension() * getBoardDimension()];
-
-        System.arraycopy(board.getBoard(), 0, mBoardArray, 0, getBoardDimension() * getBoardDimension());
-
         mCenterSpace = board.getCenterSpace();
         mCorners = board.getCorners();
         if (board.getCachedTaflmanLocations() == null && getState() != null) {
-            initializeTaflmanLocations();
+            setupTaflmen(getState().getAttackers(), getState().getDefenders());
         } else if(board.getCachedTaflmanLocations() != null){
             mCachedTaflmanLocations = new TaflmanCoordMap(board.getCachedTaflmanLocations());
         }
     }
 
     // [y][x]
-    private char[] mBoardArray;
     //TODO: privatize
-    public TaflmanCoordMap mCachedTaflmanLocations = null;
+    private TaflmanCoordMap mCachedTaflmanLocations = null;
     private Coord mCenterSpace;
     private List<Coord> mCorners;
     private Rules mRules;
@@ -54,25 +44,20 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public void setupTaflmen(Side attackers, Side defenders) {
-        for (Side.TaflmanHolder taflman : attackers.getStartingTaflmen()) {
-            mBoardArray[getIndex(taflman.coord)] = taflman.packed;
-        }
-
-        for (Side.TaflmanHolder taflman : defenders.getStartingTaflmen()) {
-            mBoardArray[getIndex(taflman.coord)] = taflman.packed;
-        }
-
-        initializeTaflmanLocations();
+        initializeTaflmanLocations(attackers, defenders);
     }
 
-    private void initializeTaflmanLocations() {
+    private void initializeTaflmanLocations(Side attackers, Side defenders) {
         byte defenderCount = (byte) getState().mGame.getGameRules().howManyDefenders();
         byte attackerCount = (byte) getState().mGame.getGameRules().howManyAttackers();
         mCachedTaflmanLocations = new TaflmanCoordMap(attackerCount, defenderCount);
-        for (int i = 0; i < mBoardArray.length; i++) {
-            if (mBoardArray[i] != Taflman.EMPTY) {
-                mCachedTaflmanLocations.put(mBoardArray[i], Coord.getCoordForIndex(i));
-            }
+
+        for(Side.TaflmanHolder t : attackers.getStartingTaflmen()) {
+            mCachedTaflmanLocations.put(t.packed, t.coord);
+        }
+
+        for(Side.TaflmanHolder t : defenders.getStartingTaflmen()) {
+            mCachedTaflmanLocations.put(t.packed, t.coord);
         }
     }
 
@@ -98,11 +83,6 @@ public abstract class BoardImpl extends Board {
         }
 
         return taflmen;
-    }
-
-    @Override
-    public char[] getBoard() {
-        return mBoardArray;
     }
 
     @Override
@@ -215,11 +195,12 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public void setOccupier(Coord space, char taflman) {
+        if(taflman == Taflman.EMPTY) throw new IllegalArgumentException("Must be called with nonempty taflman");
         mCachedTaflmanLocations.put(taflman, space);
     }
 
     @Override
-    public void unsetOccupier(Coord space, char taflman) {
+    public void unsetOccupier(char taflman) {
         mCachedTaflmanLocations.remove(taflman);
     }
 
@@ -230,7 +211,7 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public char getOccupier(Coord coord) {
-        return mBoardArray[getIndex(coord)];
+        return mCachedTaflmanLocations.getTaflman(coord);
     }
 
     @Override

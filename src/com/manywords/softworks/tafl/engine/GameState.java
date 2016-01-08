@@ -456,14 +456,12 @@ public class GameState {
 
     public long zobristHash() {
         int boardSquares = getBoard().getBoardDimension() * getBoard().getBoardDimension();
-        char[] boardArray = getBoard().getBoard();
-        long hash = 0;
-        for (int i = 0; i < boardSquares; i++) {
-            if (boardArray[i] != Taflman.EMPTY) {
-                int typeIndex = getZobristTypeIndex(boardArray[i]);
 
-                hash = hash ^ mGame.mZobristConstants[i][typeIndex];
-            }
+        long hash = 0;
+        for (char taflman : getBoard().getCachedTaflmanLocations().getTaflmen()) {
+            int typeIndex = getZobristTypeIndex(taflman);
+            int coordIndex = Coord.getIndex(getBoard().findTaflmanSpace(taflman));
+            hash = hash ^ mGame.mZobristConstants[coordIndex][typeIndex];
         }
 
         if(hash == 0) hash = 1;

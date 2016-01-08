@@ -14,12 +14,6 @@ public abstract class Board {
      */
     public abstract void setupTaflmen(Side attackers, Side defenders);
 
-    /**
-     * Get the board's backing array.
-     *
-     * @return
-     */
-    public abstract char[] getBoard();
     public abstract int getIndex(Coord c);
     public abstract int getIndex(int x, int y);
 
@@ -48,6 +42,7 @@ public abstract class Board {
     /**
      * Remove a taflman from the game.
      */
+    public abstract void unsetOccupier(char taflman);
 
     /**
      * Get the square at the center of the board.
