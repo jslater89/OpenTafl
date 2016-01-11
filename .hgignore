@@ -15,5 +15,8 @@ out*
 .idea/dictionaries/**xml
 .idea/vcs.xml
 
+package/README.txt
+package/LICENSE.txt
+
 **~
 **local.properties

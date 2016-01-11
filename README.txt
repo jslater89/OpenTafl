@@ -12,7 +12,7 @@ Future features will include network play and support for third-party AI
 engines.
 
 v0.1.5b (released 01/11/16):
-- Memory usage reduced to about 1/3 of 0.1.4b.
+- Memory usage reduced to about 1/3 of 0.1.4b
 - Added readme and license file
 
 v0.1.4b (released 01/07/16):
