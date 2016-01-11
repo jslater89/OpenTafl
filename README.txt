@@ -1,7 +1,19 @@
 README
 
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
-Norse boardgame.
+Norse boardgame. At present, it supports local play against another human
+and an AI.
+
+The AI is capable of playing Brandub to search depth 6 relatively easily,
+and of playing it to depth 7 on a fast computer if you let it take some
+time to think.
+
+Future features will include network play and support for third-party AI
+engines.
+
+v0.1.5b (released 01/11/16):
+- Memory usage reduced to about 1/3 of 0.1.4b.
+- Added readme and license file
 
 v0.1.4b (released 01/07/16):
 - Serious memory optimizations, which will nevertheless need further work
