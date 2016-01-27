@@ -1,0 +1,277 @@
+OpenTafl Notation
+
+Builds in part on the work of Damian Walker at http://tafl.cyningstan.com/.
+
+Components in [] are optional. Components in <> are required. Strings inside quotation
+marks are included literally, without the quotes. Components suffixed with ... repeat
+as required. Strings outside of brackets or quotation marks are explanations. In
+multi-line definitions, lines preceded by # are comments, and are not part of the record
+being defined.
+
+1. Positional Records
+
+	<"/"><<row-record><"/">>...
+
+	row-record: [empty-space-count][taflman-symbol]
+	empty-space-count: count of empty spaces since row start or last taflman.
+	taflman-symbol: one of the following strings, defenders uppercase, attackers
+	lowercase.
+		"k": king
+		"n": knight (berserk)
+		"c": commander (berserk)
+		"t": taflman
+
+Examples:
+
+Brandub starting position:
+/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/
+
+Tawlbwrdd starting position (Bell layout):
+/4ttt4/4t1t4/5t5/5T5/tt2TTT2tt/t1tTTKTTt1t/tt2TTT2tt/5T5/5t5/4t1t4/4ttt4/
+
+Copenhagen or Fetlar diamond starting position:
+/3ttttt3/5t5/11/t4T4t/t3TTT3t/tt1TTKTT1tt/t3TTT3t/t4T4t/11/5t5/3ttttt3/
+
+2. Move Records
+
+Spaces are given in a form of algebraic notation, starting at "a" and "1" and using
+as many letters and numbers as required to capture the size of the board. No letters
+or numbers are skipped. Letters should be lower-case.
+
+[taflman-symbol]<starting-space><move-type><ending-space>[capture-record][info-symbol]
+
+OR
+
+<resignation-symbol>
+
+	taflman-symbol: see Positional Records definition. Use for special pieces only.
+	starting-space: the space the piece originated on.
+	move-type:
+		"-": regular move
+		"^": jump (berserk)
+		"=": berserk move (berserk)
+	ending-space: the space the piece ended on.
+	capture-record: 
+		[<"x"><capture-location>[<"/"><capture-location>]...]
+	capture-location:
+		[taflman-symbol]<captured-space>
+		Use taflman-symbol for special pieces only.
+	info-symbol:
+		"+": king vulnerable to capture.
+		"-": king has at least one route to escape.
+		"++": king captured, game ends.
+		"--": king escapes, game ends.
+	resignation-symbol: "---"
+
+Examples:
+
+Taflman moves:
+e5-e8
+
+Taflman moves and captures:
+e5-e8xe9
+
+Attacking side commander jumps:
+ce6^e8
+
+Defending side knight jumps, capturing jumped taflman and three destination-adjacent
+taflmen:
+Ne6^e8xe7/e9/f8/d8
+
+Defending side knight makes berserk move:
+Ne8=e4xe3
+
+King moves to a position which threatens escape:
+Ke5-e1-
+
+King escapes:
+Ke1-a1--
+
+King may be captured next turn:
+a3-e3+
+
+King captured:
+e3-e4++
+
+3. Rules Records
+
+Rules records describe the rules of a given game. The rules record below is broken into
+multiple lines; multiple lines are permitted for human readability, but machine-to-machine
+uses are encouraged to be single-line. No rule entry may be split into multiple lines.
+The board size entry must come first, and the starting position must come last. Ordering
+of rule entries in between doesn't matter.
+
+Explanatory notes for each rule entry are given below the definition, along with default
+values. Rule entries may be left out if unnecessary.
+
+The explanatory notes inside the specification are not part of the specification, and
+are present only for organizational purposes.
+
+# The rules record starts with the board size record.
+<board-size>
+
+# These rules concern general rules of the game.
+[<"esc:"><escape-type>] [<"surf:"><yes-no>] [<"atkf:"><yes-no>] [<"cenhe:"><yes-no>]
+
+# These rules concern piece strengths and movement types.
+[<"ka:"><yes-no>] [<"ks:"><yes-no>] [<"kj:"><jump-type>]
+[<"nj:"><jump-type>] [<"cj:"><jump-type>]
+
+# These rules concern special spaces on the board.
+[<"cor:"><space-list>] [<"cen:"><space-list>]
+[<"afor:"><space-list>] [<"dfor:"><space-list>]
+[<"corh:"><piece-type-list>] [<"cenh:"><piece-type-list>]
+[<"aforh:"><piece-type-list>] [<"dforh:"><piece-type-list>]
+[<"corp:"><piece-type-list>] [<"cenp:"><piece-type-list>]
+[<"aforp:"><piece-type-list>] [<"dforp:"><piece-type-list>]
+[<"cors:"><piece-type-list>] [<"cens:"><piece-type-list>]
+[<"afors:"><piece-type-list>] [<"dfors:"><piece-type-list>]
+
+# These rules concern shieldwall and edge fort formations.
+[<"sw:"><shieldwall-mode>] [<"swf:"><yes-no>] [<"efe:"><yes-no>]
+
+# These rules concern berserk mode.
+[<"ber:"><berserk-mode>]
+
+# The rules record ends with the starting position entry.
+<starting-position>
+
+	board-size: <"dim:"><size>
+		board size is the length of the side of the board.
+	escape-type:
+		"c": corner
+		"e": edge
+	yes-no:
+		"y": yes
+		"n": no
+	jump-type:
+		"n": no jumps
+		"r": restricted jumps: only to center, corners, or friendly fortresses
+		"j": jump over enemy pieces: no capturing
+		"c": jump over enemy pieces: capturing
+	space-list:
+		<corner-space>[<","><corner-space>]
+	piece-type-list:
+		<taflman-symbol>[<","><taflman-symbol>]
+	shieldwall-mode:
+		"n": no shieldwall capture
+		"w": weak shieldwalls, corners may not close a shieldwall position
+		"s": strong shieldwalls, corners may close a shieldwall position
+	berserk-mode:
+		"n": no berserk moves allowed
+		"c": berserking piece must capture if available
+		"m": berserking piece must move
+	starting-position: <"start:"><position-record>
+		The value of the starting position rules entry is the positional record
+		corresponding to the start position.
+
+Explanatory notes:
+	board-size: 
+		must be present.
+	esc:
+		(escape) defaults to "c" (corner escape)
+	surf: 
+		(surrounding fatal) if a side is surrounded entirely by pieces from the other
+		side, should that side lose? Defaults to "y" (yes).
+	atkf: 
+		(attackers first) should the attacking side go first? Defaults to "y" (yes).
+		If "n", the defenders move first.
+	cenhe:
+		(center hostile when empty) does the center space become hostile to defenders
+		when not occupied by defenders? Defaults to "y" (yes).
+	ka: 
+		(king armed) does the king participate in captures? Defaults to "y" (yes).
+	ks: 
+		(king strong) does the king need to be surrounded on four sides to be captured? 		Defaults to "y" (yes). If "n", the king need only be surrounded on two sides.
+	kj: 
+		(king jump) can the king jump? Defaults to "n" (no).
+	nj: 
+		(knight jump) can the knight jump? Defaults to "c" (capturing jumps).
+	cj: 
+		(commander jump) can the commander jump? Defaults to "j" (non-capturing jumps).
+	cor: 
+		(corner spaces) a list of spaces to treat as corner spaces, useful for e.g. alea
+		evangelii with larger corner forts. Defaults to "". If empty, only the four 
+		physical corner spaces will be treated as corners.
+	cen: 
+		(center spaces) a list of spaces to treat as the center space. Defaults to "".
+		If empty, only the physical center space will be treated as the center.
+	afor: 
+		(attacker fortresses) a list of spaces to be treated as attacker fortresses.
+		Defaults to "". If empty, no spaces will be treated as fortresses.
+	dfor: 
+		(defender fortresses) as attacker fortresses.
+	corh:
+		(corner hostile to...) a list of piece types to which the corner spaces are
+		hostile. Defaults to "tcnkTCNK" (all pieces).
+	cenh:
+		as corh. Defaults to "tcnk" (all attacking pieces).
+	aforh:
+		as corh. Defaults to "TCNK" (all defending pieces).
+	dforh:
+		as corh. Defaults to "tcnk" (all attacking pieces).
+	corp:
+		(corner passable by...) a list of piece types which can move through the corner
+		spaces. Defaults to "K" (king only).
+	cenp:
+		as corp. Defaults to "K" (king only).
+	aforp:
+		as corp. Defaults to "tcnkTCNK" (all pieces).
+	dforp:
+		as corp. Defaults to "TCNK" (all defending pieces).
+	cors:
+		(can stop on corner...) a list of piece types which can stop on the corner
+		spaces. Defaults to "K" (king only).
+	cens:
+		as cors. Defaults to "K" (king only).
+	afors:
+		as cors. Defaults to "tcnkTCNK" (all pieces).
+	dfors:
+		as cors. Defaults to "TCNK" (all defending pieces).
+	sw:
+		(shieldwall mode) Defaults to "n" (none).
+	swf:
+		(shieldwall flanking required) May a shieldwall capture only be made by a piece
+		moving to close one of its flanks (that is, moving to the edge?) Defaults to "y"
+		(yes). If "n", any move that results in a closed shieldwall position against an
+		edge will capture the surrounded pieces.
+	efe:
+		(edge fort escape) Does the king's side win if he is surrounded against the edge
+		of the board by friendly pieces, with at least one move available, and with no
+		enemy pieces inside the fort? Defaults to "n" (no).
+	ber:
+		(berserk mode) Defaults to "n" (none).
+	starting-position:
+		must be present.
+
+Examples:
+
+Fetlar:
+11x11, defenders go first, all others as default.
+
+dim:11 atkf:n start:/3ttttt3/5t5/11/t4T4t/t3TTT3t/tt1TTKTT1tt/t3TTT3t/t4T4t/11/5t5/3ttttt3/
+
+Copenhagen:
+11x11, defenders go first, shieldwalls on and may be formed against corners, edge
+escapes on.
+
+dim:11 atkf:n sw:s efe:y start:/3ttttt3/5t5/11/t4T4t/t3TTT3t/tt1TTKTT1tt/t3TTT3t/t4T4t/11/5t5/3ttttt3/
+
+Berserk:
+11x11, defenders go first, surrounding not fatal, king can jump into throne and 
+corners, berserk mode on for capturing moves only. Note 'c'ommanders and k'N'ight 
+in the starting position.
+
+dim:11 surf:n atkf:n kj:r ber:c start:/3ttttt3/5c5/11/t4T4t/t3NTT3t/tc1TTKTT1ct/t3TTT3t/t4T4t/11/5c5/3ttttt3/t4T4t/11/5t5/3ttttt3/
+
+Brandub:
+7x7, weak king, attackers go first, center doesn't become hostile and isn't hostile to
+anyone, all pieces may pass through the center.
+
+dim:7 ks:n cenhe:n cenh: cenp:tcnkTCNK start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/
+
+Sea Battle 9x9:
+9x9, escape to the edges, king unarmed, center and corners not hostile, all pieces may
+move through and stop on the center and corners.
+
+dim:9 esc:e ka:n cenh: corh: cenp:tcnkTCNK corh:tcnkTCNK cens:tcnkTCNK cors:tcnkTCNK start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
