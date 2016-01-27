@@ -24,6 +24,8 @@ public abstract class Board {
      */
     public abstract int getBoardDimension();
 
+    public abstract char[][] getBoardArray();
+
     public abstract char getOccupier(int x, int y);
 
     public abstract char getOccupier(Coord space);

@@ -89,6 +89,19 @@ public abstract class BoardImpl extends Board {
     public abstract int getBoardDimension();
 
     @Override
+    public char[][] getBoardArray() {
+        char[][] boardArray = new char[getBoardDimension()][getBoardDimension()];
+
+        for(char taflman : getCachedTaflmanLocations().getTaflmen()) {
+            Coord c = findTaflmanSpace(taflman);
+
+            boardArray[c.y][c.x] = taflman;
+        }
+
+        return boardArray;
+    }
+
+    @Override
     public Coord getCenterSpace() {
         return mCenterSpace;
     }

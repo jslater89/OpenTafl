@@ -572,6 +572,7 @@ public class RawTerminal implements UiCallback {
         }
         */
         println("Zobrist: " + state.mZobristHash);
+        println("OTN: " + state.getOTNString());
         print(getGameStateString(state));
     }
 

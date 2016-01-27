@@ -666,8 +666,8 @@ public class Taflman {
         String edge2 = "";
         String symbol = "-";
         if (getSide(taflman).isAttackingSide()) {
-            edge1 = "<";
-            edge2 = ">";
+            edge1 = "[";
+            edge2 = "]";
         } else {
             edge1 = "(";
             edge2 = ")";
@@ -678,5 +678,18 @@ public class Taflman {
         if (isKnight(taflman)) symbol = "?";
 
         return edge1 + symbol + edge2;
+    }
+
+    public static String getOtnStringSymbol(char taflman) {
+        String symbol = "";
+        if(isKing(taflman)) symbol = "k";
+        else if(isCommander(taflman)) symbol = "c";
+        else if(isKnight(taflman)) symbol = "n";
+        else symbol = "t";
+
+        if(getSide(taflman).isAttackingSide()) symbol = symbol.toLowerCase();
+        else symbol = symbol.toUpperCase();
+
+        return symbol;
     }
 }

@@ -435,6 +435,33 @@ public class GameState {
         return new GameState(this);
     }
 
+    public String getOTNString() {
+        char[][] board = getBoard().getBoardArray();
+
+        String otnString = "/";
+        for(int y = 0; y < getBoard().getBoardDimension(); y++) {
+            int emptyCount = 0;
+
+            for(int x = 0; x < getBoard().getBoardDimension(); x++) {
+                if(board[y][x] == Taflman.EMPTY) {
+                    emptyCount++;
+                }
+                else {
+                    if(emptyCount > 0) {
+                        otnString += emptyCount;
+                        emptyCount = 0;
+                    }
+                    otnString += Taflman.getOtnStringSymbol(board[y][x]);
+                }
+            }
+
+            if(emptyCount > 0) otnString += emptyCount;
+            otnString += "/";
+        }
+
+        return otnString;
+    }
+
     public long updateZobristHash(long oldZobrist, Board oldBoard, MoveRecord move) {
         long hash = oldZobrist;
         int startIndex = oldBoard.getIndex(move.mStart);
