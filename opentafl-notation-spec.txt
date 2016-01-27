@@ -182,7 +182,8 @@ Explanatory notes:
 	ka: 
 		(king armed) does the king participate in captures? Defaults to "y" (yes).
 	ks: 
-		(king strong) does the king need to be surrounded on four sides to be captured? 		Defaults to "y" (yes). If "n", the king need only be surrounded on two sides.
+		(king strong) does the king need to be surrounded on four sides to be captured? 
+		Defaults to "y" (yes). If "n", the king need only be surrounded on two sides.
 	kj: 
 		(king jump) can the king jump? Defaults to "n" (no).
 	nj: 
