@@ -95,15 +95,15 @@ public class Taflman {
      * @return
      */
     public static boolean isKing(char taflman) {
-        return (char) (getPackedType(taflman) & TYPE_KING) == TYPE_KING;
+        return (char) (getPackedType(taflman) & TYPE_MASK) == TYPE_KING;
     }
 
     public static boolean isKnight(char taflman) {
-        return (char) (getPackedType(taflman) & TYPE_KNIGHT) == TYPE_KNIGHT;
+        return (char) (getPackedType(taflman) & TYPE_MASK) == TYPE_KNIGHT;
     }
 
     public static boolean isCommander(char taflman) {
-        return (char) (getPackedType(taflman) & TYPE_COMMANDER) == TYPE_COMMANDER;
+        return (char) (getPackedType(taflman) & TYPE_MASK) == TYPE_COMMANDER;
     }
 
     /**
