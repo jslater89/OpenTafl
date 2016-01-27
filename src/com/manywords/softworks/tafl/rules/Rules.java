@@ -131,4 +131,8 @@ public abstract class Rules {
      * @return
      */
     public abstract boolean isSurroundingFatal();
+
+    public String getOTRString() {
+        return "";
+    }
 }
