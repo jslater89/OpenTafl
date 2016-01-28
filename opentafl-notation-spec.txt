@@ -50,6 +50,7 @@ OR
 		"-": regular move
 		"^": jump (berserk)
 		"=": berserk move (berserk)
+		"^=": berserk jump (berserk)
 	ending-space: the space the piece ended on.
 	capture-record: 
 		[<"x"><capture-location>[<"/"><capture-location>]...]
