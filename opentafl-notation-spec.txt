@@ -264,7 +264,7 @@ Berserk:
 corners, berserk mode on for capturing moves only. Note 'c'ommanders and k'N'ight 
 in the starting position.
 
-dim:11 surf:n atkf:n kj:r ber:c start:/3ttttt3/5c5/11/t4T4t/t3NTT3t/tc1TTKTT1ct/t3TTT3t/t4T4t/11/5c5/3ttttt3/t4T4t/11/5t5/3ttttt3/
+dim:11 surf:n atkf:n kj:r ber:c start:/3ttttt3/5c5/11/t4T4t/t3NTT3t/tc1TTKTT1ct/t3TTT3t/t4T4t/11/5c5/3ttttt3/
 
 Brandub:
 7x7, weak king, attackers go first, center doesn't become hostile and isn't hostile to
