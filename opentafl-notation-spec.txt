@@ -275,4 +275,4 @@ Sea Battle 9x9:
 9x9, escape to the edges, king unarmed, center and corners not hostile, all pieces may
 move through and stop on the center and corners.
 
-dim:9 esc:e ka:n cenh: cenhe:n corh: cenp:tcnkTCNK corh:tcnkTCNK cens:tcnkTCNK cors:tcnkTCNK start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
+dim:9 esc:e ka:n cenh: cenhe:n corh: cenp:tcnkTCNK corp:tcnkTCNK cens:tcnkTCNK cors:tcnkTCNK start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
