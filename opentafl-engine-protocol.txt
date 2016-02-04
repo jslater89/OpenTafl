@@ -1,0 +1,115 @@
+OTEP - OpenTafl Engine Protocol
+
+The OpenTafl Engine Protocol is a bidirectional communications protocol used by
+OpenTafl to communicate with external tafl engines. For simplicity, it uses
+piped text input and output, with human-readable commands.
+
+1. hello
+Direction: Engine -> OpenTafl
+Command: 'hello'
+
+Alerts OpenTafl that the engine is active.
+
+2. verbose-moves
+Direction: Engine -> OpenTafl
+Command: 'verbose-moves <on|off>'
+Default: on
+
+When set to on, OpenTafl will provide the engine with enhanced algebraic tafl
+notation (as described in the OpenTafl Notation specificiation). When set to 
+off, OpenTafl will provide standard algebraic tafl notation, as designed by
+Damian Walker (see the OpenTafl Notation specification).
+
+3. rules
+Direction: OpenTafl <-> Engine
+Command: 'rules [rules-string]'
+
+OpenTafl provides the engine with an OpenTafl Notation Rules string, as defined
+in the OpenTafl Notation specification. See the OpenTafl Notation spec for
+defaults and other required implementation details.
+
+When receiving a 'rules' command, the engine should initialize to the starting
+board position. If the engine sends a 'rules' command, OpenTafl will reply with
+a 'rules' command.
+
+4. position
+Direction: OpenTafl <-> Engine
+Command: 'position [position-record]'
+
+OpenTafl provides the engine with an OpenTafl Notation Position string, as
+defined in the OpenTafl Notation specification.
+
+5. side
+Direction: OpenTafl <-> Engine
+Command: 'side [attackers|defenders]'
+
+OpenTafl informs the engine which side it is to play for.
+
+6. clock
+Direction: OpenTafl <-> Engine
+Command: 'clock [attacker-seconds] [defender-seconds] [overtime-seconds] [attacker-overtimes] [defender-overtimes]'
+
+OpenTafl provides the engine with the time left for both players in seconds. If
+overtime timing is enabled, also provides the length of each overtime period in
+seconds, and how many overtime periods the attacker and defender have left. If
+standard timing is not enabled, [attacker-seconds] and [defender-seconds] will
+be -1.
+
+7. analyze
+Direction: OpenTafl -> Engine
+Command: 'analyze [number] [seconds]'
+
+OpenTafl instructs the engine to analyze the current position, returning the
+given number of possible moves with evaluations (see 'analysis') and taking up
+to the given amount of time. Engines are not required to return exactly
+[number] moves, provided they return at least one move.
+
+8. analysis
+Direction: Engine -> OpenTafl
+Command: 'analysis [number] [<move-list> <evaluation>]...'
+
+The engine should provide [number] move-list and evaluation pairs. A move-list
+is a list of moves in simple algebraic tafl notation or OpenTafl algebraic tafl
+notation (see OpenTafl Notation specification for details), which leads from
+the current game state to the deepest state searched, separated by the pipe
+character: '|'. The move-list should include no spaces. The evaluation is the
+engine's overall evaluation of the move which starts the move-list.
+
+Engines are not required to return a full move list, and may elect to simply
+provide the first move in the list (the move which exits the current game
+state).
+
+9. play
+Direction: OpenTafl -> Engine
+Command: 'play [attackers|defenders]'
+
+OpenTafl instructs the engine to play for the given side from the current
+board state. The game clock runs from the moment the OpenTafl sends the 'play'
+command to the moment that OpenTafl receives the 'make-move' command.
+
+10. move
+Direction: Engine -> OpenTafl
+Command: 'move [move-record]'
+
+The engine submits the given move to OpenTafl. May return an error. (See
+'move-error').
+
+11. move-error
+Direction: OpenTafl -> Engine
+Command: 'move-error [error-code]
+
+Error code can be one of the following:
+1: wrong side
+2: no piece at start
+3: illegal move (blocked, piece at end, &c.)
+4: wrong side (berserk move)
+5: no piece at start/non-berserk piece at start (berserk move)
+6: illegal move (berserk)
+
+12. opponent-move
+Direction: OpenTafl -> Engine
+Command: 'opponent-move [move-record] [position-record]'
+
+OpenTafl informs the engine that the other side has made a move, given as
+[move-record] in whichever algebraic tafl notation the engine is configured
+to use. [position-record] gives the new state of the board.
