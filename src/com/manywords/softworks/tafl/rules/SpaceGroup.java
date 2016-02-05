@@ -9,7 +9,8 @@ package com.manywords.softworks.tafl.rules;
 public enum SpaceGroup {
     NONE, // Normal space
     THRONE, // The center square
-    FORTRESS, // Any fortress that isn't a corner
+    ATTACKER_FORT, // Any fortress that isn't a corner
+    DEFENDER_FORT,
     CORNER // Corner fortresses, potentially hostile
 }
 /*

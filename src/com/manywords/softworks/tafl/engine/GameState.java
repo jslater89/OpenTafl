@@ -311,7 +311,7 @@ public class GameState {
                         getBoard().isEdgeSpace(Taflman.getCurrentSpace(this, taflman))) {
                     return DEFENDER_WIN;
                 } else if (getBoard().getRules().getEscapeType() == Rules.CORNERS) {
-                    for (Coord corner : getBoard().getCorners()) {
+                    for (Coord corner : mGame.getGameRules().getCornerSpaces()) {
                         if (mBoard.getOccupier(corner) == taflman) {
                             return DEFENDER_WIN;
                         }

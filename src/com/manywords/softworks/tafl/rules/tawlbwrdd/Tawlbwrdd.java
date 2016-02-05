@@ -10,6 +10,9 @@ import com.manywords.softworks.tafl.rules.tawlbwrdd.eleven.Tawlbwrdd11Attackers;
 import com.manywords.softworks.tafl.rules.tawlbwrdd.eleven.Tawlbwrdd11Board;
 import com.manywords.softworks.tafl.rules.tawlbwrdd.eleven.Tawlbwrdd11Defenders;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Tawlbwrdd extends Rules {
     public static Tawlbwrdd newTawlbwrdd11() {
         Tawlbwrdd11Board board = new Tawlbwrdd11Board();
@@ -21,6 +24,7 @@ public class Tawlbwrdd extends Rules {
     }
 
     public Tawlbwrdd(Board board, Side attackers, Side defenders) {
+        super(board, attackers, defenders);
         mStartingBoard = board;
         mStartingBoard.setRules(this);
         mStartingAttackers = attackers;
@@ -30,6 +34,11 @@ public class Tawlbwrdd extends Rules {
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;
+
+    @Override
+    public void setupSpaceGroups(int boardSize) {
+
+    }
 
     @Override
     public boolean isKingArmed() {

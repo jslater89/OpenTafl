@@ -8,25 +8,9 @@ import java.util.*;
 public abstract class BoardImpl extends Board {
     public BoardImpl() {
         Coord.initialize(getBoardDimension());
-
-        int center = (getBoardDimension() - 1) / 2;
-        mCenterSpace = Coord.get(center, center);
-
-        Coord topLeft = Coord.get(0, 0);
-        Coord topRight = Coord.get(getBoardDimension() - 1, 0);
-        Coord bottomLeft = Coord.get(0, getBoardDimension() - 1);
-        Coord bottomRight = Coord.get(getBoardDimension() - 1, getBoardDimension() - 1);
-
-        mCorners = new ArrayList<Coord>(4);
-        mCorners.add(topLeft);
-        mCorners.add(topRight);
-        mCorners.add(bottomLeft);
-        mCorners.add(bottomRight);
     }
 
     public BoardImpl(Board board) {
-        mCenterSpace = board.getCenterSpace();
-        mCorners = board.getCorners();
         if (board.getCachedTaflmanLocations() == null && getState() != null) {
             setupTaflmen(getState().getAttackers(), getState().getDefenders());
         } else if(board.getCachedTaflmanLocations() != null){
@@ -37,8 +21,6 @@ public abstract class BoardImpl extends Board {
     // [y][x]
     //TODO: privatize
     private TaflmanCoordMap mCachedTaflmanLocations = null;
-    private Coord mCenterSpace;
-    private List<Coord> mCorners;
     private Rules mRules;
     private GameState mState;
 
@@ -102,16 +84,6 @@ public abstract class BoardImpl extends Board {
     }
 
     @Override
-    public Coord getCenterSpace() {
-        return mCenterSpace;
-    }
-
-    @Override
-    public List<Coord> getCorners() {
-        return mCorners;
-    }
-
-    @Override
     public boolean isEdgeSpace(Coord space) {
         if ((space.x == 0) || (space.x == getBoardDimension() - 1) ||
                 ((space.y == 0 || space.y == getBoardDimension() - 1))) {
@@ -123,13 +95,17 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public SpaceGroup getSpaceGroupFor(Coord space) {
-        if (getCenterSpace().equals(space)) {
+        if (getRules().isCenterSpace(space)) {
             return SpaceGroup.THRONE;
         }
-        for (Coord corner : getCorners()) {
-            if (corner.equals(space)) {
-                return SpaceGroup.CORNER;
-            }
+        if (getRules().isCornerSpace(space)) {
+            return SpaceGroup.CORNER;
+        }
+        if (getRules().isAttackerFort(space)) {
+            return SpaceGroup.ATTACKER_FORT;
+        }
+        if (getRules().isDefenderFort(space)) {
+            return SpaceGroup.DEFENDER_FORT;
         }
 
         return SpaceGroup.NONE;
@@ -346,7 +322,7 @@ public abstract class BoardImpl extends Board {
             for (Coord space : edge) {
                 // If the space is a corner and start position is null, this is a potential
                 // start position.
-                if (startPosition == null && getCorners().contains(space)
+                if (startPosition == null && getRules().isCornerSpace(space)
                         && getRules().allowShieldWallCaptures() == Rules.STRONG_SHIELDWALL) {
                     startPosition = space;
                     continue;
@@ -362,7 +338,7 @@ public abstract class BoardImpl extends Board {
                 // If start position isn't null, check to see if the position has ended.
                 if (startPosition != null) {
                     // STRONG_SHIELDWALL means corners can cap shieldwalls.
-                    if (getCorners().contains(space)
+                    if (getRules().isCornerSpace(space)
                             && getRules().allowShieldWallCaptures() == Rules.STRONG_SHIELDWALL) {
                         endPosition = space;
 

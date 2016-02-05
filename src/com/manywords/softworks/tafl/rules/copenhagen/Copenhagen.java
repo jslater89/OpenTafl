@@ -7,6 +7,9 @@ import com.manywords.softworks.tafl.rules.copenhagen.eleven.Copenhagen11Defender
 import com.manywords.softworks.tafl.rules.copenhagen.eleven.test.*;
 import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Board;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Copenhagen extends Rules {
     public static Copenhagen newCopenhagen11() {
         Copenhagen11Board board = new Copenhagen11Board();
@@ -70,6 +73,7 @@ public class Copenhagen extends Rules {
     }
 
     public Copenhagen(Board board, Side attackers, Side defenders) {
+        super(board, attackers, defenders);
         mStartingBoard = board;
         mStartingBoard.setRules(this);
         mStartingAttackers = attackers;
@@ -80,6 +84,29 @@ public class Copenhagen extends Rules {
     private Side mStartingAttackers;
     private Side mStartingDefenders;
     private boolean mStrictShieldwallRule = false;
+
+    @Override
+    public void setupSpaceGroups(int boardSize) {
+        int center = (boardSize - 1) / 2;
+
+        List<Coord> centerSpace = new ArrayList<Coord>(1);
+        centerSpace.add(Coord.get(center, center));
+
+        setCenterSpaces(centerSpace);
+
+        Coord c1 = Coord.get(0, 0);
+        Coord c2 = Coord.get(boardSize - 1, 0);
+        Coord c3 = Coord.get(0, boardSize - 1);
+        Coord c4 = Coord.get(boardSize - 1, boardSize - 1);
+
+        List<Coord> corners = new ArrayList<Coord>(4);
+        corners.add(c1);
+        corners.add(c2);
+        corners.add(c3);
+        corners.add(c4);
+
+        setCornerSpaces(corners);
+    }
 
     @Override
     public boolean isKingArmed() {

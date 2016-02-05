@@ -30,6 +30,9 @@ public class Coord {
     private static List<Coord> mAllEdges;
 
     public static void initialize(int dimension) {
+        if(mDimension == dimension) {
+            return;
+        }
         mDimension = dimension;
         mCoords = new Coord[dimension][dimension];
 

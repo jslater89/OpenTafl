@@ -550,9 +550,9 @@ public class RawTerminal implements UiCallback {
 
     public static String getGameStateString(GameState state) {
         List<Coord> specialSpaces = new ArrayList<Coord>();
-        specialSpaces.add(state.getBoard().getCenterSpace());
+        specialSpaces.addAll(state.getBoard().getRules().getCenterSpaces());
 
-        for (Coord corner : state.getBoard().getCorners()) {
+        for (Coord corner : state.getBoard().getRules().getCornerSpaces()) {
             specialSpaces.add(corner);
         }
 
@@ -579,9 +579,9 @@ public class RawTerminal implements UiCallback {
     public static void renderGameStateWithAllowableMoves(GameState state, Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
         allowableMoves.removeAll(allowableDestinations);
         List<Coord> specialSpaces = new ArrayList<Coord>();
-        specialSpaces.add(state.getBoard().getCenterSpace());
+        specialSpaces.addAll(state.getBoard().getRules().getCenterSpaces());
 
-        for (Coord corner : state.getBoard().getCorners()) {
+        for (Coord corner : state.getBoard().getRules().getCornerSpaces()) {
             specialSpaces.add(corner);
         }
 
@@ -597,9 +597,9 @@ public class RawTerminal implements UiCallback {
     public static void renderGameStateWithReachableSpaces(GameState state, Coord highlight, Set<Coord> reachableSpaces) {
         String boardAsText = "";
         List<Coord> specialSpaces = new ArrayList<Coord>();
-        specialSpaces.add(state.getBoard().getCenterSpace());
+        specialSpaces.addAll(state.getBoard().getRules().getCenterSpaces());
 
-        for (Coord corner : state.getBoard().getCorners()) {
+        for (Coord corner : state.getBoard().getRules().getCornerSpaces()) {
             specialSpaces.add(corner);
         }
 

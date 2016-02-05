@@ -258,7 +258,7 @@ public class FishyEvaluator implements Evaluator {
         // attackers to occupy them.
         // attacker max: 0.4
         List<Coord> cornerPoints = new ArrayList<Coord>(4);
-        for (Coord corner : board.getCorners()) {
+        for (Coord corner : board.getRules().getCornerSpaces()) {
             cornerPoints.addAll(board.getDiagonalSpaces(corner));
         }
 

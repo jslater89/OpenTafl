@@ -47,21 +47,6 @@ public abstract class Board {
     public abstract void unsetOccupier(char taflman);
 
     /**
-     * Get the square at the center of the board.
-     *
-     * @return
-     */
-    public abstract Coord getCenterSpace();
-
-    /**
-     * Get the squares or groups of squares at the
-     * corners.
-     *
-     * @return
-     */
-    public abstract List<Coord> getCorners();
-
-    /**
      * Get the space group to which this space belongs,
      * or null.
      *

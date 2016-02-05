@@ -6,6 +6,9 @@ import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Board;
 import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Defenders;
 import com.manywords.softworks.tafl.rules.seabattle.nine.test.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class SeaBattle extends Rules {
     public static SeaBattle newSeaBattle9() {
@@ -45,6 +48,7 @@ public class SeaBattle extends Rules {
     }
 
     public SeaBattle(Board board, Side attackers, Side defenders) {
+        super(board, attackers, defenders);
         mStartingBoard = board;
         mStartingBoard.setRules(this);
         mStartingAttackers = attackers;
@@ -54,6 +58,11 @@ public class SeaBattle extends Rules {
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;
+
+    @Override
+    public void setupSpaceGroups(int boardSize) {
+
+    }
 
     @Override
     public boolean isKingArmed() {

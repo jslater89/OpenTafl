@@ -1,6 +1,110 @@
 package com.manywords.softworks.tafl.rules;
 
+import java.util.*;
+
 public abstract class Rules {
+    private Set<Coord> mCenterSpaces = new LinkedHashSet<Coord>();
+    private Set<Coord> mCornerSpaces = new LinkedHashSet<Coord>();
+    private Set<Coord> mAttackerForts = new LinkedHashSet<Coord>();
+    private Set<Coord> mDefenderForts = new LinkedHashSet<Coord>();
+
+    public Rules (Board board, Side attackers, Side defenders) {
+        setupSpaceGroups(board.getBoardDimension());
+    }
+
+    /**
+     * Set the spaces considered as center spaces.
+     * @param c
+     */
+    public void setCenterSpaces(List<Coord> c) {
+        mCenterSpaces.clear();
+        mCenterSpaces.addAll(c);
+    }
+
+    /**
+     * Set the spaces considered as corner spaces.
+     * @param c
+     */
+    public void setCornerSpaces(List<Coord> c) {
+        mCornerSpaces.clear();
+        mCornerSpaces.addAll(c);
+    }
+
+    /**
+     * Set the spaces considered as attacker fortresses.
+     * @param c
+     */
+    public void setAttackerForts(List<Coord> c) {
+        mAttackerForts.clear();
+        mAttackerForts.addAll(c);
+    }
+
+    /**
+     * Set the spaces considered as defender fortresses.
+     * @param c
+     */
+    public void setDefenderForts(List<Coord> c) {
+        mDefenderForts.clear();
+        mDefenderForts.addAll(c);
+    }
+
+    /**
+     * Return whether the given space is a center space.
+     * @param c
+     * @return
+     */
+    public boolean isCenterSpace(Coord c) {
+        return mCenterSpaces.contains(c);
+    }
+
+    /**
+     * Return whether the given space is a corner space.
+     * @param c
+     * @return
+     */
+    public boolean isCornerSpace(Coord c) {
+        return mCornerSpaces.contains(c);
+    }
+
+    /**
+     * Return whether the given space is an attacker fortress.
+     * @param c
+     * @return
+     */
+    public boolean isAttackerFort(Coord c) {
+        return mAttackerForts.contains(c);
+    }
+
+    /**
+     * Return whether the given space is a defender fortress.
+     * @param c
+     * @return
+     */
+    public boolean isDefenderFort(Coord c) {
+        return mDefenderForts.contains(c);
+    }
+
+    public Set<Coord> getCenterSpaces() {
+        return mCenterSpaces;
+    }
+
+    public Set<Coord> getCornerSpaces() {
+        return mCornerSpaces;
+    }
+
+    public Set<Coord> getAttackerForts() {
+        return mAttackerForts;
+    }
+
+    public Set<Coord> getDefenderForts() {
+        return mDefenderForts;
+    }
+
+    /**
+     * Set up the centers, corners, and
+     */
+    public abstract void setupSpaceGroups(int boardSize);
+
     /**
      * Can the king participate in captures?
      *
