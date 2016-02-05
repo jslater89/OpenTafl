@@ -70,9 +70,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
         if(result == GOOD_MOVE) {
             GameTreeState nextState;
             if (mGame.getGameRules().getBerserkMode() > 0 && temp.getBerserkingTaflman() != Taflman.EMPTY) {
-                nextState = new GameTreeState(workspace, temp);
+                nextState = new GameTreeState(workspace, temp, this);
             } else {
-                nextState = new GameTreeState(workspace, temp);
+                nextState = new GameTreeState(workspace, temp, this);
             }
 
             return nextState;
@@ -83,10 +83,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
     }
 
-    public GameTreeState(AiWorkspace workspace, GameTreeState advanceFrom) {
+    public GameTreeState(AiWorkspace workspace, GameTreeState advanceFrom, GameTreeState realParent) {
         super(workspace, advanceFrom, advanceFrom.getBoard(), advanceFrom.getAttackers(), advanceFrom.getDefenders(), advanceFrom.getBerserkingTaflman());
 
-        mParent = (GameTreeState) advanceFrom;
+        mParent = (GameTreeState) realParent;
         mAlpha = mParent.getAlpha();
         mBeta = mParent.getBeta();
         mDepth = ((GameTreeState) mParent).mDepth + 1;
@@ -215,12 +215,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public void replaceChild(GameTreeNode oldNode, GameTreeNode newNode) {
-        for (int i = 0; i < mBranches.size(); i++) {
-            if (mBranches.get(i) == oldNode) {
-                mBranches.set(i, newNode);
-                break;
-            }
-        }
+        mBranches.set(mBranches.indexOf(oldNode), newNode);
     }
 
     public void setParent(GameTreeNode newParent) {
@@ -336,6 +331,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
         desiredState.mValue = minimalGameTreeNode.getValue();
         desiredState.mBranches = minimalGameTreeNode.getBranches();
 
+        for(GameTreeNode node : minimalGameTreeNode.getBranches()) {
+            node.setParent(desiredState);
+        }
         desiredState.getParentNode().replaceChild(minimalGameTreeNode, desiredState);
         return desiredState;
     }
@@ -501,12 +499,14 @@ public class GameTreeState extends GameState implements GameTreeNode {
             mTaflmanMoveCache = null;
 
             // All moves explored; minify this state
-            MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
-            if (mParent != null) {
-                mParent.replaceChild(GameTreeState.this, minifiedNode);
-            }
-            for(GameTreeNode branch : mBranches) {
-                branch.setParent(minifiedNode);
+            if(mDepth != 0) {
+                MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
+                if (mParent != null) {
+                    mParent.replaceChild(GameTreeState.this, minifiedNode);
+                }
+                for (GameTreeNode branch : mBranches) {
+                    branch.setParent(minifiedNode);
+                }
             }
         }
 

@@ -163,12 +163,7 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     public void replaceChild(GameTreeNode oldNode, GameTreeNode newNode) {
-        for (int i = 0; i < mBranches.size(); i++) {
-            if (mBranches.get(i) == oldNode) {
-                mBranches.set(i, newNode);
-                break;
-            }
-        }
+        mBranches.set(mBranches.indexOf(oldNode), newNode);
     }
 
     public void setParent(GameTreeNode newParent) {
