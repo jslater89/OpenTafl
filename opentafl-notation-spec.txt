@@ -38,11 +38,18 @@ Spaces are given in a form of algebraic notation, starting at "a" and "1" and us
 as many letters and numbers as required to capture the size of the board. No letters
 or numbers are skipped. Letters should be lower-case.
 
-[taflman-symbol]<starting-space><move-type><ending-space>[capture-record][info-symbol]
+	# This is the standard OTN move record:
+	[taflman-symbol]<starting-space><move-type><ending-space>[capture-record][info-symbol]
 
 OR
 
-<resignation-symbol>
+	# This is a standard algebraic tafl notation record, and is Damian Walker's
+	# creation. Never uses taflman-symbol, only uses + and ++ for info-symbol,
+	# to denote that the player who moved has either threatened to win or has
+	# won.
+	<starting-space><"-"><ending-space>[capture-record][info-symbol]
+
+	<resignation-symbol>
 
 	taflman-symbol: see Positional Records definition. Use for special pieces only.
 	starting-space: the space the piece originated on.
@@ -108,63 +115,63 @@ values. Rule entries may be left out if unnecessary.
 The explanatory notes inside the specification are not part of the specification, and
 are present only for organizational purposes.
 
-# The rules record starts with the board size record.
-<board-size>
+	# The rules record starts with the board size record.
+	<board-size>
 
-# These rules concern general rules of the game.
-[<"esc:"><escape-type>] [<"surf:"><yes-no>] [<"atkf:"><yes-no>] [<"cenhe:"><yes-no>]
+	# These rules concern general rules of the game.
+	[<"esc:"><escape-type>] [<"surf:"><yes-no>] [<"atkf:"><yes-no>] [<"cenhe:"><yes-no>]
 
-# These rules concern piece strengths and movement types.
-[<"ka:"><yes-no>] [<"ks:"><yes-no>] [<"kj:"><jump-type>]
-[<"nj:"><jump-type>] [<"cj:"><jump-type>]
+	# These rules concern piece strengths and movement types.
+	[<"ka:"><yes-no>] [<"ks:"><yes-no>] [<"kj:"><jump-type>]
+	[<"nj:"><jump-type>] [<"cj:"><jump-type>]
 
-# These rules concern special spaces on the board.
-[<"cor:"><space-list>] [<"cen:"><space-list>]
-[<"afor:"><space-list>] [<"dfor:"><space-list>]
-[<"corh:"><piece-type-list>] [<"cenh:"><piece-type-list>]
-[<"aforh:"><piece-type-list>] [<"dforh:"><piece-type-list>]
-[<"corp:"><piece-type-list>] [<"cenp:"><piece-type-list>]
-[<"aforp:"><piece-type-list>] [<"dforp:"><piece-type-list>]
-[<"cors:"><piece-type-list>] [<"cens:"><piece-type-list>]
-[<"afors:"><piece-type-list>] [<"dfors:"><piece-type-list>]
+	# These rules concern special spaces on the board.
+	[<"cor:"><space-list>] [<"cen:"><space-list>]
+	[<"afor:"><space-list>] [<"dfor:"><space-list>]
+	[<"corh:"><piece-type-list>] [<"cenh:"><piece-type-list>]
+	[<"aforh:"><piece-type-list>] [<"dforh:"><piece-type-list>]
+	[<"corp:"><piece-type-list>] [<"cenp:"><piece-type-list>]
+	[<"aforp:"><piece-type-list>] [<"dforp:"><piece-type-list>]
+	[<"cors:"><piece-type-list>] [<"cens:"><piece-type-list>]
+	[<"afors:"><piece-type-list>] [<"dfors:"><piece-type-list>]
 
-# These rules concern shieldwall and edge fort formations.
-[<"sw:"><shieldwall-mode>] [<"swf:"><yes-no>] [<"efe:"><yes-no>]
+	# These rules concern shieldwall and edge fort formations.
+	[<"sw:"><shieldwall-mode>] [<"swf:"><yes-no>] [<"efe:"><yes-no>]
 
-# These rules concern berserk mode.
-[<"ber:"><berserk-mode>]
+	# These rules concern berserk mode.
+	[<"ber:"><berserk-mode>]
 
-# The rules record ends with the starting position entry.
-<starting-position>
+	# The rules record ends with the starting position entry.
+	<starting-position>
 
-	board-size: <"dim:"><size>
-		board size is the length of the side of the board.
-	escape-type:
-		"c": corner
-		"e": edge
-	yes-no:
-		"y": yes
-		"n": no
-	jump-type:
-		"n": no jumps
-		"r": restricted jumps: only to center, corners, or friendly fortresses
-		"j": jump over enemy pieces: no capturing
-		"c": jump over enemy pieces: capturing
-	space-list:
-		<corner-space>[<","><corner-space>]
-	piece-type-list:
-		<taflman-symbol>[<","><taflman-symbol>]
-	shieldwall-mode:
-		"n": no shieldwall capture
-		"w": weak shieldwalls, corners may not close a shieldwall position
-		"s": strong shieldwalls, corners may close a shieldwall position
-	berserk-mode:
-		"n": no berserk moves allowed
-		"c": berserking piece must capture if available
-		"m": berserking piece must move
-	starting-position: <"start:"><position-record>
-		The value of the starting position rules entry is the positional record
-		corresponding to the start position.
+		board-size: <"dim:"><size>
+			board size is the length of the side of the board.
+		escape-type:
+			"c": corner
+			"e": edge
+		yes-no:
+			"y": yes
+			"n": no
+		jump-type:
+			"n": no jumps
+			"r": restricted jumps: only to center, corners, or friendly fortresses
+			"j": jump over enemy pieces: no capturing
+			"c": jump over enemy pieces: capturing
+		space-list:
+			<corner-space>[<","><corner-space>]
+		piece-type-list:
+			<taflman-symbol>[<","><taflman-symbol>]
+		shieldwall-mode:
+			"n": no shieldwall capture
+			"w": weak shieldwalls, corners may not close a shieldwall position
+			"s": strong shieldwalls, corners may close a shieldwall position
+		berserk-mode:
+			"n": no berserk moves allowed
+			"c": berserking piece must capture if available
+			"m": berserking piece must move
+		starting-position: <"start:"><position-record>
+			The value of the starting position rules entry is the positional record
+			corresponding to the start position.
 
 Explanatory notes:
 	board-size: 
@@ -279,3 +286,66 @@ Sea Battle 9x9:
 move through and stop on the center and corners.
 
 dim:9 esc:e ka:n cenh: cenhe: corh: cenp:tcnkTCNK corp:tcnkTCNK cens:tcnkTCNK cors:tcnkTCNK start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
+
+4. Game Records
+	# These elements should be separated by newlines. Tags may be placed on individual
+	# lines, or 
+	# Rules strings should not
+	# contain any newlines.
+	[tags]
+	<rules-string>
+	[position-string]
+	
+	# This pattern should be separated from the header by newlines.
+	# This pattern repeats for the whole game. The final element may omit
+	# one move record, if the game ends. Commentary should be displayed
+	# alongside its turn.
+	<<turn-number><"."> <move-record> <move-record>>
+	[[first-half-commentary]|[second-half-commentary]]
+
+	tags: 
+		none, some, or all tags may be included, at the compiler's choice.
+		[<"["><tag-type><":"><tag-value><"]">]
+		
+	tag-type:
+		"event": 
+			tournament or match event name
+		"site": 
+			location of game, in city, country format
+		"date": 
+			date of game: YYYY.MM.DD
+		"round": 
+			round in tournament or match
+		"attackers": 
+			player of the attackers, in lastname, firstname format
+		"defenders": 
+			player of the defenders
+		"result": 
+			"1" (attackers win), "0" (draw), "-1" (defenders win), or "?" (other)
+		"annotator": 
+			person providing game notes, in lastname, firstname format
+		"compiler": 
+			person assembling this file, in lastname, firstname format
+		"time-control": 
+			<main-time-seconds> [<overtime-periods>:<overtime-length]
+		"termination": 
+			human-readable definition of how the game ended
+
+	rules-string:
+		an OTN rules string.
+	
+	position-string:
+		optionally, a starting position for the game, if not the starting position
+		in the rules string.
+
+	turn-number:
+		the number of times each player has moved, starting at 1.
+	
+	move-record:
+		an OTN move record.
+
+	first-half-commentary:
+		comment on the first move of this turn.
+
+	second-half-commentary:
+		comment on the second move of this turn.
