@@ -158,9 +158,9 @@ are present only for organizational purposes.
 			"j": jump over enemy pieces: no capturing
 			"c": jump over enemy pieces: capturing
 		space-list:
-			<corner-space>[<","><corner-space>]
+			[<space><",">]...
 		piece-type-list:
-			<taflman-symbol>[<","><taflman-symbol>]
+			[<taflman-symbol>]...
 		shieldwall-mode:
 			"n": no shieldwall capture
 			"w": weak shieldwalls, corners may not close a shieldwall position
@@ -174,8 +174,8 @@ are present only for organizational purposes.
 			corresponding to the start position.
 
 Explanatory notes:
-	board-size: 
-		must be present.
+	dim: 
+		(dimension) must be present.
 	esc:
 		(escape) defaults to "c" (corner escape)
 	surf: 
@@ -184,9 +184,6 @@ Explanatory notes:
 	atkf: 
 		(attackers first) should the attacking side go first? Defaults to "y" (yes).
 		If "n", the defenders move first.
-	cenhe:
-		(center hostile when empty) does the center space become hostile to defenders
-		when not occupied by defenders? Defaults to "y" (yes).
 	ka: 
 		(king armed) does the king participate in captures? Defaults to "y" (yes).
 	ks: 
@@ -200,11 +197,11 @@ Explanatory notes:
 		(commander jump) can the commander jump? Defaults to "j" (non-capturing jumps).
 	cor: 
 		(corner spaces) a list of spaces to treat as corner spaces, useful for e.g. alea
-		evangelii with larger corner forts. Defaults to "". If empty, only the four 
-		physical corner spaces will be treated as corners.
+		evangelii with larger corner forts. Defaults to "default": the four physical
+		corner spaces.
 	cen: 
-		(center spaces) a list of spaces to treat as the center space. Defaults to "".
-		If empty, only the physical center space will be treated as the center.
+		(center spaces) a list of spaces to treat as the center space. Defaults to
+		"default": the physical center space.
 	afor: 
 		(attacker fortresses) a list of spaces to be treated as attacker fortresses.
 		Defaults to "". If empty, no spaces will be treated as fortresses.
@@ -225,7 +222,7 @@ Explanatory notes:
 		(corner passable by...) a list of piece types which can move through the corner
 		spaces. Defaults to "K" (king only).
 	cenp:
-		as corp. Defaults to "K" (king only).
+		as corp. Defaults to "tcnkTCNK" (king only).
 	aforp:
 		as corp. Defaults to "tcnkTCNK" (all pieces).
 	dforp:
@@ -243,7 +240,7 @@ Explanatory notes:
 		(shieldwall mode) Defaults to "n" (none).
 	swf:
 		(shieldwall flanking required) May a shieldwall capture only be made by a piece
-		moving to close one of its flanks (that is, moving to the edge?) Defaults to "y"
+	tcnk	moving to close one of its flanks (that is, moving to the edge?) Defaults to "y"
 		(yes). If "n", any move that results in a closed shieldwall position against an
 		edge will capture the surrounded pieces.
 	efe:
@@ -285,7 +282,7 @@ Sea Battle 9x9:
 9x9, escape to the edges, king unarmed, center and corners not hostile, all pieces may
 move through and stop on the center and corners.
 
-dim:9 esc:e ka:n cenh: cenhe: corh: cenp:tcnkTCNK corp:tcnkTCNK cens:tcnkTCNK cors:tcnkTCNK start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
+dim:9 esc:e ka:n cen: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
 
 4. Game Records
 	# These elements should be separated by newlines. Tags may be placed on individual
