@@ -612,6 +612,22 @@ public class RawTerminal implements UiCallback {
         print(boardAsText);
     }
 
+    public static void renderBoard(Board board) {
+        String boardAsText = "";
+        List<Coord> specialSpaces = new ArrayList<Coord>();
+        specialSpaces.addAll(board.getRules().getCenterSpaces());
+
+        for (Coord corner : board.getRules().getCornerSpaces()) {
+            specialSpaces.add(corner);
+        }
+
+        for (int i = 0; i < board.getBoardDimension(); i++) {
+            boardAsText += renderRow(i, board, specialSpaces, null, null, null, null);
+        }
+
+        print(boardAsText);
+    }
+
     private static String renderRow(int rank, Board board, List<Coord> special, Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
         String rowString = "";
         String allowableSpaceFill = "-";
@@ -711,7 +727,7 @@ public class RawTerminal implements UiCallback {
             Coord space = Coord.get(i, rank);
             char occupier = board.getOccupier(space);
             if (occupier != Taflman.EMPTY) {
-                String color = (Taflman.getSide(occupier).isAttackingSide() ? ANSI_RED : ANSI_WHITE);
+                String color = (Taflman.getPackedSide(occupier) == Taflman.SIDE_ATTACKERS ? ANSI_RED : ANSI_WHITE);
                 rowString += color + Taflman.getStringSymbol(occupier);
                 rowString += ANSI_BLUE;
                 rowString += "|";

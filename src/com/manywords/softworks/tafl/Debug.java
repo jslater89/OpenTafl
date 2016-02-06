@@ -1,5 +1,9 @@
 package com.manywords.softworks.tafl;
 
+import com.manywords.softworks.tafl.rules.Board;
+import com.manywords.softworks.tafl.rules.Rules;
+import com.manywords.softworks.tafl.rules.brandub.Brandub;
+import com.manywords.softworks.tafl.rules.serializer.OTNRulesSerializer;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.Map;
@@ -7,6 +11,13 @@ import java.util.Map;
 public class Debug {
     public static void run(Map<String, String> args) {
 
+        String rulesString = OTNRulesSerializer.getOTNRulesString(Brandub.newBrandub7());
+        Rules r = OTNRulesSerializer.getRulesForString(rulesString);
+
+        Board b = r.getBoard();
+        RawTerminal.renderBoard(b);
+
+        /*
         RawTerminal display = new RawTerminal();
         display.runUi();
 

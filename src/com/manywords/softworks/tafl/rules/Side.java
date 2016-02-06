@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Side {
-    public class TaflmanHolder {
+    public static class TaflmanHolder {
         public final char packed;
         public final Coord coord;
 
@@ -14,7 +14,7 @@ public abstract class Side {
         }
 
         public String toString() {
-            return "TaflmanHolder: " + coord;
+            return "TaflmanHolder: " + packed + "@" + coord;
         }
     }
 
@@ -42,7 +42,7 @@ public abstract class Side {
     public abstract List<TaflmanHolder> generateTaflmen();
 
     private char[] mTaflmen;
-    private Board mBoard;
+    protected Board mBoard;
     private List<TaflmanHolder> mStartingTaflmen;
 
     public final Board getBoard() {

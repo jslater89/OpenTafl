@@ -1,8 +1,6 @@
 package com.manywords.softworks.tafl.rules.serializer;
 
-import com.manywords.softworks.tafl.rules.Coord;
-import com.manywords.softworks.tafl.rules.Rules;
-import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.rules.*;
 
 import java.util.*;
 
@@ -65,42 +63,42 @@ public class OTNRulesSerializer {
 
 
     public static String getOTNRulesString(Rules rules) {
-        String otnString = "";
+        String otnrString = "";
 
-        otnString += "dim:";
-        otnString += rules.boardSize;
-        otnString += " ";
+        otnrString += "dim:";
+        otnrString += rules.boardSize;
+        otnrString += " ";
 
         if(rules.getEscapeType() == Rules.EDGES) {
-            otnString += "esc:e ";
+            otnrString += "esc:e ";
         }
 
         if(!rules.isSurroundingFatal()) {
-            otnString += "surf:n ";
+            otnrString += "surf:n ";
         }
 
         if(!rules.getStartingSide().isAttackingSide()) {
-            otnString += "atkf:n ";
+            otnrString += "atkf:n ";
         }
 
         if(!rules.isKingArmed()) {
-            otnString += "ka:n ";
+            otnrString += "ka:n ";
         }
 
         if(!rules.isKingStrong()) {
-            otnString += "ks:n ";
+            otnrString += "ks:n ";
         }
 
         if(rules.getKingJumpMode() != Taflman.JUMP_NONE) {
-            otnString += "kj:" + getStringForJumpMode(rules.getKingJumpMode()) + " ";
+            otnrString += "kj:" + getStringForJumpMode(rules.getKingJumpMode()) + " ";
         }
 
         if(rules.getKnightJumpMode() != Taflman.JUMP_CAPTURE) {
-            otnString += "nj:" + getStringForJumpMode(rules.getKnightJumpMode()) + " ";
+            otnrString += "nj:" + getStringForJumpMode(rules.getKnightJumpMode()) + " ";
         }
 
         if(rules.getCommanderJumpMode() != Taflman.JUMP_STANDARD) {
-            otnString += "cj:" + getStringForJumpMode(rules.getCommanderJumpMode()) + " ";
+            otnrString += "cj:" + getStringForJumpMode(rules.getCommanderJumpMode()) + " ";
         }
 
         Set<Coord> corners = rules.getCornerSpaces();
@@ -110,7 +108,7 @@ public class OTNRulesSerializer {
                 cornersString += corner.toString() + ",";
             }
 
-            otnString += cornersString + " ";
+            otnrString += cornersString + " ";
         }
 
         Set<Coord> centers = rules.getCenterSpaces();
@@ -120,7 +118,7 @@ public class OTNRulesSerializer {
                 centerString += center.toString() + ",";
             }
 
-            otnString += centerString + " ";
+            otnrString += centerString + " ";
         }
 
         Set<Coord> attackerForts = rules.getAttackerForts();
@@ -130,7 +128,7 @@ public class OTNRulesSerializer {
                 fortString += fort.toString() + ",";
             }
 
-            otnString += fortString + " ";
+            otnrString += fortString + " ";
         }
 
         Set<Coord> defenderForts = rules.getDefenderForts();
@@ -140,67 +138,189 @@ public class OTNRulesSerializer {
                 fortString += fort.toString() + ",";
             }
 
-            otnString += fortString + " ";
+            otnrString += fortString + " ";
         }
 
         String corp = getStringForTaflmanTypeList(rules.cornerPassableFor);
-        if(!corp.equals(defaults.get("corp"))) otnString += "corp:" + corp + " ";
+        if(!corp.equals(defaults.get("corp"))) otnrString += "corp:" + corp + " ";
 
         String cenp = getStringForTaflmanTypeList(rules.centerPassableFor);
-        if(!cenp.equals(defaults.get("cenp"))) otnString += "cenp:" + cenp + " ";
+        if(!cenp.equals(defaults.get("cenp"))) otnrString += "cenp:" + cenp + " ";
 
         String aforp = getStringForTaflmanTypeList(rules.attackerFortPassableFor);
-        if(!aforp.equals(defaults.get("aforp"))) otnString += "aforp:" + aforp + " ";
+        if(!aforp.equals(defaults.get("aforp"))) otnrString += "aforp:" + aforp + " ";
 
         String dforp = getStringForTaflmanTypeList(rules.defenderFortPassableFor);
-        if(!dforp.equals(defaults.get("dforp"))) otnString += "dforp:" + dforp + " ";
+        if(!dforp.equals(defaults.get("dforp"))) otnrString += "dforp:" + dforp + " ";
 
         String cors = getStringForTaflmanTypeList(rules.cornerStoppableFor);
-        if(!cors.equals(defaults.get("cors"))) otnString += "cors:" + cors + " ";
+        if(!cors.equals(defaults.get("cors"))) otnrString += "cors:" + cors + " ";
 
         String cens = getStringForTaflmanTypeList(rules.centerStoppableFor);
-        if(!cens.equals(defaults.get("cens"))) otnString += "cens:" + cens + " ";
+        if(!cens.equals(defaults.get("cens"))) otnrString += "cens:" + cens + " ";
 
         String afors = getStringForTaflmanTypeList(rules.attackerFortStoppableFor);
-        if(!afors.equals(defaults.get("afors"))) otnString += "afors:" + afors + " ";
+        if(!afors.equals(defaults.get("afors"))) otnrString += "afors:" + afors + " ";
 
         String dfors = getStringForTaflmanTypeList(rules.defenderFortStoppableFor);
-        if(!dfors.equals(defaults.get("dfors"))) otnString += "dfors:" + afors + " ";
+        if(!dfors.equals(defaults.get("dfors"))) otnrString += "dfors:" + afors + " ";
 
         String corh = getStringForTaflmanTypeList(rules.cornerHostileTo);
-        if(!corh.equals(defaults.get("corh"))) otnString += "corh:" + corh + " ";
+        if(!corh.equals(defaults.get("corh"))) otnrString += "corh:" + corh + " ";
 
         String cenh = getStringForTaflmanTypeList(rules.centerHostileTo);
-        if(!cenh.equals(defaults.get("cenh"))) otnString += "cenh:" + cenh + " ";
+        if(!cenh.equals(defaults.get("cenh"))) otnrString += "cenh:" + cenh + " ";
 
         String cenhe = getStringForTaflmanTypeList(rules.emptyCenterHostileTo);
-        if(!cenhe.equals(defaults.get("cenhe"))) otnString += "cenhe:" + cenhe + " ";
+        if(!cenhe.equals(defaults.get("cenhe"))) otnrString += "cenhe:" + cenhe + " ";
 
         String aforh = getStringForTaflmanTypeList(rules.attackerFortHostileTo);
-        if(!aforh.equals(defaults.get("aforh"))) otnString += "aforh:" + aforh + " ";
+        if(!aforh.equals(defaults.get("aforh"))) otnrString += "aforh:" + aforh + " ";
 
         String dforh = getStringForTaflmanTypeList(rules.defenderFortHostileTo);
-        if(!dforh.equals(defaults.get("dforh"))) otnString += "dforh:" + dforh + " ";
+        if(!dforh.equals(defaults.get("dforh"))) otnrString += "dforh:" + dforh + " ";
 
         if(rules.allowShieldWallCaptures() != Rules.NO_SHIELDWALL) {
-            otnString += "sw:" + getStringForShieldwallMode(rules.allowShieldWallCaptures()) + " ";
+            otnrString += "sw:" + getStringForShieldwallMode(rules.allowShieldWallCaptures()) + " ";
         }
 
         if(!rules.allowFlankingShieldwallCapturesOnly()) {
-            otnString += "swf:n ";
+            otnrString += "swf:n ";
         }
 
         if(rules.allowShieldFortEscapes()) {
-            otnString += "efe:y ";
+            otnrString += "efe:y ";
         }
 
         if(rules.getBerserkMode() != Rules.BERSERK_NONE) {
-            otnString += "ber:" + getStringForBerserkMode(rules.getBerserkMode()) + " ";
+            otnrString += "ber:" + getStringForBerserkMode(rules.getBerserkMode()) + " ";
         }
 
-        otnString += "start:" + rules.getBoard().getOTNPositionString();
+        otnrString += "start:" + rules.getBoard().getOTNPositionString();
 
-        return otnString;
+        return otnrString;
+    }
+
+    public static Rules getRulesForString(String otnrString) {
+        int boardSize = 0;
+        boolean attackerCommanders = false;
+        boolean defenderCommanders = false;
+        boolean attackerKnights = false;
+        boolean defenderKnights = false;
+        List<List<Side.TaflmanHolder>> startingTaflmen;
+
+        Map<String, String> config = new HashMap<String, String>();
+        String[] components = otnrString.split(" ");
+        for(String component : components) {
+            String[] keyValue = component.split(":");
+            if(keyValue.length == 1) {
+                config.put(keyValue[0], "");
+            }
+            else {
+                config.put(keyValue[0], keyValue[1]);
+            }
+        }
+
+        System.out.println(config);
+
+        int boardDimension = Integer.parseInt(config.get("dim"));
+        String startPosition = config.get("start");
+        startingTaflmen = parseTaflmenFromPosition(startPosition);
+
+        Board board = new GenericBoard(boardDimension);
+        Side attackers = new GenericSide(board, true, startingTaflmen.get(0));
+        //System.out.println(attackers.getStartingTaflmen());
+        Side defenders = new GenericSide(board, false, startingTaflmen.get(1));
+        //System.out.println(defenders.getStartingTaflmen());
+        Rules rules = new GenericRules(board, attackers, defenders);
+
+        return rules;
+    }
+
+    private static List<List<Side.TaflmanHolder>> parseTaflmenFromPosition(String startPosition) {
+        List<Side.TaflmanHolder> attackers = new ArrayList<Side.TaflmanHolder>();
+        List<Side.TaflmanHolder> defenders = new ArrayList<Side.TaflmanHolder>();
+        List<List<Side.TaflmanHolder>> taflmen = new ArrayList<>();
+        taflmen.add(attackers);
+        taflmen.add(defenders);
+
+        String[] rawRows = startPosition.split("/");
+        List<String> rows = new ArrayList<String>();
+        for(String row : rawRows) {
+            if(row.length() > 0) rows.add(row);
+        }
+
+        int currentAttackerId = 0;
+        int currentDefenderId = 0;
+
+        int currentRow = 0;
+        for(String row : rows) {
+            boolean inNumber = false;
+            String numberSoFar = "";
+
+            int currentCol = 0;
+            for(int i = 0; i < row.length(); i++) {
+                char c = row.charAt(i);
+
+                // Catch multi-number digits
+                if(Character.isDigit(c)) {
+                    inNumber = true;
+                    numberSoFar += c;
+                    continue;
+                }
+                else if(inNumber && !Character.isDigit(c)) {
+                    currentCol += Integer.parseInt(numberSoFar);
+                    numberSoFar = "";
+                    inNumber = false;
+                }
+
+                char side = 0;
+                char id = 0;
+                char type = 0;
+
+                if(Character.isUpperCase(c)) {
+                    side = Taflman.SIDE_DEFENDERS;
+                    id = (char) currentDefenderId++;
+                }
+                else {
+                    side = Taflman.SIDE_ATTACKERS;
+                    id = (char) currentAttackerId++;
+                }
+
+                char typeChar = Character.toUpperCase(c);
+                switch(typeChar) {
+                    case 'T': type = Taflman.TYPE_TAFLMAN; break;
+                    case 'C': type = Taflman.TYPE_COMMANDER; break;
+                    case 'N': type = Taflman.TYPE_KNIGHT; break;
+                    case 'K': type = Taflman.TYPE_KING; break;
+                    default: type = Taflman.TYPE_TAFLMAN;
+                }
+
+                char taflman = Taflman.encode(id, type, side);
+                Coord coord = Coord.get(currentCol, currentRow);
+
+                Side.TaflmanHolder th = new Side.TaflmanHolder(taflman, coord);
+                if(side == Taflman.SIDE_ATTACKERS) {
+                    attackers.add(th);
+                }
+                else {
+                    defenders.add(th);
+                }
+                currentCol++;
+            }
+
+            currentRow++;
+        }
+
+
+        return taflmen;
+    }
+
+    public static boolean isNumeric(String str) {
+        for (char c : str.toCharArray()) {
+            if (!Character.isDigit(c)) return false;
+        }
+        return true;
     }
 
     private static String getStringForJumpMode(int jumpMode) {

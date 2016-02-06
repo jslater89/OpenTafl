@@ -52,6 +52,15 @@ public class Taflman {
         return packedTaflman;
     }
 
+    public static char encode(char id, char type, char side) {
+        char packedTaflman = 0;
+        packedTaflman = (char) (packedTaflman | id);
+        packedTaflman = (char) (packedTaflman | type);
+        packedTaflman = (char) (packedTaflman | side);
+
+        return packedTaflman;
+    }
+
     public static byte getPackedId(char packed) {
         return (byte) (packed & ID_MASK);
     }
@@ -665,7 +674,7 @@ public class Taflman {
         String edge1 = "";
         String edge2 = "";
         String symbol = "-";
-        if (getSide(taflman).isAttackingSide()) {
+        if (getPackedSide(taflman) == SIDE_ATTACKERS) {
             edge1 = "[";
             edge2 = "]";
         } else {

@@ -36,6 +36,7 @@ public abstract class Rules {
     public boolean[] defenderFortHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
 
     public Rules (Board board, Side attackers, Side defenders) {
+        board.setRules(this);
         board.setupTaflmen(attackers, defenders);
         boardSize = board.getBoardDimension();
         setupSpaceGroups(boardSize);
