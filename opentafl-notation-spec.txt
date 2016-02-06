@@ -276,7 +276,7 @@ Brandub:
 7x7, weak king, attackers go first, center doesn't become hostile and isn't hostile to
 anyone, all pieces may pass through the center.
 
-dim:7 ks:n cenhe: cenh: cenp:tcnkTCNK start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/
+dim:7 ks:n cenhe: cenh: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/
 
 Sea Battle 9x9:
 9x9, escape to the edges, king unarmed, center and corners not hostile, all pieces may
