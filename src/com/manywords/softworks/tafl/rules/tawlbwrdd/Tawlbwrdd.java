@@ -37,7 +37,10 @@ public class Tawlbwrdd extends Rules {
 
     @Override
     public void setupSpaceGroups(int boardSize) {
+        setDefaultSpaceGroups();
 
+        setCornerSpaces(new ArrayList<Coord>());
+        setCenterSpaces(new ArrayList<Coord>());
     }
 
     @Override

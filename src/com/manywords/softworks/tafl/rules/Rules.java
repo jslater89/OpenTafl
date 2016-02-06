@@ -1,15 +1,86 @@
 package com.manywords.softworks.tafl.rules;
 
+import com.manywords.softworks.tafl.rules.serializer.OTNRulesSerializer;
+
 import java.util.*;
 
 public abstract class Rules {
+    public static final int TAFLMAN_TYPE_COUNT = 8;
+
+    public final int boardSize;
     private Set<Coord> mCenterSpaces = new LinkedHashSet<Coord>();
     private Set<Coord> mCornerSpaces = new LinkedHashSet<Coord>();
     private Set<Coord> mAttackerForts = new LinkedHashSet<Coord>();
     private Set<Coord> mDefenderForts = new LinkedHashSet<Coord>();
 
+    /*
+        These arrays are provided for auto-generated rules; hardcoded rules
+        need not use them for movement/hostility detection, but should
+        set them for serialization.
+     */
+    public boolean[] centerPassableFor = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] centerStoppableFor = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] centerHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] emptyCenterHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
+
+    public boolean[] cornerPassableFor = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] cornerStoppableFor = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] cornerHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
+
+    public boolean[] attackerFortPassableFor = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] attackerFortStoppableFor = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] attackerFortHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
+
+    public boolean[] defenderFortPassableFor = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] defenderFortStoppableFor = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] defenderFortHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
+
     public Rules (Board board, Side attackers, Side defenders) {
-        setupSpaceGroups(board.getBoardDimension());
+        board.setupTaflmen(attackers, defenders);
+        boardSize = board.getBoardDimension();
+        setupSpaceGroups(boardSize);
+    }
+
+    /**
+     * Sets the default (i.e. Fetlar-style) space groups.
+     */
+    public void setDefaultSpaceGroups() {
+        int center = (boardSize - 1) / 2;
+
+        List<Coord> centerSpace = new ArrayList<Coord>(1);
+        centerSpace.add(Coord.get(center, center));
+
+        setCenterSpaces(centerSpace);
+
+        Coord c1 = Coord.get(0, 0);
+        Coord c2 = Coord.get(boardSize - 1, 0);
+        Coord c3 = Coord.get(0, boardSize - 1);
+        Coord c4 = Coord.get(boardSize - 1, boardSize - 1);
+
+        List<Coord> corners = new ArrayList<Coord>(4);
+        corners.add(c1);
+        corners.add(c2);
+        corners.add(c3);
+        corners.add(c4);
+
+        setCornerSpaces(corners);
+
+        centerPassableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cenp"));
+        centerStoppableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cens"));
+        centerHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cenh"));
+        emptyCenterHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cenhe"));
+
+        cornerPassableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("corp"));
+        cornerStoppableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cors"));
+        cornerHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("corh"));
+
+        attackerFortPassableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("aforp"));
+        attackerFortStoppableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("afors"));
+        attackerFortHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("aforh"));
+
+        defenderFortPassableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("dforp"));
+        defenderFortStoppableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("dfors"));
+        defenderFortHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("dforh"));
     }
 
     /**
@@ -237,6 +308,6 @@ public abstract class Rules {
     public abstract boolean isSurroundingFatal();
 
     public String getOTRString() {
-        return "";
+        return OTNRulesSerializer.getOTNRulesString(this);
     }
 }

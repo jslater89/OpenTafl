@@ -687,7 +687,7 @@ public class Taflman {
         else if(isKnight(taflman)) symbol = "n";
         else symbol = "t";
 
-        if(getSide(taflman).isAttackingSide()) symbol = symbol.toLowerCase();
+        if(getPackedSide(taflman) == SIDE_ATTACKERS) symbol = symbol.toLowerCase();
         else symbol = symbol.toUpperCase();
 
         return symbol;

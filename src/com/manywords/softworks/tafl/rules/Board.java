@@ -164,6 +164,8 @@ public abstract class Board {
         return coord;
     }
 
+    public abstract String getOTNPositionString();
+
     /**
      * Get a copy of this board for manipulation.
      *

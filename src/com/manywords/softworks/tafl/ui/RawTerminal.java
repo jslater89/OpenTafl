@@ -4,7 +4,6 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.UiCallback;
-import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.ui.player.LocalAi;
 import com.manywords.softworks.tafl.ui.player.LocalHuman;
@@ -572,7 +571,7 @@ public class RawTerminal implements UiCallback {
         }
         */
         println("Zobrist: " + state.mZobristHash);
-        println("OTN: " + state.getOTNString());
+        println("OTN: " + state.getOTNPositionString());
         print(getGameStateString(state));
     }
 

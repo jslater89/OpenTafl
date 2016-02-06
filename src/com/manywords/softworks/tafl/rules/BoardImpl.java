@@ -30,8 +30,8 @@ public abstract class BoardImpl extends Board {
     }
 
     private void initializeTaflmanLocations(Side attackers, Side defenders) {
-        byte defenderCount = (byte) getState().mGame.getGameRules().howManyDefenders();
-        byte attackerCount = (byte) getState().mGame.getGameRules().howManyAttackers();
+        byte defenderCount = (byte) defenders.getStartingTaflmen().size();
+        byte attackerCount = (byte) attackers.getStartingTaflmen().size();
         mCachedTaflmanLocations = new TaflmanCoordMap(attackerCount, defenderCount);
 
         for(Side.TaflmanHolder t : attackers.getStartingTaflmen()) {
@@ -461,6 +461,34 @@ public abstract class BoardImpl extends Board {
                 return Coord.get(getBoardDimension() - 2, space.y);
             }
         }
+    }
+
+    @Override
+    public String getOTNPositionString() {
+        char[][] board = getBoardArray();
+
+        String otnString = "/";
+        for(int y = 0; y < getBoardDimension(); y++) {
+            int emptyCount = 0;
+
+            for(int x = 0; x < getBoardDimension(); x++) {
+                if(board[y][x] == Taflman.EMPTY) {
+                    emptyCount++;
+                }
+                else {
+                    if(emptyCount > 0) {
+                        otnString += emptyCount;
+                        emptyCount = 0;
+                    }
+                    otnString += Taflman.getOtnStringSymbol(board[y][x]);
+                }
+            }
+
+            if(emptyCount > 0) otnString += emptyCount;
+            otnString += "/";
+        }
+
+        return otnString;
     }
 
     @Override

@@ -5,7 +5,6 @@ import com.manywords.softworks.tafl.rules.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class GameState {
     public GameState(Game game, Rules startingRules) {
@@ -435,31 +434,8 @@ public class GameState {
         return new GameState(this);
     }
 
-    public String getOTNString() {
-        char[][] board = getBoard().getBoardArray();
-
-        String otnString = "/";
-        for(int y = 0; y < getBoard().getBoardDimension(); y++) {
-            int emptyCount = 0;
-
-            for(int x = 0; x < getBoard().getBoardDimension(); x++) {
-                if(board[y][x] == Taflman.EMPTY) {
-                    emptyCount++;
-                }
-                else {
-                    if(emptyCount > 0) {
-                        otnString += emptyCount;
-                        emptyCount = 0;
-                    }
-                    otnString += Taflman.getOtnStringSymbol(board[y][x]);
-                }
-            }
-
-            if(emptyCount > 0) otnString += emptyCount;
-            otnString += "/";
-        }
-
-        return otnString;
+    public String getOTNPositionString() {
+        return getBoard().getOTNPositionString();
     }
 
     public long updateZobristHash(long oldZobrist, Board oldBoard, MoveRecord move) {
