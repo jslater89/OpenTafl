@@ -119,7 +119,7 @@ are present only for organizational purposes.
 	<board-size>
 
 	# These rules concern general rules of the game.
-	[<"esc:"><escape-type>] [<"surf:"><yes-no>] [<"atkf:"><yes-no>] [<"cenhe:"><yes-no>]
+	[<"esc:"><escape-type>] [<"surf:"><yes-no>] [<"atkf:"><yes-no>]
 
 	# These rules concern piece strengths and movement types.
 	[<"ka:"><yes-no>] [<"ks:"><yes-no>] [<"kj:"><jump-type>]
@@ -129,6 +129,7 @@ are present only for organizational purposes.
 	[<"cor:"><space-list>] [<"cen:"><space-list>]
 	[<"afor:"><space-list>] [<"dfor:"><space-list>]
 	[<"corh:"><piece-type-list>] [<"cenh:"><piece-type-list>]
+	[<"cenhe:"><piece-type-list>]
 	[<"aforh:"><piece-type-list>] [<"dforh:"><piece-type-list>]
 	[<"corp:"><piece-type-list>] [<"cenp:"><piece-type-list>]
 	[<"aforp:"><piece-type-list>] [<"dforp:"><piece-type-list>]
@@ -240,7 +241,7 @@ Explanatory notes:
 		(shieldwall mode) Defaults to "n" (none).
 	swf:
 		(shieldwall flanking required) May a shieldwall capture only be made by a piece
-	tcnk	moving to close one of its flanks (that is, moving to the edge?) Defaults to "y"
+		moving to close one of its flanks (that is, moving to the edge?) Defaults to "y"
 		(yes). If "n", any move that results in a closed shieldwall position against an
 		edge will capture the surrounded pieces.
 	efe:
@@ -327,6 +328,8 @@ dim:9 esc:e ka:n cen: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3t
 			<main-time-seconds> [<overtime-periods>:<overtime-length]
 		"termination": 
 			human-readable definition of how the game ended
+		"variant":
+			name of the tafl variant being played
 
 	rules-string:
 		an OTN rules string.
