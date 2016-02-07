@@ -7,6 +7,9 @@ import java.util.List;
  */
 public class GenericSide extends Side {
     private boolean mAttackingSide;
+    private List<TaflmanHolder> mStartingTaflmen;
+    private boolean mCommanders = false;
+    private boolean mKnights = false;
 
     public GenericSide(Board b) {
         super(b);
@@ -15,6 +18,17 @@ public class GenericSide extends Side {
     public GenericSide(Board b, boolean isAttackingSide, List<TaflmanHolder> taflmen) {
         super(b, taflmen);
         this.mAttackingSide = isAttackingSide;
+        mStartingTaflmen = taflmen;
+
+        for(TaflmanHolder holder : taflmen) {
+            char taflman = holder.packed;
+            if(Taflman.getPackedType(taflman) == Taflman.TYPE_COMMANDER) {
+                mCommanders = true;
+            }
+            if(Taflman.getPackedType(taflman) == Taflman.TYPE_KNIGHT) {
+                mKnights = true;
+            }
+        }
     }
 
     @Override
@@ -24,12 +38,12 @@ public class GenericSide extends Side {
 
     @Override
     public boolean hasCommanders() {
-        return false;
+        return mCommanders;
     }
 
     @Override
     public boolean hasKnights() {
-        return false;
+        return mKnights;
     }
 
     @Override
@@ -39,6 +53,6 @@ public class GenericSide extends Side {
 
     @Override
     public List<TaflmanHolder> generateTaflmen() {
-        return null;
+        return mStartingTaflmen;
     }
 }
