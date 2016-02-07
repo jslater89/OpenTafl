@@ -52,6 +52,105 @@ public class GenericRules extends Rules {
     private boolean mEdgeFortEscape = false;
     private int mBerserkMode = BERSERK_NONE;
 
+    public void setEscapeType(int escapeType) {
+        mEscapeType = escapeType;
+    }
+
+    public void setSurroundingFatal(boolean surroundingFatal) {
+        mSurroundingFatal = surroundingFatal;
+    }
+
+    public void setAttackersFirst(boolean attackersFirst) {
+        mAttackersFirst = attackersFirst;
+    }
+
+    public void setKingArmed(boolean kingArmed) {
+        mKingArmed = kingArmed;
+    }
+
+    public void setKingStrong(boolean kingStrong) {
+        mKingStrong = kingStrong;
+    }
+
+    public void setKingJumpMode(int kingJumpMode) {
+        mKingJumpMode = kingJumpMode;
+        reevaluateJumps();
+    }
+
+    public void setCommanderJumpMode(int commanderJumpMode) {
+        mCommanderJumpMode = commanderJumpMode;
+        reevaluateJumps();
+    }
+
+    public void setKnightJumpMode(int knightJumpMode) {
+        mKnightJumpMode = knightJumpMode;
+        reevaluateJumps();
+    }
+
+    private void reevaluateJumps() {
+        mDefendersJump = false;
+
+        if(mDefenderCommanders && mCommanderJumpMode != Taflman.JUMP_NONE) {
+            mDefendersJump = true;
+        }
+        else if(mDefenderKnights && mKnightJumpMode != Taflman.JUMP_NONE) {
+            mDefendersJump = true;
+        }
+        else if(mKingJumpMode != Taflman.JUMP_NONE) {
+            mDefendersJump = true;
+        }
+
+        mAttackersJump = false;
+
+        if(mAttackerCommanders && mCommanderJumpMode != Taflman.JUMP_NONE) {
+            mAttackersJump = true;
+        }
+        else if(mAttackerKnights && mKnightJumpMode != Taflman.JUMP_NONE) {
+            mAttackersJump = true;
+        }
+    }
+
+    public void setShieldwallMode(int shieldwallMode) {
+        mShieldwallMode = shieldwallMode;
+    }
+
+    public void setShieldwallFlankingRequired(boolean shieldwallFlankingRequired) {
+        mShieldwallFlankingRequired = shieldwallFlankingRequired;
+    }
+
+    public void setEdgeFortEscape(boolean edgeFortEscape) {
+        mEdgeFortEscape = edgeFortEscape;
+    }
+
+    public void setBerserkMode(int berserkMode) {
+        mBerserkMode = berserkMode;
+    }
+
+    public void setCenterParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] hostileEmpty) {
+        if(passable != null) centerPassableFor = passable;
+        if(stoppable != null) centerStoppableFor = stoppable;
+        if(hostile != null) centerHostileTo = hostile;
+        if(hostileEmpty != null) emptyCenterHostileTo = hostileEmpty;
+    }
+
+    public void setCornerParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile) {
+        if(passable != null) cornerPassableFor = passable;
+        if(stoppable != null) cornerStoppableFor = stoppable;
+        if(hostile != null) cornerHostileTo = hostile;
+    }
+
+    public void setAttackerFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile) {
+        if(passable != null) attackerFortPassableFor = passable;
+        if(stoppable != null) attackerFortStoppableFor = stoppable;
+        if(hostile != null) attackerFortHostileTo = hostile;
+    }
+
+    public void setDefenderFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile) {
+        if(passable != null) defenderFortPassableFor = passable;
+        if(stoppable != null) defenderFortStoppableFor = stoppable;
+        if(hostile != null) defenderFortHostileTo = hostile;
+    }
+
     /*
     ----------- THIS CODE IS FOR RULING GAMES -----------
      */
@@ -59,6 +158,7 @@ public class GenericRules extends Rules {
     private Board mBoard;
     private Side mAttackers;
     private Side mDefenders;
+
     private boolean mAttackersJump;
     private boolean mDefendersJump;
 

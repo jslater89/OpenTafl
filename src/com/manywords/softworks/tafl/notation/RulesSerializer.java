@@ -232,7 +232,54 @@ public class RulesSerializer {
         //System.out.println(attackers.getStartingTaflmen());
         Side defenders = new GenericSide(board, false, startingTaflmen.get(1));
         //System.out.println(defenders.getStartingTaflmen());
-        Rules rules = new GenericRules(board, attackers, defenders);
+        GenericRules rules = new GenericRules(board, attackers, defenders);
+
+        if(config.containsKey("esc")) rules.setEscapeType(getEscapeTypeForString(config.get("esc")));
+        if(config.containsKey("surf")) rules.setSurroundingFatal(getBooleanForString(config.get("surf")));
+        if(config.containsKey("atkf")) rules.setAttackersFirst(getBooleanForString(config.get("atkf")));
+        if(config.containsKey("ka")) rules.setKingArmed(getBooleanForString(config.get("ka")));
+        if(config.containsKey("ks")) rules.setKingStrong(getBooleanForString(config.get("ks")));
+        if(config.containsKey("kj")) rules.setKingJumpMode(getJumpModeForString(config.get("kj")));
+        if(config.containsKey("nj")) rules.setKnightJumpMode(getJumpModeForString(config.get("nj")));
+        if(config.containsKey("cj")) rules.setCommanderJumpMode(getJumpModeForString(config.get("cj")));
+        if(config.containsKey("sw")) rules.setShieldwallMode(getShieldwallModeForString(config.get("sw")));
+        if(config.containsKey("swf")) rules.setShieldwallFlankingRequired(getBooleanForString(config.get("swf")));
+        if(config.containsKey("efe")) rules.setEdgeFortEscape(getBooleanForString(config.get("efe")));
+        if(config.containsKey("ber")) rules.setBerserkMode(getBerserkModeForString(config.get("ber")));
+
+        boolean[] passable, stoppable, hostile, emptyHostile;
+        passable = stoppable = hostile = emptyHostile = null;
+
+        // Center
+        if(config.containsKey("cenp")) passable = getTaflmanTypeListForString(config.get("cenp"));
+        if(config.containsKey("cens")) stoppable = getTaflmanTypeListForString(config.get("cens"));
+        if(config.containsKey("cenh")) hostile = getTaflmanTypeListForString(config.get("cenh"));
+        if(config.containsKey("cenhe")) emptyHostile = getTaflmanTypeListForString(config.get("cenhe"));
+        rules.setCenterParameters(passable, stoppable, hostile, emptyHostile);
+
+        passable = stoppable = hostile = emptyHostile = null;
+
+        // Corner
+        if(config.containsKey("corp")) passable = getTaflmanTypeListForString(config.get("corp"));
+        if(config.containsKey("cors")) stoppable = getTaflmanTypeListForString(config.get("cors"));
+        if(config.containsKey("corh")) hostile = getTaflmanTypeListForString(config.get("corh"));
+        rules.setCornerParameters(passable, stoppable, hostile);
+
+        passable = stoppable = hostile = emptyHostile = null;
+
+        // Attacker fort
+        if(config.containsKey("aforp")) passable = getTaflmanTypeListForString(config.get("aforp"));
+        if(config.containsKey("afors")) stoppable = getTaflmanTypeListForString(config.get("afors"));
+        if(config.containsKey("aforh")) hostile = getTaflmanTypeListForString(config.get("aforh"));
+        rules.setAttackerFortParameters(passable, stoppable, hostile);
+
+        passable = stoppable = hostile = emptyHostile = null;
+
+        // Defender fort
+        if(config.containsKey("dforp")) passable = getTaflmanTypeListForString(config.get("dforp"));
+        if(config.containsKey("dfors")) stoppable = getTaflmanTypeListForString(config.get("dfors"));
+        if(config.containsKey("dforh")) hostile = getTaflmanTypeListForString(config.get("dforh"));
+        rules.setDefenderFortParameters(passable, stoppable, hostile);
 
         return rules;
     }
@@ -269,6 +316,16 @@ public class RulesSerializer {
             if (!Character.isDigit(c)) return false;
         }
         return true;
+    }
+
+    private static int getEscapeTypeForString(String escapeString) {
+        if(escapeString.equals("c")) return Rules.CORNERS;
+        else return Rules.EDGES;
+    }
+
+    private static boolean getBooleanForString(String yesNo) {
+        if(yesNo.equals("y")) return true;
+        else return false;
     }
 
     private static String getStringForJumpMode(int jumpMode) {

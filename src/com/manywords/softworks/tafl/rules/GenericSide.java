@@ -19,7 +19,7 @@ public class GenericSide extends Side {
 
     @Override
     public boolean isAttackingSide() {
-        return false;
+        return mAttackingSide;
     }
 
     @Override
