@@ -7,9 +7,6 @@ import com.manywords.softworks.tafl.rules.copenhagen.eleven.Copenhagen11Defender
 import com.manywords.softworks.tafl.rules.copenhagen.eleven.test.*;
 import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Board;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Copenhagen extends Rules {
     public static Copenhagen newCopenhagen11() {
         Copenhagen11Board board = new Copenhagen11Board();
@@ -140,10 +137,10 @@ public class Copenhagen extends Rules {
     @Override
     public boolean isSpaceHostileToSide(Board board, Coord space, Side side) {
 
-        SpaceGroup spaces = board.getSpaceGroupFor(space);
+        SpaceType spaces = board.getSpaceTypeFor(space);
         // Center is hostile to defenders only if not
         // occupied, and attackers always.
-        if (spaces == SpaceGroup.THRONE) {
+        if (spaces == SpaceType.CENTER) {
             if (side.isAttackingSide()) {
                 return true;
             } else if (board.getOccupier(space) == Taflman.EMPTY) {
@@ -153,7 +150,7 @@ public class Copenhagen extends Rules {
         }
 
         // Corners are hostile to everyone all the time.
-        if (spaces == SpaceGroup.CORNER) {
+        if (spaces == SpaceType.CORNER) {
             return true;
         }
 
@@ -165,8 +162,8 @@ public class Copenhagen extends Rules {
     public boolean canTaflmanMoveThrough(Board board, char piece, Coord space) {
         // This is a little bit redundant, with canTaflmanStopOn, but probably
         // useful for logic purposes.
-        SpaceGroup spaces = board.getSpaceGroupFor(space);
-        if (spaces == SpaceGroup.CORNER && !Taflman.isKing(piece)) {
+        SpaceType spaces = board.getSpaceTypeFor(space);
+        if (spaces == SpaceType.CORNER && !Taflman.isKing(piece)) {
             return false;
         }
 
@@ -175,18 +172,18 @@ public class Copenhagen extends Rules {
 
     @Override
     public boolean canTaflmanStopOn(Board board, char piece, Coord space) {
-        SpaceGroup spaces = board.getSpaceGroupFor(space);
+        SpaceType spaces = board.getSpaceTypeFor(space);
 
         // Any piece can move through any non-special square
-        if (spaces == SpaceGroup.NONE) return true;
+        if (spaces == SpaceType.NONE) return true;
 
         // Only the king can stop on the throne.
-        if (spaces == SpaceGroup.THRONE && !Taflman.isKing(piece)) {
+        if (spaces == SpaceType.CENTER && !Taflman.isKing(piece)) {
             return false;
         }
 
         // Only the king can stop on corners.
-        if (spaces == SpaceGroup.CORNER && !Taflman.isKing(piece)) {
+        if (spaces == SpaceType.CORNER && !Taflman.isKing(piece)) {
             return false;
         }
 

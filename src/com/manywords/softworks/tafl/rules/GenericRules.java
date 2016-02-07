@@ -1,5 +1,7 @@
 package com.manywords.softworks.tafl.rules;
 
+import com.manywords.softworks.tafl.notation.RulesSerializer;
+
 /**
  * Created by jay on 2/6/16.
  */
@@ -221,17 +223,108 @@ public class GenericRules extends Rules {
 
     @Override
     public boolean isSpaceHostileToSide(Board board, Coord space, Side side) {
-        return false;
+        SpaceType type = board.getSpaceTypeFor(space);
+
+        boolean[] hostilityArray = new boolean[TAFLMAN_TYPE_COUNT];
+        switch(type) {
+            case CENTER:
+                char centerOccupier = board.getOccupier(space);
+
+                hostilityArray = (centerOccupier == Taflman.EMPTY ? emptyCenterHostileTo : centerHostileTo);
+                break;
+            case CORNER:
+                hostilityArray = cornerHostileTo;
+                break;
+            case ATTACKER_FORT:
+                hostilityArray = attackerFortHostileTo;
+                break;
+            case DEFENDER_FORT:
+                hostilityArray = defenderFortHostileTo;
+                break;
+        }
+
+        if(side.isAttackingSide()) {
+            return hostilityArray[RulesSerializer.TaflmanTypeIndex.t];
+        }
+        else {
+            return hostilityArray[RulesSerializer.TaflmanTypeIndex.T];
+        }
     }
 
     @Override
     public boolean canTaflmanMoveThrough(Board board, char piece, Coord space) {
-        return false;
+        int index = getTaflmanTypeIndexFor(piece);
+        SpaceType type = board.getSpaceTypeFor(space);
+
+        boolean[] passabilityArray = new boolean[TAFLMAN_TYPE_COUNT];
+        switch(type) {
+            case CENTER:
+                passabilityArray = centerPassableFor;
+                break;
+            case CORNER:
+                passabilityArray = cornerPassableFor;
+                break;
+            case ATTACKER_FORT:
+                passabilityArray = attackerFortPassableFor;
+                break;
+            case DEFENDER_FORT:
+                passabilityArray = defenderFortPassableFor;
+                break;
+        }
+
+        return passabilityArray[index];
     }
 
     @Override
     public boolean canTaflmanStopOn(Board board, char piece, Coord space) {
-        return false;
+        int index = getTaflmanTypeIndexFor(piece);
+        SpaceType type = board.getSpaceTypeFor(space);
+
+        boolean[] stoppabilityArray = new boolean[TAFLMAN_TYPE_COUNT];
+        switch(type) {
+            case CENTER:
+                stoppabilityArray = centerStoppableFor;
+                break;
+            case CORNER:
+                stoppabilityArray = cornerStoppableFor;
+                break;
+            case ATTACKER_FORT:
+                stoppabilityArray = attackerFortStoppableFor;
+                break;
+            case DEFENDER_FORT:
+                stoppabilityArray = defenderFortStoppableFor;
+                break;
+        }
+
+        return stoppabilityArray[index];
+    }
+
+
+    private int getTaflmanTypeIndexFor(char taflman) {
+        if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
+            switch(Taflman.getPackedType(taflman)) {
+                case Taflman.TYPE_KING:
+                    return RulesSerializer.TaflmanTypeIndex.k;
+                case Taflman.TYPE_KNIGHT:
+                    return RulesSerializer.TaflmanTypeIndex.n;
+                case Taflman.TYPE_COMMANDER:
+                    return RulesSerializer.TaflmanTypeIndex.c;
+                default:
+                    return RulesSerializer.TaflmanTypeIndex.t;
+            }
+        }
+        else {
+            switch(Taflman.getPackedType(taflman)) {
+                case Taflman.TYPE_KING:
+                    return RulesSerializer.TaflmanTypeIndex.K;
+                case Taflman.TYPE_KNIGHT:
+                    return RulesSerializer.TaflmanTypeIndex.N;
+                case Taflman.TYPE_COMMANDER:
+                    return RulesSerializer.TaflmanTypeIndex.C;
+                default:
+                    return RulesSerializer.TaflmanTypeIndex.T;
+            }
+        }
     }
 
     @Override

@@ -6,9 +6,6 @@ import com.manywords.softworks.tafl.rules.brandub.seven.Brandub7Board;
 import com.manywords.softworks.tafl.rules.brandub.seven.Brandub7Defenders;
 import com.manywords.softworks.tafl.rules.brandub.seven.test.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class Brandub extends Rules {
     public static Brandub newBrandub7() {
@@ -122,7 +119,7 @@ public class Brandub extends Rules {
     @Override
     public boolean isSpaceHostileToSide(Board board, Coord space, Side side) {
         // Corners are always hostile, center is not.
-        if (board.getSpaceGroupFor(space) == SpaceGroup.CORNER) {
+        if (board.getSpaceTypeFor(space) == SpaceType.CORNER) {
             return true;
         } else {
             return false;
@@ -133,8 +130,8 @@ public class Brandub extends Rules {
     public boolean canTaflmanMoveThrough(Board board, char piece, Coord space) {
         // Only the king can move through corners
 
-        SpaceGroup spaces = board.getSpaceGroupFor(space);
-        if (spaces == SpaceGroup.CORNER && !Taflman.isKing(piece)) {
+        SpaceType spaces = board.getSpaceTypeFor(space);
+        if (spaces == SpaceType.CORNER && !Taflman.isKing(piece)) {
             return false;
         }
         return true;
@@ -143,8 +140,8 @@ public class Brandub extends Rules {
     @Override
     public boolean canTaflmanStopOn(Board board, char piece, Coord space) {
         //Only the king can stop on corners or the center square.
-        SpaceGroup spaces = board.getSpaceGroupFor(space);
-        if ((spaces == SpaceGroup.CORNER || spaces == SpaceGroup.THRONE)
+        SpaceType spaces = board.getSpaceTypeFor(space);
+        if ((spaces == SpaceType.CORNER || spaces == SpaceType.CENTER)
                 && !Taflman.isKing(piece)) {
             return false;
         }

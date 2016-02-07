@@ -1,8 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai.evaluators;
 
 import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.ui.RawTerminal;
@@ -165,7 +163,7 @@ public class FishyEvaluator implements Evaluator {
         int kingEdges = 0;
         for (Coord dest : kingDestinations) {
             if (board.isEdgeSpace(dest)) kingEdges++;
-            if (board.getSpaceGroupFor(dest) == SpaceGroup.CORNER) kingCorners++;
+            if (board.getSpaceTypeFor(dest) == SpaceType.CORNER) kingCorners++;
         }
 
         if (edgeEscape) { // block max: defender 0.75, attacker 0.0

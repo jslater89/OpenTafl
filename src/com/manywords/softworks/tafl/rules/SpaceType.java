@@ -6,9 +6,9 @@ package com.manywords.softworks.tafl.rules;
  * in case of Alea Evangelii), or forts in the middle
  * of the board (in the case of Alea Evangelii variants.)
  */
-public enum SpaceGroup {
+public enum SpaceType {
     NONE, // Normal space
-    THRONE, // The center square
+    CENTER, // The center square
     ATTACKER_FORT, // Any fortress that isn't a corner
     DEFENDER_FORT,
     CORNER // Corner fortresses, potentially hostile
@@ -17,12 +17,12 @@ public enum SpaceGroup {
     public static enum Type {
 	}
 	
-	public SpaceGroup(List<Coord> spaces, Type type) {
+	public SpaceType(List<Coord> spaces, Type type) {
 		mSpaces = spaces;
 		mType = type;
 	}
 	
-	public SpaceGroup(Coord space, Type type) {
+	public SpaceType(Coord space, Type type) {
 		mType = type;
 		mSpaces = new ArrayList<Coord>(1);
 		mSpaces.add(space);

@@ -53,7 +53,7 @@ public abstract class Board {
      *
      * @return
      */
-    public abstract SpaceGroup getSpaceGroupFor(Coord space);
+    public abstract SpaceType getSpaceTypeFor(Coord space);
 
     /**
      * Is this space an edge?

@@ -2,7 +2,6 @@ package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -245,7 +244,7 @@ public class Taflman {
         boolean canJump = false;
 
         if (getJumpMode(taflman) == Taflman.JUMP_RESTRICTED) {
-            if (getBoard(state).getSpaceGroupFor(space) != SpaceGroup.NONE) {
+            if (getBoard(state).getSpaceTypeFor(space) != SpaceType.NONE) {
                 isStartSpecial = true;
             } else {
                 isStartSpecial = false;
@@ -317,11 +316,11 @@ public class Taflman {
 
     private static Coord checkJumpDestination(GameState state, char taflman, Coord destination, boolean isStartSpecial) {
 
-        SpaceGroup group = getBoard(state).getSpaceGroupFor(destination);
+        SpaceType group = getBoard(state).getSpaceTypeFor(destination);
 
         if (getBoard(state).getOccupier(destination) != EMPTY) {
             // Can't jump to an occupied space.
-        } else if (group == SpaceGroup.NONE && !isStartSpecial && getJumpMode(taflman) == Taflman.JUMP_RESTRICTED) {
+        } else if (group == SpaceType.NONE && !isStartSpecial && getJumpMode(taflman) == Taflman.JUMP_RESTRICTED) {
             // If group is null and start is special and this is a restricted-jump taflman,
             // then we can't jump. If we are able to jump, fall through to standard
             // case.
@@ -557,13 +556,13 @@ public class Taflman {
             // sandwich is the capturer's current location, and there are no special
             // spaces in play, this *is* a jump (conditions 1 and 2) and *can't* be
             // a capture (condition 3).
-            SpaceGroup adjacentOneGroup = getBoard(state).getSpaceGroupFor(adjacentOne);
-            SpaceGroup adjacentTwoGroup = getBoard(state).getSpaceGroupFor(adjacentTwo);
-            if (adjacentOne == move && getBoard(state).getOccupier(adjacentTwo) == capturer && adjacentTwoGroup == SpaceGroup.NONE) {
+            SpaceType adjacentOneGroup = getBoard(state).getSpaceTypeFor(adjacentOne);
+            SpaceType adjacentTwoGroup = getBoard(state).getSpaceTypeFor(adjacentTwo);
+            if (adjacentOne == move && getBoard(state).getOccupier(adjacentTwo) == capturer && adjacentTwoGroup == SpaceType.NONE) {
                 return false;
             }
 
-            if (adjacentTwo == move && getBoard(state).getOccupier(adjacentOne) == capturer && adjacentOneGroup == SpaceGroup.NONE) {
+            if (adjacentTwo == move && getBoard(state).getOccupier(adjacentOne) == capturer && adjacentOneGroup == SpaceType.NONE) {
                 return false;
             }
 
@@ -571,10 +570,10 @@ public class Taflman {
                     && (Taflman.getSide(capturer).hasCommanders() || Taflman.getSide(capturer).hasKnights())) {
                 // If the other side has commanders or knights and this is a strong
                 // king, we need to check for commander/knight sandwich.
-                if (getBoard(state).getSpaceGroupFor(adjacentOne) == SpaceGroup.THRONE || getBoard(state).getSpaceGroupFor(adjacentTwo) == SpaceGroup.THRONE) {
+                if (getBoard(state).getSpaceTypeFor(adjacentOne) == SpaceType.CENTER || getBoard(state).getSpaceTypeFor(adjacentTwo) == SpaceType.CENTER) {
                     // If one of the squares in question is a center space, we're safe.
                     return false;
-                } else if (getBoard(state).getSpaceGroupFor(Taflman.getCurrentSpace(state, taflman)) == SpaceGroup.THRONE) {
+                } else if (getBoard(state).getSpaceTypeFor(Taflman.getCurrentSpace(state, taflman)) == SpaceType.CENTER) {
                     // Can't be commander-sandwiched on the throne.
                     return false;
                 } else {
@@ -584,11 +583,11 @@ public class Taflman {
                     // If one of the adjacent spaces is a corner, that's half of
                     // a capture.
 
-                    if (adjacentOneGroup != SpaceGroup.NONE || adjacentTwoGroup != SpaceGroup.NONE) {
-                        if (adjacentOneGroup == SpaceGroup.CORNER && getBoard(state).isSpaceHostileTo(adjacentOne, taflman)) {
+                    if (adjacentOneGroup != SpaceType.NONE || adjacentTwoGroup != SpaceType.NONE) {
+                        if (adjacentOneGroup == SpaceType.CORNER && getBoard(state).isSpaceHostileTo(adjacentOne, taflman)) {
                             hostileCorner += 1;
                         }
-                        if (adjacentTwoGroup == SpaceGroup.CORNER && getBoard(state).isSpaceHostileTo(adjacentTwo, taflman)) {
+                        if (adjacentTwoGroup == SpaceType.CORNER && getBoard(state).isSpaceHostileTo(adjacentTwo, taflman)) {
                             hostileCorner += 1;
                         }
                     }

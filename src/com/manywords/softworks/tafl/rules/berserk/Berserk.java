@@ -110,20 +110,20 @@ public class Berserk extends Rules {
     @Override
     public boolean isSpaceHostileToSide(Board board, Coord space, Side side) {
         // Center is hostile to attackers always.
-        if (board.getSpaceGroupFor(space) == SpaceGroup.THRONE && side.isAttackingSide()) {
+        if (board.getSpaceTypeFor(space) == SpaceType.CENTER && side.isAttackingSide()) {
             return true;
         }
 
         // Center is hostile to defenders only if not
         // occupied.
-        if (board.getSpaceGroupFor(space) == SpaceGroup.THRONE && !side.isAttackingSide()) {
+        if (board.getSpaceTypeFor(space) == SpaceType.CENTER && !side.isAttackingSide()) {
             if (board.getOccupier(space) == 0) {
                 return true;
             }
         }
 
         // Corners are hostile to everyone all the time.
-        if (board.getSpaceGroupFor(space) == SpaceGroup.CORNER) {
+        if (board.getSpaceTypeFor(space) == SpaceType.CORNER) {
             return true;
         }
 
@@ -135,8 +135,8 @@ public class Berserk extends Rules {
     public boolean canTaflmanMoveThrough(Board board, char piece, Coord space) {
         // This is a little bit redundant, with canTaflmanStopOn, but probably
         // useful for logic purposes.
-        SpaceGroup group = board.getSpaceGroupFor(space);
-        if (group == SpaceGroup.CORNER && !Taflman.isKing(piece)) {
+        SpaceType group = board.getSpaceTypeFor(space);
+        if (group == SpaceType.CORNER && !Taflman.isKing(piece)) {
             return false;
         }
 
@@ -145,18 +145,18 @@ public class Berserk extends Rules {
 
     @Override
     public boolean canTaflmanStopOn(Board board, char piece, Coord space) {
-        SpaceGroup group = board.getSpaceGroupFor(space);
+        SpaceType group = board.getSpaceTypeFor(space);
 
         // Any piece can move through any non-special square
-        if (group == SpaceGroup.NONE) return true;
+        if (group == SpaceType.NONE) return true;
 
         // Only the king can stop on the throne.
-        if (group == SpaceGroup.THRONE && !Taflman.isKing(piece)) {
+        if (group == SpaceType.CENTER && !Taflman.isKing(piece)) {
             return false;
         }
 
         // Only the king can stop on corners.
-        if (group == SpaceGroup.CORNER && !Taflman.isKing(piece)) {
+        if (group == SpaceType.CORNER && !Taflman.isKing(piece)) {
             return false;
         }
 

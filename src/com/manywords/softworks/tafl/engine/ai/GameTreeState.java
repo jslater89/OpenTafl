@@ -3,17 +3,10 @@ package com.manywords.softworks.tafl.engine.ai;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
-import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
-import com.manywords.softworks.tafl.rules.SpaceGroup;
 import com.manywords.softworks.tafl.rules.Taflman;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
