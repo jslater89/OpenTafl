@@ -148,12 +148,12 @@ public abstract class Board {
         return spaceString;
     }
 
-    public static Map<String, Integer> getCoordsFromChessNotation(String chess) {
+    public static Map<String, Integer> getCoordMapFromChessNotation(String chess) {
         Map<String, Integer> coord = new HashMap<String, Integer>();
 
         int file = (int) chess.toCharArray()[0] - (int) 'a';
-        if (file < 0 || file > 16) {
-            throw new IllegalArgumentException("No support for chess notations with more than 17 ranks");
+        if (file < 0 || file > 18) {
+            throw new IllegalArgumentException("No support for chess notations with more than 19 ranks");
         }
 
         String fileString = chess.substring(1);
@@ -163,6 +163,12 @@ public abstract class Board {
         coord.put("x", file);
 
         return coord;
+    }
+
+    public static Coord getCoordFromChessNotation(String chess) {
+        Map<String, Integer> coordMap = getCoordMapFromChessNotation(chess);
+
+        return Coord.get(coordMap.get("x"), coordMap.get("y"));
     }
 
     public abstract String getOTNPositionString();

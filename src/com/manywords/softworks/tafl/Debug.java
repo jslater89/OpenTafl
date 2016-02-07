@@ -4,6 +4,8 @@ import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
+import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
+import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.Map;
@@ -11,7 +13,7 @@ import java.util.Map;
 public class Debug {
     public static void run(Map<String, String> args) {
 
-        String rulesString = RulesSerializer.getOTNRulesString(Brandub.newBrandub7());
+        String rulesString = RulesSerializer.getOTNRulesString(SeaBattle.newSeaBattle9());
         System.out.println(rulesString);
         Rules r = RulesSerializer.getRulesForString(rulesString);
         rulesString = RulesSerializer.getOTNRulesString(r);

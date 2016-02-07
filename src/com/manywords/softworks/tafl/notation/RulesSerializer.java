@@ -247,6 +247,11 @@ public class RulesSerializer {
         if(config.containsKey("efe")) rules.setEdgeFortEscape(getBooleanForString(config.get("efe")));
         if(config.containsKey("ber")) rules.setBerserkMode(getBerserkModeForString(config.get("ber")));
 
+        if(config.containsKey("cor")) rules.setCornerSpaces(getCoordListForString(config.get("cor")));
+        if(config.containsKey("cen")) rules.setCenterSpaces(getCoordListForString(config.get("cen")));
+        if(config.containsKey("afor")) rules.setAttackerForts(getCoordListForString(config.get("afor")));
+        if(config.containsKey("dfor")) rules.setDefenderForts(getCoordListForString(config.get("dfor")));
+
         boolean[] passable, stoppable, hostile, emptyHostile;
         passable = stoppable = hostile = emptyHostile = null;
 
@@ -425,5 +430,19 @@ public class RulesSerializer {
         if(berserkString.equals("c")) return Rules.BERSERK_CAPTURE_ONLY;
 
         return Rules.BERSERK_NONE;
+    }
+
+    private static List<Coord> getCoordListForString(String coordListString) {
+        List<Coord> coordList = new ArrayList<Coord>();
+
+        String[] coords = coordListString.split(",");
+
+        for(String coordString : coords) {
+            if(coordString.length() == 0) continue;
+            Coord c = Board.getCoordFromChessNotation(coordString);
+            coordList.add(c);
+        }
+
+        return coordList;
     }
 }

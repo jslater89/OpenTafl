@@ -446,8 +446,8 @@ public class RawTerminal implements UiCallback {
                     return null;
                 }
 
-                int x = Board.getCoordsFromChessNotation(chessString).get("x");
-                int y = Board.getCoordsFromChessNotation(chessString).get("y");
+                int x = Board.getCoordMapFromChessNotation(chessString).get("x");
+                int y = Board.getCoordMapFromChessNotation(chessString).get("y");
 
                 if (x < 0 || x >= boardSize || y < 0 || y >= boardSize) {
                     println(chessString + " out of bounds");
@@ -505,8 +505,8 @@ public class RawTerminal implements UiCallback {
                     return null;
                 }
 
-                Map<String, Integer> fromCoords = Board.getCoordsFromChessNotation(fromString);
-                Map<String, Integer> toCoords = Board.getCoordsFromChessNotation(toString);
+                Map<String, Integer> fromCoords = Board.getCoordMapFromChessNotation(fromString);
+                Map<String, Integer> toCoords = Board.getCoordMapFromChessNotation(toString);
 
                 int fromX = fromCoords.get("x");
                 int fromY = fromCoords.get("y");
