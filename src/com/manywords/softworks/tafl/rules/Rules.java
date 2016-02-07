@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.rules;
 
-import com.manywords.softworks.tafl.rules.serializer.OTNRulesSerializer;
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 
 import java.util.*;
 
@@ -66,22 +66,22 @@ public abstract class Rules {
 
         setCornerSpaces(corners);
 
-        centerPassableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cenp"));
-        centerStoppableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cens"));
-        centerHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cenh"));
-        emptyCenterHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cenhe"));
+        centerPassableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cenp"));
+        centerStoppableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cens"));
+        centerHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cenh"));
+        emptyCenterHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cenhe"));
 
-        cornerPassableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("corp"));
-        cornerStoppableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("cors"));
-        cornerHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("corh"));
+        cornerPassableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("corp"));
+        cornerStoppableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cors"));
+        cornerHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("corh"));
 
-        attackerFortPassableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("aforp"));
-        attackerFortStoppableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("afors"));
-        attackerFortHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("aforh"));
+        attackerFortPassableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("aforp"));
+        attackerFortStoppableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("afors"));
+        attackerFortHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("aforh"));
 
-        defenderFortPassableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("dforp"));
-        defenderFortStoppableFor = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("dfors"));
-        defenderFortHostileTo = OTNRulesSerializer.getTaflmanTypeListForString(OTNRulesSerializer.defaults.get("dforh"));
+        defenderFortPassableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("dforp"));
+        defenderFortStoppableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("dfors"));
+        defenderFortHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("dforh"));
     }
 
     /**
@@ -309,6 +309,6 @@ public abstract class Rules {
     public abstract boolean isSurroundingFatal();
 
     public String getOTRString() {
-        return OTNRulesSerializer.getOTNRulesString(this);
+        return RulesSerializer.getOTNRulesString(this);
     }
 }

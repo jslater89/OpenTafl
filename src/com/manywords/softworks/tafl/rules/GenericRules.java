@@ -8,6 +8,30 @@ public class GenericRules extends Rules {
     public GenericRules(Board board, Side attackers, Side defenders) {
         super(board, attackers, defenders);
         mBoard = board;
+        mAttackers = attackers;
+        mDefenders = defenders;
+
+        for(Side.TaflmanHolder holder : attackers.getStartingTaflmen()) {
+            char taflman = holder.packed;
+
+            if(Taflman.getPackedType(taflman) == Taflman.TYPE_COMMANDER) {
+                mAttackerCommanders = true;
+            }
+            if(Taflman.getPackedType(taflman) == Taflman.TYPE_KNIGHT) {
+                mAttackerKnights = true;
+            }
+        }
+
+        for(Side.TaflmanHolder holder : defenders.getStartingTaflmen()) {
+            char taflman = holder.packed;
+
+            if(Taflman.getPackedType(taflman) == Taflman.TYPE_COMMANDER) {
+                mDefenderCommanders = true;
+            }
+            if(Taflman.getPackedType(taflman) == Taflman.TYPE_KNIGHT) {
+                mDefenderKnights = true;
+            }
+        }
     }
 
     /*
@@ -33,6 +57,15 @@ public class GenericRules extends Rules {
      */
 
     private Board mBoard;
+    private Side mAttackers;
+    private Side mDefenders;
+    private boolean mAttackersJump;
+    private boolean mDefendersJump;
+
+    private boolean mAttackerCommanders;
+    private boolean mDefenderCommanders;
+    private boolean mAttackerKnights;
+    private boolean mDefenderKnights;
 
     @Override
     public void setupSpaceGroups(int boardSize) {
@@ -42,47 +75,48 @@ public class GenericRules extends Rules {
 
     @Override
     public boolean isKingArmed() {
-        return false;
+        return mKingArmed;
     }
 
     @Override
     public boolean isKingStrong() {
-        return false;
+        return mKingStrong;
     }
 
     @Override
     public int getKingJumpMode() {
-        return 0;
+        return mKingJumpMode;
     }
 
     @Override
     public int getKnightJumpMode() {
-        return 0;
+        return mKnightJumpMode;
     }
 
     @Override
     public int getCommanderJumpMode() {
-        return 0;
+        return mCommanderJumpMode;
     }
 
     @Override
     public int getMercenaryJumpMode() {
-        return 0;
+        return Taflman.JUMP_NONE;
     }
 
     @Override
     public boolean canSideJump(Side side) {
-        return false;
+        if(side.isAttackingSide()) return mAttackersJump;
+        else return mDefendersJump;
     }
 
     @Override
     public int howManyAttackers() {
-        return 0;
+        return mAttackers.getStartingTaflmen().size();
     }
 
     @Override
     public int howManyDefenders() {
-        return 0;
+        return mDefenders.getStartingTaflmen().size();
     }
 
     @Override
@@ -102,27 +136,27 @@ public class GenericRules extends Rules {
 
     @Override
     public int allowShieldWallCaptures() {
-        return 0;
+        return mShieldwallMode;
     }
 
     @Override
     public boolean allowFlankingShieldwallCapturesOnly() {
-        return false;
+        return mShieldwallFlankingRequired;
     }
 
     @Override
     public boolean allowShieldFortEscapes() {
-        return false;
+        return mEdgeFortEscape;
     }
 
     @Override
     public int getEscapeType() {
-        return 0;
+        return mEscapeType;
     }
 
     @Override
     public int getBerserkMode() {
-        return 0;
+        return mBerserkMode;
     }
 
     @Override
@@ -132,21 +166,22 @@ public class GenericRules extends Rules {
 
     @Override
     public Side getAttackers() {
-        return null;
+        return mAttackers;
     }
 
     @Override
     public Side getDefenders() {
-        return null;
+        return mDefenders;
     }
 
     @Override
     public Side getStartingSide() {
-        return null;
+        if(mAttackersFirst) return mAttackers;
+        else return mDefenders;
     }
 
     @Override
     public boolean isSurroundingFatal() {
-        return false;
+        return mSurroundingFatal;
     }
 }

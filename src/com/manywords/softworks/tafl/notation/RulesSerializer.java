@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.rules.serializer;
+package com.manywords.softworks.tafl.notation;
 
 import com.manywords.softworks.tafl.rules.*;
 
@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by jay on 2/5/16.
  */
-public class OTNRulesSerializer {
+public class RulesSerializer {
     public static class TaflmanTypeIndex {
         public static final int count = Rules.TAFLMAN_TYPE_COUNT;
         public static final char[] inverse = {'t', 'c', 'n', 'k', 'T', 'C', 'N', 'K'};
@@ -244,74 +244,22 @@ public class OTNRulesSerializer {
         taflmen.add(attackers);
         taflmen.add(defenders);
 
-        String[] rawRows = startPosition.split("/");
-        List<String> rows = new ArrayList<String>();
-        for(String row : rawRows) {
-            if(row.length() > 0) rows.add(row);
-        }
+        char[][] boardArray = Board.loadOTNPositionString(startPosition);
 
-        int currentAttackerId = 0;
-        int currentDefenderId = 0;
-
-        int currentRow = 0;
-        for(String row : rows) {
-            boolean inNumber = false;
-            String numberSoFar = "";
-
-            int currentCol = 0;
-            for(int i = 0; i < row.length(); i++) {
-                char c = row.charAt(i);
-
-                // Catch multi-number digits
-                if(Character.isDigit(c)) {
-                    inNumber = true;
-                    numberSoFar += c;
-                    continue;
+        for(int y = 0; y < boardArray.length; y++) {
+            for(int x = 0; x < boardArray.length; x++) {
+                char taflman = boardArray[y][x];
+                if(taflman != Taflman.EMPTY) {
+                    Side.TaflmanHolder holder = new Side.TaflmanHolder(taflman, Coord.get(x, y));
+                    if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
+                        attackers.add(holder);
+                    }
+                    else {
+                        defenders.add(holder);
+                    }
                 }
-                else if(inNumber && !Character.isDigit(c)) {
-                    currentCol += Integer.parseInt(numberSoFar);
-                    numberSoFar = "";
-                    inNumber = false;
-                }
-
-                char side = 0;
-                char id = 0;
-                char type = 0;
-
-                if(Character.isUpperCase(c)) {
-                    side = Taflman.SIDE_DEFENDERS;
-                    id = (char) currentDefenderId++;
-                }
-                else {
-                    side = Taflman.SIDE_ATTACKERS;
-                    id = (char) currentAttackerId++;
-                }
-
-                char typeChar = Character.toUpperCase(c);
-                switch(typeChar) {
-                    case 'T': type = Taflman.TYPE_TAFLMAN; break;
-                    case 'C': type = Taflman.TYPE_COMMANDER; break;
-                    case 'N': type = Taflman.TYPE_KNIGHT; break;
-                    case 'K': type = Taflman.TYPE_KING; break;
-                    default: type = Taflman.TYPE_TAFLMAN;
-                }
-
-                char taflman = Taflman.encode(id, type, side);
-                Coord coord = Coord.get(currentCol, currentRow);
-
-                Side.TaflmanHolder th = new Side.TaflmanHolder(taflman, coord);
-                if(side == Taflman.SIDE_ATTACKERS) {
-                    attackers.add(th);
-                }
-                else {
-                    defenders.add(th);
-                }
-                currentCol++;
             }
-
-            currentRow++;
         }
-
 
         return taflmen;
     }

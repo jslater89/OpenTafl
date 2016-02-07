@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.rules;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,6 +166,74 @@ public abstract class Board {
     }
 
     public abstract String getOTNPositionString();
+
+    public static char[][] loadOTNPositionString(String otnPosition) {
+        String[] rawRows = otnPosition.split("/");
+        List<String> rows = new ArrayList<String>();
+        for(String row : rawRows) {
+            if(row.length() > 0) rows.add(row);
+        }
+
+        char[][] board = new char[rows.size()][rows.size()];
+
+        int currentAttackerId = 0;
+        int currentDefenderId = 0;
+
+        int currentRow = 0;
+        for(String row : rows) {
+            boolean inNumber = false;
+            String numberSoFar = "";
+
+            int currentCol = 0;
+            for(int i = 0; i < row.length(); i++) {
+                char c = row.charAt(i);
+
+                // Catch multi-number digits
+                if(Character.isDigit(c)) {
+                    inNumber = true;
+                    numberSoFar += c;
+                    continue;
+                }
+                else if(inNumber && !Character.isDigit(c)) {
+                    currentCol += Integer.parseInt(numberSoFar);
+                    numberSoFar = "";
+                    inNumber = false;
+                }
+
+                char side = 0;
+                char id = 0;
+                char type = 0;
+
+                if(Character.isUpperCase(c)) {
+                    side = Taflman.SIDE_DEFENDERS;
+                    id = (char) currentDefenderId++;
+                }
+                else {
+                    side = Taflman.SIDE_ATTACKERS;
+                    id = (char) currentAttackerId++;
+                }
+
+                char typeChar = Character.toUpperCase(c);
+                switch(typeChar) {
+                    case 'T': type = Taflman.TYPE_TAFLMAN; break;
+                    case 'C': type = Taflman.TYPE_COMMANDER; break;
+                    case 'N': type = Taflman.TYPE_KNIGHT; break;
+                    case 'K': type = Taflman.TYPE_KING; break;
+                    default: type = Taflman.TYPE_TAFLMAN;
+                }
+
+                char taflman = Taflman.encode(id, type, side);
+                Coord coord = Coord.get(currentCol, currentRow);
+
+                board[coord.y][coord.x] = taflman;
+                currentCol++;
+            }
+
+            currentRow++;
+        }
+
+        return board;
+    }
 
     /**
      * Get a copy of this board for manipulation.

@@ -5,10 +5,6 @@ import com.manywords.softworks.tafl.rules.berserk.eleven.Berserk11Attackers;
 import com.manywords.softworks.tafl.rules.berserk.eleven.Berserk11Board;
 import com.manywords.softworks.tafl.rules.berserk.eleven.Berserk11Defenders;
 import com.manywords.softworks.tafl.rules.berserk.eleven.test.*;
-import com.manywords.softworks.tafl.rules.serializer.OTNRulesSerializer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Berserk extends Rules {
     public static Berserk newBerserk11() {

@@ -664,9 +664,13 @@ public class Taflman {
     public static final int JUMP_RESTRICTED = 3;
 
     public static int getJumpMode(char taflman) {
-        if (isKing(taflman)) return getRules().getKingJumpMode();
-        else if (isKnight(taflman)) return getRules().getKnightJumpMode();
-        else if (isCommander(taflman)) return getRules().getCommanderJumpMode();
+        return getJumpMode(getRules(), taflman);
+    }
+
+    public static int getJumpMode(Rules r, char taflman) {
+        if (isKing(taflman)) return r.getKingJumpMode();
+        else if (isKnight(taflman)) return r.getKnightJumpMode();
+        else if (isCommander(taflman)) return r.getCommanderJumpMode();
         else return JUMP_NONE;
     }
 
