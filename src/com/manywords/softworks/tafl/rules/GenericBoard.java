@@ -16,6 +16,7 @@ public class GenericBoard extends BoardImpl {
 
     public GenericBoard(Board b) {
         super(b);
+        mBoardDimension = b.getBoardDimension();
         setRules(b.getRules());
     }
 

@@ -257,6 +257,8 @@ public class GenericRules extends Rules {
         SpaceType type = board.getSpaceTypeFor(space);
 
         boolean[] passabilityArray = new boolean[TAFLMAN_TYPE_COUNT];
+        for(int i = 0; i < passabilityArray.length; i++) passabilityArray[i] = true;
+
         switch(type) {
             case CENTER:
                 passabilityArray = centerPassableFor;
@@ -281,6 +283,8 @@ public class GenericRules extends Rules {
         SpaceType type = board.getSpaceTypeFor(space);
 
         boolean[] stoppabilityArray = new boolean[TAFLMAN_TYPE_COUNT];
+        for(int i = 0; i < stoppabilityArray.length; i++) stoppabilityArray[i] = true;
+
         switch(type) {
             case CENTER:
                 stoppabilityArray = centerStoppableFor;

@@ -7,6 +7,7 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
+        tests.add(new RulesSerializerConsistencyTest());
         tests.add(new TranspositionTableConsistencyTest());
         tests.add(new StrongKingCaptureTest());
         tests.add(new DoubleCaptureTest());
@@ -27,8 +28,8 @@ public class Test {
         tests.add(new BadCopenhagenCaptureTest());
         tests.add(new AIMatchingZobristTest());
         tests.add(new AICertainKingCaptureTest());
-        tests.add(new AITwoCornerEscapeTest());
-        tests.add(new AITwoEdgeEscapeTest());
+        tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
+        tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
         tests.add(new AIMoveRepetitionTest());
 
         for (TaflTest test : tests) {

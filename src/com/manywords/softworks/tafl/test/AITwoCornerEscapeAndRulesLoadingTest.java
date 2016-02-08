@@ -5,13 +5,13 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.UiCallback;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
-import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
+import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
-class AITwoEdgeEscapeTest extends TaflTest implements UiCallback {
+class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements UiCallback {
 
     @Override
     public void gameStateAdvanced() {
@@ -27,32 +27,23 @@ class AITwoEdgeEscapeTest extends TaflTest implements UiCallback {
 
     @Override
     public void run() {
-        Rules rules = SeaBattle.newAiTwoEdgeEscapeTest();
-        Game game = new Game(rules, null);
+        Rules rules = Brandub.newAiTwoCornerEscapeTest();
+        String rulesString = RulesSerializer.getOTNRulesString(rules);
+        Rules inflatedRules = RulesSerializer.getRulesForString(rulesString);
+        Game game = new Game(inflatedRules, null);
         GameState state = game.getCurrentState();
-        state.setCurrentSide(state.getDefenders());
 
         int victory = GameState.NO_WIN;
         int value = 0;
 
-        for(int i = 0; i < 2; i++) {
+        for(int i = 0; i < 4; i++) {
             //RawTerminal.renderGameState(state);
             AiWorkspace workspace = new AiWorkspace(game, state, 5);
-            workspace.chatty = false;
+            //workspace.chatty = true;
             workspace.explore(4);
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             value = workspace.getTreeRoot().getBestChild().getValue();
-
-            /*
-            System.out.println("value: " + value);
-            for(GameTreeNode node : workspace.getTreeRoot().getBestPath()) {
-                for(GameTreeNode child : node.getBranches()) {
-                    System.out.print(child.getEnteringMove() + ", ");
-                }
-                System.out.println();
-                System.out.println("Node: " + node.getEnteringMove() + " " + value);
-            }
-            */
+            //System.out.println("value: " + value);
 
             victory = state.checkVictory();
             if(victory != GameState.NO_WIN) {

@@ -364,6 +364,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     }
                 }
 
+                if(Taflman.getAllowableDestinations(GameTreeState.this, taflman).size() == 0) {
+                    System.out.println("No allowable destinations!");
+                }
+
                 for (Coord dest : Taflman.getAllowableDestinations(GameTreeState.this, taflman)) {
                     MoveRecord move = new MoveRecord(start, dest);
 
@@ -454,6 +458,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 distanceToFirstCutoff++;
 
                 short evaluation = node.getValue();
+
                 // A/B pruning
                 if (evaluation != Evaluator.NO_VALUE) {
                     if (mValue == Evaluator.NO_VALUE) {

@@ -209,19 +209,7 @@ public class RulesSerializer {
         boolean defenderKnights = false;
         List<List<Side.TaflmanHolder>> startingTaflmen;
 
-        Map<String, String> config = new HashMap<String, String>();
-        String[] components = otnrString.split(" ");
-        for(String component : components) {
-            String[] keyValue = component.split(":");
-            if(keyValue.length == 1) {
-                config.put(keyValue[0], "");
-            }
-            else {
-                config.put(keyValue[0], keyValue[1]);
-            }
-        }
-
-        System.out.println(config);
+        Map<String, String> config = getRulesMap(otnrString);
 
         int boardDimension = Integer.parseInt(config.get("dim"));
         String startPosition = config.get("start");
@@ -287,6 +275,22 @@ public class RulesSerializer {
         rules.setDefenderFortParameters(passable, stoppable, hostile);
 
         return rules;
+    }
+
+    private static Map<String, String> getRulesMap(String rulesString) {
+        Map<String, String> config = new HashMap<String, String>();
+        String[] components = rulesString.split(" ");
+        for(String component : components) {
+            String[] keyValue = component.split(":");
+            if(keyValue.length == 1) {
+                config.put(keyValue[0], "");
+            }
+            else {
+                config.put(keyValue[0], keyValue[1]);
+            }
+        }
+
+        return config;
     }
 
     private static List<List<Side.TaflmanHolder>> parseTaflmenFromPosition(String startPosition) {
@@ -444,5 +448,18 @@ public class RulesSerializer {
         }
 
         return coordList;
+    }
+
+    public static boolean rulesEqual(String r1, String r2) {
+        Map<String, String> rules1 = getRulesMap(r1);
+        Map<String, String> rules2 = getRulesMap(r2);
+
+        for(Map.Entry<String, String> e : rules1.entrySet()) {
+            if(!rules2.containsKey(e.getKey())) return false;
+
+            if(!e.getValue().equals(rules2.get(e.getKey()))) return false;
+        }
+
+        return true;
     }
 }
