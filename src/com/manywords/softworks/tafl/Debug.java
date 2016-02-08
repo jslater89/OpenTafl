@@ -13,6 +13,7 @@ import java.util.Map;
 public class Debug {
     public static void run(Map<String, String> args) {
 
+        /*
         String rulesString = RulesSerializer.getOTNRulesString(SeaBattle.newSeaBattle9());
         System.out.println(rulesString);
         Rules r = RulesSerializer.getRulesForString(rulesString);
@@ -21,8 +22,9 @@ public class Debug {
 
         Board b = r.getBoard();
         RawTerminal.renderBoard(b);
+        */
 
-        /*
+
         RawTerminal display = new RawTerminal();
         display.runUi();
 

@@ -364,10 +364,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     }
                 }
 
-                if(Taflman.getAllowableDestinations(GameTreeState.this, taflman).size() == 0) {
-                    System.out.println("No allowable destinations!");
-                }
-
                 for (Coord dest : Taflman.getAllowableDestinations(GameTreeState.this, taflman)) {
                     MoveRecord move = new MoveRecord(start, dest);
 
