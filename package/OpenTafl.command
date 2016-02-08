@@ -1,1 +1,1 @@
-java -server -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+TieredCompilation -Xms2048m -Xmx4096m -jar OpenTafl.jar
+java -server -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+TieredCompilation -Xms1024m -Xmx2048m -jar OpenTafl.jar

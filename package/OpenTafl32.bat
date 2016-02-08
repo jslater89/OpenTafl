@@ -1,1 +1,1 @@
-start ansicon-x86/ansicon.exe java -Xms768m -Xmx1536m -jar OpenTafl.jar
+start ansicon-x86/ansicon.exe java -Xms512m -Xmx1024m -jar OpenTafl.jar
