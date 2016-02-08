@@ -11,6 +11,16 @@ time to think.
 Future features will include network play and support for third-party AI
 engines.
 
+v0.1.6b (released 02/08/16):
+- Further reductions in memory use (fixed minification of game tree states)
+- Fixed bug in piece-type determination functions, where certain pieces
+  were treated as several types of pieces for the purposes of some rules
+- Reduced heap size arguments, owing to reduced memory usage, which may
+  fix OpenTafl32 for some Windows users
+- Improved no-color readability by switching from < to [ for attacking pieces
+- Foundational work for OpenTafl Notation engine mode: implement rules string 
+  generation and parsing
+
 v0.1.5b (released 01/11/16):
 - Memory usage reduced to about 1/3 of 0.1.4b
 - Added readme and license file
