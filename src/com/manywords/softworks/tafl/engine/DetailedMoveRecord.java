@@ -1,0 +1,163 @@
+package com.manywords.softworks.tafl.engine;
+
+/**
+ * Created by jay on 2/8/16.
+ */
+
+import com.manywords.softworks.tafl.notation.RulesSerializer;
+import com.manywords.softworks.tafl.rules.*;
+
+import java.util.List;
+import java.util.Map;
+
+import com.manywords.softworks.tafl.rules.Board;
+import com.manywords.softworks.tafl.rules.Coord;
+
+public class DetailedMoveRecord extends MoveRecord {
+    private static final byte MOVE_TYPE_MASK = 16 + 32;
+    private static final byte JUMP = 16; //bit 5
+    private static final byte BERSERK = 32; //bit 6
+
+    private static final byte TYPE_MASK = 7; //bit 1-3
+    private static final byte TAFLMAN = 1;
+    private static final byte COMMANDER = 2;
+    private static final byte KNIGHT = 1 + 2;
+    private static final byte KING = 4;
+
+    private static final byte SIDE_MASK = 8; // bit 4
+    private static final byte ATTACKERS = 8;
+    private final byte mFlags;
+
+    // bits 1-3: TYPE_MASK
+    // bit 4: SIDE_MASK
+    private static final char LOCATION_MASK = 16 + 32 + 64 + 128 + 256 + 512 + 1024 + 2048 + 4096; // bits 5-13
+    private final char[] captureArray;
+
+    public DetailedMoveRecord(Coord start, Coord end, char mover) {
+        super(start, end);
+        mFlags = moverFlagFor(mover);
+
+        this.captureArray = new char[0];
+    }
+
+    public DetailedMoveRecord(Coord start, Coord end, char mover, List<Coord> captures, List<Character> capturedTaflmen) {
+        super(start, end, captures);
+        mFlags = moverFlagFor(mover);
+        this.captureArray = buildCaptureArray(captures, capturedTaflmen);
+    }
+
+    public DetailedMoveRecord(Coord start, Coord end, char mover, List<Coord> captures, List<Character> capturedTaflmen, boolean wasJump, boolean wasBerserk) {
+        super(start, end, captures);
+        byte flags = 0;
+        flags |= moverFlagFor(mover);
+        if(wasJump) flags |= JUMP;
+        if(wasBerserk) flags |= BERSERK;
+        mFlags = flags;
+
+        this.captureArray = buildCaptureArray(captures, capturedTaflmen);
+
+        System.out.println(this);
+    }
+
+    public boolean wasJump() {
+        return (mFlags & JUMP) == JUMP;
+    }
+
+    public boolean wasBerserk() {
+        return (mFlags & BERSERK) == BERSERK;
+    }
+
+    private char[] buildCaptureArray(List<Coord> captures, List<Character> capturedTaflmen) {
+        if(capturedTaflmen.size() != captures.size()) throw new IllegalArgumentException("captureArray and capturedTaflmen differ");
+
+        char[] captureArray = new char[captures.size()];
+        for(int i = 0; i < captureArray.length; i++) {
+            char index = (char) Coord.getIndex(captures.get(i));
+            index = (char)(index << 4);
+            byte taflmanFlag = moverFlagFor(capturedTaflmen.get(i));
+
+            captureArray[i] = (char)(index | taflmanFlag);
+        }
+
+        return captureArray;
+    }
+
+    private byte moverFlagFor(char mover) {
+        byte flag = taflmanTypeToMoverType(mover);
+        flag |= (Taflman.getPackedSide(mover) == Taflman.SIDE_ATTACKERS ? ATTACKERS : 0);
+        return flag;
+    }
+
+    private byte taflmanTypeToMoverType(char mover) {
+        byte typeFlag = TAFLMAN;
+        switch(Taflman.getPackedType(mover)) {
+            case Taflman.TYPE_COMMANDER:
+                typeFlag = COMMANDER;
+                break;
+            case Taflman.TYPE_KNIGHT:
+                typeFlag = KNIGHT;
+                break;
+            case Taflman.TYPE_KING:
+                typeFlag = KING;
+                break;
+        }
+
+        return typeFlag;
+    }
+
+    private char getTaflmanCharForFlag(byte flags) {
+        char taflmanChar;
+        byte taflmanType = (byte)(mFlags & TYPE_MASK);
+        byte side = (byte)(mFlags & SIDE_MASK);
+        if(taflmanType == COMMANDER) taflmanChar = RulesSerializer.TaflmanTypeIndex.inverse[RulesSerializer.TaflmanTypeIndex.c];
+        else if(taflmanType == KNIGHT) taflmanChar = RulesSerializer.TaflmanTypeIndex.inverse[RulesSerializer.TaflmanTypeIndex.n];
+        else if(taflmanType == KING) taflmanChar = RulesSerializer.TaflmanTypeIndex.inverse[RulesSerializer.TaflmanTypeIndex.k];
+        else taflmanChar = 0;
+
+        if(taflmanChar != 0) {
+            if (side == ATTACKERS) taflmanChar = Character.toLowerCase(taflmanChar);
+            else taflmanChar = Character.toUpperCase(taflmanChar);
+        }
+
+        return taflmanChar;
+    }
+
+    private String getCaptureString(char captureEntry, boolean first) {
+        String captureRecord = "";
+
+        if(!first) captureRecord += "/";
+
+        char taflmanChar = getTaflmanCharForFlag((byte) captureEntry);
+        int index = (captureEntry & LOCATION_MASK) >> 4;
+        Coord location = Coord.getCoordForIndex(index);
+
+        captureRecord += (taflmanChar != 0 ? taflmanChar : "") + Board.getChessString(location);
+
+        return captureRecord;
+    }
+
+    public String toString() {
+        String startString = Board.getChessString(this.start);
+        String endString = Board.getChessString(this.end);
+
+        String moveSeparator = "-";
+        if(wasJump() && wasBerserk()) moveSeparator = "^=";
+        else if(wasJump()) moveSeparator = "^";
+        else if(wasBerserk()) moveSeparator = "=";
+
+        char moverChar = getTaflmanCharForFlag(mFlags);
+
+        String move = (moverChar != 0 ? moverChar : "") + startString + moveSeparator + endString;
+
+        if(captureArray.length > 0) {
+            move += "x";
+
+            for(int i = 0; i < captureArray.length; i++) {
+                move += getCaptureString(captureArray[i], i == 0);
+            }
+        }
+
+        return move;
+    }
+}
+

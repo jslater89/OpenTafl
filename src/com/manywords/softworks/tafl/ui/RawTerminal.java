@@ -404,8 +404,8 @@ public class RawTerminal implements UiCallback {
 
         int result =
                 mGame.getCurrentState().moveTaflman(
-                        mGame.getCurrentState().getBoard().getOccupier(move.mStart.x, move.mStart.y),
-                        mGame.getCurrentState().getSpaceAt(move.mEnd.x, move.mEnd.y));
+                        mGame.getCurrentState().getBoard().getOccupier(move.start.x, move.start.y),
+                        mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y));
 
         if (result != GameState.GOOD_MOVE) {
             print("Illegal play. ");

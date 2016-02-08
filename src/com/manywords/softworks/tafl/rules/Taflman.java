@@ -1,7 +1,9 @@
 package com.manywords.softworks.tafl.rules;
 
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -238,6 +240,15 @@ public class Taflman {
         return allowableDestinations;
     }
 
+    public static List<Coord> getJumpsFor(GameState state, char taflman) {
+        List<Coord> cachedJumps = state.getCachedJumpsForTaflman(taflman);
+        if(cachedJumps != null) return cachedJumps;
+
+        cachedJumps = getJumpsFrom(state, taflman, getCurrentSpace(state, taflman));
+        state.setCachedJumpsForTaflman(taflman, cachedJumps);
+        return cachedJumps;
+    }
+
     public static List<Coord> getJumpsFrom(GameState state, char taflman, Coord space) {
         List<Coord> jumps = new ArrayList<Coord>(4);
         boolean isStartSpecial = false;
@@ -403,50 +414,58 @@ public class Taflman {
     }
 
     // Returns null, or a list of spaces captured
-    public static List<Coord> moveTo(GameState state, char taflman, Coord destination) {
-        boolean captureMade = false;
+    public static MoveRecord moveTo(GameState state, char taflman, Coord destination, boolean detailed) {
+        boolean wasJump = false;
+        boolean wasBerserk = state.getBerserkingTaflman() == taflman;
         List<Coord> captures = new ArrayList<Coord>(4);
+        List<Character> capturedTaflmen = new ArrayList<Character>(4);
 
         //if(mCachedAllowableDestinations == null) {
         List<Coord> allowableDestinations = getAllowableDestinations(state, taflman);
         List<Coord> capturingMoves = null;
+        List<Coord> jumps = null;
+        Coord start = getCurrentSpace(state, taflman);
         //}
 
         if (allowableDestinations.contains(destination)) {
-            //if(mCachedCapturingMoves == null) {
             capturingMoves = getCapturingMoves(state, taflman);
-            //}
-            List<Coord> jumps = getJumpsFrom(state, taflman, getCurrentSpace(state, taflman));
+            jumps = getJumpsFor(state, taflman);
 
-            Coord start = getCurrentSpace(state, taflman);
+
             getBoard(state).setOccupier(destination, taflman);
             getSide(taflman).onTaflmanMoved(taflman, destination);
 
             if (capturingMoves.contains(destination)) {
                 if (getJumpMode(taflman) != Taflman.JUMP_NONE && jumps.contains(destination)) {
+                    wasJump = true;
                     int jumpedX = (start.x + destination.x) / 2;
                     int jumpedY = (start.y + destination.y) / 2;
                     char jumpedPiece = getBoard(state).getOccupier(Coord.get(jumpedX, jumpedY));
 
                     if (jumpedPiece != EMPTY && Taflman.isCapturedBy(state, jumpedPiece, taflman, destination, true)) {
                         captures.add(Taflman.getCurrentSpace(state, jumpedPiece));
+                        capturedTaflmen.add(jumpedPiece);
                         Taflman.capturedBy(state, jumpedPiece, taflman, destination, true);
-                        captureMade = true;
                     }
                 }
 
                 for (Coord space : getBoard(state).getAdjacentSpaces(destination)) {
                     char occupier = getBoard(state).getOccupier(space);
                     if (occupier != EMPTY && Taflman.isCapturedBy(state, occupier, taflman, destination, false)) {
-                        Taflman.capturedBy(state, occupier, taflman, destination, false);
+                        capturedTaflmen.add(occupier);
                         captures.add(space);
-                        captureMade = true;
+                        Taflman.capturedBy(state, occupier, taflman, destination, false);
                     }
                 }
             }
         }
 
-        return captures;
+        if(detailed) {
+            return new DetailedMoveRecord(start, destination, taflman, captures, capturedTaflmen, wasJump, wasBerserk);
+        }
+        else {
+            return new MoveRecord(start, destination, captures);
+        }
     }
 
     /**

@@ -137,6 +137,11 @@ public abstract class Board {
         return getChessNotationFromCoords(space.x, space.y);
     }
 
+    public static String getChessString(Coord space) {
+        Map<String, String> map = getChessNotation(space);
+        return map.get("file") + map.get("rank");
+    }
+
     public static Map<String, String> getChessNotationFromCoords(int x, int y) {
         String file = "" + (char) (((int) 'a') + x);
         String rank = "" + (y + 1);

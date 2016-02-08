@@ -2,7 +2,6 @@ package com.manywords.softworks.tafl.engine;
 
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.rules.*;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -181,6 +180,11 @@ public class GameState {
         mTaflmanMoveCache.setCachedAllowableDestinationsForTaflman(mZobristHash, taflman, moves);
     }
 
+    public void setCachedJumpsForTaflman(char taflman, List<Coord> jumps) {
+        if(mTaflmanMoveCache == null) return;
+        mTaflmanMoveCache.setCachedJumpsForTaflman(mZobristHash, taflman, jumps);
+    }
+
     public void setCachedCapturingMovesForTaflman(char taflman, List<Coord> moves) {
         if (mTaflmanMoveCache == null) return;
         mTaflmanMoveCache.setCachedCapturingMovesForTaflman(mZobristHash, taflman, moves);
@@ -199,6 +203,11 @@ public class GameState {
     public List<Coord> getCachedAllowableDestinationsForTaflman(char taflman) {
         if (mTaflmanMoveCache == null) return null;
         return mTaflmanMoveCache.getCachedAllowableDestinationsForTaflman(mZobristHash, taflman);
+    }
+
+    public List<Coord> getCachedJumpsForTaflman(char taflman) {
+        if(mTaflmanMoveCache == null) return null;
+        return mTaflmanMoveCache.getCachedJumpsForTaflman(mZobristHash, taflman);
     }
 
     public List<Coord> getCachedCapturingMovesForTaflman(char taflman) {
@@ -235,7 +244,9 @@ public class GameState {
             return ILLEGAL_MOVE;
         } else {
             Coord start = Taflman.getCurrentSpace(this, taflman);
-            List<Coord> captures = Taflman.moveTo(this, taflman, destination);
+            boolean detailed = !(this instanceof GameTreeState);
+            MoveRecord move = Taflman.moveTo(this, taflman, destination, detailed);
+            List<Coord> captures = move.captures;
 
             if (getBoard().getRules().allowShieldWallCaptures() > 0) {
                 List<ShieldwallPosition> shieldwallPositionsAttackers = getBoard().detectShieldwallPositionsForSide(getAttackers());
@@ -250,7 +261,7 @@ public class GameState {
                 }
             }
 
-            mExitingMove = new MoveRecord(start, destination, captures);
+            mExitingMove = move;
 
             if (captures.size() > 0 && getBoard().getRules().getBerserkMode() > 0) {
                 setBerserkingTaflman(taflman);
@@ -441,9 +452,9 @@ public class GameState {
 
     public long updateZobristHash(long oldZobrist, Board oldBoard, MoveRecord move) {
         long hash = oldZobrist;
-        int startIndex = oldBoard.getIndex(move.mStart);
-        int endIndex = oldBoard.getIndex(move.mEnd);
-        int oldType = getZobristTypeIndex(oldBoard.getOccupier(move.mStart));
+        int startIndex = oldBoard.getIndex(move.start);
+        int endIndex = oldBoard.getIndex(move.end);
+        int oldType = getZobristTypeIndex(oldBoard.getOccupier(move.start));
 
         hash = hash ^ mGame.mZobristConstants[startIndex][oldType];
         hash = hash ^ mGame.mZobristConstants[endIndex][oldType];
@@ -497,6 +508,6 @@ public class GameState {
     }
 
     public void makeMove(MoveRecord nextMove) {
-        moveTaflman(getPieceAt(nextMove.mStart.x, nextMove.mStart.y), nextMove.mEnd);
+        moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end);
     }
 }

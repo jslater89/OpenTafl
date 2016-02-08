@@ -316,7 +316,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public static GameTreeState getStateForMinimalNode(GameTreeState rootNode, MinimalGameTreeNode minimalGameTreeNode) {
         GameTreeState desiredState = rootNode;
         for (MoveRecord m : minimalGameTreeNode.getEnteringMoveSequence()) {
-            desiredState = desiredState.considerMove(m.mStart, m.mEnd);
+            desiredState = desiredState.considerMove(m.start, m.end);
         }
 
         desiredState.mAlpha = minimalGameTreeNode.getAlpha();
@@ -443,7 +443,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     break;
                 }
 
-                GameTreeState node = mState.considerMove(move.mStart, move.mEnd);
+                GameTreeState node = mState.considerMove(move.start, move.end);
                 // Node will be null in e.g. berserk tafl, where moves are legal
                 // according to the movement rules, but not legal according to
                 // special rules, like the berserk rule.
