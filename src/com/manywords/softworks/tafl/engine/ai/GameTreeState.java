@@ -88,38 +88,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
         mVictory = checkVictory();
     }
 
-    public void manualTurnAdvance(char berserkingTaflman, boolean isPreviousSideAttackers) {
-        boolean changeSides = true;
-
-        if (berserkingTaflman != Taflman.EMPTY) {
-            if (getBoard().getRules().getBerserkMode() == Rules.BERSERK_CAPTURE_ONLY) {
-                if (Taflman.getCapturingMoves(this, berserkingTaflman).size() > 0) {
-                    setBerserkingTaflman(berserkingTaflman);
-                    changeSides = false;
-                } else {
-                    setBerserkingTaflman(Taflman.EMPTY);
-                    changeSides = true;
-                }
-            } else if (getBoard().getRules().getBerserkMode() == Rules.BERSERK_ANY_MOVE) {
-                if (Taflman.getAllowableMoves(this, berserkingTaflman).size() > 0) {
-                    setBerserkingTaflman(berserkingTaflman);
-                    changeSides = false;
-                } else {
-                    setBerserkingTaflman(Taflman.EMPTY);
-                    changeSides = true;
-                }
-            }
-        }
-
-        if (changeSides) {
-            if (isPreviousSideAttackers) setCurrentSide(getDefenders());
-            else setCurrentSide(getAttackers());
-        } else {
-            if (isPreviousSideAttackers) setCurrentSide(getAttackers());
-            else setCurrentSide(getDefenders());
-        }
-    }
-
     public short getValue() {
         return mValue;
     }
