@@ -11,6 +11,14 @@ time to think.
 Future features will include network play and support for third-party AI
 engines.
 
+v0.1.6.1b(released 02/09/16):
+- Bugfix release for 0.1.6b.
+- Fix bug where OTN move records would show the moving taflman as the captured
+  taflman.
+- Fix bug where OTN position strings would leave out the king after the first
+  capture.
+- Fix bug where taflman move cache would be re-allocated for every state.
+
 v0.1.6b (released 02/08/16):
 - Further reductions in memory use (fixed minification of game tree states)
 - Fixed bug in piece-type determination functions, where certain pieces
