@@ -25,6 +25,9 @@ public class TaflmanMoveCache {
 
     public TaflmanMoveCache(long zobrist, byte attackers, byte defenders) {
         if(mAttackers != attackers || mDefenders != defenders) {
+            mAttackers = attackers;
+            mDefenders = defenders;
+
             mCachedAllowableMoves = new TaflmanCoordListMap(attackers, defenders);
             mCachedAllowableDestinations = new TaflmanCoordListMap(attackers, defenders);
             mCachedCapturingMoves = new TaflmanCoordListMap(attackers, defenders);
