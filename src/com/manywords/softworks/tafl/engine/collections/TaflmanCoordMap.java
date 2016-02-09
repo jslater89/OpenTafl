@@ -49,9 +49,10 @@ public class TaflmanCoordMap {
 
         // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
         int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
+        char entry = mTaflmen[index];
         char coord = mCoords[index];
 
-        if(coord != (char) -1) {
+        if(coord != (char) -1 && taflman == entry) {
             return Coord.getCoordForIndex(coord);
         }
         else {
