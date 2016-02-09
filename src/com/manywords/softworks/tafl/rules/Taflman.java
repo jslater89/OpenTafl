@@ -433,7 +433,6 @@ public class Taflman {
 
 
             getBoard(state).setOccupier(destination, taflman);
-            getSide(taflman).onTaflmanMoved(taflman, destination);
 
             if (capturingMoves.contains(destination)) {
                 if (getJumpMode(taflman) != Taflman.JUMP_NONE && jumps.contains(destination)) {

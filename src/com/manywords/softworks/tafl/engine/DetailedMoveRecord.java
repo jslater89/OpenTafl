@@ -8,7 +8,6 @@ import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
 
 import java.util.List;
-import java.util.Map;
 
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
@@ -35,21 +34,21 @@ public class DetailedMoveRecord extends MoveRecord {
 
     public DetailedMoveRecord(Coord start, Coord end, char mover) {
         super(start, end);
-        mFlags = moverFlagFor(mover);
+        mFlags = moveRecordFlagFor(mover);
 
         this.captureArray = new char[0];
     }
 
     public DetailedMoveRecord(Coord start, Coord end, char mover, List<Coord> captures, List<Character> capturedTaflmen) {
         super(start, end, captures);
-        mFlags = moverFlagFor(mover);
+        mFlags = moveRecordFlagFor(mover);
         this.captureArray = buildCaptureArray(captures, capturedTaflmen);
     }
 
     public DetailedMoveRecord(Coord start, Coord end, char mover, List<Coord> captures, List<Character> capturedTaflmen, boolean wasJump, boolean wasBerserk) {
         super(start, end, captures);
         byte flags = 0;
-        flags |= moverFlagFor(mover);
+        flags |= moveRecordFlagFor(mover);
         if(wasJump) flags |= JUMP;
         if(wasBerserk) flags |= BERSERK;
         mFlags = flags;
@@ -74,7 +73,7 @@ public class DetailedMoveRecord extends MoveRecord {
         for(int i = 0; i < captureArray.length; i++) {
             char index = (char) Coord.getIndex(captures.get(i));
             index = (char)(index << 4);
-            byte taflmanFlag = moverFlagFor(capturedTaflmen.get(i));
+            byte taflmanFlag = moveRecordFlagFor(capturedTaflmen.get(i));
 
             captureArray[i] = (char)(index | taflmanFlag);
         }
@@ -82,13 +81,13 @@ public class DetailedMoveRecord extends MoveRecord {
         return captureArray;
     }
 
-    private byte moverFlagFor(char mover) {
-        byte flag = taflmanTypeToMoverType(mover);
+    private byte moveRecordFlagFor(char mover) {
+        byte flag = taflmanTypeToMoveRecordType(mover);
         flag |= (Taflman.getPackedSide(mover) == Taflman.SIDE_ATTACKERS ? ATTACKERS : 0);
         return flag;
     }
 
-    private byte taflmanTypeToMoverType(char mover) {
+    private byte taflmanTypeToMoveRecordType(char mover) {
         byte typeFlag = TAFLMAN;
         switch(Taflman.getPackedType(mover)) {
             case Taflman.TYPE_COMMANDER:
@@ -107,8 +106,8 @@ public class DetailedMoveRecord extends MoveRecord {
 
     private char getTaflmanCharForFlag(byte flags) {
         char taflmanChar;
-        byte taflmanType = (byte)(mFlags & TYPE_MASK);
-        byte side = (byte)(mFlags & SIDE_MASK);
+        byte taflmanType = (byte)(flags & TYPE_MASK);
+        byte side = (byte)(flags & SIDE_MASK);
         if(taflmanType == COMMANDER) taflmanChar = RulesSerializer.TaflmanTypeIndex.inverse[RulesSerializer.TaflmanTypeIndex.c];
         else if(taflmanType == KNIGHT) taflmanChar = RulesSerializer.TaflmanTypeIndex.inverse[RulesSerializer.TaflmanTypeIndex.n];
         else if(taflmanType == KING) taflmanChar = RulesSerializer.TaflmanTypeIndex.inverse[RulesSerializer.TaflmanTypeIndex.k];
