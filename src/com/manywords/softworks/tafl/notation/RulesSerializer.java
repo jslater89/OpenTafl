@@ -8,19 +8,6 @@ import java.util.*;
  * Created by jay on 2/5/16.
  */
 public class RulesSerializer {
-    public static class TaflmanTypeIndex {
-        public static final int count = Rules.TAFLMAN_TYPE_COUNT;
-        public static final char[] inverse = {'t', 'c', 'n', 'k', 'T', 'C', 'N', 'K'};
-        public static final int t = 0;
-        public static final int c = 1;
-        public static final int n = 2;
-        public static final int k = 3;
-        public static final int T = 4;
-        public static final int C = 5;
-        public static final int N = 6;
-        public static final int K = 7;
-    }
-
     public static final Map<String, String> defaults;
     static {
         HashMap<String, String> map = new HashMap<>();
@@ -62,7 +49,7 @@ public class RulesSerializer {
     }
 
 
-    public static String getOTNRulesString(Rules rules) {
+    public static String getRulesRecord(Rules rules) {
         String otnrString = "";
 
         otnrString += "dim:";
@@ -196,12 +183,12 @@ public class RulesSerializer {
             otnrString += "ber:" + getStringForBerserkMode(rules.getBerserkMode()) + " ";
         }
 
-        otnrString += "start:" + rules.getBoard().getOTNPositionString();
+        otnrString += "start:" + PositionSerializer.getPositionRecord(rules.getBoard());
 
         return otnrString;
     }
 
-    public static Rules getRulesForString(String otnrString) {
+    public static Rules loadRulesRecord(String otnrString) {
         int boardSize = 0;
         boolean attackerCommanders = false;
         boolean defenderCommanders = false;
@@ -300,7 +287,7 @@ public class RulesSerializer {
         taflmen.add(attackers);
         taflmen.add(defenders);
 
-        char[][] boardArray = Board.loadOTNPositionString(startPosition);
+        char[][] boardArray = PositionSerializer.loadPositionRecord(startPosition);
 
         for(int y = 0; y < boardArray.length; y++) {
             for(int x = 0; x < boardArray.length; x++) {

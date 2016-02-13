@@ -309,6 +309,6 @@ public abstract class Rules {
     public abstract boolean isSurroundingFatal();
 
     public String getOTRString() {
-        return RulesSerializer.getOTNRulesString(this);
+        return RulesSerializer.getRulesRecord(this);
     }
 }

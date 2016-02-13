@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl;
 
+import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
@@ -14,19 +15,22 @@ public class Debug {
     public static void run(Map<String, String> args) {
 
         /*
-        String rulesString = RulesSerializer.getOTNRulesString(SeaBattle.newSeaBattle9());
+        String rulesString = RulesSerializer.getRulesRecord(SeaBattle.newSeaBattle9());
         System.out.println(rulesString);
-        Rules r = RulesSerializer.getRulesForString(rulesString);
-        rulesString = RulesSerializer.getOTNRulesString(r);
+        Rules r = RulesSerializer.loadRulesRecord(rulesString);
+        rulesString = RulesSerializer.getRulesRecord(r);
         System.out.println(rulesString);
 
         Board b = r.getBoard();
         RawTerminal.renderBoard(b);
         */
 
+        System.out.println(MoveSerializer.getMoveRegex());
 
+        /*
         RawTerminal display = new RawTerminal();
         display.runUi();
+        */
 
 		/*
 		Rules rules = null;

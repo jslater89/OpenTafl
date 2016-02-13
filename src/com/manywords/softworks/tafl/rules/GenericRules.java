@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.notation.RulesSerializer;
+import com.manywords.softworks.tafl.notation.TaflmanTypeIndex;
 
 /**
  * Created by jay on 2/6/16.
@@ -244,10 +245,10 @@ public class GenericRules extends Rules {
         }
 
         if(side.isAttackingSide()) {
-            return hostilityArray[RulesSerializer.TaflmanTypeIndex.t];
+            return hostilityArray[TaflmanTypeIndex.t];
         }
         else {
-            return hostilityArray[RulesSerializer.TaflmanTypeIndex.T];
+            return hostilityArray[TaflmanTypeIndex.T];
         }
     }
 
@@ -308,25 +309,25 @@ public class GenericRules extends Rules {
         if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
             switch(Taflman.getPackedType(taflman)) {
                 case Taflman.TYPE_KING:
-                    return RulesSerializer.TaflmanTypeIndex.k;
+                    return TaflmanTypeIndex.k;
                 case Taflman.TYPE_KNIGHT:
-                    return RulesSerializer.TaflmanTypeIndex.n;
+                    return TaflmanTypeIndex.n;
                 case Taflman.TYPE_COMMANDER:
-                    return RulesSerializer.TaflmanTypeIndex.c;
+                    return TaflmanTypeIndex.c;
                 default:
-                    return RulesSerializer.TaflmanTypeIndex.t;
+                    return TaflmanTypeIndex.t;
             }
         }
         else {
             switch(Taflman.getPackedType(taflman)) {
                 case Taflman.TYPE_KING:
-                    return RulesSerializer.TaflmanTypeIndex.K;
+                    return TaflmanTypeIndex.K;
                 case Taflman.TYPE_KNIGHT:
-                    return RulesSerializer.TaflmanTypeIndex.N;
+                    return TaflmanTypeIndex.N;
                 case Taflman.TYPE_COMMANDER:
-                    return RulesSerializer.TaflmanTypeIndex.C;
+                    return TaflmanTypeIndex.C;
                 default:
-                    return RulesSerializer.TaflmanTypeIndex.T;
+                    return TaflmanTypeIndex.T;
             }
         }
     }

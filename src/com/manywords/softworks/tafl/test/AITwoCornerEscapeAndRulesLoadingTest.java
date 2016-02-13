@@ -9,7 +9,6 @@ import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements UiCallback {
 
@@ -28,8 +27,8 @@ class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements UiCallbac
     @Override
     public void run() {
         Rules rules = Brandub.newAiTwoCornerEscapeTest();
-        String rulesString = RulesSerializer.getOTNRulesString(rules);
-        Rules inflatedRules = RulesSerializer.getRulesForString(rulesString);
+        String rulesString = RulesSerializer.getRulesRecord(rules);
+        Rules inflatedRules = RulesSerializer.loadRulesRecord(rulesString);
         Game game = new Game(inflatedRules, null);
         GameState state = game.getCurrentState();
 

@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.engine;
 
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.rules.*;
 
 import java.util.ArrayList;
@@ -447,7 +448,7 @@ public class GameState {
     }
 
     public String getOTNPositionString() {
-        return getBoard().getOTNPositionString();
+        return PositionSerializer.getPositionRecord(getBoard());
     }
 
     public long updateZobristHash(long oldZobrist, Board oldBoard, MoveRecord move) {

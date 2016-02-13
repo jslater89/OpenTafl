@@ -5,12 +5,10 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.UiCallback;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
-import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback {
 
@@ -29,8 +27,8 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
     @Override
     public void run() {
         Rules rules = SeaBattle.newAiTwoEdgeEscapeTest();
-        String rulesString = RulesSerializer.getOTNRulesString(rules);
-        Rules inflatedRules = RulesSerializer.getRulesForString(rulesString);
+        String rulesString = RulesSerializer.getRulesRecord(rules);
+        Rules inflatedRules = RulesSerializer.loadRulesRecord(rulesString);
         Game game = new Game(inflatedRules, null);
         GameState state = game.getCurrentState();
         state.setCurrentSide(state.getDefenders());

@@ -466,33 +466,5 @@ public abstract class BoardImpl extends Board {
     }
 
     @Override
-    public String getOTNPositionString() {
-        char[][] board = getBoardArray();
-
-        String otnString = "/";
-        for(int y = 0; y < getBoardDimension(); y++) {
-            int emptyCount = 0;
-
-            for(int x = 0; x < getBoardDimension(); x++) {
-                if(board[y][x] == Taflman.EMPTY) {
-                    emptyCount++;
-                }
-                else {
-                    if(emptyCount > 0) {
-                        otnString += emptyCount;
-                        emptyCount = 0;
-                    }
-                    otnString += Taflman.getOtnStringSymbol(board[y][x]);
-                }
-            }
-
-            if(emptyCount > 0) otnString += emptyCount;
-            otnString += "/";
-        }
-
-        return otnString;
-    }
-
-    @Override
     public abstract Board deepCopy();
 }
