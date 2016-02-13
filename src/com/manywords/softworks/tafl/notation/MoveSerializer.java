@@ -45,7 +45,7 @@ public class MoveSerializer {
         final String taflmanTypePattern = "([tcnkTCNK]?)";
 
         // Matches a position string (e.g. e4), capped at 19x19 for our purposes
-        final String positionPattern = "([abcdefghijklmnopqrs]{1}[1234567890]{1,2})";
+        final String positionPattern = "([a-s][1-0]{1,2})";
 
         // Matches a taflman position.
         final String taflmanPositionPattern = taflmanTypePattern + positionPattern;
@@ -57,7 +57,7 @@ public class MoveSerializer {
 
         final String moveRegex = taflmanPositionPattern + moveTypePattern + positionPattern +
                 "(" + // group all captures together
-                    "(x" + taflmanPositionPattern + "){1}" + // at least one capture must be present for this pattern
+                    "(x" + taflmanPositionPattern + ")" + // at least one capture must be present for this pattern
                     "(/" + taflmanPositionPattern + ")?" + // up to three other captures
                     "(/" + taflmanPositionPattern + ")?" + // up to three other captures
                     "(/" + taflmanPositionPattern + ")?" + // up to three other captures
