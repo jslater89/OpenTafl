@@ -14,11 +14,15 @@ public class PositionSerializer {
     public static String getPositionRecord(Board b) {
         char[][] board = b.getBoardArray();
 
+        return getPositionRecord(board);
+    }
+
+    public static String getPositionRecord(char[][] board) {
         String otnString = "/";
-        for(int y = 0; y < b.getBoardDimension(); y++) {
+        for(int y = 0; y < board.length; y++) {
             int emptyCount = 0;
 
-            for(int x = 0; x < b.getBoardDimension(); x++) {
+            for(int x = 0; x < board.length; x++) {
                 if(board[y][x] == Taflman.EMPTY) {
                     emptyCount++;
                 }
@@ -37,7 +41,6 @@ public class PositionSerializer {
 
         return otnString;
     }
-
 
     public static char[][] loadPositionRecord(String otnPosition) {
         String[] rawRows = otnPosition.split("/");

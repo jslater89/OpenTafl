@@ -84,7 +84,7 @@ ce6^e8
 
 Defending side knight jumps, capturing jumped taflman and three destination-adjacent
 taflmen:
-Ne6^e8xe7/e9/f8/d8
+Ne6^=e8xce7/ne9/f8/d8
 
 Defending side knight makes berserk move:
 Ne8=e4xe3

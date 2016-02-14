@@ -27,14 +27,8 @@ public class Debug {
         RawTerminal.renderBoard(b);
         */
 
-        Coord.initialize(11);
-        String moveRecord = "Ne6^=e8xce7/ne9/f8/d8";
-        DetailedMoveRecord move = MoveSerializer.loadMoveRecord(moveRecord);
-
-        /*
         RawTerminal display = new RawTerminal();
         display.runUi();
-        */
 
 		/*
 		Rules rules = null;
