@@ -85,14 +85,7 @@ public class PositionSerializer {
                     id = (char) currentAttackerId++;
                 }
 
-                char typeChar = Character.toUpperCase(c);
-                switch(typeChar) {
-                    case 'T': type = Taflman.TYPE_TAFLMAN; break;
-                    case 'C': type = Taflman.TYPE_COMMANDER; break;
-                    case 'N': type = Taflman.TYPE_KNIGHT; break;
-                    case 'K': type = Taflman.TYPE_KING; break;
-                    default: type = Taflman.TYPE_TAFLMAN;
-                }
+                type = TaflmanCodes.getTaflmanTypeForCode(c);
 
                 char taflman = Taflman.encode(id, type, side);
                 Coord coord = Coord.get(currentCol, currentRow);

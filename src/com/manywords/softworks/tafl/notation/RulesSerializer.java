@@ -366,18 +366,18 @@ public class RulesSerializer {
 
     private static String getStringForTaflmanTypeList(boolean[] typeList) {
         String typeString = "";
-        for(int i = 0; i < TaflmanTypeIndex.count; i++) {
-            if(typeList[i]) typeString += TaflmanTypeIndex.inverse[i];
+        for(int i = 0; i < TaflmanCodes.count; i++) {
+            if(typeList[i]) typeString += TaflmanCodes.inverse[i];
         }
 
         return typeString;
     }
 
     public static boolean[] getTaflmanTypeListForString(String typeString) {
-        boolean[] typeList = new boolean[TaflmanTypeIndex.count];
+        boolean[] typeList = new boolean[TaflmanCodes.count];
         for(int i = 0; i < typeString.length(); i++) {
             char c = typeString.charAt(i);
-            int index = indexOf(TaflmanTypeIndex.inverse, c);
+            int index = indexOf(TaflmanCodes.inverse, c);
 
             typeList[index] = true;
         }

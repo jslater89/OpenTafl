@@ -5,7 +5,7 @@ package com.manywords.softworks.tafl.engine;
  */
 
 import com.manywords.softworks.tafl.notation.MoveSerializer;
-import com.manywords.softworks.tafl.notation.TaflmanTypeIndex;
+import com.manywords.softworks.tafl.notation.TaflmanCodes;
 import com.manywords.softworks.tafl.rules.*;
 
 import java.util.List;
@@ -55,8 +55,6 @@ public class DetailedMoveRecord extends MoveRecord {
         this.flags = flags;
 
         this.captureArray = buildCaptureArray(captures, capturedTaflmen);
-
-        System.out.println(this);
     }
 
     public boolean wasJump() {
@@ -88,7 +86,11 @@ public class DetailedMoveRecord extends MoveRecord {
         return flag;
     }
 
-    private byte taflmanTypeToMoveRecordType(char mover) {
+    public String toString() {
+        return MoveSerializer.getMoveRecord(this);
+    }
+
+    public static byte taflmanTypeToMoveRecordType(char mover) {
         byte typeFlag = TAFLMAN;
         switch(Taflman.getPackedType(mover)) {
             case Taflman.TYPE_COMMANDER:
@@ -103,10 +105,6 @@ public class DetailedMoveRecord extends MoveRecord {
         }
 
         return typeFlag;
-    }
-
-    public String toString() {
-        return MoveSerializer.getMoveRecord(this);
     }
 
     public static String getCaptureString(char captureEntry, boolean first) {
@@ -127,9 +125,9 @@ public class DetailedMoveRecord extends MoveRecord {
         char taflmanChar;
         byte taflmanType = (byte)(flags & TYPE_MASK);
         byte side = (byte)(flags & SIDE_MASK);
-        if(taflmanType == COMMANDER) taflmanChar = TaflmanTypeIndex.inverse[TaflmanTypeIndex.c];
-        else if(taflmanType == KNIGHT) taflmanChar = TaflmanTypeIndex.inverse[TaflmanTypeIndex.n];
-        else if(taflmanType == KING) taflmanChar = TaflmanTypeIndex.inverse[TaflmanTypeIndex.k];
+        if(taflmanType == COMMANDER) taflmanChar = TaflmanCodes.inverse[TaflmanCodes.c];
+        else if(taflmanType == KNIGHT) taflmanChar = TaflmanCodes.inverse[TaflmanCodes.n];
+        else if(taflmanType == KING) taflmanChar = TaflmanCodes.inverse[TaflmanCodes.k];
         else taflmanChar = 0;
 
         if(taflmanChar != 0) {

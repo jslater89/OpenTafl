@@ -1,7 +1,6 @@
 package com.manywords.softworks.tafl.rules;
 
-import com.manywords.softworks.tafl.notation.RulesSerializer;
-import com.manywords.softworks.tafl.notation.TaflmanTypeIndex;
+import com.manywords.softworks.tafl.notation.TaflmanCodes;
 
 /**
  * Created by jay on 2/6/16.
@@ -245,10 +244,10 @@ public class GenericRules extends Rules {
         }
 
         if(side.isAttackingSide()) {
-            return hostilityArray[TaflmanTypeIndex.t];
+            return hostilityArray[TaflmanCodes.t];
         }
         else {
-            return hostilityArray[TaflmanTypeIndex.T];
+            return hostilityArray[TaflmanCodes.T];
         }
     }
 
@@ -309,25 +308,25 @@ public class GenericRules extends Rules {
         if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
             switch(Taflman.getPackedType(taflman)) {
                 case Taflman.TYPE_KING:
-                    return TaflmanTypeIndex.k;
+                    return TaflmanCodes.k;
                 case Taflman.TYPE_KNIGHT:
-                    return TaflmanTypeIndex.n;
+                    return TaflmanCodes.n;
                 case Taflman.TYPE_COMMANDER:
-                    return TaflmanTypeIndex.c;
+                    return TaflmanCodes.c;
                 default:
-                    return TaflmanTypeIndex.t;
+                    return TaflmanCodes.t;
             }
         }
         else {
             switch(Taflman.getPackedType(taflman)) {
                 case Taflman.TYPE_KING:
-                    return TaflmanTypeIndex.K;
+                    return TaflmanCodes.K;
                 case Taflman.TYPE_KNIGHT:
-                    return TaflmanTypeIndex.N;
+                    return TaflmanCodes.N;
                 case Taflman.TYPE_COMMANDER:
-                    return TaflmanTypeIndex.C;
+                    return TaflmanCodes.C;
                 default:
-                    return TaflmanTypeIndex.T;
+                    return TaflmanCodes.T;
             }
         }
     }

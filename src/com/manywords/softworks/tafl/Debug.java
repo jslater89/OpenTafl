@@ -1,7 +1,9 @@
 package com.manywords.softworks.tafl;
 
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.rules.Board;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
@@ -25,7 +27,9 @@ public class Debug {
         RawTerminal.renderBoard(b);
         */
 
-        System.out.println(MoveSerializer.getMoveRegex());
+        Coord.initialize(11);
+        String moveRecord = "Ne6^=e8xce7/ne9/f8/d8";
+        DetailedMoveRecord move = MoveSerializer.loadMoveRecord(moveRecord);
 
         /*
         RawTerminal display = new RawTerminal();
