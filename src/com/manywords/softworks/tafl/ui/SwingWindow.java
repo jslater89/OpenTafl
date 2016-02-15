@@ -7,17 +7,17 @@ import com.manywords.softworks.tafl.ui.swing.SquarePanel;
 import javax.swing.*;
 import java.awt.*;
 
-public class Window extends JFrame implements UiCallback {
+public class SwingWindow extends JFrame implements UiCallback {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
 
-    public Window() {
+    public SwingWindow() {
         setTitle("OpenTafl");
         setSize(1024, 768);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setVisible(true);
 
         getContentPane().add(initBoardUI());

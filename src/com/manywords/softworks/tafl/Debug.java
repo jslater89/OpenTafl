@@ -1,15 +1,6 @@
 package com.manywords.softworks.tafl;
 
-import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
-import com.manywords.softworks.tafl.notation.MoveSerializer;
-import com.manywords.softworks.tafl.rules.Board;
-import com.manywords.softworks.tafl.rules.Coord;
-import com.manywords.softworks.tafl.rules.Rules;
-import com.manywords.softworks.tafl.rules.brandub.Brandub;
-import com.manywords.softworks.tafl.notation.RulesSerializer;
-import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
-import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
-import com.manywords.softworks.tafl.ui.RawTerminal;
+import com.manywords.softworks.tafl.ui.LanternaTerminal;
 
 import java.util.Map;
 
@@ -27,8 +18,12 @@ public class Debug {
         RawTerminal.renderBoard(b);
         */
 
+        LanternaTerminal t = new LanternaTerminal();
+
+        /*
         RawTerminal display = new RawTerminal();
         display.runUi();
+        */
 
 		/*
 		Rules rules = null;

@@ -2,7 +2,7 @@ package com.manywords.softworks.tafl;
 
 import com.manywords.softworks.tafl.test.Test;
 import com.manywords.softworks.tafl.ui.RawTerminal;
-import com.manywords.softworks.tafl.ui.Window;
+import com.manywords.softworks.tafl.ui.SwingWindow;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,7 @@ public class OpenTafl {
         }
 
         if (window) {
-            Window w = new Window();
+            SwingWindow w = new SwingWindow();
         } else {
             RawTerminal display = new RawTerminal();
             display.runUi();

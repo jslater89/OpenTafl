@@ -692,6 +692,10 @@ public class Taflman {
     }
 
     public static String getStringSymbol(char taflman) {
+        return getStringSymbol(taflman, 3);
+    }
+
+    public static String getStringSymbol(char taflman, int size) {
         String edge1 = "";
         String edge2 = "";
         String symbol = "-";
@@ -707,7 +711,12 @@ public class Taflman {
         if (isCommander(taflman)) symbol = "o";
         if (isKnight(taflman)) symbol = "?";
 
-        return edge1 + symbol + edge2;
+        if(size == 1) return symbol;
+        else if(size == 2) return edge1 + symbol;
+        else if(size == 3) return edge1 + symbol + edge2;
+        else if(size == 4) return edge1 + symbol + symbol + edge2;
+        else if(size == 5) return edge1 + "-" + symbol + "-" + edge2;
+        else return edge1 + symbol + edge2;
     }
 
     public static String getOtnStringSymbol(char taflman) {
