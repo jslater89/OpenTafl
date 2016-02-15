@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.ui;
 
-import com.manywords.softworks.tafl.engine.UiCallback;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.swing.SquarePanel;
 
@@ -59,5 +59,10 @@ public class Window extends JFrame implements UiCallback {
     public void victoryForSide(Side side) {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public MoveRecord waitForHumanMoveInput() {
+        return null;
     }
 }
