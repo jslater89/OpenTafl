@@ -5,18 +5,44 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
 public class LocalHuman implements Player {
+    private MoveCallback mCallback;
+    private PlayerWorkerThread mWorker;
 
     @Override
-    public MoveRecord getNextMove(RawTerminal ui, Game game, int searchDepth) {
+    public void setCallback(MoveCallback c) {
+        mCallback = c;
+    }
+
+    @Override
+    public void getNextMove(RawTerminal ui, Game game, int searchDepth) {
         System.out.println("Waiting for human move.");
-        MoveRecord r = null;
 
-        while (ui.inGame()) {
-            r = ui.waitForInGameInput();
-            if (r != null) return r;
-        }
+        mWorker = new PlayerWorkerThread(new PlayerWorkerThread.PlayerWorkerRunnable() {
+            private boolean mRunning = true;
 
-        return null;
+            @Override
+            public void cancel() {
+                mRunning = false;
+            }
+
+            @Override
+            public void run() {
+                MoveRecord r = null;
+                while (ui.inGame() && mRunning) {
+                    r = ui.waitForInGameInput();
+                    if (r != null) {
+                        mCallback.onMoveDecided(r);
+                        return;
+                    }
+                }
+            }
+        });
+        mWorker.start();
+    }
+
+    @Override
+    public void stop() {
+        mWorker.cancel();
     }
 
     @Override

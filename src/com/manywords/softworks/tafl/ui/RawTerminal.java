@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.ui.player.LocalAi;
 import com.manywords.softworks.tafl.ui.player.LocalHuman;
 import com.manywords.softworks.tafl.ui.player.Player;
+import com.manywords.softworks.tafl.ui.player.Player.MoveCallback;
 import jline.console.ConsoleReader;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class RawTerminal implements UiCallback {
@@ -48,7 +50,16 @@ public class RawTerminal implements UiCallback {
 
     private boolean mInMenu = true;
     private boolean mInOptions = false;
+
     private boolean mInGame = false;
+
+
+    private final int WAITING_FOR_MOVE = 0;
+    private final int MOVE_INVALID = -1;
+    private final int MOVE_VALID = 1;
+    private final int IDLE = -2;
+    private AtomicInteger mMoveStatus = new AtomicInteger(IDLE);
+
     private boolean mPostGame = false;
     private ConsoleReader mConsoleReader;
 
@@ -104,6 +115,9 @@ public class RawTerminal implements UiCallback {
         // Attacking side
         mPlayers[0] = new LocalAi();
 
+        mPlayers[0].setCallback(mMoveCallback);
+        mPlayers[1].setCallback(mMoveCallback);
+
         printMenuHeader();
 
         while (mUiRunning) {
@@ -112,20 +126,49 @@ public class RawTerminal implements UiCallback {
             } else if (mInOptions) {
                 waitForOptionsInput();
             } else if (mInGame) {
-                int result = waitForNextMove();
-                if (result == 0) {
-                    GameState state = mGame.getCurrentState();
-                    if (state.getCurrentSide().isAttackingSide()) {
-                        mCurrentPlayer = 0;
-                    } else {
-                        mCurrentPlayer = 1;
+                if (mMoveStatus.intValue() != WAITING_FOR_MOVE) {
+                    if(mMoveStatus.intValue() == MOVE_VALID) {
+                        GameState state = mGame.getCurrentState();
+                        if (state.getCurrentSide().isAttackingSide()) {
+                            mCurrentPlayer = 0;
+                        }
+                        else {
+                            mCurrentPlayer = 1;
+                        }
                     }
+
+                    waitForNextMove();
                 }
             } else if (mPostGame) {
                 waitForPostGameInput();
             }
         }
     }
+
+    private final MoveCallback mMoveCallback = new MoveCallback() {
+
+        @Override
+        public void onMoveDecided(MoveRecord move) {
+            int result =
+                    mGame.getCurrentState().moveTaflman(
+                            mGame.getCurrentState().getBoard().getOccupier(move.start.x, move.start.y),
+                            mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y));
+
+            if (result != GameState.GOOD_MOVE) {
+                mMoveStatus.set(MOVE_INVALID);
+                print("Illegal play. ");
+                if (result == GameState.ILLEGAL_SIDE) {
+                    println("Not your taflman.");
+                }
+                else {
+                    println("Move disallowed.");
+                }
+            }
+            else {
+                mMoveStatus.set(MOVE_VALID);
+            }
+        }
+    };
 
     public void startGame(Game game) {
         mGame = game;
@@ -341,11 +384,14 @@ public class RawTerminal implements UiCallback {
 
                 if (commandParts[3].startsWith("ai")) {
                     mPlayers[side] = new LocalAi();
+                    mPlayers[side].setCallback(mMoveCallback);
                 } else if (commandParts[3].startsWith("human")) {
                     mPlayers[side] = new LocalHuman();
+                    mPlayers[side].setCallback(mMoveCallback);
                 } else if (commandParts[3].startsWith("network")) {
                     println("Network play not implemented. Falling back to local human.");
                     mPlayers[side] = new LocalHuman();
+                    mPlayers[side].setCallback(mMoveCallback);
                 } else {
                     println("Unknown player type. Use 'ai', 'human', or 'network'.");
                 }
@@ -395,28 +441,13 @@ public class RawTerminal implements UiCallback {
         }
     }
 
-    private int waitForNextMove() {
-        MoveRecord move = mPlayers[mCurrentPlayer].getNextMove(this, mGame, mSearchDepth);
-
-        if (!mInGame) {
-            return 0;
+    private void waitForNextMove() {
+        if(mInGame) {
+            mMoveStatus.set(WAITING_FOR_MOVE);
+            mPlayers[mCurrentPlayer].getNextMove(this, mGame, mSearchDepth);
         }
-
-        int result =
-                mGame.getCurrentState().moveTaflman(
-                        mGame.getCurrentState().getBoard().getOccupier(move.start.x, move.start.y),
-                        mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y));
-
-        if (result != GameState.GOOD_MOVE) {
-            print("Illegal play. ");
-            if (result == GameState.ILLEGAL_SIDE) {
-                println("Not your taflman.");
-            } else {
-                println("Move disallowed.");
-            }
-            return -1;
-        } else {
-            return 0;
+        else {
+            mMoveStatus.set(IDLE);
         }
     }
 
@@ -486,6 +517,9 @@ public class RawTerminal implements UiCallback {
         if (command.startsWith("quit")) {
             mInGame = false;
             mInMenu = true;
+
+            mPlayers[0].stop();
+            mPlayers[1].stop();
 
             printMenuHeader();
         }

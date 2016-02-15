@@ -8,10 +8,17 @@ public interface Player {
     public enum Type {
         HUMAN,
         NETWORK,
-        AI
+        AI,
+        ENGINE
     }
 
-    public MoveRecord getNextMove(RawTerminal ui, Game game, int searchDepth);
+    public interface MoveCallback {
+        public void onMoveDecided(MoveRecord record);
+    }
+
+    public void getNextMove(RawTerminal ui, Game game, int searchDepth);
+    public void stop();
+    public void setCallback(MoveCallback callback);
 
     public Type getType();
 }
