@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="jline-2.13-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="lanterna-3.0.0-beta2" level="project" />
   </component>
 </module>
