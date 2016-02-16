@@ -44,7 +44,7 @@ public class MainMenuWindow extends BasicWindow {
                 CommandWindow cw = new CommandWindow(g, mTerminalCallback);
                 StatusWindow sw = new StatusWindow(g, mTerminalCallback);
 
-                mTerminalCallback.onEnteringGame(bw, sw, cw);
+                mTerminalCallback.onEnteringGame(g, bw, sw, cw);
             }
         });
         p.addComponent(playButton);
@@ -65,6 +65,7 @@ public class MainMenuWindow extends BasicWindow {
         });
         p.addComponent(quitButton);
 
+        /*
         TerminalBoardImage.init(11);
         TerminalBoardImage i = new TerminalBoardImage();
         TerminalImagePanel panel = new TerminalImagePanel(i);
@@ -72,6 +73,7 @@ public class MainMenuWindow extends BasicWindow {
 
         Game game = new Game(Copenhagen.newCopenhagen11(), null);
         i.renderBoard(game.getCurrentState(), null, null, null, null);
+        */
 
         this.setComponent(p);
     }

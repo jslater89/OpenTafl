@@ -40,13 +40,19 @@ public class OpenTafl {
             if (args[i].equals("-v")) {
                 if (i + 1 < args.length) {
                     mapArgs.put("-v", args[i + 1]);
+                    i++;
                 }
             }
 
-            if (args[i].equals("-d")) {
+            else if (args[i].equals("-d")) {
                 if (i + 1 < args.length) {
                     mapArgs.put("-d", args[i + 1]);
+                    i++;
                 }
+            }
+
+            else {
+                mapArgs.put(args[i], "");
             }
         }
 

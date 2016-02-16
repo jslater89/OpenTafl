@@ -10,6 +10,7 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
+import com.manywords.softworks.tafl.ui.player.Player;
 
 class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback {
 
@@ -19,7 +20,7 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
     }
 
     @Override
-    public void awaitingMove(boolean isAttackingSide) {
+    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
 

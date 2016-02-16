@@ -4,16 +4,13 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
-import com.manywords.softworks.tafl.rules.Coord;
-import com.manywords.softworks.tafl.rules.Taflman;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.List;
 
-public class LocalAi implements Player {
+public class LocalAi extends Player {
     private MoveCallback mCallback;
-    private PlayerWorkerThread mWorker;
+    private UiWorkerThread mWorker;
 
     @Override
     public void setCallback(MoveCallback c) {
@@ -24,7 +21,7 @@ public class LocalAi implements Player {
     public void getNextMove(UiCallback ui, Game game, int searchDepth) {
         ui.statusText("Waiting for computer move.");
 
-        mWorker = new PlayerWorkerThread(new PlayerWorkerThread.PlayerWorkerRunnable() {
+        mWorker = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
             private boolean mRunning = true;
 
             @Override
@@ -60,16 +57,16 @@ public class LocalAi implements Player {
                 }
 
 
-                System.out.println("Finding best state...");
+                ui.statusText("Finding best state...");
                 GameTreeNode bestMove = workspace.getTreeRoot().getBestChild();
-                System.out.println("Best move: " + bestMove.getRootMove() + " with path...");
+                ui.statusText("Best move: " + bestMove.getRootMove() + " with path...");
 
                 List<GameTreeNode> bestPath = workspace.getTreeRoot().getBestPath();
 
                 for (GameTreeNode node : bestPath) {
-                    System.out.println("\t" + node.getEnteringMove());
+                    ui.statusText("\t" + node.getEnteringMove());
                 }
-                System.out.println("End of best path scored " + bestMove.getValue());
+                ui.statusText("End of best path scored " + bestMove.getValue());
                 //System.out.println("Best path zobrist: " + bestMove.getZobrist());
 
                 onMoveDecided(bestMove.getRootMove());
@@ -80,7 +77,7 @@ public class LocalAi implements Player {
 
     @Override
     public void stop() {
-        mWorker.cancel();
+        if(mWorker != null) mWorker.cancel();
     }
 
     @Override

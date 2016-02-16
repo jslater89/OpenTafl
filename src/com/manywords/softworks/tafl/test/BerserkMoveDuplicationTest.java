@@ -10,6 +10,7 @@ import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
+import com.manywords.softworks.tafl.ui.player.Player;
 
 class BerserkMoveDuplicationTest extends TaflTest implements UiCallback {
 
@@ -19,7 +20,7 @@ class BerserkMoveDuplicationTest extends TaflTest implements UiCallback {
     }
 
     @Override
-    public void awaitingMove(boolean isAttackingSide) {
+    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
 

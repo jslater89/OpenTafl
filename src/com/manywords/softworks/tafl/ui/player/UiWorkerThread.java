@@ -3,14 +3,14 @@ package com.manywords.softworks.tafl.ui.player;
 /**
  * Created by jay on 2/15/16.
  */
-public class PlayerWorkerThread extends Thread {
-    public abstract static class PlayerWorkerRunnable implements Runnable {
+public class UiWorkerThread extends Thread {
+    public abstract static class UiWorkerRunnable implements Runnable {
         public abstract void cancel();
     }
 
-    private PlayerWorkerRunnable mRunnable;
+    private UiWorkerRunnable mRunnable;
 
-    public PlayerWorkerThread(PlayerWorkerRunnable r) {
+    public UiWorkerThread(UiWorkerRunnable r) {
         super(r);
         mRunnable = r;
     }

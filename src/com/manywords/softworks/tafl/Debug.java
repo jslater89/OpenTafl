@@ -19,12 +19,13 @@ public class Debug {
         RawTerminal.renderBoard(b);
         */
 
-        /*
-        AdvancedTerminal t = new AdvancedTerminal();
-        */
-
-        RawTerminal display = new RawTerminal();
-        display.runUi();
+        if(args.size() == 1) {
+            AdvancedTerminal t = new AdvancedTerminal();
+        }
+        else {
+            RawTerminal display = new RawTerminal();
+            display.runUi();
+        }
 
 		/*
 		Rules rules = null;

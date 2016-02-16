@@ -9,6 +9,7 @@ import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
+import com.manywords.softworks.tafl.ui.player.Player;
 
 class CornerVictoryTest extends TaflTest implements UiCallback {
 
@@ -18,7 +19,7 @@ class CornerVictoryTest extends TaflTest implements UiCallback {
     }
 
     @Override
-    public void awaitingMove(boolean isAttackingSide) {
+    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
 

@@ -1,5 +1,7 @@
 package com.manywords.softworks.tafl.ui.lanterna.settings;
 
+import com.manywords.softworks.tafl.ui.player.Player;
+
 /**
  * Created by jay on 2/15/16.
  */
@@ -25,5 +27,20 @@ public class TerminalSettings {
             default:
                 return "External Engine";
         }
+    }
+
+    public static Player getNewPlayer(int type) {
+        switch(type) {
+            case HUMAN:
+                return Player.getNewPlayer(Player.Type.HUMAN);
+            case AI:
+                return Player.getNewPlayer(Player.Type.AI);
+            case NETWORK:
+                return Player.getNewPlayer(Player.Type.HUMAN);
+            case ENGINE:
+                return Player.getNewPlayer(Player.Type.AI);
+        }
+
+        return null;
     }
 }

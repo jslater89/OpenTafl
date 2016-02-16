@@ -10,9 +10,14 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
+import com.manywords.softworks.tafl.ui.command.Command;
+import com.manywords.softworks.tafl.ui.command.CommandEngine;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
+import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
+import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowDecorationRenderer;
@@ -21,6 +26,8 @@ import com.manywords.softworks.tafl.ui.lanterna.window.BoardWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.CommandWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.MainMenuWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.StatusWindow;
+import com.manywords.softworks.tafl.ui.player.Player;
+import com.manywords.softworks.tafl.ui.player.UiWorkerThread;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -30,8 +37,8 @@ import java.io.IOException;
  */
 public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
     public interface TerminalCallback {
-        public void onMenuNavigation(com.googlecode.lanterna.gui2.Window destination);
-        public void onEnteringGame(BoardWindow bw, StatusWindow sw, CommandWindow cw);
+        public void onMenuNavigation(Window destination);
+        public void onEnteringGame(Game g, BoardWindow bw, StatusWindow sw, CommandWindow cw);
         public void handleInGameCommand(String command);
 
         public UiCallback getUiCallback();
@@ -42,6 +49,12 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
     private BoardWindow mBoardWindow;
     private StatusWindow mStatusWindow;
     private CommandWindow mCommandWindow;
+
+    private UiWorkerThread mGameThread;
+    private Game mGame;
+    private CommandEngine mCommandEngine;
+
+    private boolean mInGame;
 
     public AdvancedTerminal() {
         super();
@@ -134,39 +147,61 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
         mCommandWindow.setSize(commandSize);
     }
 
-    @Override
-    public void gameStarting() {
+    private void leaveGameUi() {
+        mGui.removeWindow(mBoardWindow);
+        mGui.removeWindow(mStatusWindow);
+        mGui.removeWindow(mCommandWindow);
 
+        //mGameThread.cancel();
+        mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
     }
 
     @Override
-    public void awaitingMove(boolean isAttackingSide) {
+    public void gameStarting() {
+        statusText("Game starting");
+        mInGame = true;
+    }
 
+    @Override
+    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
+        statusText("Awaiting" + (isAttackingSide ? " attacker " : " defender ") + "move");
     }
 
     @Override
     public void moveResult(CommandResult result, MoveRecord move) {
-
+        if(result.result == CommandResult.FAIL) {
+            statusText(result.message);
+        }
+        else {
+            statusText("Last move: " + move);
+            mBoardWindow.rerenderBoard();
+        }
     }
 
     @Override
     public void statusText(String text) {
-
+        mStatusWindow.addStatus(text);
     }
 
     @Override
     public void gameStateAdvanced() {
-
+        mBoardWindow.rerenderBoard();
     }
 
     @Override
     public void victoryForSide(Side side) {
-
+        mBoardWindow.rerenderBoard();
+        if(side.isAttackingSide()) {
+            statusText("Attackers win!");
+        }
+        else {
+            statusText("Defenders win!");
+        }
     }
 
     @Override
     public void gameFinished() {
-
+        mInGame = false;
     }
 
     @Override
@@ -176,7 +211,7 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
 
     @Override
     public boolean inGame() {
-        return false;
+        return mInGame;
     }
 
     private TerminalCallback mTerminalCallback = new TerminalCallback() {
@@ -190,18 +225,75 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
         }
 
         @Override
-        public void onEnteringGame(BoardWindow bw, StatusWindow sw, CommandWindow cw) {
+        public void onEnteringGame(Game g, BoardWindow bw, StatusWindow sw, CommandWindow cw) {
             mGui.removeWindow(mGui.getActiveWindow());
             mBoardWindow = bw;
             mStatusWindow = sw;
             mCommandWindow = cw;
+
+            // Set up a game thread
+            mGameThread = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
+                private boolean mRunning = true;
+                @Override
+                public void cancel() {
+                    mRunning = false;
+                }
+
+                @Override
+                public void run() {
+                    mGame = g;
+                    mCommandEngine = new CommandEngine(g, AdvancedTerminal.this, TerminalSettings.getNewPlayer(TerminalSettings.attackers), TerminalSettings.getNewPlayer(TerminalSettings.defenders));
+                    mCommandEngine.startGame();
+                }
+            });
+            mGameThread.start();
+
+            // This is our UI thread (blocking call)
             addBoardWindows();
         }
 
-        int count = 0;
         @Override
         public void handleInGameCommand(String command) {
-            mStatusWindow.addStatus("Lalalallalalallalallalallalalassdfasdfasdfasdfgdsfasdfasdfasdgasdfewagasdf" + count++);
+            Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
+            CommandResult r = mCommandEngine.executeCommand(c);
+
+            if(r.result != CommandResult.SUCCESS) {
+                statusText(r.message);
+            }
+            else if (r.type == CommandResult.Type.MOVE) {
+                if(r.extra != null) {
+                    if(mCommandEngine.getCurrentPlayer().getType() == Player.Type.HUMAN) {
+                        mCommandEngine.getCurrentPlayer().onMoveDecided((MoveRecord) r.extra);
+                    }
+                    else {
+                        statusText("Not your turn!");
+                    }
+                }
+                else {
+                    throw new IllegalStateException("Received successful move command with no move record");
+                }
+            }
+            else if (r.type == CommandResult.Type.INFO) {
+                HumanCommandParser.Info infoCommand = (HumanCommandParser.Info) c;
+                mBoardWindow.rerenderBoard(infoCommand.location, infoCommand.stops, infoCommand.moves, infoCommand.captures);
+            }
+            else if (r.type == CommandResult.Type.SHOW) {
+                mBoardWindow.rerenderBoard();
+            }
+            else if (r.type == CommandResult.Type.HISTORY) {
+                String gameRecord = (String) r.extra;
+                statusText(gameRecord);
+            }
+            else if (r.type == CommandResult.Type.QUIT) {
+                if(mInGame) {
+                    // Leave the game thread running for history.
+                    statusText("Finished game. Enter 'quit' again to return to menu.");
+                    mCommandEngine.finishGame();
+                }
+                else {
+                    leaveGameUi();
+                }
+            }
         }
 
         @Override

@@ -2,12 +2,11 @@ package com.manywords.softworks.tafl.ui.player;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
-public class LocalHuman implements Player {
+public class LocalHuman extends Player {
     private MoveCallback mCallback;
-    private PlayerWorkerThread mWorker;
+    private UiWorkerThread mWorker;
 
     @Override
     public void setCallback(MoveCallback c) {
@@ -16,9 +15,9 @@ public class LocalHuman implements Player {
 
     @Override
     public void getNextMove(UiCallback ui, Game game, int searchDepth) {
-        System.out.println("Waiting for human move.");
+        ui.statusText("Waiting for human move.");
 
-        mWorker = new PlayerWorkerThread(new PlayerWorkerThread.PlayerWorkerRunnable() {
+        mWorker = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
             private boolean mRunning = true;
 
             @Override
@@ -38,7 +37,7 @@ public class LocalHuman implements Player {
 
     @Override
     public void stop() {
-        mWorker.cancel();
+        if(mWorker != null) mWorker.cancel();
     }
 
     @Override

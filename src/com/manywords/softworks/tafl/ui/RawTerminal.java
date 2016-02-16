@@ -127,7 +127,7 @@ public class RawTerminal implements UiCallback {
             } else if (mInOptions) {
                 waitForOptionsInput();
             } else if (mInGame) {
-                if(mPlayers[mCurrentPlayer] instanceof LocalHuman) {
+                if(mCommandEngine.getCurrentPlayer() instanceof LocalHuman) {
                     waitForInGameInput();
                 }
                 else {
@@ -210,7 +210,7 @@ public class RawTerminal implements UiCallback {
     }
 
     @Override
-    public void awaitingMove(boolean isAttackingSide) {
+    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
         waitForNextMove();
     }
 

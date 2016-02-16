@@ -9,6 +9,7 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
+import com.manywords.softworks.tafl.ui.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ class AIMoveRepetitionTest extends TaflTest implements UiCallback {
     }
 
     @Override
-    public void awaitingMove(boolean isAttackingSide) {
+    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
 

@@ -16,6 +16,8 @@ public class TerminalThemeConstants {
     public static final TextColor WHITE = new TextColor.RGB(0xff, 0xff, 0xff);
     public static final TextColor BLUE = TextColor.ANSI.BLUE;
     public static final TextColor RED = TextColor.ANSI.RED;
+    public static final TextColor GREEN = TextColor.ANSI.GREEN;
+    public static final TextColor YELLOW = TextColor.ANSI.YELLOW;
 
     public static final EnumSet<SGR> NO_SGRS = EnumSet.noneOf(SGR.class);
 

@@ -42,8 +42,12 @@ public class CommandEngine {
         waitForNextMove();
     }
 
+    public Player getCurrentPlayer() {
+        return mCurrentPlayer;
+    }
+
     private void waitForNextMove() {
-        mUiCallback.awaitingMove(mGame.getCurrentSide().isAttackingSide());
+        mUiCallback.awaitingMove(mCurrentPlayer, mGame.getCurrentSide().isAttackingSide());
         mCurrentPlayer.getNextMove(mUiCallback, mGame, mSearchDepth);
     }
 
@@ -61,6 +65,7 @@ public class CommandEngine {
             if(player != mCurrentPlayer) {
                 message += "Not your turn.";
                 mUiCallback.moveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), null);
+                return;
             }
             int result =
                     mGame.getCurrentState().moveTaflman(

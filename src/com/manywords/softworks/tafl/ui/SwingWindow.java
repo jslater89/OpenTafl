@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.ui;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
+import com.manywords.softworks.tafl.ui.player.Player;
 import com.manywords.softworks.tafl.ui.swing.SquarePanel;
 
 import javax.swing.*;
@@ -56,7 +57,7 @@ public class SwingWindow extends JFrame implements UiCallback {
     }
 
     @Override
-    public void awaitingMove(boolean isAttackingSide) {
+    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
 
