@@ -20,7 +20,7 @@ class EdgeFortEscapeTest extends TaflTest {
         state.moveTaflman(state.getPieceAt(2, 5), state.getSpaceAt(2, 6));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
-        assert state.checkVictory() == -2;
+        assert state.checkVictory() == GameState.DEFENDER_WIN;
 
         state.moveTaflman(state.getPieceAt(2, 0), state.getSpaceAt(2, 1));
         state = game.getCurrentState();
@@ -28,7 +28,7 @@ class EdgeFortEscapeTest extends TaflTest {
         state.moveTaflman(state.getPieceAt(2, 8), state.getSpaceAt(2, 7));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
-        assert state.checkVictory() == -2;
+        assert state.checkVictory() == GameState.DEFENDER_WIN;
     }
 
 }
