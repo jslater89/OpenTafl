@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.ui.lanterna.component;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.Label;
 
@@ -11,12 +12,33 @@ import java.util.List;
  */
 public class ScrollingLabel extends Label {
     // Queue
+    /*
+     * mStringBuffer holds up to 512 strings, which are broken up for display
+     * by the line buffer.
+     */
+
+    private List<String> mStringBuffer;
     private List<String> mLineBuffer;
+    private int mHeight;
+    private int mWidth;
+    private int mStartPosition = 0;
 
     public ScrollingLabel(String text) {
         super(text);
+        mStringBuffer = new ArrayList<String>(512);
         mLineBuffer = new ArrayList<String>(512);
         clearAndAddLine(text);
+    }
+
+    @Override
+    public synchronized Label setSize(TerminalSize size) {
+        Label result = super.setSize(size);
+        mHeight = size.getRows();
+        mWidth = size.getColumns();
+
+        resize();
+
+        return result;
     }
 
     public synchronized void clearAndAddLine(String text) {
@@ -24,7 +46,21 @@ public class ScrollingLabel extends Label {
     }
 
     public synchronized void resize() {
-        addLine("", false, true);
+        mHeight = getSize().getRows();
+        mWidth = getSize().getColumns();
+
+        mLineBuffer.clear();
+
+        for(int i = mStringBuffer.size() - 1; i >= 0; i--) {
+            String s = mStringBuffer.get(i);
+            List<String> lines = TerminalTextUtils.getWordWrappedText(mWidth, s);
+
+            for(String line : lines) {
+                mLineBuffer.add(0, line);
+            }
+
+            if(mLineBuffer.size() > 512) break;
+        }
     }
 
     public synchronized void addLine(String text) {
@@ -32,34 +68,63 @@ public class ScrollingLabel extends Label {
     }
 
     private synchronized void addLine(String text, boolean clear) {
-        addLine(text, clear, false);
-    }
+        if(mLineBuffer == null || mStringBuffer == null) return; //during init
+        if(text == null || text.equals("")) return; // crashes TTU.getWordWrappedText
 
-    private synchronized void addLine(String text, boolean clear, boolean resize) {
-        if(mLineBuffer == null) return; //during init
-        if(text == null || text.equals("") || resize) return; // crashes TTU.getWordWrappedText
-
-        if (clear || resize) mLineBuffer.clear();
-        if(!resize) {
-            List<String> wrappedLine = TerminalTextUtils.getWordWrappedText(getSize().getColumns(), text);
-            for (String s : wrappedLine) {
-                mLineBuffer.add(0, s);
-            }
-
-            while (mLineBuffer.size() > 512) mLineBuffer.remove(511);
+        if (clear) {
+            mLineBuffer.clear();
+            mStringBuffer.clear();
         }
-        String out = lineBufferToString();
+
+        mStringBuffer.add(0, text);
+
+        List<String> wrappedLine = TerminalTextUtils.getWordWrappedText(mWidth, text);
+        for (String s : wrappedLine) {
+            mLineBuffer.add(0, s);
+        }
+
+        while (mStringBuffer.size() > 512) mStringBuffer.remove(511);
+        while (mLineBuffer.size() > 512) mLineBuffer.remove(511);
+
+        if(mStartPosition != 0) {
+            mStartPosition += wrappedLine.size();
+        }
+
+        String out = lineBufferToString(mStartPosition);
         setText(out);
     }
 
-    private String lineBufferToString() {
+    public void handleScroll(boolean up) {
+        if(up) {
+            // Always leave enough in the line buffer so that we fill the message window when we scroll up.
+            mStartPosition = Math.min(mStartPosition + mHeight - 4, mLineBuffer.size() - mHeight);
+        }
+        else {
+            // Never look into the future.
+            mStartPosition = Math.max(mStartPosition - mHeight + 4, 0);
+        }
+
+        String out = lineBufferToString(mStartPosition);
+        setText(out);
+    }
+
+    private String lineBufferToString(int offset) {
         StringBuilder out = new StringBuilder();
-        int lines = getSize().getRows();
+        int lines = getSize().getRows() + offset;
         int start = Math.min(lines, mLineBuffer.size()) - 1;
 
-        for(int i = start; i >= 0; i--) {
-            out.append(mLineBuffer.get(i));
-            out.append("\n");
+        for(int i = start; i >= offset; i--) {
+            if(offset > 0 && i == offset) {
+                out.append("[Scrolled at ");
+                out.append(mStartPosition);
+                out.append("/");
+                out.append(mLineBuffer.size());
+                out.append("]\n");
+            }
+            else {
+                out.append(mLineBuffer.get(i));
+                out.append("\n");
+            }
         }
 
         return out.toString();

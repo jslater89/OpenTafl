@@ -5,6 +5,8 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
+import com.googlecode.lanterna.input.*;
+import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.ResizeListener;
@@ -40,6 +42,7 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
         public void onMenuNavigation(Window destination);
         public void onEnteringGame(Game g, BoardWindow bw, StatusWindow sw, CommandWindow cw);
         public void handleInGameCommand(String command);
+        public void handleKeyStroke(KeyStroke key);
 
         public UiCallback getUiCallback();
     }
@@ -293,6 +296,13 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
                 else {
                     leaveGameUi();
                 }
+            }
+        }
+
+        @Override
+        public void handleKeyStroke(KeyStroke key) {
+            if(key.getKeyType() == KeyType.PageUp || key.getKeyType() == KeyType.PageDown) {
+                mStatusWindow.handleInput(key);
             }
         }
 

@@ -11,6 +11,7 @@ import com.googlecode.lanterna.input.KeyType;
 public class TerminalEnterTerminatedTextBox extends TextBox {
     public interface TextBoxCallback {
         public void onEnterPressed(String input);
+        public void onPageKeyPressed(KeyStroke key);
     }
 
     private TextBoxCallback mCallback;
@@ -24,6 +25,10 @@ public class TerminalEnterTerminatedTextBox extends TextBox {
         if(keyStroke.getKeyType() == KeyType.Enter) {
             mCallback.onEnterPressed(getText());
             setText("");
+            return Result.HANDLED;
+        }
+        else if(keyStroke.getKeyType() == KeyType.PageUp || keyStroke.getKeyType() == KeyType.PageDown) {
+            mCallback.onPageKeyPressed(keyStroke);
             return Result.HANDLED;
         }
         else {

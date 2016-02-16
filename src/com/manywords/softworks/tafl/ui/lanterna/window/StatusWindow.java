@@ -6,9 +6,12 @@ import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.LinearLayout;
 import com.googlecode.lanterna.gui2.Panel;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
+import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
 /**
  * Created by jay on 2/15/16.
@@ -24,9 +27,12 @@ public class StatusWindow extends BasicWindow {
 
         Label textLabel = new Label("Status");
         textLabel.addStyle(SGR.UNDERLINE);
+
         mTextDisplay = new ScrollingLabel("");
+
         Label clockLabel = new Label("Clock");
         clockLabel.addStyle(SGR.UNDERLINE);
+
         mClockDisplay = new Label("");
 
         p.addComponent(textLabel);
@@ -45,6 +51,16 @@ public class StatusWindow extends BasicWindow {
         }
     }
 
+    @Override
+    public boolean handleInput(KeyStroke key) {
+        if(key.getKeyType() == KeyType.PageUp) {
+            mTextDisplay.handleScroll(true);
+        }
+        else if(key.getKeyType() == KeyType.PageDown) {
+            mTextDisplay.handleScroll(false);
+        }
+        return super.handleInput(key);
+    }
 
     @Override
     public void setSize(TerminalSize size) {

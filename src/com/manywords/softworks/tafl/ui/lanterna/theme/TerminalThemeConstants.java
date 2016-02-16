@@ -13,6 +13,7 @@ import java.util.EnumSet;
 public class TerminalThemeConstants {
     public static final TextColor DKGRAY = new TextColor.RGB(0x05, 0x05, 0x05);
     public static final TextColor LTGRAY = new TextColor.RGB(0xcc, 0xcc, 0xcc);
+    public static final TextColor GRAY = new TextColor.RGB(0x40, 0x40, 0x40);
     public static final TextColor WHITE = new TextColor.RGB(0xff, 0xff, 0xff);
     public static final TextColor BLUE = TextColor.ANSI.BLUE;
     public static final TextColor RED = TextColor.ANSI.RED;

@@ -61,7 +61,7 @@ public class TerminalThemeDefinition implements ThemeDefinition {
 
             @Override
             public TextColor getBackground() {
-                return TerminalThemeConstants.DKGRAY;
+                return TerminalThemeConstants.GRAY;
             }
 
             @Override
@@ -81,7 +81,7 @@ public class TerminalThemeDefinition implements ThemeDefinition {
 
             @Override
             public TextColor getBackground() {
-                return TerminalThemeConstants.DKGRAY;
+                return TerminalThemeConstants.GRAY;
             }
 
             @Override
