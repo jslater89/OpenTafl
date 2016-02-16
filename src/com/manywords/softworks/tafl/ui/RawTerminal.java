@@ -4,6 +4,10 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.*;
+import com.manywords.softworks.tafl.ui.command.Command;
+import com.manywords.softworks.tafl.ui.command.CommandEngine;
+import com.manywords.softworks.tafl.ui.command.CommandResult;
+import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
 import com.manywords.softworks.tafl.ui.player.LocalAi;
 import com.manywords.softworks.tafl.ui.player.LocalHuman;
 import com.manywords.softworks.tafl.ui.player.Player;
@@ -45,6 +49,7 @@ public class RawTerminal implements UiCallback {
     public static String SPACER = "";
 
     private Game mGame;
+    private CommandEngine mCommandEngine;
     private boolean mUiRunning = false;
 
     private boolean mInMenu = true;
@@ -171,6 +176,7 @@ public class RawTerminal implements UiCallback {
 
     public void startGame(Game game) {
         mGame = game;
+        mCommandEngine = new CommandEngine(mGame);
 
         mInMenu = false;
         mPostGame = false;
@@ -528,48 +534,14 @@ public class RawTerminal implements UiCallback {
         }
 
         if (command.startsWith("move")) {
-            String[] commandParts = command.split(" ");
-            if (commandParts.length != 3) {
-                println("Wrong command format, try move [file+rank] [file+rank] (e.g. move a4 a3)");
-            } else {
-                int boardSize = mGame.getCurrentState().getBoard().getBoardDimension();
-
-                String fromString = commandParts[1].toLowerCase();
-                String toString = commandParts[2].toLowerCase();
-
-                if (!Board.validateChessNotation(fromString, boardSize) || !Board.validateChessNotation(toString, boardSize)) {
-                    println("Incorrect space formats: $fromString $toString");
-                    return null;
-                }
-
-                Map<String, Integer> fromCoords = Board.getCoordMapFromChessNotation(fromString);
-                Map<String, Integer> toCoords = Board.getCoordMapFromChessNotation(toString);
-
-                int fromX = fromCoords.get("x");
-                int fromY = fromCoords.get("y");
-                int toX = toCoords.get("x");
-                int toY = toCoords.get("y");
-
-                if (fromX < 0 || fromX >= boardSize || fromY < 0 || fromY >= boardSize) {
-                    println("Piece out of bounds");
-                    return null;
-                }
-
-                if (toX < 0 || toX >= boardSize || toY < 0 || toY >= boardSize) {
-                    println("Destination out of bounds");
-                    return null;
-                }
-
-                char piece = mGame.getCurrentState().getPieceAt(fromX, fromY);
-
-                if (piece == Taflman.EMPTY) {
-                    println("No piece at $fromX $fromY");
-                    return null;
-                }
-                Coord destination = mGame.getCurrentState().getSpaceAt(toX, toY);
-
-                MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mGame.getCurrentState(), piece), destination);
-                return record;
+            Command moveCommand = HumanCommandParser.newMoveCommand(mCommandEngine, command);
+            CommandResult result = mCommandEngine.executeCommand(moveCommand);
+            if(result.result == CommandResult.SUCCESS && result.extra != null) {
+                return (MoveRecord) result.extra;
+            }
+            else {
+                println(result.message);
+                return null;
             }
         }
         return null;
