@@ -83,11 +83,11 @@ public class ScrollingLabel extends Label {
             mLineBuffer.add(0, s);
         }
 
-        while (mStringBuffer.size() > 512) mStringBuffer.remove(511);
-        while (mLineBuffer.size() > 512) mLineBuffer.remove(511);
+        while (mStringBuffer.size() >= 512) mStringBuffer.remove(511);
+        while (mLineBuffer.size() >= 512) mLineBuffer.remove(511);
 
         if(mStartPosition != 0) {
-            mStartPosition += wrappedLine.size();
+            mStartPosition = Math.min(mStartPosition + wrappedLine.size(), mLineBuffer.size() - mHeight);
         }
 
         String out = lineBufferToString(mStartPosition);
