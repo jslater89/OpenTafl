@@ -12,6 +12,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
+import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowDecorationRenderer;
@@ -134,6 +135,26 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
     }
 
     @Override
+    public void gameStarting() {
+
+    }
+
+    @Override
+    public void awaitingMove(boolean isAttackingSide) {
+
+    }
+
+    @Override
+    public void moveResult(CommandResult result, MoveRecord move) {
+
+    }
+
+    @Override
+    public void statusText(String text) {
+
+    }
+
+    @Override
     public void gameStateAdvanced() {
 
     }
@@ -144,8 +165,18 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
     }
 
     @Override
+    public void gameFinished() {
+
+    }
+
+    @Override
     public MoveRecord waitForHumanMoveInput() {
         return null;
+    }
+
+    @Override
+    public boolean inGame() {
+        return false;
     }
 
     private TerminalCallback mTerminalCallback = new TerminalCallback() {

@@ -221,6 +221,8 @@ public class GameState {
         return mTaflmanMoveCache.getCachedReachableSpacesForTaflman(mZobristHash, taflman);
     }
 
+    public static final int DEFENDER_WIN = 2;
+    public static final int ATTACKER_WIN = 1;
     public static final int GOOD_MOVE = 0;
     public static final int ILLEGAL_SIDE = -1;
     public static final int ILLEGAL_SIDE_BERSERKER = -2;
@@ -264,14 +266,15 @@ public class GameState {
 
             mExitingMove = move;
 
+            int result;
             if (captures.size() > 0 && getBoard().getRules().getBerserkMode() > 0) {
                 setBerserkingTaflman(taflman);
-                mGame.advanceState(this, false, taflman, true);
+                result = mGame.advanceState(this, false, taflman, true);
             } else {
                 setBerserkingTaflman(Taflman.EMPTY);
-                mGame.advanceState(this, true, Taflman.EMPTY, true);
+                result = mGame.advanceState(this, true, Taflman.EMPTY, true);
             }
-            return GOOD_MOVE;
+            return result;
         }
     }
 
@@ -306,10 +309,6 @@ public class GameState {
 
         return captures;
     }
-
-    public static final int NO_WIN = 0;
-    public static final int ATTACKER_WIN = -1;
-    public static final int DEFENDER_WIN = -2;
 
     public int checkVictory() {
         boolean kingAlive = false;
@@ -379,7 +378,7 @@ public class GameState {
             return ATTACKER_WIN;
         }
 
-        return NO_WIN;
+        return GOOD_MOVE; // i.e. no win
     }
 
     private boolean checkEdgeFortEscape() {

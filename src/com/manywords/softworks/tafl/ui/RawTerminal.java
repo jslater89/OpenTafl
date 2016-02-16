@@ -119,9 +119,6 @@ public class RawTerminal implements UiCallback {
         // Attacking side
         mPlayers[0] = new LocalAi();
 
-        mPlayers[0].setCallback(mMoveCallback);
-        mPlayers[1].setCallback(mMoveCallback);
-
         printMenuHeader();
 
         while (mUiRunning) {
@@ -149,51 +146,12 @@ public class RawTerminal implements UiCallback {
         }
     }
 
-    private final MoveCallback mMoveCallback = new MoveCallback() {
-
-        @Override
-        public void onMoveDecided(MoveRecord move) {
-            int result =
-                    mGame.getCurrentState().moveTaflman(
-                            mGame.getCurrentState().getBoard().getOccupier(move.start.x, move.start.y),
-                            mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y));
-
-            if (result != GameState.GOOD_MOVE) {
-                mMoveStatus.set(MOVE_INVALID);
-                print("Illegal play. ");
-                if (result == GameState.ILLEGAL_SIDE) {
-                    println("Not your taflman.");
-                }
-                else {
-                    println("Move disallowed.");
-                }
-            }
-            else {
-                mMoveStatus.set(MOVE_VALID);
-            }
-        }
-    };
-
     public void startGame(Game game) {
         mGame = game;
-        mCommandEngine = new CommandEngine(mGame);
+        mCommandEngine = new CommandEngine(mGame, this, mPlayers[0], mPlayers[1]);
+        mCommandEngine.setSearchDepth(mSearchDepth);
 
-        mInMenu = false;
-        mPostGame = false;
-
-        mInGame = true;
-
-        if (mGame.getCurrentState().getCurrentSide().isAttackingSide()) {
-            mCurrentPlayer = ATTACKING_SIDE;
-        } else {
-            mCurrentPlayer = DEFENDING_SIDE;
-        }
-
-        //System.out.println("Running AI search for JIT optimization.");
-        //new AiWorkspace(mGame, mGame.getCurrentState()).explore(2);
-
-        renderGameState(mGame.getCurrentState());
-        printStatus();
+        mCommandEngine.startGame();
     }
 
     public static void disableColor() {
@@ -234,6 +192,44 @@ public class RawTerminal implements UiCallback {
         mInGame = false;
         mPostGame = true;
         renderGameState(mGame.getCurrentState());
+    }
+
+    @Override
+    public void gameFinished() {
+        mInGame = false;
+        mInMenu = false;
+
+        mPostGame = true;
+    }
+
+    @Override
+    public void gameStarting() {
+        mInMenu = false;
+        mPostGame = false;
+
+        mInGame = true;
+        renderGameState(mGame.getCurrentState());
+        printStatus();
+    }
+
+    @Override
+    public void awaitingMove(boolean isAttackingSide) {
+        waitForNextMove();
+    }
+
+    @Override
+    public void moveResult(CommandResult result, MoveRecord move) {
+        if(result.result == CommandResult.SUCCESS) {
+            mMoveStatus.set(MOVE_VALID);
+        }
+        else {
+            mMoveStatus.set(MOVE_INVALID);
+        }
+    }
+
+    @Override
+    public void statusText(String text) {
+        println(text);
     }
 
     public void gameStateAdvanced() {
@@ -389,14 +385,11 @@ public class RawTerminal implements UiCallback {
 
                 if (commandParts[3].startsWith("ai")) {
                     mPlayers[side] = new LocalAi();
-                    mPlayers[side].setCallback(mMoveCallback);
                 } else if (commandParts[3].startsWith("human")) {
                     mPlayers[side] = new LocalHuman();
-                    mPlayers[side].setCallback(mMoveCallback);
                 } else if (commandParts[3].startsWith("network")) {
                     println("Network play not implemented. Falling back to local human.");
                     mPlayers[side] = new LocalHuman();
-                    mPlayers[side].setCallback(mMoveCallback);
                 } else {
                     println("Unknown player type. Use 'ai', 'human', or 'network'.");
                 }
@@ -449,7 +442,6 @@ public class RawTerminal implements UiCallback {
     private void waitForNextMove() {
         if(mInGame) {
             mMoveStatus.set(WAITING_FOR_MOVE);
-            mPlayers[mCurrentPlayer].getNextMove(this, mGame, mSearchDepth);
         }
         else {
             mMoveStatus.set(IDLE);

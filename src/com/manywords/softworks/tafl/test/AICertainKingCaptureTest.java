@@ -8,8 +8,29 @@ import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
+import com.manywords.softworks.tafl.ui.command.CommandResult;
 
 class AICertainKingCaptureTest extends TaflTest implements UiCallback {
+
+    @Override
+    public void gameStarting() {
+
+    }
+
+    @Override
+    public void awaitingMove(boolean isAttackingSide) {
+
+    }
+
+    @Override
+    public void moveResult(CommandResult result, MoveRecord move) {
+
+    }
+
+    @Override
+    public void statusText(String text) {
+
+    }
 
     @Override
     public void gameStateAdvanced() {
@@ -24,8 +45,18 @@ class AICertainKingCaptureTest extends TaflTest implements UiCallback {
     }
 
     @Override
+    public void gameFinished() {
+
+    }
+
+    @Override
     public MoveRecord waitForHumanMoveInput() {
         return null;
+    }
+
+    @Override
+    public boolean inGame() {
+        return false;
     }
 
     @Override
@@ -36,7 +67,7 @@ class AICertainKingCaptureTest extends TaflTest implements UiCallback {
 
         //RawTerminal.renderGameState(state);
         state = game.getCurrentState();
-        AiWorkspace workspace = new AiWorkspace(game, state, 5);
+        AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
         workspace.explore(3);
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);

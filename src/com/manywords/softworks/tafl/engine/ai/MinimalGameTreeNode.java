@@ -119,7 +119,7 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     public GameTreeNode getBestChild() {
-        if (this.mVictory != GameTreeState.NO_WIN) return null;
+        if (this.mVictory != GameTreeState.GOOD_MOVE) return null;
 
         GameTreeNode bestMove = null;
         for (GameTreeNode child : getBranches()) {

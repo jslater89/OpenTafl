@@ -89,7 +89,7 @@ public class Game {
 
     // TODO: pass StateEvent object to notify UI of happenings
     // in callback
-    public void advanceState(GameState currentState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
+    public int advanceState(GameState currentState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
         GameState nextState;
         if (mGameRules.getBerserkMode() > 0 && berserkingTaflman != Taflman.EMPTY) {
             nextState = new GameState(
@@ -113,16 +113,7 @@ public class Game {
         // Victory
         int result = currentState.checkVictory();
 
-        if (result < 0) {
-            if (mCallback != null) {
-                mCallback.victoryForSide(result == GameState.ATTACKER_WIN ? currentState.getAttackers() : currentState.getDefenders());
-            }
-        } else {
-            // Game continues
-            if (mCallback != null) {
-                mCallback.gameStateAdvanced();
-            }
-        }
+        return result;
     }
 
     public boolean historyContainsPosition(GameState state) {

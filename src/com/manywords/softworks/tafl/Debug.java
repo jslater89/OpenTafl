@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl;
 
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.Map;
 
@@ -18,12 +19,12 @@ public class Debug {
         RawTerminal.renderBoard(b);
         */
 
-        AdvancedTerminal t = new AdvancedTerminal();
-
         /*
+        AdvancedTerminal t = new AdvancedTerminal();
+        */
+
         RawTerminal display = new RawTerminal();
         display.runUi();
-        */
 
 		/*
 		Rules rules = null;

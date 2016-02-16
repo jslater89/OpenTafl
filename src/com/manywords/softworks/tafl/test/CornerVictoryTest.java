@@ -8,8 +8,29 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
+import com.manywords.softworks.tafl.ui.command.CommandResult;
 
 class CornerVictoryTest extends TaflTest implements UiCallback {
+
+    @Override
+    public void gameStarting() {
+
+    }
+
+    @Override
+    public void awaitingMove(boolean isAttackingSide) {
+
+    }
+
+    @Override
+    public void moveResult(CommandResult result, MoveRecord move) {
+
+    }
+
+    @Override
+    public void statusText(String text) {
+
+    }
 
     @Override
     public void gameStateAdvanced() {
@@ -24,8 +45,18 @@ class CornerVictoryTest extends TaflTest implements UiCallback {
     }
 
     @Override
+    public void gameFinished() {
+
+    }
+
+    @Override
     public MoveRecord waitForHumanMoveInput() {
         return null;
+    }
+
+    @Override
+    public boolean inGame() {
+        return false;
     }
 
     @Override

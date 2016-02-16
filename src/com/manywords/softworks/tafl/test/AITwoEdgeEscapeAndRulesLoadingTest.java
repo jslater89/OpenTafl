@@ -9,8 +9,29 @@ import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
+import com.manywords.softworks.tafl.ui.command.CommandResult;
 
 class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback {
+
+    @Override
+    public void gameStarting() {
+
+    }
+
+    @Override
+    public void awaitingMove(boolean isAttackingSide) {
+
+    }
+
+    @Override
+    public void moveResult(CommandResult result, MoveRecord move) {
+
+    }
+
+    @Override
+    public void statusText(String text) {
+
+    }
 
     @Override
     public void gameStateAdvanced() {
@@ -25,8 +46,18 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
     }
 
     @Override
+    public void gameFinished() {
+
+    }
+
+    @Override
     public MoveRecord waitForHumanMoveInput() {
         return null;
+    }
+
+    @Override
+    public boolean inGame() {
+        return false;
     }
 
     @Override
@@ -38,12 +69,12 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
         GameState state = game.getCurrentState();
         state.setCurrentSide(state.getDefenders());
 
-        int victory = GameState.NO_WIN;
+        int victory = GameState.GOOD_MOVE;
         int value = 0;
 
         for(int i = 0; i < 2; i++) {
             //RawTerminal.renderGameState(state);
-            AiWorkspace workspace = new AiWorkspace(game, state, 5);
+            AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
             workspace.chatty = false;
             workspace.explore(4);
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
@@ -61,7 +92,7 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
             */
 
             victory = state.checkVictory();
-            if(victory != GameState.NO_WIN) {
+            if(victory != GameState.GOOD_MOVE) {
                 break;
             }
             else {

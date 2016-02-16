@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.ui;
 
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
+import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.swing.SquarePanel;
 
 import javax.swing.*;
@@ -50,6 +51,26 @@ public class SwingWindow extends JFrame implements UiCallback {
     }
 
     @Override
+    public void gameStarting() {
+
+    }
+
+    @Override
+    public void awaitingMove(boolean isAttackingSide) {
+
+    }
+
+    @Override
+    public void moveResult(CommandResult result, MoveRecord move) {
+
+    }
+
+    @Override
+    public void statusText(String text) {
+
+    }
+
+    @Override
     public void gameStateAdvanced() {
         // TODO Auto-generated method stub
 
@@ -62,7 +83,17 @@ public class SwingWindow extends JFrame implements UiCallback {
     }
 
     @Override
+    public void gameFinished() {
+
+    }
+
+    @Override
     public MoveRecord waitForHumanMoveInput() {
         return null;
+    }
+
+    @Override
+    public boolean inGame() {
+        return false;
     }
 }

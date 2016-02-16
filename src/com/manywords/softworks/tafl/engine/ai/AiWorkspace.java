@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
+import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -25,15 +26,17 @@ public class AiWorkspace extends Game {
 
     private AiThreadPool mThreadPool;
     private GameState mOriginalStartingState;
+    private UiCallback mUiCallback;
 
     public boolean chatty = false;
 
-    public AiWorkspace(Game startingGame, GameState startingState, int transpositionTableSize) {
+    public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory());
         setGameRules(startingGame.getGameRules());
         setUiCallback(null);
         mOriginalStartingState = startingState;
         mGame = startingGame;
+        mUiCallback = ui;
         mThreadPool = new AiThreadPool(Math.min(1, Runtime.getRuntime().availableProcessors() - 1));
 
         if (transpositionTable == null || transpositionTable.size() != transpositionTableSize) {
@@ -62,8 +65,8 @@ public class AiWorkspace extends Game {
             int size = getGameTreeSize();
             double statesPerSec = size / ((finish - start) / 1000d);
 
-            if (chatty) {
-                System.out.println("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
+            if (chatty && mUiCallback != null) {
+                mUiCallback.statusText("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
             }
         }
 
@@ -74,8 +77,8 @@ public class AiWorkspace extends Game {
         mGame.mAverageBranchingFactorCount += 1;
         mGame.mAverageBranchingFactor = observedBranching;
 
-        if(chatty) {
-            System.out.println("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / maxDepth)));
+        if(chatty && mUiCallback != null) {
+            mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / maxDepth)));
         }
     }
 
@@ -100,7 +103,7 @@ public class AiWorkspace extends Game {
      * The GameTreeStates handle all turn advancement.
      */
     @Override
-    public void advanceState(GameState currentState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
-
+    public int advanceState(GameState currentState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
+        return 0;
     }
 }

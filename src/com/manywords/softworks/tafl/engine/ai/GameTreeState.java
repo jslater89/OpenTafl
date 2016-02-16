@@ -110,7 +110,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public GameTreeNode getBestChild() {
-        if (this.mVictory != NO_WIN) return null;
+        if (this.mVictory != GOOD_MOVE) return null;
 
         GameTreeNode bestMove = null;
         for (GameTreeNode child : getBranches()) {
@@ -263,7 +263,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
             mParent.replaceChild(GameTreeState.this, smallChild);
-        } else if (mVictory != NO_WIN || mDepth >= currentMaxDepth) {
+        } else if (mVictory != GOOD_MOVE || mDepth >= currentMaxDepth) {
             mValue = evaluate();
 
             // Put the value in tables

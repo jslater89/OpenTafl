@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.RawTerminal;
+import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.List;
 
@@ -20,8 +21,8 @@ public class LocalAi implements Player {
     }
 
     @Override
-    public void getNextMove(RawTerminal ui, Game game, int searchDepth) {
-        System.out.println("Waiting for computer move.");
+    public void getNextMove(UiCallback ui, Game game, int searchDepth) {
+        ui.statusText("Waiting for computer move.");
 
         mWorker = new PlayerWorkerThread(new PlayerWorkerThread.PlayerWorkerRunnable() {
             private boolean mRunning = true;
@@ -33,30 +34,29 @@ public class LocalAi implements Player {
 
             @Override
             public void run() {
-                AiWorkspace workspace = new AiWorkspace(game, game.getCurrentState(), 50);
+                AiWorkspace workspace = new AiWorkspace(ui, game, game.getCurrentState(), 50);
                 workspace.chatty = true;
 
                 workspace.explore(searchDepth);
                 //while(!workspace.isThreadPoolIdle()) { continue; }
                 workspace.stopExploring();
 
-                System.out.println("# cutoffs/avg. to 1st a/b a/b");
+                ui.statusText("# cutoffs/avg. to 1st a/b a/b");
                 for (int i = 0; i < searchDepth; i++) {
-                    System.out.print("Depth " + i + ": " + workspace.mAlphaCutoffs[i] + "/" + workspace.mBetaCutoffs[i]);
+                    String line = "Depth " + i + ": " + workspace.mAlphaCutoffs[i] + "/" + workspace.mBetaCutoffs[i];
                     if (workspace.mAlphaCutoffDistances[i] > 0) {
-                        System.out.print(" " + workspace.mAlphaCutoffDistances[i] / workspace.mAlphaCutoffs[i]);
+                        line += " " + workspace.mAlphaCutoffDistances[i] / workspace.mAlphaCutoffs[i];
                     } else {
-                        System.out.print(" 0");
+                        line += " 0";
                     }
-                    System.out.print("/");
+                    line += "/";
 
                     if (workspace.mBetaCutoffDistances[i] > 0) {
-                        System.out.print(workspace.mBetaCutoffDistances[i] / workspace.mBetaCutoffs[i]);
+                        line += "" + workspace.mBetaCutoffDistances[i] / workspace.mBetaCutoffs[i];
                     } else {
-                        System.out.print("0");
+                        line += "0";
                     }
-
-                    System.out.println();
+                    ui.statusText(line);
                 }
 
 
@@ -72,7 +72,7 @@ public class LocalAi implements Player {
                 System.out.println("End of best path scored " + bestMove.getValue());
                 //System.out.println("Best path zobrist: " + bestMove.getZobrist());
 
-                mCallback.onMoveDecided(bestMove.getRootMove());
+                onMoveDecided(bestMove.getRootMove());
             }
         });
         mWorker.start();
@@ -81,6 +81,11 @@ public class LocalAi implements Player {
     @Override
     public void stop() {
         mWorker.cancel();
+    }
+
+    @Override
+    public void onMoveDecided(MoveRecord record) {
+        mCallback.onMoveDecided(record);
     }
 
     @Override
