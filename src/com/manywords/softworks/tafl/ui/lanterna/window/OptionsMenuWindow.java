@@ -4,15 +4,15 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
-import com.manywords.softworks.tafl.ui.LanternaTerminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 /**
  * Created by jay on 2/15/16.
  */
 public class OptionsMenuWindow extends BasicWindow {
-    private LanternaTerminal.TerminalCallback mTerminalCallback;
-    public OptionsMenuWindow(LanternaTerminal.TerminalCallback callback) {
+    private AdvancedTerminal.TerminalCallback mTerminalCallback;
+    public OptionsMenuWindow(AdvancedTerminal.TerminalCallback callback) {
         mTerminalCallback = callback;
 
         refreshSettings();

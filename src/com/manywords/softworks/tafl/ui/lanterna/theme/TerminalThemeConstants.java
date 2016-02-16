@@ -29,6 +29,11 @@ public class TerminalThemeConstants {
         FULL_SCREEN.add(Window.Hint.FULL_SCREEN);
     }
 
+    public static final ArrayList<Window.Hint> FIXED_SIZE = new ArrayList<Window.Hint>();
+    static {
+        FIXED_SIZE.add(Window.Hint.FIXED_SIZE);
+    }
+
     public static final ArrayList<Window.Hint> BOARD_WINDOW = new ArrayList<Window.Hint>();
     static {
         BOARD_WINDOW.add(Window.Hint.FIXED_POSITION);
@@ -38,10 +43,12 @@ public class TerminalThemeConstants {
     public static final ArrayList<Window.Hint> STATUS_WINDOW = new ArrayList<Window.Hint>();
     static {
         STATUS_WINDOW.add(Window.Hint.FIXED_POSITION);
+        STATUS_WINDOW.add(Window.Hint.FIXED_SIZE);
     }
 
     public static final ArrayList<Window.Hint> COMMAND_WINDOW = new ArrayList<Window.Hint>();
     static {
         COMMAND_WINDOW.add(Window.Hint.FIXED_POSITION);
+        COMMAND_WINDOW.add(Window.Hint.FIXED_SIZE);
     }
 }

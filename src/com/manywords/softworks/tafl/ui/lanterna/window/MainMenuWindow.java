@@ -2,25 +2,20 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
-import com.manywords.softworks.tafl.ui.LanternaTerminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalImagePanel;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.sun.scenario.Settings;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jay on 2/15/16.
  */
 public class MainMenuWindow extends BasicWindow {
-    private LanternaTerminal.TerminalCallback mTerminalCallback;
-    public MainMenuWindow(LanternaTerminal.TerminalCallback callback) {
+    private AdvancedTerminal.TerminalCallback mTerminalCallback;
+    public MainMenuWindow(AdvancedTerminal.TerminalCallback callback) {
         mTerminalCallback = callback;
 
         Panel p = new Panel();

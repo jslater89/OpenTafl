@@ -3,7 +3,7 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.Panel;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.ui.LanternaTerminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalImagePanel;
 
@@ -12,9 +12,9 @@ import com.manywords.softworks.tafl.ui.lanterna.component.TerminalImagePanel;
  */
 public class BoardWindow extends BasicWindow {
     private Game mGame;
-    private LanternaTerminal.TerminalCallback mCallback;
+    private AdvancedTerminal.TerminalCallback mCallback;
     private TerminalBoardImage mBoardImage;
-    public BoardWindow(String title, Game g, LanternaTerminal.TerminalCallback callback) {
+    public BoardWindow(String title, Game g, AdvancedTerminal.TerminalCallback callback) {
         super(title);
         mGame = g;
 

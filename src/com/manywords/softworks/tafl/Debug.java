@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl;
 
-import com.manywords.softworks.tafl.ui.LanternaTerminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 
 import java.util.Map;
 
@@ -18,7 +18,7 @@ public class Debug {
         RawTerminal.renderBoard(b);
         */
 
-        LanternaTerminal t = new LanternaTerminal();
+        AdvancedTerminal t = new AdvancedTerminal();
 
         /*
         RawTerminal display = new RawTerminal();

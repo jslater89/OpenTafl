@@ -2,16 +2,16 @@ package com.manywords.softworks.tafl.ui;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
+import com.googlecode.lanterna.terminal.ResizeListener;
+import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowDecorationRenderer;
@@ -22,18 +22,16 @@ import com.manywords.softworks.tafl.ui.lanterna.window.MainMenuWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.StatusWindow;
 
 import javax.swing.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by jay on 2/15/16.
  */
-public class LanternaTerminal extends SwingTerminalFrame implements UiCallback {
+public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
     public interface TerminalCallback {
         public void onMenuNavigation(com.googlecode.lanterna.gui2.Window destination);
         public void onEnteringGame(BoardWindow bw, StatusWindow sw, CommandWindow cw);
+        public void handleInGameCommand(String command);
 
         public UiCallback getUiCallback();
     }
@@ -44,7 +42,7 @@ public class LanternaTerminal extends SwingTerminalFrame implements UiCallback {
     private StatusWindow mStatusWindow;
     private CommandWindow mCommandWindow;
 
-    public LanternaTerminal() {
+    public AdvancedTerminal() {
         super();
         setTitle("OpenTafl");
         setSize(1024, 768);
@@ -52,6 +50,12 @@ public class LanternaTerminal extends SwingTerminalFrame implements UiCallback {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+        addResizeListener(new ResizeListener() {
+            @Override
+            public void onResized(Terminal terminal, TerminalSize terminalSize) {
+                layoutGameWindows(terminalSize);
+            }
+        });
 
         Screen s = null;
         try {
@@ -69,43 +73,64 @@ public class LanternaTerminal extends SwingTerminalFrame implements UiCallback {
         mGui.addWindowAndWait(mainMenuWindow);
     }
 
-    private void layoutGameWindows() {
-        if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) return;
-
-        mGui.removeWindow(mBoardWindow);
-        mGui.removeWindow(mStatusWindow);
-        mGui.removeWindow(mCommandWindow);
-
+    private void addBoardWindows() {
         mGui.addWindow(mBoardWindow);
         mGui.addWindow(mStatusWindow);
         mGui.addWindow(mCommandWindow);
+
+        layoutGameWindows(mGui.getScreen().getTerminalSize());
+
+        mGui.waitForWindowToClose(mBoardWindow);
+    }
+
+    private void layoutGameWindows(TerminalSize size) {
+        if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) return;
 
         mBoardWindow.setHints(TerminalThemeConstants.BOARD_WINDOW);
         mStatusWindow.setHints(TerminalThemeConstants.STATUS_WINDOW);
         mCommandWindow.setHints(TerminalThemeConstants.COMMAND_WINDOW);
 
-        TerminalSize screenSize = mGui.getScreen().getTerminalSize();
+        TerminalSize screenSize = size;
         TerminalSize boardWindowSize = mBoardWindow.getPreferredSize();
-        TerminalSize commandWindowSize = mCommandWindow.getPreferredSize();
-        TerminalSize statusWindowSize = mStatusWindow.getPreferredSize();
 
         mBoardWindow.setPosition(new TerminalPosition(0, 0));
+        int leftoverRight = screenSize.getColumns() - boardWindowSize.getColumns();
+        int leftoverBottom = screenSize.getRows() - boardWindowSize.getRows();
+        int boardWindowHeight = boardWindowSize.getRows();
+        int boardWindowWidth = boardWindowSize.getColumns();
+        TerminalPosition statusPosition, commandPosition;
+        TerminalSize statusSize, commandSize;
 
-        if(statusWindowSize.getColumns() + 3<= (screenSize.getColumns() - boardWindowSize.getColumns())) {
-            mStatusWindow.setPosition(new TerminalPosition(boardWindowSize.getColumns() + 3, 0));
+        if(leftoverRight < 20) {
+            statusPosition = new TerminalPosition(0, boardWindowHeight + 2);
+            statusSize = new TerminalSize(boardWindowWidth, leftoverBottom - 6);
+
+            leftoverBottom -= statusSize.getRows();
+            leftoverBottom -= 4;
+
+            commandPosition = new TerminalPosition(0, boardWindowHeight + 2 + statusSize.getRows() + 2);
+            commandSize = new TerminalSize(boardWindowWidth, leftoverBottom);
+        }
+        else if(leftoverRight < 40){
+            statusPosition = new TerminalPosition(boardWindowWidth + 2, 0);
+            statusSize = new TerminalSize(leftoverRight - 4, boardWindowHeight);
+
+            commandPosition = new TerminalPosition(0, boardWindowHeight + 2);
+            commandSize = new TerminalSize(boardWindowWidth, 4);
         }
         else {
-            mStatusWindow.setPosition(new TerminalPosition(0, boardWindowSize.getRows() + 3));
+            statusPosition = new TerminalPosition(boardWindowWidth + 2, 0);
+            statusSize = new TerminalSize(leftoverRight - 4, boardWindowHeight - 6);
+
+            commandPosition = new TerminalPosition(boardWindowWidth + 2, statusSize.getRows() + 2);
+            commandSize = new TerminalSize(leftoverRight - 4, 4);
         }
 
-        if(commandWindowSize.getColumns() + 3 <= (screenSize.getColumns() - boardWindowSize.getColumns())) {
-            mCommandWindow.setPosition(new TerminalPosition(boardWindowSize.getColumns() + 3, statusWindowSize.getRows() + 3));
-        }
-        else {
-            mCommandWindow.setPosition(new TerminalPosition(0, boardWindowSize.getRows() + statusWindowSize.getRows() + 3 + 3));
-        }
+        mStatusWindow.setPosition(statusPosition);
+        mStatusWindow.setSize(statusSize);
 
-        mGui.waitForWindowToClose(mBoardWindow);
+        mCommandWindow.setPosition(commandPosition);
+        mCommandWindow.setSize(commandSize);
     }
 
     @Override
@@ -139,12 +164,18 @@ public class LanternaTerminal extends SwingTerminalFrame implements UiCallback {
             mBoardWindow = bw;
             mStatusWindow = sw;
             mCommandWindow = cw;
-            layoutGameWindows();
+            addBoardWindows();
+        }
+
+        int count = 0;
+        @Override
+        public void handleInGameCommand(String command) {
+            mStatusWindow.addStatus("Lalalallalalallalallalallalalassdfasdfasdfasdfgdsfasdfasdfasdgasdfewagasdf" + count++);
         }
 
         @Override
         public UiCallback getUiCallback() {
-            return LanternaTerminal.this;
+            return AdvancedTerminal.this;
         }
     };
 }
