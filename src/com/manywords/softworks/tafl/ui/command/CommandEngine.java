@@ -15,6 +15,8 @@ public class CommandEngine {
     private Player mCurrentPlayer;
     private UiCallback mUiCallback;
 
+    private boolean mInGame = false;
+
     private int mSearchDepth = 4;
 
     public CommandEngine(Game g, UiCallback callback, Player attacker, Player defender) {
@@ -29,6 +31,8 @@ public class CommandEngine {
     }
 
     public void startGame() {
+        mInGame = true;
+
         mAttacker.setCallback(mMoveCallback);
         mDefender.setCallback(mMoveCallback);
 
@@ -47,11 +51,15 @@ public class CommandEngine {
     }
 
     private void waitForNextMove() {
+        if(!mInGame) return;
+
         mUiCallback.awaitingMove(mCurrentPlayer, mGame.getCurrentSide().isAttackingSide());
         mCurrentPlayer.getNextMove(mUiCallback, mGame, mSearchDepth);
     }
 
     public void finishGame() {
+        mInGame = false;
+
         mAttacker.stop();
         mDefender.stop();
         mUiCallback.gameFinished();
