@@ -68,7 +68,7 @@ public class StatusWindow extends BasicWindow {
 
         if(mTextDisplay != null) {
             mTextDisplay.setLabelWidth(this.getSize().getColumns());
-            mTextDisplay.setSize(new TerminalSize(getSize().getColumns(), getSize().getRows() - 4));
+            mTextDisplay.setSize(new TerminalSize(getSize().getColumns(), getSize().getRows() - 6));
             mTextDisplay.setPreferredSize(mTextDisplay.getSize());
         }
     }

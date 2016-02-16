@@ -119,6 +119,7 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
         TerminalSize statusSize, commandSize;
 
         if(leftoverRight < 20) {
+            // status and command stacked beneath the board window
             statusPosition = new TerminalPosition(0, boardWindowHeight + 2);
             statusSize = new TerminalSize(boardWindowWidth, leftoverBottom - 6);
 
@@ -128,19 +129,13 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
             commandPosition = new TerminalPosition(0, boardWindowHeight + 2 + statusSize.getRows() + 2);
             commandSize = new TerminalSize(boardWindowWidth, leftoverBottom);
         }
-        else if(leftoverRight < 40){
+        else {
+            // command beneath the board window, status to the right
             statusPosition = new TerminalPosition(boardWindowWidth + 2, 0);
-            statusSize = new TerminalSize(leftoverRight - 4, boardWindowHeight);
+            statusSize = new TerminalSize(leftoverRight - 4, boardWindowHeight + 2 + 4);
 
             commandPosition = new TerminalPosition(0, boardWindowHeight + 2);
             commandSize = new TerminalSize(boardWindowWidth, 4);
-        }
-        else {
-            statusPosition = new TerminalPosition(boardWindowWidth + 2, 0);
-            statusSize = new TerminalSize(leftoverRight - 4, boardWindowHeight - 6);
-
-            commandPosition = new TerminalPosition(boardWindowWidth + 2, statusSize.getRows() + 2);
-            commandSize = new TerminalSize(leftoverRight - 4, 4);
         }
 
         mStatusWindow.setPosition(statusPosition);
