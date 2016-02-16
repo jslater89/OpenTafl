@@ -19,6 +19,7 @@ public class CommandEngine {
 
     public CommandEngine(Game g, UiCallback callback, Player attacker, Player defender) {
         mGame = g;
+        mUiCallback = callback;
         mAttacker = attacker;
         mDefender = defender;
     }
@@ -28,6 +29,9 @@ public class CommandEngine {
     }
 
     public void startGame() {
+        mAttacker.setCallback(mMoveCallback);
+        mDefender.setCallback(mMoveCallback);
+
         if (mGame.getCurrentState().getCurrentSide().isAttackingSide()) {
             mCurrentPlayer = mAttacker;
         } else {
@@ -76,10 +80,12 @@ public class CommandEngine {
                 }
 
                 mUiCallback.moveResult(new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, message, null), move);
+                mUiCallback.gameStateAdvanced();
             }
             else {
                 mCurrentPlayer = (mGame.getCurrentSide().isAttackingSide() ? mAttacker : mDefender);
                 mUiCallback.moveResult(new CommandResult(CommandResult.Type.NONE, CommandResult.SUCCESS, "", null), move);
+                mUiCallback.gameStateAdvanced();
             }
 
             waitForNextMove();

@@ -127,18 +127,15 @@ public class RawTerminal implements UiCallback {
             } else if (mInOptions) {
                 waitForOptionsInput();
             } else if (mInGame) {
-                if (mMoveStatus.intValue() != WAITING_FOR_MOVE) {
-                    if(mMoveStatus.intValue() == MOVE_VALID) {
-                        GameState state = mGame.getCurrentState();
-                        if (state.getCurrentSide().isAttackingSide()) {
-                            mCurrentPlayer = 0;
-                        }
-                        else {
-                            mCurrentPlayer = 1;
-                        }
+                if(mPlayers[mCurrentPlayer] instanceof LocalHuman) {
+                    waitForInGameInput();
+                }
+                else {
+                    try {
+                        Thread.sleep(250);
+                    } catch (InterruptedException e) {
+                        // no-op
                     }
-
-                    waitForNextMove();
                 }
             } else if (mPostGame) {
                 waitForPostGameInput();
@@ -234,6 +231,7 @@ public class RawTerminal implements UiCallback {
 
     public void gameStateAdvanced() {
         renderGameState(mGame.getCurrentState());
+        mCurrentPlayer = mGame.getCurrentSide().isAttackingSide() ? ATTACKING_SIDE : DEFENDING_SIDE;
         printStatus();
     }
 
@@ -449,7 +447,9 @@ public class RawTerminal implements UiCallback {
     }
 
     public MoveRecord waitForHumanMoveInput() {
-        return waitForInGameInput();
+        // No-op for this UI type: the main UI loop handles
+        // it instead.
+        return null;
     }
 
     public MoveRecord waitForInGameInput() {
@@ -529,6 +529,7 @@ public class RawTerminal implements UiCallback {
             Command moveCommand = HumanCommandParser.newMoveCommand(mCommandEngine, command);
             CommandResult result = mCommandEngine.executeCommand(moveCommand);
             if(result.result == CommandResult.SUCCESS && result.extra != null) {
+                mPlayers[mCurrentPlayer].onMoveDecided((MoveRecord) result.extra);
                 return (MoveRecord) result.extra;
             }
             else {

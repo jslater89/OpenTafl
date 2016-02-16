@@ -28,10 +28,8 @@ public class LocalHuman implements Player {
 
             @Override
             public void run() {
-                MoveRecord r = null;
                 if (ui.inGame() && mRunning) {
-                    r = ui.waitForHumanMoveInput();
-                    onMoveDecided(r);
+                    ui.waitForHumanMoveInput();
                 }
             }
         });
