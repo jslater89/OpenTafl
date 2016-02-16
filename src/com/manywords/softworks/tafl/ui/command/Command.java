@@ -14,7 +14,7 @@ public class Command {
 
     }
 
-    protected String mError;
+    protected String mError = "";
 
     public String getError() {
         return mError;

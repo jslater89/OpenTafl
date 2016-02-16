@@ -14,7 +14,7 @@ public interface Player {
     }
 
     public interface MoveCallback {
-        public void onMoveDecided(MoveRecord record);
+        public void onMoveDecided(Player player, MoveRecord record);
     }
 
     public void getNextMove(UiCallback ui, Game game, int searchDepth);

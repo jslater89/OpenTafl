@@ -76,6 +76,24 @@ public class Game {
         return mHistory;
     }
 
+    public String getHistoryString() {
+        String gameRecord = "";
+        int count = 1;
+        for(int i = 0; i < getHistory().size(); ) {
+            gameRecord += count++ + ". ";
+            if(i + 1 < getHistory().size()) {
+                gameRecord += getHistory().get(i++).getExitingMove() + " " + getHistory().get(i++).getExitingMove() + "\n";
+            }
+            else {
+                gameRecord += getHistory().get(i++).getExitingMove() + "\n";
+            }
+
+            if(i == getHistory().size()) break;
+        }
+
+        return gameRecord;
+    }
+
     /**
      * Sides do not always go in strict sequence!
      * If the berserker rule is in effect, one side

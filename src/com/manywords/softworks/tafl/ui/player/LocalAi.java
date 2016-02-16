@@ -85,7 +85,7 @@ public class LocalAi implements Player {
 
     @Override
     public void onMoveDecided(MoveRecord record) {
-        mCallback.onMoveDecided(record);
+        mCallback.onMoveDecided(this, record);
     }
 
     @Override

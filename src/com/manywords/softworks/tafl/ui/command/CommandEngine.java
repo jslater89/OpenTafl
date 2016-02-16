@@ -47,14 +47,21 @@ public class CommandEngine {
         mCurrentPlayer.getNextMove(mUiCallback, mGame, mSearchDepth);
     }
 
-    private void finishGame() {
+    public void finishGame() {
+        mAttacker.stop();
+        mDefender.stop();
         mUiCallback.gameFinished();
     }
 
     private final Player.MoveCallback mMoveCallback = new Player.MoveCallback() {
 
         @Override
-        public void onMoveDecided(MoveRecord move) {
+        public void onMoveDecided(Player player, MoveRecord move) {
+            String message = "Illegal play. ";
+            if(player != mCurrentPlayer) {
+                message += "Not your turn.";
+                mUiCallback.moveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), null);
+            }
             int result =
                     mGame.getCurrentState().moveTaflman(
                             mGame.getCurrentState().getBoard().getOccupier(move.start.x, move.start.y),
@@ -71,7 +78,6 @@ public class CommandEngine {
                 return;
             }
             else if (result != GameState.GOOD_MOVE) {
-                String message = "Illegal play. ";
                 if (result == GameState.ILLEGAL_SIDE) {
                     message += "Not your taflman.";
                 }
@@ -79,12 +85,11 @@ public class CommandEngine {
                     message += "Move disallowed.";
                 }
 
-                mUiCallback.moveResult(new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, message, null), move);
-                mUiCallback.gameStateAdvanced();
+                mUiCallback.moveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), move);
             }
             else {
                 mCurrentPlayer = (mGame.getCurrentSide().isAttackingSide() ? mAttacker : mDefender);
-                mUiCallback.moveResult(new CommandResult(CommandResult.Type.NONE, CommandResult.SUCCESS, "", null), move);
+                mUiCallback.moveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", null), move);
                 mUiCallback.gameStateAdvanced();
             }
 
@@ -93,44 +98,57 @@ public class CommandEngine {
     };
 
     public CommandResult executeCommand(Command command) {
+        // 1. NULL COMMAND: FAILURE
         if(command == null) {
-            return new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, "No information", null);
+            return new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, "Command not recognized", null);
         }
-        if(command instanceof HumanCommandParser.Move) {
+        // 2. COMMAND WITH ERROR: FAILURE
+        else if(!command.getError().equals("")) {
+            return new CommandResult(CommandResult.Type.SENT, CommandResult.FAIL, command.mError, null);
+        }
+        // 3. MOVE COMMAND: RETURN MOVE RECORD (receiver sends to callback after verifying side &c)
+        else if(command instanceof HumanCommandParser.Move) {
             HumanCommandParser.Move m = (HumanCommandParser.Move) command;
             if(m.from == null || m.to == null) {
                 return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, "Invalid coords", null);
             }
-            int fromX = m.from.x;
-            int fromY = m.from.y;
-            int toX = m.to.x;
-            int toY = m.to.y;
-            int boardSize = mGame.getCurrentState().getBoard().getBoardDimension();
 
             String message = "";
 
-            if (fromX < 0 || fromX >= boardSize || fromY < 0 || fromY >= boardSize) {
-                message = "Piece out of bounds";
-                return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null);
-            }
-
-            if (toX < 0 || toX >= boardSize || toY < 0 || toY >= boardSize) {
-                message = "Destination out of bounds";
-                return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null);
-            }
-
-            char piece = mGame.getCurrentState().getPieceAt(fromX, fromY);
-
+            char piece = mGame.getCurrentState().getPieceAt(m.from.x, m.from.y);
             if (piece == Taflman.EMPTY) {
-                message = "No piece at $fromX $fromY";
+                message = "No taflman at " + m.from;
                 return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null);
             }
-            Coord destination = mGame.getCurrentState().getSpaceAt(toX, toY);
+
+            Coord destination = mGame.getCurrentState().getSpaceAt(m.to.x, m.to.y);
             MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mGame.getCurrentState(), piece), destination);
             return new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", record);
         }
+        // 4. INFO COMMAND: SUCCESS (command parser does all the required verification)
+        else if(command instanceof HumanCommandParser.Info) {
+            return new CommandResult(CommandResult.Type.INFO, CommandResult.SUCCESS, "", null);
+        }
+        // 5. SHOW COMMAND: SUCCESS
+        else if(command instanceof HumanCommandParser.Show) {
+            return new CommandResult(CommandResult.Type.SHOW, CommandResult.SUCCESS, "", null);
+        }
+        // 5. HISTORY COMMAND: SUCCESS
+        else if(command instanceof HumanCommandParser.History) {
+            String gameRecord = mGame.getHistoryString();
 
-        return new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, "No information", null);
+            return new CommandResult(CommandResult.Type.HISTORY, CommandResult.SUCCESS, "", gameRecord);
+        }
+        // 5. HELP COMMAND: SUCCESS
+        else if(command instanceof HumanCommandParser.Help) {
+            return new CommandResult(CommandResult.Type.HELP, CommandResult.SUCCESS, "", null);
+        }
+        // 5. QUIT COMMAND: SUCCESS
+        else if(command instanceof HumanCommandParser.Quit) {
+            return new CommandResult(CommandResult.Type.QUIT, CommandResult.SUCCESS, "", null);
+        }
+
+        return new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, "Command not recognized", null);
     }
 
     public Game getGame() {

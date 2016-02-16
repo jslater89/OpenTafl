@@ -1,5 +1,9 @@
 package com.manywords.softworks.tafl.ui.command;
 
+import com.manywords.softworks.tafl.rules.Coord;
+
+import java.util.List;
+
 /**
  * Created by jay on 2/15/16.
  */
@@ -8,8 +12,14 @@ public class CommandResult {
     public static final int FAIL = 0;
 
     public enum Type {
-        NONE,
+        NONE, // No or unknown command type
+        SENT, // The command just issued
         MOVE,
+        INFO,
+        SHOW,
+        HISTORY,
+        HELP,
+        QUIT,
     }
 
     public final Type type;

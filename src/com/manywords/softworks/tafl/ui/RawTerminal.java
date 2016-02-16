@@ -220,6 +220,8 @@ public class RawTerminal implements UiCallback {
             mMoveStatus.set(MOVE_VALID);
         }
         else {
+            renderGameState(mGame.getCurrentState());
+            statusText(result.message);
             mMoveStatus.set(MOVE_INVALID);
         }
     }
@@ -254,10 +256,7 @@ public class RawTerminal implements UiCallback {
 
         // Handle history command
         if (command.startsWith("history")) {
-            for (GameState state : mGame.getHistory()) {
-                MoveRecord record = state.getExitingMove();
-                println(record);
-            }
+            statusText(mGame.getHistoryString());
         }
     }
 
@@ -463,80 +462,45 @@ public class RawTerminal implements UiCallback {
             System.exit(-1);
         }
 
+        Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
+        CommandResult r = mCommandEngine.executeCommand(c);
 
-        // Handle info command
-        if (command.startsWith("info")) {
-            String[] commandParts = command.split(" ");
-            if (commandParts.length != 2) {
-                println("Wrong command format, try info [file+rank] [file+rank] (e.g. info a4)");
-            } else {
-                int boardSize = mGame.getGameRules().getBoard().getBoardDimension();
-                String chessString = commandParts[1].toLowerCase();
-
-                if (!Board.validateChessNotation(chessString, boardSize)) {
-                    println("Incorrect space format: " + chessString);
-                    return null;
-                }
-
-                int x = Board.getCoordMapFromChessNotation(chessString).get("x");
-                int y = Board.getCoordMapFromChessNotation(chessString).get("y");
-
-                if (x < 0 || x >= boardSize || y < 0 || y >= boardSize) {
-                    println(chessString + " out of bounds");
-                } else {
-                    char piece = mGame.getCurrentState().getPieceAt(x, y);
-                    if (piece != Taflman.EMPTY) {
-                        List<Coord> stops = Taflman.getAllowableDestinations(mGame.getCurrentState(), piece);
-                        List<Coord> moves = Taflman.getAllowableMoves(mGame.getCurrentState(), piece);
-                        List<Coord> captures = Taflman.getCapturingMoves(mGame.getCurrentState(), piece);
-
-                        renderGameStateWithAllowableMoves(
-                                mGame.getCurrentState(), mGame.getCurrentState().getSpaceAt(x, y),
-                                stops, moves, captures);
-                    } else {
-                        println("No taflman at " + chessString);
-                    }
-                }
+        if(r.result != CommandResult.SUCCESS) {
+            renderGameState(mGame.getCurrentState());
+            printStatus();
+            statusText(r.message);
+        }
+        else if (r.type == CommandResult.Type.MOVE) {
+            if(r.extra != null) {
+                mPlayers[mCurrentPlayer].onMoveDecided((MoveRecord) r.extra);
+            }
+            else {
+                throw new IllegalStateException("Received successful move command with no move record");
             }
         }
-
-        // Handle show command
-        if (command.startsWith("show")) {
+        else if (r.type == CommandResult.Type.INFO) {
+            HumanCommandParser.Info infoCommand = (HumanCommandParser.Info) c;
+            renderGameStateWithAllowableMoves(mGame.getCurrentState(),
+                    infoCommand.location,
+                    infoCommand.stops,
+                    infoCommand.moves,
+                    infoCommand.captures);
+        }
+        else if (r.type == CommandResult.Type.SHOW) {
             renderGameState(mGame.getCurrentState());
             printStatus();
         }
-
-        // Handle history command
-        if (command.startsWith("history")) {
-            for (GameState state : mGame.getHistory()) {
-                MoveRecord record = state.getExitingMove();
-                println(record);
-            }
+        else if (r.type == CommandResult.Type.HISTORY) {
+            String gameRecord = (String) r.extra;
+            statusText(gameRecord);
         }
-
-        // Handle quit command
-        if (command.startsWith("quit")) {
+        else if (r.type == CommandResult.Type.QUIT) {
+            mCommandEngine.finishGame();
             mInGame = false;
             mInMenu = true;
-
-            mPlayers[0].stop();
-            mPlayers[1].stop();
-
             printMenuHeader();
         }
 
-        if (command.startsWith("move")) {
-            Command moveCommand = HumanCommandParser.newMoveCommand(mCommandEngine, command);
-            CommandResult result = mCommandEngine.executeCommand(moveCommand);
-            if(result.result == CommandResult.SUCCESS && result.extra != null) {
-                mPlayers[mCurrentPlayer].onMoveDecided((MoveRecord) result.extra);
-                return (MoveRecord) result.extra;
-            }
-            else {
-                println(result.message);
-                return null;
-            }
-        }
         return null;
     }
 
