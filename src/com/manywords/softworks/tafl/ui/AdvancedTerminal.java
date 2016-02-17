@@ -290,7 +290,7 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
                 String helpString = HumanCommandParser.getHelpString(getCurrentCommands());
 
                 ScrollingMessageDialog dialog = new ScrollingMessageDialog("OpenTafl Help", helpString, MessageDialogButton.Close);
-                dialog.setSize(new TerminalSize(70, 30));
+                dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
                 dialog.showDialog(mGui);
             }
             else if (r.type == CommandResult.Type.QUIT) {
