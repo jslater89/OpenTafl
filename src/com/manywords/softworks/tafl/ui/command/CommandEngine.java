@@ -159,6 +159,10 @@ public class CommandEngine {
             return new CommandResult(CommandResult.Type.HELP, CommandResult.SUCCESS, "", null);
         }
         // 5. QUIT COMMAND: SUCCESS
+        else if(command instanceof HumanCommandParser.Rules) {
+            return new CommandResult(CommandResult.Type.RULES, CommandResult.SUCCESS, "", null);
+        }
+        // 5. QUIT COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Quit) {
             return new CommandResult(CommandResult.Type.QUIT, CommandResult.SUCCESS, "", null);
         }

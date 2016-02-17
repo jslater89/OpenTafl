@@ -311,4 +311,8 @@ public abstract class Rules {
     public String getOTRString() {
         return RulesSerializer.getRulesRecord(this);
     }
+
+    public String getHumanReadableRules() {
+        return "";
+    }
 }

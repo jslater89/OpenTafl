@@ -135,9 +135,66 @@ public class HumanCommandParser {
             // Always succeeds
         }
     }
+    public static class Rules extends Command {
+        public Rules(CommandEngine engine, String command) {
+            // Always succeeds
+        }
+    }
     public static class Quit extends Command {
         public Quit(CommandEngine engine, String command) {
-
+            // Always succeeds
         }
+    }
+
+    public static String getHelpString(List<CommandResult.Type> types) {
+        StringBuilder help = new StringBuilder();
+
+        for(CommandResult.Type t : types) {
+            help.append(getHelpString(t));
+        }
+
+        return help.toString();
+    }
+
+    public static String getHelpString(CommandResult.Type type) {
+        switch (type) {
+
+            case NONE:
+                return "";
+            case SENT:
+                return "";
+            case MOVE:
+                return
+                        "move [space-notation] [space-notation]\n" +
+                                "e.g. move a4 a1\n" +
+                                "Move the taflman at the first space to the second.\n\n";
+            case INFO:
+                return
+                        "info [space-notation]\n" +
+                                "e.g. info a4\n" +
+                                "Show the allowable moves, destinations, and captures for the taflman at the given space.\n\n";
+            case SHOW:
+                return
+                        "show\n" +
+                                "Redraw the board.\n\n";
+            case HISTORY:
+                return
+                        "history\n" +
+                                "Show the game history so far.\n\n";
+            case HELP:
+                return
+                        "help\n" +
+                                "Show this message.\n\n";
+            case RULES:
+                return
+                        "rules\n" +
+                                "Show the rules of the game.\n\n";
+            case QUIT:
+                return
+                        "quit\n" +
+                                "Quit the current game, or return to the main menu.";
+        }
+
+        return "";
     }
 }

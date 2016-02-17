@@ -19,6 +19,7 @@ public class CommandResult {
         SHOW,
         HISTORY,
         HELP,
+        RULES,
         QUIT,
     }
 

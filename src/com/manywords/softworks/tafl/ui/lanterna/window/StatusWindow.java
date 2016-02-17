@@ -54,10 +54,10 @@ public class StatusWindow extends BasicWindow {
     @Override
     public boolean handleInput(KeyStroke key) {
         if(key.getKeyType() == KeyType.PageUp) {
-            mTextDisplay.handleScroll(true);
+            mTextDisplay.handleScroll(true, true);
         }
         else if(key.getKeyType() == KeyType.PageDown) {
-            mTextDisplay.handleScroll(false);
+            mTextDisplay.handleScroll(true, false);
         }
         return super.handleInput(key);
     }

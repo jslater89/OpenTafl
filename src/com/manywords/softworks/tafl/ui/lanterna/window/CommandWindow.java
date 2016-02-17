@@ -20,7 +20,7 @@ public class CommandWindow extends BasicWindow {
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
 
-        Label l = new Label("Enter command (...)");
+        Label l = new Label("Enter command (enter 'help' for list):");
         mTextBox = new TerminalEnterTerminatedTextBox(new TerminalEnterTerminatedTextBox.TextBoxCallback() {
             @Override
             public void onEnterPressed(String input) {
@@ -31,9 +31,8 @@ public class CommandWindow extends BasicWindow {
             public void onPageKeyPressed(KeyStroke key) {
                 mCallback.handleKeyStroke(key);
             }
-
-
         });
+
 
         p.addComponent(l);
         p.addComponent(mTextBox);

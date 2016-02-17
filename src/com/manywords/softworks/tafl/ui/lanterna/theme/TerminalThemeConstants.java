@@ -54,4 +54,10 @@ public class TerminalThemeConstants {
         COMMAND_WINDOW.add(Window.Hint.FIXED_POSITION);
         COMMAND_WINDOW.add(Window.Hint.FIXED_SIZE);
     }
+
+    public static final ArrayList<Window.Hint> CENTERED_MODAL = new ArrayList<>();
+    static {
+        CENTERED_MODAL.add(Window.Hint.CENTERED);
+        CENTERED_MODAL.add(Window.Hint.MODAL);
+    }
 }

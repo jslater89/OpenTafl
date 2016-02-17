@@ -5,6 +5,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
@@ -19,6 +20,7 @@ import com.manywords.softworks.tafl.ui.command.Command;
 import com.manywords.softworks.tafl.ui.command.CommandEngine;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
+import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
@@ -33,6 +35,8 @@ import com.manywords.softworks.tafl.ui.player.UiWorkerThread;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jay on 2/15/16.
@@ -282,6 +286,13 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
                 String gameRecord = (String) r.extra;
                 statusText(gameRecord);
             }
+            else if (r.type == CommandResult.Type.HELP) {
+                String helpString = HumanCommandParser.getHelpString(getCurrentCommands());
+
+                ScrollingMessageDialog dialog = new ScrollingMessageDialog("OpenTafl Help", helpString, MessageDialogButton.Close);
+                dialog.setSize(new TerminalSize(70, 30));
+                dialog.showDialog(mGui);
+            }
             else if (r.type == CommandResult.Type.QUIT) {
                 if(mInGame) {
                     // Leave the game thread running for history.
@@ -292,6 +303,22 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
                     leaveGameUi();
                 }
             }
+        }
+
+        private List<CommandResult.Type> getCurrentCommands() {
+            List<CommandResult.Type> types = new ArrayList<>();
+
+            if(mInGame) {
+                types.add(CommandResult.Type.MOVE);
+            }
+
+            types.add(CommandResult.Type.INFO);
+            types.add(CommandResult.Type.SHOW);
+            types.add(CommandResult.Type.HISTORY);
+            types.add(CommandResult.Type.HELP);
+            types.add(CommandResult.Type.QUIT);
+
+            return types;
         }
 
         @Override

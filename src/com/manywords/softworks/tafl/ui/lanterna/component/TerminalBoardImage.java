@@ -50,8 +50,9 @@ public class TerminalBoardImage extends BasicTextImage {
         clearSpaces();
         renderSpecialSpaces(state.getBoard().getRules());
 
-        if(allowableDestinations != null) renderAllowableDestinations(allowableDestinations);
+        // Render in order of most spaces to fewest, for maximum information preservation
         if(allowableMoves != null) renderAllowableMoves(allowableMoves);
+        if(allowableDestinations != null) renderAllowableDestinations(allowableDestinations);
         if(captureSpaces != null) renderCapturingMoves(captureSpaces);
         if(highlight != null) renderHighlight(highlight);
 

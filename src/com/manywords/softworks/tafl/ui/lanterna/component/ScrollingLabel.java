@@ -23,6 +23,10 @@ public class ScrollingLabel extends Label {
     private int mWidth;
     private int mStartPosition = 0;
 
+    public ScrollingLabel() {
+        this("");
+    }
+
     public ScrollingLabel(String text) {
         super(text);
         mStringBuffer = new ArrayList<String>(512);
@@ -46,10 +50,9 @@ public class ScrollingLabel extends Label {
     }
 
     public synchronized void resize() {
-        mHeight = getSize().getRows();
-        mWidth = getSize().getColumns();
-
         mLineBuffer.clear();
+
+        if(mStringBuffer.size() == 0) return;
 
         for(int i = mStringBuffer.size() - 1; i >= 0; i--) {
             String s = mStringBuffer.get(i);
@@ -61,6 +64,13 @@ public class ScrollingLabel extends Label {
 
             if(mLineBuffer.size() > 512) break;
         }
+
+        if(mStartPosition > (mLineBuffer.size() - mHeight)) {
+            mStartPosition = Math.max(mLineBuffer.size() - mHeight, 0);
+        }
+
+        String out = lineBufferToString(mStartPosition);
+        setText(out);
     }
 
     public synchronized void addLine(String text) {
@@ -76,7 +86,16 @@ public class ScrollingLabel extends Label {
             mStringBuffer.clear();
         }
 
-        mStringBuffer.add(0, text);
+        String[] lines = text.split("\n");
+        for(String line : lines) {
+            // Preserve double-spacing
+            if(line.equals("")) line = " ";
+
+            mStringBuffer.add(0, line);
+        }
+
+        // We'll get the string next time we get a setSize.
+        if(mWidth == 0) return;
 
         List<String> wrappedLine = TerminalTextUtils.getWordWrappedText(mWidth, text);
         for (String s : wrappedLine) {
@@ -94,14 +113,16 @@ public class ScrollingLabel extends Label {
         setText(out);
     }
 
-    public void handleScroll(boolean up) {
+    public void handleScroll(boolean page, boolean up) {
+        int distance = (page ? mHeight - 4 : 1);
         if(up) {
             // Always leave enough in the line buffer so that we fill the message window when we scroll up.
-            mStartPosition = Math.min(mStartPosition + mHeight - 4, mLineBuffer.size() - mHeight);
+            // If the line buffer is smaller than the height, start at zero.
+            mStartPosition = Math.min(mStartPosition + distance, Math.max(mLineBuffer.size() - mHeight, 0));
         }
         else {
             // Never look into the future.
-            mStartPosition = Math.max(mStartPosition - mHeight + 4, 0);
+            mStartPosition = Math.max(mStartPosition - distance, 0);
         }
 
         String out = lineBufferToString(mStartPosition);
