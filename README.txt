@@ -1,17 +1,36 @@
 README
 
+1. Introduction
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
 Norse boardgame. At present, it supports local play against another human
-and an AI.
+and an AI. Future features will include network play and support for 
+third-party AI engines, among others.
 
-The AI is capable of playing Brandub to search depth 6 relatively easily,
-and of playing it to depth 7 on a fast computer if you let it take some
-time to think.
+You can follow the development of OpenTafl at soapbox.manywords.press/tag/tafl.
 
-Future features will include network play and support for third-party AI
-engines.
+2. How-to
+Run the OpenTafl script file corresponding to your platform:
+OpenTafl32.bat (Windows, 32-bit java)
+OpenTafl64.bat (Windows, 64-bit java)
+OpenTafl.sh (Linux and Mac)
 
-v0.1.6.1b(released 02/09/16):
+To determine if you have 32-bit or 64-bit Java installed, run this command in
+a command prompt window:
+
+java -version
+
+If you see '64-bit' in the output from that command, you have 64-bit Java.
+
+3. Version history
+
+v0.1.7b (released 02/17/16):
+- Prep work for external engine support: split work into additional threads to
+  avoid blocking certain other pieces, e.g. the game clock and the engine->
+  host communication.
+- New portable cross-platform UI, built on the Lanterna terminal graphics
+  library
+
+v0.1.6.1b (released 02/09/16):
 - Bugfix release for 0.1.6b.
 - Fix bug where OTN move records would show the moving taflman as the captured
   taflman.
