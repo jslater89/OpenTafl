@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.ui.lanterna.settings;
 
 import com.manywords.softworks.tafl.ui.player.Player;
 
+import java.io.File;
+
 /**
  * Created by jay on 2/15/16.
  */
@@ -13,6 +15,11 @@ public class TerminalSettings {
 
     public static int attackers = AI;
     public static int defenders = HUMAN;
+
+    public static File attackerEngineFile = null;
+    public static File defenderEngineFile = null;
+
+    public static int aiSearchdepth = 4;
 
     public static int variant = 1;
 

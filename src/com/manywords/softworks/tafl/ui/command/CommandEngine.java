@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.UiCallback;
+import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.Player;
 
 public class CommandEngine {
@@ -33,6 +34,7 @@ public class CommandEngine {
     public void startGame() {
         mInGame = true;
 
+        mSearchDepth = TerminalSettings.aiSearchdepth;
         mAttacker.setCallback(mMoveCallback);
         mDefender.setCallback(mMoveCallback);
 

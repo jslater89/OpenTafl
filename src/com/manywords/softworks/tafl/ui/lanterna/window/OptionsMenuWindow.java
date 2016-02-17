@@ -1,11 +1,16 @@
 package com.manywords.softworks.tafl.ui.lanterna.window;
 
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
+import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
+
+import java.math.BigInteger;
+import java.util.List;
 
 /**
  * Created by jay on 2/15/16.
@@ -67,6 +72,16 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(defenderType);
 
+        Button aiDepthSelect = new Button("AI search depth", new Runnable() {
+            @Override
+            public void run() {
+                showAiDepthEntryDialog();
+            }
+        });
+        Label aiDepth = new Label("" + TerminalSettings.aiSearchdepth);
+        optionsPanel.addComponent(aiDepthSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(aiDepth);
 
         Button backButton = new Button("Back", new Runnable() {
             @Override
@@ -86,6 +101,25 @@ public class OptionsMenuWindow extends BasicWindow {
 
     private EmptySpace newSpacer() {
         return new EmptySpace(new TerminalSize(4, 0));
+    }
+
+    private void showAiDepthEntryDialog() {
+        List<String> lines = TerminalTextUtils.getWordWrappedText(50,
+                "The depth to which the AI will search. Values of 4 or 5 should work for all games." +
+                "Brandub may work to depth 6 or 7. Larger games may work at depth 6 on faster computers.");
+        String descriptionString = "";
+        for(String s : lines) {
+            descriptionString += s + "\n";
+        }
+        BigInteger searchdepth = TextInputDialog.showNumberDialog(
+                getTextGUI(),
+                "AI search depth",
+                descriptionString,
+                "" + TerminalSettings.aiSearchdepth);
+        int intDepth = searchdepth.intValue();
+        TerminalSettings.aiSearchdepth = intDepth;
+
+        refreshSettings();
     }
 
     private void showVariantSelectDialog() {
