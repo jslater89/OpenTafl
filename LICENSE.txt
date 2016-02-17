@@ -2,7 +2,7 @@ Copyright Jay Slater, 2014-
 
 OpenTafl is licensed under the Stout Free-As-In-Beer License (http://softworks.many-words.com/the-free-as-in-beer-license), and is a product of Jay Slater and Many Words Softworks:
 
-Stout Free-As-In-Beer License, v0.3:
+Stout Free-As-In-Beer License, v0.4:
 
 1. Definitions
 
@@ -11,7 +11,7 @@ Stout Free-As-In-Beer License, v0.3:
 	b. Licensee means the individuals or entities exercising rights granted
 	   by this license.
 	c. You means Licensee. Your is used with the corresponding meaning.
-	d. Application means a piece of software, comprising the Source Code, 
+	d. Application means a piece of software, comprising the Source Code,
 	   and, potentially, any Binary or Binaries compiled from the Source
 	   Code. This Application means the Application covered by this license.
 	e. Compilation means the process of creating a standalone, executable
@@ -68,18 +68,43 @@ conditions.
 			   Free-As-In-Beer License;
 			2. A license which does not contradict any terms of
 			   this license.
-		ii. The Licensor may elect to exempt Source Code files or 
-		    sections of Source Code files from the conditions in 
-		    section 3 by including a notice marking the file or 
-		    section to be exempted, either included in the source code
-		    file or as part of a separate notices file.
-			1. The Licensor may choose to exempt Source Code
-			   files or sections thereof from specific subsections
-			   of section 3 by explicitly naming those sections.
-			2. If the Licensor does not name specific subsections
-			   of section 3, any file exempted under the terms
-			   in section 3(b)(ii) is exempted from all terms
-			   in section 3.
+		ii. The Licensor may elect to exempt Source Code files or
+		    sections of Source Code files from any or all conditions
+		    in section 3, or from all terms of this license.
+			1. The Licensor may choose to exempt a file or section
+			   from all conditions in section 3 by including a
+			   notice which declares the exemption and names
+			   section 3(b)(ii). The following boilerplate
+			   text may be used to declare this exemption.
+
+				Under Section 3(b)(ii) of the Free-As-In-Beer
+				License, this file is exempted from all
+				conditions in Section 3 of the license.
+
+			2. The Licensor may choose to exempt Source Code
+			   files or sections thereof from specific conditions
+			   in section 3 by including a notice which declares
+			   the exemption, names the conditions, and names
+			   section 3(b)(ii). The following boilerplate text,
+			   followed by a list of section headers (e.g.,
+			   Section 3(a) - Attribution) may be used to declare
+			   this exemption.
+
+
+				Under Section 3(b)(ii) of the Free-As-In-Beer
+				License, this file is exempted from certain
+				conditions in Section 3 of the license:
+
+			3. The Licensor may choose to exempt Source Code
+			   files or sections thereof from all terms and
+			   conditions of the license by including a notice
+			   which declares the exemption and names
+			   section 3(b)(ii). The following boilerplate text
+			   may be used to declare this exemption.
+
+				Under section 3(b)(ii) of the Free-As-In-Beer
+				License, this file is exempted from all terms
+				and conditions of the license.
 
 	c. Sale of the Application and Source Code Availability
 		i. The Source Code must be made available in an electronic
@@ -89,14 +114,14 @@ conditions.
 		ii. You may not Sell the Source Code.
 		iii. You may accept donations to cover the cost of transmitting
 		     the Source Code electronically, provided that the Source
-		     Code remains available free of charge. 
+		     Code remains available free of charge.
 		iv. You may Sell physical media containing the Source Code,
 		    provided that the Source Code remains available free of
 		    charge in an electronic format.
 		v. You may Sell Binaries, provided that the Source Code remains
 		   available free of charge in an electronic format.
 
-	e. Libraries
+	d. Libraries
 		i. Libraries required to Compile or Run this Application must
 		   be available free of charge, unless:
 			1. An alternative library is available free of charge,
