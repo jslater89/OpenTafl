@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl;
 
 import com.manywords.softworks.tafl.test.Test;
+import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
 
@@ -11,22 +12,32 @@ public class OpenTafl {
     public static void main(String[] args) {
         Map<String, String> mapArgs = getArgs(args);
         boolean window = false;
+        boolean advanced = true;
 
         for (String arg : args) {
-            if (arg.contains("--debug")) {
+            if(arg.contains("--fallback")) {
+                window = false;
+                advanced = false;
+            }
+            else if (arg.contains("--debug")) {
                 Debug.run(mapArgs);
                 System.exit(0);
             } else if (arg.contains("--test")) {
                 Test.run();
                 System.exit(0);
             } else if (arg.contains("--window")) {
+                advanced = false;
                 window = true;
             }
         }
 
-        if (window) {
+        if(advanced) {
+            AdvancedTerminal t = new AdvancedTerminal();
+        }
+        else if (window) {
             SwingWindow w = new SwingWindow();
-        } else {
+        }
+        else {
             RawTerminal display = new RawTerminal();
             display.runUi();
             System.exit(0);
