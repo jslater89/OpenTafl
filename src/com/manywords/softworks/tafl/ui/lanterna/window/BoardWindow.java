@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.ui.lanterna.window;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.Panel;
 import com.manywords.softworks.tafl.engine.Game;
@@ -23,7 +24,7 @@ public class BoardWindow extends BasicWindow {
 
         Panel p = new Panel();
         mBoardImage = new TerminalBoardImage();
-        TerminalImagePanel boardImagePanel = new TerminalImagePanel(mBoardImage);
+        TerminalImagePanel boardImagePanel = new TerminalImagePanel(mBoardImage, new TerminalSize(40, 25));
         p.addComponent(boardImagePanel);
 
         this.setComponent(p);
