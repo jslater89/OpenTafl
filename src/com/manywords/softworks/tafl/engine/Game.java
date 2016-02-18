@@ -129,19 +129,9 @@ public class Game {
         mHistory.add(currentState);
 
         // Victory
-        int result = currentState.checkVictory();
+        int result = mCurrentState.checkVictory();
 
         return result;
-    }
-
-    public boolean historyContainsPosition(GameState state) {
-        for (GameState historical : mHistory) {
-            if (state.mZobristHash == historical.mZobristHash) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public boolean historyContainsHash(long zobrist) {

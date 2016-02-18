@@ -34,6 +34,7 @@ public class RulesSerializer {
         map.put("esc", "c");
         map.put("surf", "y");
         map.put("atkf", "y");
+        map.put("tfr", "d");
         map.put("ka", "y");
         map.put("ks", "y");
         map.put("kj", "n");
@@ -86,6 +87,10 @@ public class RulesSerializer {
 
         if(!rules.getStartingSide().isAttackingSide()) {
             otnrString += "atkf:n ";
+        }
+
+        if(rules.threefoldRepetitionResult() != Rules.DRAW) {
+            otnrString += getStringForThreefoldResult(rules.threefoldRepetitionResult());
         }
 
         if(!rules.isKingArmed()) {
@@ -232,6 +237,7 @@ public class RulesSerializer {
         if(config.containsKey("esc")) rules.setEscapeType(getEscapeTypeForString(config.get("esc")));
         if(config.containsKey("surf")) rules.setSurroundingFatal(getBooleanForString(config.get("surf")));
         if(config.containsKey("atkf")) rules.setAttackersFirst(getBooleanForString(config.get("atkf")));
+        if(config.containsKey("tfr")) rules.setThreefoldResult(getThreefoldResultForString(config.get("tfr")));
         if(config.containsKey("ka")) rules.setKingArmed(getBooleanForString(config.get("ka")));
         if(config.containsKey("ks")) rules.setKingStrong(getBooleanForString(config.get("ks")));
         if(config.containsKey("kj")) rules.setKingJumpMode(getJumpModeForString(config.get("kj")));
@@ -332,6 +338,34 @@ public class RulesSerializer {
             if (!Character.isDigit(c)) return false;
         }
         return true;
+    }
+
+    private static int getThreefoldResultForString(String threefoldResult) {
+        if(threefoldResult.equals("w")) {
+            return Rules.THIRD_REPETITION_WINS;
+        }
+        else if(threefoldResult.equals("l")) {
+            return Rules.THIRD_REPETITION_LOSES;
+        }
+        else if(threefoldResult.equals("d")) {
+            return Rules.DRAW;
+        }
+        else {
+            return Rules.DRAW;
+        }
+    }
+
+    private static String getStringForThreefoldResult(int threefoldResult) {
+        if(threefoldResult == Rules.THIRD_REPETITION_WINS) {
+            return "w";
+        }
+        else if(threefoldResult == Rules.THIRD_REPETITION_LOSES) {
+            return "l";
+        }
+        else if(threefoldResult == Rules.DRAW) {
+            return "d";
+        }
+        else return "i";
     }
 
     private static int getEscapeTypeForString(String escapeString) {

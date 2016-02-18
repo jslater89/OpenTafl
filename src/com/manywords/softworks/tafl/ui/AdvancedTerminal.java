@@ -176,6 +176,14 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
         }
         else {
             statusText("Last move: " + move);
+            int repeats = mGame.getCurrentState().countPositionOccurrences();
+            // The number of repeats is the number of times this has happened
+            // in the history. Add one for us, so we can report to the player
+            // more intelligently.
+            repeats++;
+            if(repeats > 1) {
+                statusText("This position has repeated " + repeats + " times!");
+            }
             mBoardWindow.rerenderBoard();
         }
     }
@@ -193,7 +201,18 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
     @Override
     public void victoryForSide(Side side) {
         mBoardWindow.rerenderBoard();
-        if(side.isAttackingSide()) {
+
+        // Notify the player if this is a victory on move repetition
+        int repeats = mGame.getCurrentState().countPositionOccurrences();
+        repeats++;
+        if(repeats > 2) {
+            statusText("This position has repeated " + repeats + " times!");
+        }
+
+        if(side == null) {
+            statusText("Draw!");
+        }
+        else if(side.isAttackingSide()) {
             statusText("Attackers win!");
         }
         else {

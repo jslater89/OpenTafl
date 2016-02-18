@@ -119,7 +119,7 @@ are present only for organizational purposes.
 	<board-size>
 
 	# These rules concern general rules of the game.
-	[<"esc:"><escape-type>] [<"surf:"><yes-no>] [<"atkf:"><yes-no>]
+	[<"esc:"><escape-type>] [<"surf:"><yes-no>] [<"atkf:"><yes-no>] [<"tfr:"><threefold-rule>]
 
 	# These rules concern piece strengths and movement types.
 	[<"ka:"><yes-no>] [<"ks:"><yes-no>] [<"kj:"><jump-type>]
@@ -150,6 +150,11 @@ are present only for organizational purposes.
 		escape-type:
 			"c": corner
 			"e": edge
+		threefold-rule:
+		    "i": ignore
+		    "d": draw
+		    "w": player who makes the threefold repetition wins
+		    "l": player who makes the threefold repetition loses
 		yes-no:
 			"y": yes
 			"n": no
@@ -185,6 +190,11 @@ Explanatory notes:
 	atkf: 
 		(attackers first) should the attacking side go first? Defaults to "y" (yes).
 		If "n", the defenders move first.
+	tfr:
+	    (threefold repetition) what should happen in the case of a threefold repetition?
+	    if "w", the player forced to respond wins. If "l", the player forced to respond
+	    loses. If "d", the game is a draw (default). If "i", threefold repetitions are
+	    ignored.
 	ka: 
 		(king armed) does the king participate in captures? Defaults to "y" (yes).
 	ks: 

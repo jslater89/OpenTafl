@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.engine;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.rules.*;
+import org.junit.Ignore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -221,6 +222,7 @@ public class GameState {
         return mTaflmanMoveCache.getCachedReachableSpacesForTaflman(mZobristHash, taflman);
     }
 
+    public static final int DRAW = 3;
     public static final int DEFENDER_WIN = 2;
     public static final int ATTACKER_WIN = 1;
     public static final int GOOD_MOVE = 0;
@@ -310,7 +312,38 @@ public class GameState {
         return captures;
     }
 
+    public int countPositionOccurrences() {
+        int repeats = 0;
+        for (GameState state : mGame.getHistory()) {
+            if (this.mZobristHash == state.mZobristHash) {
+                repeats++;
+            }
+        }
+
+        return repeats;
+    }
+
     public int checkVictory() {
+        int threefoldRepetitionResult = mGame.getGameRules().threefoldRepetitionResult();
+        // Threefold repetition cannot occur as the result of a berserk move
+        if(threefoldRepetitionResult != Rules.IGNORE && mBerserkingTaflman == Taflman.EMPTY) {
+            int repeats = countPositionOccurrences();
+
+            // If this position has occurred two other times plus this one, do the threefold
+            // checks.
+            if(repeats >= 2) {
+                if(threefoldRepetitionResult == Rules.DRAW) {
+                    return DRAW;
+                }
+                else if (threefoldRepetitionResult == Rules.THIRD_REPETITION_LOSES) {
+                    return (getCurrentSide().isAttackingSide() ? DEFENDER_WIN : ATTACKER_WIN);
+                }
+                else if (threefoldRepetitionResult == Rules.THIRD_REPETITION_WINS) {
+                    return (getCurrentSide().isAttackingSide() ? ATTACKER_WIN : DEFENDER_WIN);
+                }
+            }
+        }
+
         boolean kingAlive = false;
         boolean defenderMovesAvailable = false;
 

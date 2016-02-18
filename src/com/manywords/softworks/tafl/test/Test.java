@@ -7,6 +7,8 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
+        tests.add(new ThreefoldDrawTest());
+        tests.add(new ThreefoldVictoryTest());
         tests.add(new MoveSerializerConsistencyTest());
         tests.add(new PositionSerializerConsistencyTest());
         tests.add(new RulesSerializerConsistencyTest());

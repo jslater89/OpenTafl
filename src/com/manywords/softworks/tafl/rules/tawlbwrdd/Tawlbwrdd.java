@@ -132,6 +132,11 @@ public class Tawlbwrdd extends Rules {
     }
 
     @Override
+    public int threefoldRepetitionResult() {
+        return Rules.DRAW;
+    }
+
+    @Override
     public Board getBoard() {
         return mStartingBoard;
     }

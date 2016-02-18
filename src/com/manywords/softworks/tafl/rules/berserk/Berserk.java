@@ -191,6 +191,13 @@ public class Berserk extends Rules {
     }
 
     @Override
+    public int threefoldRepetitionResult() {
+        // The player being forced to move wins in the event of a threefold
+        // repetition.
+        return Rules.THIRD_REPETITION_LOSES;
+    }
+
+    @Override
     public Board getBoard() {
         return mStartingBoard;
     }

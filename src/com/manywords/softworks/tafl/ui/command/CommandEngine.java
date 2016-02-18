@@ -92,6 +92,11 @@ public class CommandEngine {
                 finishGame();
                 return;
             }
+            else if (result == GameState.DRAW) {
+                mUiCallback.victoryForSide(null);
+                finishGame();
+                return;
+            }
             else if (result != GameState.GOOD_MOVE) {
                 if (result == GameState.ILLEGAL_SIDE) {
                     message += "Not your taflman.";
@@ -123,6 +128,9 @@ public class CommandEngine {
         }
         // 3. MOVE COMMAND: RETURN MOVE RECORD (receiver sends to callback after verifying side &c)
         else if(command instanceof HumanCommandParser.Move) {
+            if(!mInGame) {
+                return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, "Game over", null);
+            }
             HumanCommandParser.Move m = (HumanCommandParser.Move) command;
             if(m.from == null || m.to == null) {
                 return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, "Invalid coords", null);

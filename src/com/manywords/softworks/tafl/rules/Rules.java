@@ -287,6 +287,39 @@ public abstract class Rules {
     public abstract int getBerserkMode();
 
     /**
+     * No result.
+     */
+    public static final int IGNORE = 0;
+    /**
+     * The game is drawn immediately on threefold repetition.
+     */
+    public static final int DRAW = 1;
+    /**
+     * The player who moves to make the third repetition loses.
+     * In the most common example case, where one piece is
+     * blocking the movement of one other piece, the player
+     * who makes the move into the third board state is the
+     * player who is forced to block the movement.
+     */
+    public static final int THIRD_REPETITION_LOSES = 2;
+    /**
+     * The player who moves to make the third repetition wins.
+     * In the most common example case, where one piece is
+     * blocking the movement of one other piece, the player
+     * who makes the move into the third board state is the
+     * player who is forced to block the movement.
+     */
+    public static final int THIRD_REPETITION_WINS = 3;
+
+    /**
+     * What happens on a threefold repetition? A threefold repetition
+     * is defined as a return to the same board state for the third
+     * time.
+     * @return
+     */
+    public abstract int threefoldRepetitionResult();
+
+    /**
      * Get the board for this ruleset.
      *
      * @return
