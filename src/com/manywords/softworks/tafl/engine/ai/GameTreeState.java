@@ -283,7 +283,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 }
             }
 
-            MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
+            MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
             mParent.replaceChild(GameTreeState.this, smallChild);
         } else if (mVictory != GOOD_MOVE || mDepth >= currentMaxDepth || (!workspace.mHasTime && mDepth != 0)) {
             // If we're in crash-stop mode but we started another search, and we haven't investigated any children,
@@ -295,7 +295,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             // Replace small child
             if(mDepth != 0) {
-                MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
+                MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
                 mParent.replaceChild(GameTreeState.this, smallChild);
             }
         } else {
@@ -493,7 +493,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             // All moves explored; minify this state
             if(mDepth != 0) {
-                MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
+                MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
                 if (mParent != null) {
                     mParent.replaceChild(GameTreeState.this, minifiedNode);
                 }
@@ -529,12 +529,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     @Override
-    public void revalueParent() {
-        if(getParentNode().isMaximizingNode()) {
-            getParentNode().setValue((short) Math.max(getParentNode().getValue(), mValue));
-        }
-        else {
-            getParentNode().setValue((short) Math.min(getParentNode().getValue(), mValue));
-        }
+    public void revalueParent(int depthOfObservation) {
+        GameTreeNodeMethods.revalueParent(this, depthOfObservation);
     }
 }

@@ -142,14 +142,20 @@ public class AiWorkspace extends Game {
                     }
                 });
                 deepestExtension += extensionDepth;
+                boolean certainVictory = true;
                 for(int i = 0; i < extensionCount; i++) {
                     if(getTreeRoot().getBranches().size() > i) {
                         List<GameTreeNode> nodes = getTreeRoot().getNthPath(i);
                         GameTreeNode n = nodes.get(nodes.size() - 1);
                         n.explore(deepestExtension, deepestExtension, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool);
-                        n.revalueParent();
+                        if(n.getVictory() == GameState.GOOD_MOVE) {
+                            certainVictory = false;
+                        }
+                        n.revalueParent(n.getDepth());
                     }
                 }
+
+                if(certainVictory) break;
                 extensionIterations++;
             }
         }

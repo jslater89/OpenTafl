@@ -18,8 +18,9 @@ public class MinimalGameTreeNode implements GameTreeNode {
     public final boolean mCurrentSideAttackers;
     public final long mZobrist;
     public final int mVictory;
+    public final int mGameLength;
 
-    public MinimalGameTreeNode(GameTreeNode root, int depth, int maxDepth, MoveRecord enteringMove, short alpha, short beta, short evaluation, List<GameTreeNode> branches, boolean currentSideAttackers, long zobrist, int victory) {
+    public MinimalGameTreeNode(GameTreeNode root, int depth, int maxDepth, MoveRecord enteringMove, short alpha, short beta, short evaluation, List<GameTreeNode> branches, boolean currentSideAttackers, long zobrist, int victory, int gameLength) {
         mParent = root;
         mDepth = depth;
         mEnteringMove = enteringMove;
@@ -29,6 +30,7 @@ public class MinimalGameTreeNode implements GameTreeNode {
         mAlpha = alpha;
         mBeta = beta;
         mVictory = victory;
+        mGameLength = gameLength;
 
         // This is a leaf
         if (evaluation != Evaluator.NO_VALUE) {
@@ -196,13 +198,8 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     @Override
-    public void revalueParent() {
-        if(getParentNode().isMaximizingNode()) {
-            getParentNode().setValue((short) Math.max(getParentNode().getValue(), mValue));
-        }
-        else {
-            getParentNode().setValue((short) Math.min(getParentNode().getValue(), mValue));
-        }
+    public void revalueParent(int depthOfObservation) {
+        GameTreeNodeMethods.revalueParent(this, depthOfObservation);
     }
 
     @Override
