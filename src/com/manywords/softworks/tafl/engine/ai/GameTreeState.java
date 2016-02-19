@@ -97,9 +97,26 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public List<GameTreeNode> getBestPath() {
-        List<GameTreeNode> bestPath = new ArrayList<GameTreeNode>();
+        return getPathForChild(getBestChild());
+    }
 
-        GameTreeNode node = getBestChild();
+    public List<GameTreeNode> getNthPath(int i) {
+        return getPathForChild(getNthChild(i));
+    }
+
+    public GameTreeNode getNthChild(int i) {
+        getBranches().sort(new Comparator<GameTreeNode>() {
+            @Override
+            public int compare(GameTreeNode o1, GameTreeNode o2) {
+                return -(o1.getValue() - o2.getValue());
+            }
+        });
+
+        return getBranches().get(i);
+    }
+
+    private static List<GameTreeNode> getPathForChild(GameTreeNode node) {
+        List<GameTreeNode> bestPath = new ArrayList<GameTreeNode>();
 
         while (node != null) {
             bestPath.add(node);
@@ -160,6 +177,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
     @Override
     public void setBeta(short beta) {
         mBeta = beta;
+    }
+
+    @Override
+    public void setValue(short value) {
+        mValue = value;
     }
 
     public short getAlpha() {
@@ -247,7 +269,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 mAlpha = (short) Math.max(mAlpha, mValue);
 
                 //System.out.println("Depth " + mDepth + " Attacker value " + mValue + " Alpha " + mAlpha + " Beta " + mBeta);
-                if (mBeta <= mAlpha && mDepth < currentMaxDepth) {
+                if (mBeta <= mAlpha && mDepth < workspace.mBetaCutoffs.length) {
                     workspace.mBetaCutoffs[mDepth]++;
                     workspace.mBetaCutoffDistances[mDepth] += 1;
                 }
@@ -255,7 +277,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 mBeta = (short) Math.min(mBeta, mValue);
 
                 //System.out.println("Depth " + mDepth + " Defender value " + mValue + " Alpha " + mAlpha + " Beta " + mBeta);
-                if (mBeta <= mAlpha && mDepth < currentMaxDepth) {
+                if (mBeta <= mAlpha && mDepth < workspace.mAlphaCutoffs.length) {
                     workspace.mAlphaCutoffs[mDepth]++;
                     workspace.mAlphaCutoffDistances[mDepth] += 1;
                 }
@@ -263,15 +285,19 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
             mParent.replaceChild(GameTreeState.this, smallChild);
-        } else if (mVictory != GOOD_MOVE || mDepth >= currentMaxDepth) {
+        } else if (mVictory != GOOD_MOVE || mDepth >= currentMaxDepth || (!workspace.mHasTime && mDepth != 0)) {
+            // If we're in crash-stop mode but we started another search, and we haven't investigated any children,
+            // we should investigate another level to at least maybe get some transposition table hits.
             mValue = evaluate();
 
             // Put the value in tables
             workspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
 
             // Replace small child
-            MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
-            mParent.replaceChild(GameTreeState.this, smallChild);
+            if(mDepth != 0) {
+                MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory);
+                mParent.replaceChild(GameTreeState.this, smallChild);
+            }
         } else {
             this.mValue = Evaluator.NO_VALUE;
             new ExploreTask(this, currentMaxDepth, overallMaxDepth, threadPool).doTask();
@@ -287,6 +313,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             desiredState = desiredState.considerMove(m.start, m.end);
         }
 
+        desiredState.mParent = minimalGameTreeNode.getParentNode();
         desiredState.mAlpha = minimalGameTreeNode.getAlpha();
         desiredState.mBeta = minimalGameTreeNode.getBeta();
         desiredState.mValue = minimalGameTreeNode.getValue();
@@ -437,8 +464,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
                         if (mBeta <= mAlpha) {
                             //System.out.println("Beta cutoff");
                             cutoffType = 1;
-                            workspace.mBetaCutoffs[mDepth]++;
-                            workspace.mBetaCutoffDistances[mDepth] += distanceToFirstCutoff;
+                            if(workspace.mBetaCutoffs.length > mDepth) {
+                                workspace.mBetaCutoffs[mDepth]++;
+                                workspace.mBetaCutoffDistances[mDepth] += distanceToFirstCutoff;
+                            }
                             cutoff = true;
                         }
                     } else {
@@ -449,8 +478,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
                         if (mBeta <= mAlpha) {
                             //System.out.println("Alpha cutoff");
                             cutoffType = 0;
-                            workspace.mAlphaCutoffs[mDepth]++;
-                            workspace.mAlphaCutoffDistances[mDepth] += distanceToFirstCutoff;
+                            if(workspace.mBetaCutoffs.length > mDepth) {
+                                workspace.mAlphaCutoffs[mDepth]++;
+                                workspace.mAlphaCutoffDistances[mDepth] += distanceToFirstCutoff;
+                            }
                             cutoff = true;
                         }
                     }
@@ -478,10 +509,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
     }
 
-    public int countChildren() {
+    public int countChildren(int depth) {
+        if(getDepth() == depth) return 1;
         int total = 0;
         for (GameTreeNode node : mBranches) {
-            total += node.countChildren();
+            total += node.countChildren(depth);
         }
 
         if (total == 0) {
@@ -494,5 +526,15 @@ public class GameTreeState extends GameState implements GameTreeNode {
     @Override
     public long getZobrist() {
         return mZobristHash;
+    }
+
+    @Override
+    public void revalueParent() {
+        if(getParentNode().isMaximizingNode()) {
+            getParentNode().setValue((short) Math.max(getParentNode().getValue(), mValue));
+        }
+        else {
+            getParentNode().setValue((short) Math.min(getParentNode().getValue(), mValue));
+        }
     }
 }

@@ -11,6 +11,8 @@ public interface GameTreeNode {
 
     public abstract void setBeta(short beta);
 
+    public abstract void setValue(short value);
+
     public abstract short getAlpha();
 
     public abstract short getBeta();
@@ -37,7 +39,7 @@ public interface GameTreeNode {
 
     public abstract void setParent(GameTreeNode newParent);
 
-    public abstract int countChildren();
+    public abstract int countChildren(int toDepth);
 
     public abstract int getDepth();
 
@@ -46,4 +48,6 @@ public interface GameTreeNode {
     public abstract GameTreeNode getBestChild();
 
     public abstract long getZobrist();
+
+    public abstract void revalueParent();
 }

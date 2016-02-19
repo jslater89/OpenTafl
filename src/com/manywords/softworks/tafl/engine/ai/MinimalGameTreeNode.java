@@ -13,7 +13,7 @@ public class MinimalGameTreeNode implements GameTreeNode {
     public final MoveRecord mEnteringMove;
     public short mAlpha;
     public short mBeta;
-    public final short mValue;
+    public short mValue;
     public final List<GameTreeNode> mBranches;
     public final boolean mCurrentSideAttackers;
     public final long mZobrist;
@@ -50,6 +50,11 @@ public class MinimalGameTreeNode implements GameTreeNode {
     @Override
     public void setBeta(short beta) {
         mBeta = beta;
+    }
+
+    @Override
+    public void setValue(short value) {
+        mValue = value;
     }
 
     public short getAlpha() {
@@ -170,10 +175,12 @@ public class MinimalGameTreeNode implements GameTreeNode {
         mParent = newParent;
     }
 
-    public int countChildren() {
+    public int countChildren(int depth) {
+        if(getDepth() == depth) return 1;
+
         int total = 0;
         for (GameTreeNode node : mBranches) {
-            total += node.countChildren();
+            total += node.countChildren(depth);
         }
 
         if (total == 0) {
@@ -186,6 +193,16 @@ public class MinimalGameTreeNode implements GameTreeNode {
     @Override
     public long getZobrist() {
         return mZobrist;
+    }
+
+    @Override
+    public void revalueParent() {
+        if(getParentNode().isMaximizingNode()) {
+            getParentNode().setValue((short) Math.max(getParentNode().getValue(), mValue));
+        }
+        else {
+            getParentNode().setValue((short) Math.min(getParentNode().getValue(), mValue));
+        }
     }
 
     @Override
