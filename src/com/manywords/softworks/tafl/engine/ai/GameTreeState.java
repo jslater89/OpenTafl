@@ -4,7 +4,6 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.rules.Coord;
-import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
         // result should be good move except in cases like berserk,
         // where most moves on a berserk turn are illegal.
-        if(result == GOOD_MOVE) {
+        if(result >= GOOD_MOVE) {
             GameTreeState nextState;
             if (mGame.getGameRules().getBerserkMode() > 0 && temp.getBerserkingTaflman() != Taflman.EMPTY) {
                 nextState = new GameTreeState(workspace, temp, this);
@@ -108,14 +107,20 @@ public class GameTreeState extends GameState implements GameTreeNode {
         getBranches().sort(new Comparator<GameTreeNode>() {
             @Override
             public int compare(GameTreeNode o1, GameTreeNode o2) {
-                return -(o1.getValue() - o2.getValue());
+                if(isMaximizingNode()) {
+                    return -(o1.getValue() - o2.getValue());
+                }
+                else {
+                    // low to high
+                    return (o1.getValue() - o2.getValue());
+                }
             }
         });
 
         return getBranches().get(i);
     }
 
-    private static List<GameTreeNode> getPathForChild(GameTreeNode node) {
+    public static List<GameTreeNode> getPathForChild(GameTreeNode node) {
         List<GameTreeNode> bestPath = new ArrayList<GameTreeNode>();
 
         while (node != null) {
@@ -259,9 +264,16 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool) {
         setAlpha(alpha);
         setBeta(beta);
+        boolean extension = false;
+        if(overallMaxDepth < currentMaxDepth) {
+            extension = true;
+        }
         mCurrentMaxDepth = currentMaxDepth;
 
-        short cachedValue = workspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
+        short cachedValue = Evaluator.NO_VALUE;
+        if(!extension) {
+            cachedValue = workspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
+        }
         if (cachedValue != Evaluator.NO_VALUE && mDepth > 0) {
             mValue = cachedValue;
 
@@ -285,19 +297,19 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
             mParent.replaceChild(GameTreeState.this, smallChild);
-        } else if (mVictory != GOOD_MOVE || mDepth >= currentMaxDepth || (!workspace.mHasTime && mDepth != 0)) {
-            // If we're in crash-stop mode but we started another search, and we haven't investigated any children,
-            // we should investigate another level to at least maybe get some transposition table hits.
+        } else if (mVictory != GOOD_MOVE || mDepth >= currentMaxDepth || (workspace.mNoTime && mDepth != 0) || (!extension && workspace.mExtensionTime && mDepth != 0)) {
+            // If this is a victory, evaluate and stop exploring.
+            // If we've hit the target depth, evaluate and stop exploring.
+            // If we're out of time and this isn't the root node, stop exploring.
+            // If we're in extension time and not in extension search, stop exploring.
             mValue = evaluate();
 
             // Put the value in tables
             workspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
 
             // Replace small child
-            if(mDepth != 0) {
-                MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
-                mParent.replaceChild(GameTreeState.this, smallChild);
-            }
+            MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
+            mParent.replaceChild(GameTreeState.this, smallChild);
         } else {
             this.mValue = Evaluator.NO_VALUE;
             new ExploreTask(this, currentMaxDepth, overallMaxDepth, threadPool).doTask();
@@ -326,6 +338,16 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return desiredState;
     }
 
+    private boolean treeParentsContainHash(long zobrist) {
+        GameTreeNode parent = getParentNode();
+        while(parent != null) {
+            if(parent.getZobrist() == zobrist) {
+                return true;
+            }
+            parent = parent.getParentNode();
+        }
+        return false;
+    }
 
     private class ExploreTask implements Runnable {
         GameTreeState mState;
@@ -333,6 +355,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
         AiThreadPool mThreadPool;
 
         public ExploreTask(GameTreeState state, int currentMaxDepth, int overallMaxDepth, AiThreadPool threadPool) {
+            mCurrentMaxDepth = currentMaxDepth;
+            mOverallMaxDepth = overallMaxDepth;
             mState = state;
             mThreadPool = threadPool;
         }
@@ -380,7 +404,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     }
 
                     long nextZobrist = updateZobristHash(mZobristHash, getBoard(), move);
-                    if(!mGame.historyContainsHash(nextZobrist)) {
+                    if(!mGame.historyContainsHash(nextZobrist) && !treeParentsContainHash(nextZobrist)) {
                         successorMoves.add(move);
                     }
                 }

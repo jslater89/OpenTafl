@@ -70,7 +70,7 @@ class ThreefoldDrawTest extends TaflTest implements UiCallback {
         // Target: start position
 
         // First time at the position
-        RawTerminal.renderGameState(state);
+        //RawTerminal.renderGameState(state);
         state.moveTaflman(state.getPieceAt(5, 3), state.getSpaceAt(4, 3));
         state = game.getCurrentState();
 
@@ -84,7 +84,7 @@ class ThreefoldDrawTest extends TaflTest implements UiCallback {
         state.moveTaflman(state.getPieceAt(4, 1), state.getSpaceAt(5, 1));
         state = game.getCurrentState();
         // Second time at the position
-        RawTerminal.renderGameState(state);
+        //RawTerminal.renderGameState(state);
 
         state.moveTaflman(state.getPieceAt(5, 3), state.getSpaceAt(4, 3));
         state = game.getCurrentState();
@@ -98,11 +98,13 @@ class ThreefoldDrawTest extends TaflTest implements UiCallback {
         state.moveTaflman(state.getPieceAt(4, 1), state.getSpaceAt(5, 1));
         state = game.getCurrentState();
         // Third time at the position
-        RawTerminal.renderGameState(state);
+        //RawTerminal.renderGameState(state);
 
+        /*
         for(GameState s : game.getHistory()) {
             System.out.println(s.mZobristHash);
         }
+        */
 
         assert state.checkVictory() == GameState.DRAW;
     }

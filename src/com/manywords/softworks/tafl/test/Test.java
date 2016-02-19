@@ -20,8 +20,8 @@ public class Test {
         tests.add(new CornerVictoryTest());
         tests.add(new RestrictedSpaceTest());
         tests.add(new EncirclementTest());
-        tests.add(new ShieldwallTest());
         tests.add(new StrictShieldwallTest());
+        tests.add(new ShieldwallTest());
         tests.add(new EdgeFortEscapeTest());
         tests.add(new EdgeFortEscapeFailedTest());
         tests.add(new CommanderCaptureVictoryTest());
@@ -42,6 +42,7 @@ public class Test {
                 System.out.println(test.getClass().getSimpleName() + ": passed");
             } catch (AssertionError e) {
                 System.out.println(test.getClass().getSimpleName() + ": FAILED");
+                e.printStackTrace(System.out);
                 System.exit(0);
             }
         }

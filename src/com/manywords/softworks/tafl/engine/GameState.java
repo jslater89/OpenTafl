@@ -110,8 +110,6 @@ public class GameState {
             if (previousState.getCurrentSide().isAttackingSide()) setCurrentSide(getAttackers());
             else setCurrentSide(getDefenders());
         }
-
-        mZobristHash = updateZobristHash(previousState.mZobristHash, previousState.getBoard(), previousState.getExitingMove());
     }
 
     public Game mGame;
@@ -297,7 +295,7 @@ public class GameState {
 
         boolean capturingShieldwall = true;
         for (Coord space : surroundedByShieldwall) {
-            if (mBoard.getOccupier(space) == Taflman.EMPTY || Taflman.getSide(mBoard.getOccupier(space)) != getDefenders()) {
+            if (mBoard.getOccupier(space) == Taflman.EMPTY || Taflman.getPackedSide(mBoard.getOccupier(space)) == Taflman.getPackedSide(potentialCapturer)) {
                 capturingShieldwall = false;
             }
         }
@@ -493,7 +491,7 @@ public class GameState {
         hash = hash ^ mGame.mZobristConstants[endIndex][oldType];
 
         for(Coord capturedCoord : move.captures) {
-            int captureIndex = getBoard().getIndex(capturedCoord);
+            int captureIndex = oldBoard.getIndex(capturedCoord);
             oldType = getZobristTypeIndex(oldBoard.getOccupier(capturedCoord));
             hash = hash ^ mGame.mZobristConstants[captureIndex][oldType];
         }

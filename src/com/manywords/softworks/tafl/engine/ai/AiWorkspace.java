@@ -35,7 +35,8 @@ public class AiWorkspace extends Game {
      */
     private long mThinkTime = -1;
 
-    public boolean mHasTime = true;
+    public boolean mNoTime = false;
+    public boolean mExtensionTime = false;
 
     private AiThreadPool mThreadPool;
     private GameState mOriginalStartingState;
@@ -65,17 +66,14 @@ public class AiWorkspace extends Game {
     private boolean canDoDeeperSearch(int nextDepth) {
         long timeLeft = mStartTime + mThinkTime - System.currentTimeMillis();
         long timeToPreviousDepth = mLastTimeToDepth[nextDepth - 1];
-        long timeToNextDepth = mLastTimeToDepth[nextDepth];
 
-        // We can't do a deeper search if we have less time than the recorded time
-        // to the next depth, or if we have less than eight times the time it took
-        // to get to the previous depth.
-        return !(timeLeft < (8 * timeToPreviousDepth) || timeLeft < timeToNextDepth);
+        // We can start a deeper search
+        return !(isTimeCritical() || timeLeft < (timeToPreviousDepth * 2));
     }
 
     private boolean isTimeCritical() {
         long timeLeft = mStartTime + mThinkTime - System.currentTimeMillis();
-        return timeLeft < 500;
+        return timeLeft < (long) Math.min(mThinkTime * 0.05, 250);
     }
 
     public void explore(int thinkTime) {
@@ -97,19 +95,27 @@ public class AiWorkspace extends Game {
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                mHasTime = false;
-                t.cancel();
-                t.purge();
+                mExtensionTime = true;
             }
-        }, mThinkTime);
+        }, (int) (mThinkTime * 0.9));
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mNoTime = true;
+            }
+        }, mThinkTime - 250); // save an extra quarter second
 
-        final int extensionDepth = 1;
-        final int extensionCount = 8;
+        boolean firstExtension = true;
+        final int extensionDepth = 2;
+        final int extensionCount = 5;
+        final int extensionLimit = 6;
+        int extensionStart = 0;
         int deepestExtension = 1;
         int extensionIterations = 0;
         int depth;
+        int treeSizePreExtension = 0;
         for (depth = 1; depth <= maxDepth;) {
-            if(canDoDeeperSearch(depth)) {
+            if(canDoDeeperSearch(depth) && !mNoTime && !mExtensionTime) {
                 mAlphaCutoffs = new long[maxDepth];
                 mAlphaCutoffDistances = new long[maxDepth];
                 mBetaCutoffs = new long[maxDepth];
@@ -120,7 +126,7 @@ public class AiWorkspace extends Game {
                 mStartingState.explore(depth, maxDepth, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool);
                 long finish = System.currentTimeMillis();
 
-                if (mHasTime) {
+                if (!mNoTime) {
                     mLastTimeToDepth[depth] = finish - start;
                 }
                 double timeTaken = (finish - start) / 1000d;
@@ -134,14 +140,15 @@ public class AiWorkspace extends Game {
                 depth++;
                 deepestExtension = depth;
             }
-            else {
-                if(isTimeCritical()) break;
-
-                if(chatty && mUiCallback != null) {
-                    mUiCallback.statusText("Extension search to depth " + deepestExtension);
+            else if (!isTimeCritical()) {
+                if(firstExtension) {
+                    firstExtension = false;
+                    if(chatty && mUiCallback != null) {
+                        mUiCallback.statusText("Running extension search to fill time...");
+                    }
                 }
 
-                // Do an extension search on the three best known moves.
+                // Do an extension search on the best-known moves.
                 getTreeRoot().getBranches().sort(new Comparator<GameTreeNode>() {
                     @Override
                     public int compare(GameTreeNode o1, GameTreeNode o2) {
@@ -155,36 +162,52 @@ public class AiWorkspace extends Game {
                         }
                     }
                 });
-                
+
                 deepestExtension += extensionDepth;
+
+                if(deepestExtension > depth + extensionLimit) {
+                    deepestExtension = depth + extensionDepth;
+                    extensionStart += extensionCount;
+                }
+
                 boolean certainVictory = true;
-                for(int i = 0; i < extensionCount; i++) {
-                    if(getTreeRoot().getBranches().size() > i) {
-                        List<GameTreeNode> nodes = getTreeRoot().getNthPath(i);
-                        GameTreeNode n = nodes.get(nodes.size() - 1);
-                        n.explore(deepestExtension, deepestExtension, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool);
-                        if(n.getVictory() == GameState.GOOD_MOVE) {
-                            certainVictory = false;
-                        }
-                        n.revalueParent(n.getDepth());
+                int e = 0;
+                for(GameTreeNode branch : getTreeRoot().getBranches()) {
+                    if(e < extensionStart) {
+                        e++;
+                        continue;
                     }
+
+                    List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
+                    GameTreeNode n = nodes.get(nodes.size() - 1);
+                    n.explore(deepestExtension, depth, n.getAlpha(), n.getBeta(), mThreadPool);
+                    if(n.getVictory() == GameState.GOOD_MOVE) {
+                        certainVictory = false;
+                    }
+                    n.revalueParent(n.getDepth());
+
+                    e++;
+                    if(e > extensionStart + extensionCount) break;
                 }
 
                 if(certainVictory) break;
                 extensionIterations++;
             }
+            else {
+                break;
+            }
         }
-
         mEndTime = System.currentTimeMillis();
 
         int nodes = getGameTreeSize(depth);
+        int fullNodes = getGameTreeSize(depth + extensionLimit);
         int size = getTreeRoot().mBranches.size();
         double observedBranching = ((mGame.mAverageBranchingFactor * mGame.mAverageBranchingFactorCount) + size) / (++mGame.mAverageBranchingFactorCount);
         mGame.mAverageBranchingFactor = observedBranching;
 
         if(chatty && mUiCallback != null) {
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / maxDepth)));
-            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec, extension iterations: " + extensionIterations);
+            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec, extended by " + (fullNodes - nodes) + " extra nodes");
         }
     }
 
@@ -209,7 +232,7 @@ public class AiWorkspace extends Game {
      * The GameTreeStates handle all turn advancement.
      */
     @Override
-    public int advanceState(GameState currentState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
+    public int advanceState(GameState currentState, GameState nextState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
         return 0;
     }
 }

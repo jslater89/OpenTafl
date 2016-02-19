@@ -69,12 +69,14 @@ class AIMatchingZobristTest extends TaflTest implements UiCallback {
 
         state = game.getCurrentState();
         AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
-        workspace.explore(3);
+        workspace.explore(1);
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         long zobrist = workspace.getTreeRoot().getBestChild().getZobrist();
+        long zobrist2 = workspace.getTreeRoot().updateZobristHash(workspace.getTreeRoot().getZobrist(), workspace.getTreeRoot().getBoard(), nextMove);
         state.makeMove(nextMove);
 
         state = game.getCurrentState();
+        assert zobrist == zobrist2;
         assert zobrist == state.mZobristHash;
     }
 

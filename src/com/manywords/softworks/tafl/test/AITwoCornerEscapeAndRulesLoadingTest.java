@@ -31,7 +31,7 @@ class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements UiCallbac
 
     @Override
     public void statusText(String text) {
-
+        System.out.println(text);
     }
 
     @Override
@@ -73,27 +73,27 @@ class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements UiCallbac
         int value = 0;
 
         for(int i = 0; i < 4; i++) {
-            //RawTerminal.renderGameState(state);
-            AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
-            //workspace.chatty = true;
-            workspace.explore(4);
-            MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
-            value = workspace.getTreeRoot().getBestChild().getValue();
-            //System.out.println("value: " + value);
-
             victory = state.checkVictory();
+            System.out.println("victory " + victory);
             if(victory != GameState.GOOD_MOVE) {
                 break;
             }
-            else {
-                state.makeMove(nextMove);
-            }
 
+            RawTerminal.renderGameState(state);
+            AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
+            workspace.chatty = true;
+            workspace.explore(2);
+            MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
+            value = workspace.getTreeRoot().getBestChild().getValue();
+            System.out.println("nextmove: " + nextMove + " value: " + value);
+
+            state.makeMove(nextMove);
             state = game.getCurrentState();
         }
 
         victory = state.checkVictory();
-        //RawTerminal.renderGameState(state);
+        System.out.println("victory " + victory);
+        RawTerminal.renderGameState(state);
 
         assert victory == GameState.DEFENDER_WIN;
     }

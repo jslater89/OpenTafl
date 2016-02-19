@@ -10,7 +10,7 @@ class StrictShieldwallTest extends TaflTest {
 
     @Override
     public void run() {
-        Rules rules = Copenhagen.newShieldwallTest();
+        Rules rules = Copenhagen.newStrictShieldwallTest();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
 
@@ -22,8 +22,8 @@ class StrictShieldwallTest extends TaflTest {
         state = game.getCurrentState();
 
         //RawTerminal.renderGameState(state);
-        //println("Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers()));
-        //println("Defender shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getDefenders()));
+        //println "Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers())
+        //println "Defender shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getDefenders())
 
         state.moveTaflman(state.getPieceAt(5, 2), state.getSpaceAt(5, 1));
         state = game.getCurrentState();
@@ -36,13 +36,13 @@ class StrictShieldwallTest extends TaflTest {
         state = game.getCurrentState();
 
         //RawTerminal.renderGameState(state);
-        //println "Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers())
-        //println "Defender shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getDefenders())
+        //println("Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers()));
+        //println("Defender shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getDefenders()));
         assert 2 == state.getBoard().detectShieldwallPositionsForSide(state.getAttackers()).size();
         assert 2 == state.getBoard().detectShieldwallPositionsForSide(state.getDefenders()).size();
 
         assert state.checkVictory() == GameState.DEFENDER_WIN;
-        assert state.getPieceAt(5, 0) == Taflman.EMPTY;
+        assert state.getPieceAt(5, 0) != Taflman.EMPTY;
     }
 
 }
