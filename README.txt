@@ -23,6 +23,10 @@ If you see '64-bit' in the output from that command, you have 64-bit Java.
 
 3. Version history
 
+v0.1.7.1b (released 02/19/16):
+- Fixes for game UI layout for narrow screen sizes
+- Implement threefold repetition rules, plus rules serializer support
+
 v0.1.7b (released 02/17/16):
 - Prep work for external engine support: split work into additional threads to
   avoid blocking certain other pieces, e.g. the game clock and the engine->
