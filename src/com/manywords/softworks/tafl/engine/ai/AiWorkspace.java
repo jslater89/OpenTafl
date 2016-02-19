@@ -155,10 +155,7 @@ public class AiWorkspace extends Game {
                         }
                     }
                 });
-
-                for(GameTreeNode node : getTreeRoot().getBranches()) {
-                    System.out.println(node.getValue());
-                }
+                
                 deepestExtension += extensionDepth;
                 boolean certainVictory = true;
                 for(int i = 0; i < extensionCount; i++) {
