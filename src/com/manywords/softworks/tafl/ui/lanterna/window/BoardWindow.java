@@ -33,6 +33,7 @@ public class BoardWindow extends BasicWindow {
 
     public void rerenderBoard() {
         mBoardImage.renderBoard(mGame.getCurrentState(), null, null, null, null);
+        invalidate();
     }
 
     public void rerenderBoard(Coord location, List<Coord> stops, List<Coord> moves, List<Coord> captures) {

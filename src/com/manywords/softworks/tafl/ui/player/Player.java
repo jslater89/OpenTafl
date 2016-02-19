@@ -17,7 +17,7 @@ public abstract class Player {
         public void onMoveDecided(Player player, MoveRecord record);
     }
 
-    public abstract void getNextMove(UiCallback ui, Game game, int searchDepth);
+    public abstract void getNextMove(UiCallback ui, Game game, int thinkTime);
     public abstract void stop();
     public abstract void onMoveDecided(MoveRecord record);
     public abstract void setCallback(MoveCallback callback);

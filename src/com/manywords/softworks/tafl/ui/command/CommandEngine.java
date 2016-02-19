@@ -18,7 +18,7 @@ public class CommandEngine {
 
     private boolean mInGame = false;
 
-    private int mSearchDepth = 4;
+    private int mThinkTime = 4;
 
     public CommandEngine(Game g, UiCallback callback, Player attacker, Player defender) {
         mGame = g;
@@ -28,13 +28,13 @@ public class CommandEngine {
     }
 
     public void setSearchDepth(int depth) {
-        mSearchDepth = depth;
+        mThinkTime = depth;
     }
 
     public void startGame() {
         mInGame = true;
 
-        mSearchDepth = TerminalSettings.aiSearchdepth;
+        mThinkTime = TerminalSettings.aiThinkTime;
         mAttacker.setCallback(mMoveCallback);
         mDefender.setCallback(mMoveCallback);
 
@@ -56,7 +56,7 @@ public class CommandEngine {
         if(!mInGame) return;
 
         mUiCallback.awaitingMove(mCurrentPlayer, mGame.getCurrentSide().isAttackingSide());
-        mCurrentPlayer.getNextMove(mUiCallback, mGame, mSearchDepth);
+        mCurrentPlayer.getNextMove(mUiCallback, mGame, mThinkTime);
     }
 
     public void finishGame() {

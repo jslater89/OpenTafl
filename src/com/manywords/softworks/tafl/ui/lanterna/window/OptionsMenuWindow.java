@@ -72,13 +72,13 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(defenderType);
 
-        Button aiDepthSelect = new Button("AI search depth", new Runnable() {
+        Button aiDepthSelect = new Button("AI think time", new Runnable() {
             @Override
             public void run() {
                 showAiDepthEntryDialog();
             }
         });
-        Label aiDepth = new Label("" + TerminalSettings.aiSearchdepth);
+        Label aiDepth = new Label("" + TerminalSettings.aiThinkTime);
         optionsPanel.addComponent(aiDepthSelect);
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(aiDepth);
@@ -105,19 +105,19 @@ public class OptionsMenuWindow extends BasicWindow {
 
     private void showAiDepthEntryDialog() {
         List<String> lines = TerminalTextUtils.getWordWrappedText(50,
-                "The depth to which the AI will search. Values of 4 or 5 should work for all games." +
-                "Brandub may work to depth 6 or 7. Larger games may work at depth 6 on faster computers.");
+                "The maximum time in seconds per AI move, or 0 to let the AI" +
+                        " decide its timing based on the game clock.");
         String descriptionString = "";
         for(String s : lines) {
             descriptionString += s + "\n";
         }
         BigInteger searchdepth = TextInputDialog.showNumberDialog(
                 getTextGUI(),
-                "AI search depth",
+                "AI think time",
                 descriptionString,
-                "" + TerminalSettings.aiSearchdepth);
+                "" + TerminalSettings.aiThinkTime);
         int intDepth = searchdepth.intValue();
-        TerminalSettings.aiSearchdepth = intDepth;
+        TerminalSettings.aiThinkTime = intDepth;
 
         refreshSettings();
     }

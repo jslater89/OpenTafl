@@ -19,7 +19,7 @@ public class TerminalSettings {
     public static File attackerEngineFile = null;
     public static File defenderEngineFile = null;
 
-    public static int aiSearchdepth = 4;
+    public static int aiThinkTime = 10;
 
     public static int variant = 1;
 

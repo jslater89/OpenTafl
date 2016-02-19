@@ -14,7 +14,7 @@ public class LocalHuman extends Player {
     }
 
     @Override
-    public void getNextMove(UiCallback ui, Game game, int searchDepth) {
+    public void getNextMove(UiCallback ui, Game game, int thinkTime) {
         ui.statusText("Waiting for human move.");
 
         mWorker = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {

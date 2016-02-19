@@ -18,7 +18,7 @@ public class LocalAi extends Player {
     }
 
     @Override
-    public void getNextMove(UiCallback ui, Game game, int searchDepth) {
+    public void getNextMove(UiCallback ui, Game game, int thinkTime) {
         ui.statusText("Waiting for computer move.");
 
         mWorker = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
@@ -34,12 +34,12 @@ public class LocalAi extends Player {
                 AiWorkspace workspace = new AiWorkspace(ui, game, game.getCurrentState(), 50);
                 workspace.chatty = true;
 
-                workspace.explore(searchDepth);
+                workspace.explore(thinkTime);
                 //while(!workspace.isThreadPoolIdle()) { continue; }
                 workspace.stopExploring();
 
                 ui.statusText("# cutoffs/avg. to 1st a/b a/b");
-                for (int i = 0; i < searchDepth; i++) {
+                for (int i = 0; i < thinkTime; i++) {
                     String line = "Depth " + i + ": " + workspace.mAlphaCutoffs[i] + "/" + workspace.mBetaCutoffs[i];
                     if (workspace.mAlphaCutoffDistances[i] > 0) {
                         line += " " + workspace.mAlphaCutoffDistances[i] / workspace.mAlphaCutoffs[i];

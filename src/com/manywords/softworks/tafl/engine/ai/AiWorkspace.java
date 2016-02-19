@@ -78,8 +78,16 @@ public class AiWorkspace extends Game {
         return timeLeft < 500;
     }
 
-    public void explore(int maxDepth) {
+    public void explore(int thinkTime) {
+        if(thinkTime == 0) {
+            mThinkTime = -1;
+        }
+        else {
+            mThinkTime = thinkTime * 1000;
+        }
+
         mStartTime = System.currentTimeMillis();
+        int maxDepth = 10;
         if(mThinkTime == -1) {
             mThinkTime = planTimeUsage(mGame);
         }
@@ -95,8 +103,8 @@ public class AiWorkspace extends Game {
             }
         }, mThinkTime);
 
-        final int extensionDepth = 2;
-        final int extensionCount = 5;
+        final int extensionDepth = 1;
+        final int extensionCount = 8;
         int deepestExtension = 1;
         int extensionIterations = 0;
         int depth;
@@ -137,10 +145,20 @@ public class AiWorkspace extends Game {
                 getTreeRoot().getBranches().sort(new Comparator<GameTreeNode>() {
                     @Override
                     public int compare(GameTreeNode o1, GameTreeNode o2) {
-                        // Sort in reverse order of value
-                        return -(o1.getValue() - o2.getValue());
+                        // Sort by value high to low
+                        if(getTreeRoot().isMaximizingNode()) {
+                            return -(o1.getValue() - o2.getValue());
+                        }
+                        else {
+                            // low to high
+                            return (o1.getValue() - o2.getValue());
+                        }
                     }
                 });
+
+                for(GameTreeNode node : getTreeRoot().getBranches()) {
+                    System.out.println(node.getValue());
+                }
                 deepestExtension += extensionDepth;
                 boolean certainVictory = true;
                 for(int i = 0; i < extensionCount; i++) {
