@@ -1,3 +1,5 @@
 set CLASSPATH="out/production/TaflEngine;lib/*"
 
-start package/ansicon-x64/ansicon.exe java -server -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+TieredCompilation -agentlib:hprof=cpu=samples,depth=100,interval=1,lineno=y,thread=y,file=hprof.txt -Xms2048M -Xmx4096M -cp %CLASSPATH% com/manywords/softworks/tafl/OpenTafl --debug
+::java -server -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+TieredCompilation -agentlib:hprof=cpu=samples,depth=100,interval=1,lineno=y,thread=y,file=hprof.txt -Xms2048M -Xmx4096M -cp %CLASSPATH% com/manywords/softworks/tafl/OpenTafl --debug
+
+java -server -XX:+UseCompressedOops -XX:+UseConcMarkSweepGC -XX:+TieredCompilation -Xms2048M -Xmx4096M -cp %CLASSPATH% com/manywords/softworks/tafl/OpenTafl --debug
