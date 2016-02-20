@@ -62,6 +62,10 @@ public class AiWorkspace extends Game {
         }
     }
 
+    public static void resetTranspositionTable() {
+        transpositionTable = new TranspositionTable((transpositionTable != null? transpositionTable.size() : 5));
+    }
+
     private long planTimeUsage(Game g) {
         return 10000;
     }

@@ -29,7 +29,7 @@ public class FishyEvaluator implements Evaluator {
 
         int maxDepth = state.mCurrentMaxDepth;
         int depth = state.mDepth;
-        int victory = state.mVictory;
+        int victory = state.checkVictory();
 
         Board board = state.getBoard();
 

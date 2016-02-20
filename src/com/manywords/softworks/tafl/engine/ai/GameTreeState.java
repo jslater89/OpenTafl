@@ -23,7 +23,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public short mAlpha;
     public short mBeta;
     public short mValue = Evaluator.NO_VALUE;
-    public int mVictory;
     public List<GameTreeNode> mBranches = new ArrayList<GameTreeNode>();
 
     // TODO: comment debug code here.
@@ -265,6 +264,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         if(!extension) {
             cachedValue = workspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
         }
+
         if (cachedValue != Evaluator.NO_VALUE && mDepth > 0) {
             mValue = cachedValue;
 
@@ -288,11 +288,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
             mParent.replaceChild(GameTreeState.this, smallChild);
-        } else if (mVictory != GOOD_MOVE || mDepth >= currentMaxDepth || (workspace.mNoTime && mDepth != 0) || (!extension && workspace.mExtensionTime && mDepth != 0)) {
+        } else if (mDepth != 0 && (checkVictory() != GOOD_MOVE || mDepth >= currentMaxDepth || (workspace.mNoTime) || (!extension && workspace.mExtensionTime))) {
             // If this is a victory, evaluate and stop exploring.
             // If we've hit the target depth, evaluate and stop exploring.
             // If we're out of time and this isn't the root node, stop exploring.
             // If we're in extension time and not in extension search, stop exploring.
+            // If we're at depth 0, go explore another level, just to be safe.
             mValue = evaluate();
 
             // Put the value in tables

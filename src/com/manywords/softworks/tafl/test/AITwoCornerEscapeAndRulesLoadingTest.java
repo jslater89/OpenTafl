@@ -67,6 +67,8 @@ class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements UiCallbac
 
     @Override
     public void run() {
+        AiWorkspace.resetTranspositionTable();
+
         Rules rules = Brandub.newAiTwoCornerEscapeTest();
         String rulesString = RulesSerializer.getRulesRecord(rules);
         Rules inflatedRules = RulesSerializer.loadRulesRecord(rulesString);

@@ -63,6 +63,8 @@ class AICertainKingCaptureTest extends TaflTest implements UiCallback {
 
     @Override
     public void run() {
+        AiWorkspace.resetTranspositionTable();
+
         Rules rules = Brandub.newAiCertainKingCaptureTest();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();

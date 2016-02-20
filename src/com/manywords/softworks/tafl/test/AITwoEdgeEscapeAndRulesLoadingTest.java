@@ -31,7 +31,7 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
 
     @Override
     public void statusText(String text) {
-
+        System.out.println(text);
     }
 
     @Override
@@ -63,6 +63,7 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
 
     @Override
     public void run() {
+        AiWorkspace.resetTranspositionTable();
         Rules rules = SeaBattle.newAiTwoEdgeEscapeTest();
         String rulesString = RulesSerializer.getRulesRecord(rules);
         Rules inflatedRules = RulesSerializer.loadRulesRecord(rulesString);
@@ -76,7 +77,7 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
         for(int i = 0; i < 2; i++) {
             //RawTerminal.renderGameState(state);
             AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
-            //workspace.chatty = false;
+            //workspace.chatty = true;
             workspace.explore(1);
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             value = workspace.getTreeRoot().getBestChild().getValue();

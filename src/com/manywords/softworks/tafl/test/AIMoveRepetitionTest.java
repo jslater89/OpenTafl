@@ -65,7 +65,7 @@ class AIMoveRepetitionTest extends TaflTest implements UiCallback {
 
     @Override
     public void run() {
-        //TODO: implement
+        AiWorkspace.resetTranspositionTable();
 
         Rules rules = Brandub.newAiMoveRepetitionTest();
         Game game = new Game(rules, null);
