@@ -333,6 +333,9 @@ public class GameState {
     }
 
     public int checkVictory() {
+        if(mVictory == VICTORY_UNCHECKED) {
+            mVictory = checkVictoryInternal();
+        }
         return checkVictoryInternal();
     }
 

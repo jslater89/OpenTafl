@@ -78,9 +78,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
         mAlpha = mParent.getAlpha();
         mBeta = mParent.getBeta();
         mDepth = ((GameTreeState) mParent).mDepth + 1;
-
-        // Victory
-        mVictory = checkVictory();
     }
 
     public short getValue() {
