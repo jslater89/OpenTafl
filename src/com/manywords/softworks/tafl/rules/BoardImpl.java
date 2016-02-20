@@ -239,6 +239,11 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public boolean isSideEncircled(Side side) {
+        for(char taflman : side.getTaflmen()) {
+            for(Coord c : Taflman.getAllowableDestinations(getState(), taflman)) {
+                if(isEdgeSpace(c)) return false;
+            }
+        }
         // Start at the edges.
         List<Coord> edges = getEdgesFlat();
         Set<Coord> considered = new HashSet<Coord>(getBoardDimension() * getBoardDimension());
