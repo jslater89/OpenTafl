@@ -80,7 +80,7 @@ public class CommandEngine {
             int result =
                     mGame.getCurrentState().moveTaflman(
                             mGame.getCurrentState().getBoard().getOccupier(move.start.x, move.start.y),
-                            mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y));
+                            mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y)).getLastMoveResult();
 
             if (result == GameState.ATTACKER_WIN) {
                 mUiCallback.victoryForSide(mGame.getCurrentState().getAttackers());

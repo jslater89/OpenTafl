@@ -30,7 +30,13 @@ public class GameState {
     }
 
     public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist) {
-        this(game, previousState, board, attackers, defenders, updateZobrist, true);
+        this(previousState);
+
+        updateGameState(game, previousState, board, attackers, defenders, updateZobrist, true, Taflman.EMPTY);
+    }
+
+    public GameState(int moveErrorCode) {
+        mLastMoveResult = moveErrorCode;
     }
 
     public GameState(GameState copyState) {
@@ -48,7 +54,7 @@ public class GameState {
         mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getGameRules().howManyAttackers(), (byte) mGame.getGameRules().howManyDefenders());
     }
 
-    public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist, boolean autoChangeSides) {
+    public void updateGameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist, boolean autoChangeSides, char berserkingTaflman) {
         if (!((this instanceof GameTreeState) || (this instanceof GameState)) && !autoChangeSides) {
             throw new IllegalArgumentException("Only internal methods may directly call this constructor!");
         }
@@ -71,10 +77,6 @@ public class GameState {
         }
 
         mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getGameRules().howManyAttackers(), (byte) mGame.getGameRules().howManyDefenders());
-    }
-
-    public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, char berserkingTaflman) {
-        this(game, previousState, board, attackers, defenders, true, true);
 
         if(berserkingTaflman == Taflman.EMPTY) return;
 
@@ -112,7 +114,10 @@ public class GameState {
         }
     }
 
+    private static final int VICTORY_UNCHECKED = -50;
     public Game mGame;
+    private int mLastMoveResult;
+    private int mVictory;
     public long mZobristHash;
     private Board mBoard;
     private Side mAttackers;
@@ -132,6 +137,7 @@ public class GameState {
         return mExitingMove;
     }
     public MoveRecord getEnteringMove() { return mEnteringMove; }
+    public int getLastMoveResult() { return mLastMoveResult; }
 
     public Side setCurrentSide(Side side) {
         mCurrentSide = side;
@@ -229,52 +235,57 @@ public class GameState {
     public static final int ILLEGAL_MOVE = -3;
     public static final int ILLEGAL_MOVE_BERSERKER = -4;
 
-    public int moveTaflman(char taflman, Coord destination) {
+    public GameState moveTaflman(char taflman, Coord destination) {
         if (mBerserkingTaflman != Taflman.EMPTY && Taflman.getSide(taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {
-            return ILLEGAL_SIDE_BERSERKER;
+            return new GameState(ILLEGAL_SIDE_BERSERKER);
         }
 
         if (Taflman.getSide(taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {
-            return ILLEGAL_SIDE;
+            return new GameState(ILLEGAL_SIDE);
         }
 
         if (mBerserkingTaflman != Taflman.EMPTY && taflman != mBerserkingTaflman) {
-            return ILLEGAL_MOVE_BERSERKER;
+            return new GameState(ILLEGAL_MOVE_BERSERKER);
         }
 
         List<Coord> moves = Taflman.getAllowableDestinations(this, taflman);
         if (!moves.contains(destination)) {
-            return ILLEGAL_MOVE;
-        } else {
-            Coord start = Taflman.getCurrentSpace(this, taflman);
-            boolean detailed = !(this instanceof GameTreeState);
-            MoveRecord move = Taflman.moveTo(this, taflman, destination, detailed);
+            return new GameState(ILLEGAL_MOVE);
+        }
+        else {
+            GameState nextState = new GameState(this);
+
+            boolean detailed = !(nextState instanceof GameTreeState);
+            MoveRecord move = Taflman.moveTo(nextState, taflman, destination, detailed);
             List<Coord> captures = move.captures;
 
             if (getBoard().getRules().allowShieldWallCaptures() > 0) {
-                List<ShieldwallPosition> shieldwallPositionsAttackers = getBoard().detectShieldwallPositionsForSide(getAttackers());
-                List<ShieldwallPosition> shieldwallPositionsDefenders = getBoard().detectShieldwallPositionsForSide(getDefenders());
+                List<ShieldwallPosition> shieldwallPositionsAttackers = nextState.getBoard().detectShieldwallPositionsForSide(getAttackers());
+                List<ShieldwallPosition> shieldwallPositionsDefenders = nextState.getBoard().detectShieldwallPositionsForSide(getDefenders());
 
                 for (ShieldwallPosition position : shieldwallPositionsAttackers) {
-                    captures.addAll(checkShieldwallPositionForCaptures(taflman, destination, position));
+                    captures.addAll(nextState.checkShieldwallPositionForCaptures(taflman, destination, position));
                 }
 
                 for (ShieldwallPosition position : shieldwallPositionsDefenders) {
-                    captures.addAll(checkShieldwallPositionForCaptures(taflman, destination, position));
+                    captures.addAll(nextState.checkShieldwallPositionForCaptures(taflman, destination, position));
                 }
             }
 
+            nextState.mEnteringMove = move;
             mExitingMove = move;
 
-            int result;
             if (captures.size() > 0 && getBoard().getRules().getBerserkMode() > 0) {
-                setBerserkingTaflman(taflman);
-                result = mGame.advanceState(this, false, taflman, true);
+                nextState.setBerserkingTaflman(taflman);
+                nextState = mGame.advanceState(this, nextState, false, taflman, true);
+                nextState.mLastMoveResult = nextState.checkVictory();
             } else {
-                setBerserkingTaflman(Taflman.EMPTY);
-                result = mGame.advanceState(this, true, Taflman.EMPTY, true);
+                //nextState.setBerserkingTaflman(Taflman.EMPTY);
+                nextState.setBerserkingTaflman(Taflman.EMPTY);
+                nextState = mGame.advanceState(this, nextState, true, Taflman.EMPTY, true);
+                nextState.mLastMoveResult = nextState.checkVictory();
             }
-            return result;
+            return nextState;
         }
     }
 
@@ -322,6 +333,12 @@ public class GameState {
     }
 
     public int checkVictory() {
+        return checkVictoryInternal();
+    }
+
+    private int checkVictoryInternal() {
+        if(getAttackers().getTaflmen().size() == 0) return DEFENDER_WIN;
+        else if (getDefenders().getTaflmen().size() == 0) return ATTACKER_WIN;
         int threefoldRepetitionResult = mGame.getGameRules().threefoldRepetitionResult();
         // Threefold repetition cannot occur as the result of a berserk move
         if(threefoldRepetitionResult != Rules.IGNORE && mBerserkingTaflman == Taflman.EMPTY) {

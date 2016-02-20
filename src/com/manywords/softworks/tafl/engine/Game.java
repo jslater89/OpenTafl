@@ -107,31 +107,23 @@ public class Game {
 
     // TODO: pass StateEvent object to notify UI of happenings
     // in callback
-    public int advanceState(GameState currentState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
-        GameState nextState;
-        if (mGameRules.getBerserkMode() > 0 && berserkingTaflman != Taflman.EMPTY) {
-            nextState = new GameState(
-                    this,
-                    currentState,
-                    currentState.getBoard(),
-                    currentState.getAttackers(),
-                    currentState.getDefenders(),
-                    berserkingTaflman);
-        } else {
-            nextState = new GameState(
-                    this,
-                    currentState,
-                    currentState.getBoard(),
-                    currentState.getAttackers(),
-                    currentState.getDefenders(), true, true);
-        }
+    public GameState advanceState(GameState currentState, GameState nextState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
+        nextState.updateGameState(
+                this,
+                currentState,
+                nextState.getBoard(),
+                nextState.getAttackers(),
+                nextState.getDefenders(),
+                advanceTurn,
+                true,
+                berserkingTaflman);
+
         mCurrentState = nextState;
         mHistory.add(currentState);
 
         // Victory
-        int result = mCurrentState.checkVictory();
-
-        return result;
+        mCurrentState.checkVictory();
+        return mCurrentState;
     }
 
     public boolean historyContainsHash(long zobrist) {

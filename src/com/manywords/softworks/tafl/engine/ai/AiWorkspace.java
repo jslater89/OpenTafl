@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
+import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.text.DecimalFormat;
@@ -37,6 +38,8 @@ public class AiWorkspace extends Game {
 
     public boolean mNoTime = false;
     public boolean mExtensionTime = false;
+
+    private final Object mTimeLock = new Object();
 
     private AiThreadPool mThreadPool;
     private GameState mOriginalStartingState;
@@ -95,15 +98,20 @@ public class AiWorkspace extends Game {
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                mExtensionTime = true;
+                synchronized (mTimeLock) {
+                    mExtensionTime = true;
+                }
             }
         }, (int) (mThinkTime * 0.9));
+
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                mNoTime = true;
+                synchronized (mTimeLock) {
+                    mNoTime = true;
+                };
             }
-        }, mThinkTime - 250); // save an extra quarter second
+        }, mThinkTime - (Math.min((int) (mThinkTime * 0.05), 250))); // save 1/4 second or 5%, whichever is less
 
         boolean firstExtension = true;
         final int extensionDepth = 2;
@@ -114,8 +122,14 @@ public class AiWorkspace extends Game {
         int extensionIterations = 0;
         int depth;
         int treeSizePreExtension = 0;
+
+        // Do the main search
         for (depth = 1; depth <= maxDepth;) {
-            if(canDoDeeperSearch(depth) && !mNoTime && !mExtensionTime) {
+            if (canDoDeeperSearch(depth)) {
+                if (isTimeCritical() || mNoTime || mExtensionTime) {
+                    break;
+                }
+
                 mAlphaCutoffs = new long[maxDepth];
                 mAlphaCutoffDistances = new long[maxDepth];
                 mBetaCutoffs = new long[maxDepth];
@@ -140,10 +154,17 @@ public class AiWorkspace extends Game {
                 depth++;
                 deepestExtension = depth;
             }
-            else if (!isTimeCritical()) {
-                if(firstExtension) {
+            else {
+                break;
+            }
+        }
+
+        // Do the extension search
+        while(true) {
+            if (!isTimeCritical()) {
+                if (firstExtension) {
                     firstExtension = false;
-                    if(chatty && mUiCallback != null) {
+                    if (chatty && mUiCallback != null) {
                         mUiCallback.statusText("Running extension search to fill time...");
                     }
                 }
@@ -153,7 +174,7 @@ public class AiWorkspace extends Game {
                     @Override
                     public int compare(GameTreeNode o1, GameTreeNode o2) {
                         // Sort by value high to low
-                        if(getTreeRoot().isMaximizingNode()) {
+                        if (getTreeRoot().isMaximizingNode()) {
                             return -(o1.getValue() - o2.getValue());
                         }
                         else {
@@ -165,15 +186,15 @@ public class AiWorkspace extends Game {
 
                 deepestExtension += extensionDepth;
 
-                if(deepestExtension > depth + extensionLimit) {
+                if (deepestExtension > depth + extensionLimit) {
                     deepestExtension = depth + extensionDepth;
                     extensionStart += extensionCount;
                 }
 
                 boolean certainVictory = true;
                 int e = 0;
-                for(GameTreeNode branch : getTreeRoot().getBranches()) {
-                    if(e < extensionStart) {
+                for (GameTreeNode branch : getTreeRoot().getBranches()) {
+                    if (e < extensionStart) {
                         e++;
                         continue;
                     }
@@ -181,22 +202,23 @@ public class AiWorkspace extends Game {
                     List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
                     GameTreeNode n = nodes.get(nodes.size() - 1);
                     n.explore(deepestExtension, depth, n.getAlpha(), n.getBeta(), mThreadPool);
-                    if(n.getVictory() == GameState.GOOD_MOVE) {
+                    if (n.getVictory() == GameState.GOOD_MOVE) {
                         certainVictory = false;
                     }
                     n.revalueParent(n.getDepth());
 
                     e++;
-                    if(e > extensionStart + extensionCount) break;
+                    if (e > extensionStart + extensionCount) break;
                 }
 
-                if(certainVictory) break;
+                if (certainVictory) break;
                 extensionIterations++;
             }
             else {
                 break;
             }
         }
+
         mEndTime = System.currentTimeMillis();
 
         int nodes = getGameTreeSize(depth);
@@ -232,7 +254,18 @@ public class AiWorkspace extends Game {
      * The GameTreeStates handle all turn advancement.
      */
     @Override
-    public int advanceState(GameState currentState, GameState nextState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
-        return 0;
+    public GameState advanceState(GameState currentState, GameState nextState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
+        nextState.updateGameState(
+                this,
+                currentState,
+                nextState.getBoard(),
+                nextState.getAttackers(),
+                nextState.getDefenders(),
+                true,
+                true,
+                berserkingTaflman);
+
+        nextState.checkVictory();
+        return nextState;
     }
 }

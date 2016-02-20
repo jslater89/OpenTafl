@@ -30,7 +30,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
     private String debugOutputString = null;
 
     public GameTreeState(AiWorkspace workspace, GameState copyState) {
-        super(workspace, copyState, copyState.getBoard(), copyState.getAttackers(), copyState.getDefenders(), false, false);
+        super(copyState);
+        mGame = workspace;
         this.workspace = workspace;
 
         mZobristHash = copyState.mZobristHash;
@@ -46,6 +47,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
     public GameTreeState(GameTreeState copyState) {
         super(copyState);
+        mGame = workspace;
         mParent = copyState.mParent;
         mAlpha = copyState.mAlpha;
         mBeta = copyState.mBeta;
@@ -53,19 +55,13 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public GameTreeState considerMove(Coord start, Coord end) {
-        GameTreeState temp = new GameTreeState(this);
-        char toMove = temp.getBoard().getOccupier(start);
-        int result = temp.moveTaflman(toMove, end);
+        char toMove = getBoard().getOccupier(start);
+        GameState nextGameState = moveTaflman(toMove, end);
 
         // result should be good move except in cases like berserk,
         // where most moves on a berserk turn are illegal.
-        if(result >= GOOD_MOVE) {
-            GameTreeState nextState;
-            if (mGame.getGameRules().getBerserkMode() > 0 && temp.getBerserkingTaflman() != Taflman.EMPTY) {
-                nextState = new GameTreeState(workspace, temp, this);
-            } else {
-                nextState = new GameTreeState(workspace, temp, this);
-            }
+        if(nextGameState.getLastMoveResult() >= GOOD_MOVE) {
+            GameTreeState nextState = new GameTreeState(workspace, nextGameState, this);
 
             return nextState;
         }
@@ -75,10 +71,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
     }
 
-    public GameTreeState(AiWorkspace workspace, GameTreeState advanceFrom, GameTreeState realParent) {
-        super(workspace, advanceFrom, advanceFrom.getBoard(), advanceFrom.getAttackers(), advanceFrom.getDefenders(), advanceFrom.getBerserkingTaflman());
+    public GameTreeState(AiWorkspace workspace, GameState advanceFrom, GameTreeState realParent) {
+        super(advanceFrom);
 
-        mParent = (GameTreeState) realParent;
+        mParent = realParent;
         mAlpha = mParent.getAlpha();
         mBeta = mParent.getBeta();
         mDepth = ((GameTreeState) mParent).mDepth + 1;
@@ -132,8 +128,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public GameTreeNode getBestChild() {
-        if (this.mVictory != GOOD_MOVE) return null;
-
         GameTreeNode bestMove = null;
         for (GameTreeNode child : getBranches()) {
             if(mGame.historyContainsHash(child.getZobrist())) {
@@ -466,7 +460,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 // Node will be null in e.g. berserk tafl, where moves are legal
                 // according to the movement rules, but not legal according to
                 // special rules, like the berserk rule.
-                if(node == null) continue;
+                if(node == null) {
+                    continue;
+                }
 
                 mBranches.add(node);
                 node.explore(mCurrentMaxDepth, mOverallMaxDepth, mAlpha, mBeta, mThreadPool);
@@ -517,6 +513,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             // All moves explored; minify this state
             if(mDepth != 0) {
+                if(mValue == Evaluator.NO_VALUE) {
+                    System.out.println("Entering moves " + getEnteringMoveSequence());
+                    System.out.println("No value");
+                    System.exit(0);
+                }
                 MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
                 if (mParent != null) {
                     mParent.replaceChild(GameTreeState.this, minifiedNode);

@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.engine.ai;
 
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +37,9 @@ public class MinimalGameTreeNode implements GameTreeNode {
         if (evaluation != Evaluator.NO_VALUE) {
             mValue = evaluation;
         } else { // This is a branch
+            if(root instanceof GameTreeState) {
+                RawTerminal.renderGameState((GameTreeState) root);
+            }
             throw new IllegalStateException("MinimalGameTreeNode created for unvalued state");
         }
     }
