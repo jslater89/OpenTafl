@@ -44,6 +44,9 @@ public class Test {
                 System.out.println(test.getClass().getSimpleName() + ": FAILED");
                 e.printStackTrace(System.out);
                 System.exit(0);
+            } catch (Exception e) {
+                e.printStackTrace(System.out);
+                System.exit(0);
             }
         }
     }

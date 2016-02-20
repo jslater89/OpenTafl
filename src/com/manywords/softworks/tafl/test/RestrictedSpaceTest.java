@@ -77,8 +77,8 @@ class RestrictedSpaceTest extends TaflTest implements UiCallback {
         assert !allowableDestinations.contains(state.getSpaceAt(5, 5));
         assert allowableDestinations.contains(state.getSpaceAt(5, 4));
 
-        assert state.moveTaflman(ofInterest, state.getSpaceAt(5, 5)) == GameState.ILLEGAL_MOVE;
-        assert state.moveTaflman(ofInterest, state.getSpaceAt(5, 4)) == GameState.GOOD_MOVE;
+        assert state.moveTaflman(ofInterest, state.getSpaceAt(5, 5)).getLastMoveResult() == GameState.ILLEGAL_MOVE;
+        assert state.moveTaflman(ofInterest, state.getSpaceAt(5, 4)).getLastMoveResult() == GameState.GOOD_MOVE;
     }
 
 }

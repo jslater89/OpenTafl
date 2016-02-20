@@ -30,7 +30,7 @@ class AIMatchingZobristTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
-
+        System.out.println(text);
     }
 
     @Override
@@ -64,11 +64,12 @@ class AIMatchingZobristTest extends TaflTest implements UiCallback {
     public void run() {
         Rules rules = Brandub.newAiMoveRepetitionTest();
         Game game = new Game(rules, null);
-        GameState state = game.getCurrentState();
+        GameState state;
 
 
         state = game.getCurrentState();
         AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
+        //workspace.chatty = true;
         workspace.explore(1);
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         long zobrist = workspace.getTreeRoot().getBestChild().getZobrist();

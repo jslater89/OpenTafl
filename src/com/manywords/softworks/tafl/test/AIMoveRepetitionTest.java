@@ -74,25 +74,25 @@ class AIMoveRepetitionTest extends TaflTest implements UiCallback {
 
         state = game.getCurrentState();
         AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
-        workspace.explore(3);
+        workspace.explore(1);
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);
 
         state = game.getCurrentState();
         workspace = new AiWorkspace(this, game, state, 5);
-        workspace.explore(3);
+        workspace.explore(1);
         nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);
 
         state = game.getCurrentState();
         workspace = new AiWorkspace(this, game, state, 5);
-        workspace.explore(3);
+        workspace.explore(1);
         nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);
 
         state = game.getCurrentState();
         workspace = new AiWorkspace(this, game, state, 5);
-        workspace.explore(3);
+        workspace.explore(1);
         nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);
 

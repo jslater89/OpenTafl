@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.test;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
@@ -12,6 +13,8 @@ import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.player.Player;
+
+import java.util.List;
 
 class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements UiCallback {
 
@@ -75,26 +78,26 @@ class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements UiCallbac
 
         for(int i = 0; i < 4; i++) {
             victory = state.checkVictory();
-            System.out.println("victory " + victory);
+            //System.out.println("victory " + victory);
             if(victory != GameState.GOOD_MOVE) {
                 break;
             }
 
-            RawTerminal.renderGameState(state);
+            //RawTerminal.renderGameState(state);
             AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
-            workspace.chatty = true;
-            workspace.explore(2);
+            //workspace.chatty = true;
+            workspace.explore(1);
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             value = workspace.getTreeRoot().getBestChild().getValue();
-            System.out.println("nextmove: " + nextMove + " value: " + value);
+            List<GameTreeNode> path = workspace.getTreeRoot().getBestPath();
 
             state.makeMove(nextMove);
             state = game.getCurrentState();
         }
 
         victory = state.checkVictory();
-        System.out.println("victory " + victory);
-        RawTerminal.renderGameState(state);
+        //System.out.println("victory " + victory);
+        //RawTerminal.renderGameState(state);
 
         assert victory == GameState.DEFENDER_WIN;
     }

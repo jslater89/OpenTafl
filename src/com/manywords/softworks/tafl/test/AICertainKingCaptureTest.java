@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.test;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -30,7 +31,7 @@ class AICertainKingCaptureTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
-
+        System.out.println(text);
     }
 
     @Override
@@ -67,9 +68,9 @@ class AICertainKingCaptureTest extends TaflTest implements UiCallback {
         GameState state = game.getCurrentState();
 
         //RawTerminal.renderGameState(state);
-        state = game.getCurrentState();
         AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
         workspace.explore(1);
+        //workspace.chatty = true;
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);
 

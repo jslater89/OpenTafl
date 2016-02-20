@@ -36,7 +36,7 @@ class ShieldwallTest extends TaflTest {
         state.moveTaflman(state.getPieceAt(2, 1), state.getSpaceAt(1, 1));
         state = game.getCurrentState();
 
-        RawTerminal.renderGameState(state);
+        //RawTerminal.renderGameState(state);
         //System.out.println("Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers()));
         //System.out.println("Defender shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getDefenders()));
         assert 2 == state.getBoard().detectShieldwallPositionsForSide(state.getAttackers()).size();

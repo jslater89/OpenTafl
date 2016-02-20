@@ -76,8 +76,8 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
         for(int i = 0; i < 2; i++) {
             //RawTerminal.renderGameState(state);
             AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
-            workspace.chatty = false;
-            workspace.explore(4);
+            //workspace.chatty = false;
+            workspace.explore(1);
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             value = workspace.getTreeRoot().getBestChild().getValue();
 

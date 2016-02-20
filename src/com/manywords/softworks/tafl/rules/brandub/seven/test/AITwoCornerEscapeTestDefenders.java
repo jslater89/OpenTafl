@@ -37,7 +37,7 @@ public class AITwoCornerEscapeTestDefenders extends Side {
         int x = 3;
         int y = 3;
 
-        taflmen.add(new King((byte) 0, Coord.get(3, 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new King((byte) 0, Coord.get(3, 0), this, getBoard(), getBoard().getRules()));
 
         // Give it another piece to faff about with
         taflmen.add(new TaflmanImpl((byte) 1, Taflman.TYPE_TAFLMAN, Coord.get(x, y + 1), this, getBoard(), getBoard().getRules()));
