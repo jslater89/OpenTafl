@@ -39,7 +39,7 @@ public class LocalAi extends Player {
                 workspace.stopExploring();
 
                 ui.statusText("# cutoffs/avg. to 1st a/b a/b");
-                for (int i = 0; i < thinkTime; i++) {
+                for (int i = 0; i < workspace.mAlphaCutoffs.length; i++) {
                     String line = "Depth " + i + ": " + workspace.mAlphaCutoffs[i] + "/" + workspace.mBetaCutoffs[i];
                     if (workspace.mAlphaCutoffDistances[i] > 0) {
                         line += " " + workspace.mAlphaCutoffDistances[i] / workspace.mAlphaCutoffs[i];
