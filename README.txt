@@ -23,6 +23,13 @@ If you see '64-bit' in the output from that command, you have 64-bit Java.
 
 3. Version history
 
+v0.1.8b (released 02/20/16):
+- Speed and memory usage improvements
+- AI difficulty set by thinking time instead of search depth
+- If insufficient time to search to the next depth, stop at the current
+  depth and search deeper, starting at the known best moves, to catch some
+  horizon effects
+
 v0.1.7.1b (released 02/19/16):
 - Fixes for game UI layout for narrow screen sizes
 - Implement threefold repetition rules, plus rules serializer support
@@ -30,17 +37,17 @@ v0.1.7.1b (released 02/19/16):
 v0.1.7b (released 02/17/16):
 - Prep work for external engine support: split work into additional threads to
   avoid blocking certain other pieces, e.g. the game clock and the engine->
-  host communication.
+  host communication
 - New portable cross-platform UI, built on the Lanterna terminal graphics
   library
 
 v0.1.6.1b (released 02/09/16):
-- Bugfix release for 0.1.6b.
+- Bugfix release for 0.1.6b
 - Fix bug where OTN move records would show the moving taflman as the captured
-  taflman.
+  taflman
 - Fix bug where OTN position strings would leave out the king after the first
-  capture.
-- Fix bug where taflman move cache would be re-allocated for every state.
+  capture
+- Fix bug where taflman move cache would be re-allocated for every state
 
 v0.1.6b (released 02/08/16):
 - Further reductions in memory use (fixed minification of game tree states)
