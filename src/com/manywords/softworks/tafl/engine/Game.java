@@ -22,7 +22,15 @@ public class Game {
     }
 
     public Game(Rules rules, UiCallback callback) {
+        this(rules, callback, null);
+    }
+
+    public Game(Rules rules, UiCallback callback, GameClock.TimeSpec timeSpec) {
         mGameRules = rules;
+
+        if(timeSpec != null) {
+            mClock = new GameClock(this, getGameRules().getAttackers(), getGameRules().getDefenders(), timeSpec);
+        }
 
         int boardSquares = rules.getBoard().getBoardDimension() * rules.getBoard().getBoardDimension();
         mZobristConstants = new long[boardSquares][Taflman.COUNT_TYPES * 2];
@@ -47,10 +55,19 @@ public class Game {
     public final long[][] mZobristConstants;
     public double mAverageBranchingFactor = 0;
     public int mAverageBranchingFactorCount = 0;
+    private GameClock mClock;
     private UiCallback mCallback;
     private Rules mGameRules;
     private GameState mCurrentState;
     private List<GameState> mHistory;
+
+    public void start() {
+        mClock.start(getGameRules().getStartingSide());
+    }
+
+    public void finish() {
+        mClock.stop();
+    }
 
     public UiCallback getUiCallback() {
         return mCallback;
@@ -124,6 +141,10 @@ public class Game {
         // Victory
         mCurrentState.checkVictory();
         return mCurrentState;
+    }
+
+    public void timeUpdate(Side side) {
+        mCallback.timeUpdate(side);
     }
 
     public boolean historyContainsHash(long zobrist) {

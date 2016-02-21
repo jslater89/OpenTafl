@@ -62,6 +62,7 @@ public class CommandEngine {
     public void finishGame() {
         mInGame = false;
 
+        mGame.finish();
         mAttacker.stop();
         mDefender.stop();
         mUiCallback.gameFinished();

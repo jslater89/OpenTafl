@@ -215,6 +215,11 @@ public class RawTerminal implements UiCallback {
     }
 
     @Override
+    public void timeUpdate(Side side) {
+
+    }
+
+    @Override
     public void moveResult(CommandResult result, MoveRecord move) {
         if(result.result == CommandResult.SUCCESS) {
             mMoveStatus.set(MOVE_VALID);

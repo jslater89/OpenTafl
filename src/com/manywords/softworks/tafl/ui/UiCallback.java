@@ -12,6 +12,7 @@ public interface UiCallback {
 
     public void gameStarting();
     public void awaitingMove(Player player, boolean isAttackingSide);
+    public void timeUpdate(Side side);
     public void moveResult(CommandResult result, MoveRecord move);
     public void statusText(String text);
     public void gameStateAdvanced();

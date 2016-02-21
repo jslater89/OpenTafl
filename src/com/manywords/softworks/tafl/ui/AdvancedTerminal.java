@@ -170,6 +170,11 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
     }
 
     @Override
+    public void timeUpdate(Side side) {
+
+    }
+
+    @Override
     public void moveResult(CommandResult result, MoveRecord move) {
         if(result.result == CommandResult.FAIL) {
             statusText(result.message);
