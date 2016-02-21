@@ -19,6 +19,9 @@ class GameClockTest extends TaflTest implements UiCallback {
 
     @Override
     public void run() {
+        // n.b. all times here are padded by 150 msec or so, because our tick thread
+        // only runs once per tenth-second.
+        
         // Let time run out for the starting player.
         Rules rules = Berserk.newCommanderCornerCaptureKingTest();
         mGame = new Game(rules, null, new GameClock.TimeSpec(500, 0, 0, 0));
@@ -32,7 +35,7 @@ class GameClockTest extends TaflTest implements UiCallback {
         mGame.start();
 
         try {
-            Thread.sleep(600);
+            Thread.sleep(650);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -60,7 +63,7 @@ class GameClockTest extends TaflTest implements UiCallback {
         mGame.getClock().slap(true);
 
         try {
-            Thread.sleep(600);
+            Thread.sleep(650);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -94,7 +97,7 @@ class GameClockTest extends TaflTest implements UiCallback {
         mGame.getClock().slap(true);
 
         try {
-            Thread.sleep(350);
+            Thread.sleep(400);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -124,12 +127,38 @@ class GameClockTest extends TaflTest implements UiCallback {
         assert entry.getOvertimeCount() == 1;
 
         try {
-            Thread.sleep(600);
+            Thread.sleep(650);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         // Sleeping for another 600msec pushes us past the end of the clock.
+        assert mTimeExpired;
+        assert !mSideExpiredFor.isAttackingSide();
+
+        // Test increment time adding
+        mSideExpiredFor = null;
+        mTimeExpired = false;
+        mGame = new Game(rules, null, new GameClock.TimeSpec(500, 0, 0, 250));
+        mGame.getClock().setCallback(mClockCallback);
+
+        //System.out.println("Starting test 3");
+        mGame.start();
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assert !mTimeExpired;
+
+        try {
+            Thread.sleep(350);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         assert mTimeExpired;
         assert !mSideExpiredFor.isAttackingSide();
     }
