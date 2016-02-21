@@ -2,13 +2,12 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.gui2.BasicWindow;
-import com.googlecode.lanterna.gui2.Label;
-import com.googlecode.lanterna.gui2.LinearLayout;
-import com.googlecode.lanterna.gui2.Panel;
+import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
@@ -17,11 +16,13 @@ import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
  * Created by jay on 2/15/16.
  */
 public class StatusWindow extends BasicWindow {
+    private Game mGame;
     private ScrollingLabel mTextDisplay;
-    private Label mClockDisplay;
+    private Label mAttackerClockDisplay, mDefenderClockDisplay;
     public StatusWindow(Game g, AdvancedTerminal.TerminalCallback callback) {
         super("Information");
 
+        mGame = g;
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
 
@@ -33,12 +34,18 @@ public class StatusWindow extends BasicWindow {
         Label clockLabel = new Label("Clock");
         clockLabel.addStyle(SGR.UNDERLINE);
 
-        mClockDisplay = new Label("");
+        mAttackerClockDisplay = new Label("");
+        mDefenderClockDisplay = new Label("");
+
+        Panel clockPanel = new Panel();
+        clockPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        clockPanel.addComponent(mAttackerClockDisplay);
+        clockPanel.addComponent(mDefenderClockDisplay);
 
         p.addComponent(textLabel);
         p.addComponent(mTextDisplay);
         p.addComponent(clockLabel);
-        p.addComponent(mClockDisplay);
+        p.addComponent(clockPanel);
 
         setComponent(p);
     }
@@ -49,6 +56,17 @@ public class StatusWindow extends BasicWindow {
         for(int i = 0; i < lines.length; i++) {
             mTextDisplay.addLine(lines[i]);
         }
+    }
+
+    public void handleTimeUpdate(Side side) {
+        GameClock.ClockEntry attackerEntry = mGame.getClock().getClockEntry(mGame.getGameRules().getAttackers());
+        GameClock.ClockEntry defenderEntry = mGame.getClock().getClockEntry(mGame.getGameRules().getDefenders());
+
+        String attackerString = (side.isAttackingSide() ? "ATTACKER" : "Attacker") + "\n" + attackerEntry.humanReadableString();
+        String defenderString = (side.isAttackingSide() ? "Defender" : "DEFENDER") + "\n" + defenderEntry.humanReadableString();
+
+        mAttackerClockDisplay.setText(attackerString);
+        mDefenderClockDisplay.setText(defenderString);
     }
 
     @Override

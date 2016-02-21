@@ -14,6 +14,7 @@ import com.googlecode.lanterna.terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.command.Command;
@@ -171,7 +172,7 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
 
     @Override
     public void timeUpdate(Side side) {
-
+        mStatusWindow.handleTimeUpdate(side);
     }
 
     @Override

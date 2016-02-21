@@ -7,7 +7,6 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
-        tests.add(new GameClockTest());
         tests.add(new ThreefoldDrawTest());
         tests.add(new ThreefoldVictoryTest());
         tests.add(new MoveSerializerConsistencyTest());
@@ -31,6 +30,7 @@ public class Test {
         tests.add(new BerserkMoveDuplicationTest());
         tests.add(new BadFetlarCaptureTest());
         tests.add(new BadCopenhagenCaptureTest());
+        tests.add(new GameClockTest());
         tests.add(new AIMatchingZobristTest());
         tests.add(new AICertainKingCaptureTest());
         tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
@@ -47,6 +47,7 @@ public class Test {
                 e.printStackTrace(System.out);
                 System.exit(0);
             } catch (Exception e) {
+                System.out.println("CRASHED");
                 e.printStackTrace(System.out);
                 System.exit(0);
             }

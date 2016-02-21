@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
@@ -37,7 +38,7 @@ public class MainMenuWindow extends BasicWindow {
         Button playButton = new Button("Play", new Runnable() {
             @Override
             public void run() {
-                Game g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), mTerminalCallback.getUiCallback());
+                Game g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), mTerminalCallback.getUiCallback(), new GameClock.TimeSpec(600000, 30000, 3, 0));
                 TerminalBoardImage.init(g.getGameRules().getBoard().getBoardDimension());
 
                 BoardWindow bw = new BoardWindow(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant), g, mTerminalCallback);

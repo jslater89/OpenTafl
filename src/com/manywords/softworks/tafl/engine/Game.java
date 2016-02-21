@@ -140,6 +140,10 @@ public class Game {
         mCurrentState = nextState;
         mHistory.add(currentState);
 
+        if(mClock != null) {
+            mClock.slap(advanceTurn);
+        }
+
         // Victory
         mCurrentState.checkVictory();
         return mCurrentState;

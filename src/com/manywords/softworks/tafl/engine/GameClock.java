@@ -3,6 +3,8 @@ package com.manywords.softworks.tafl.engine;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 
+import java.time.LocalTime;
+
 /**
  * Created by jay on 2/20/16.
  */
@@ -51,11 +53,11 @@ public class GameClock {
 
         if(startingSide.isAttackingSide()) {
             mCurrentPlayer = ATTACKERS;
-            return new ClockEntry(mClocks[ATTACKERS]);
+            return mClocks[ATTACKERS];
         }
         else {
             mCurrentPlayer = DEFENDERS;
-            return new ClockEntry(mClocks[DEFENDERS]);
+            return mClocks[DEFENDERS];
         }
     }
 
@@ -84,12 +86,12 @@ public class GameClock {
             }
         }
         mCallback.timeUpdate(mClocks[mCurrentPlayer].mSide);
-        return new ClockEntry(mClocks[mCurrentPlayer]);
+        return mClocks[mCurrentPlayer];
     }
 
     public ClockEntry getClockEntry(Side side) {
-        if(side.isAttackingSide()) return new ClockEntry(mClocks[ATTACKERS]);
-        else return new ClockEntry(mClocks[DEFENDERS]);
+        if(side.isAttackingSide()) return mClocks[ATTACKERS];
+        else return mClocks[DEFENDERS];
     }
 
     private void updateClocks() {
@@ -187,7 +189,7 @@ public class GameClock {
         private GameClock mGameClock;
         private Side mSide;
         private long mMainTimeMillis;
-        private long mOvertimeMillis                ;
+        private long mOvertimeMillis;
         private int mOvertimeCount;
 
         public ClockEntry(GameClock clock, Side side, long mainTime, long overtimeTime, int overtimeCount) {
@@ -196,14 +198,6 @@ public class GameClock {
             mMainTimeMillis = mainTime;
             mOvertimeMillis = overtimeTime;
             mOvertimeCount = overtimeCount;
-        }
-
-        public ClockEntry(ClockEntry copyFrom) {
-            mGameClock = copyFrom.mGameClock;
-            mSide = copyFrom.mSide;
-            mMainTimeMillis = copyFrom.mMainTimeMillis;
-            mOvertimeMillis = copyFrom.mOvertimeMillis;
-            mOvertimeCount = copyFrom.mOvertimeCount;
         }
 
         public GameClock getClock() {
@@ -221,6 +215,28 @@ public class GameClock {
         public String toString() {
             String result = "";
             result += (mSide.isAttackingSide() ? "Attacker clock " : "Defender clock ") + mMainTimeMillis / 1000d + " " + mOvertimeMillis / 1000d + "/" + mOvertimeCount;
+            return result;
+        }
+
+        public String humanReadableString() {
+            int mainTimeSeconds = (int) mMainTimeMillis / 1000;
+            int overtimeSeconds = (int) mOvertimeMillis / 1000;
+
+            int hours = mainTimeSeconds / 3600;
+            int minutes = (mainTimeSeconds % 3600) / 60;
+            int seconds = (mainTimeSeconds % 3600) % 60;
+            String m = (minutes > 10 ? "" + minutes : "0" + minutes);
+            String s = (seconds > 10 ? "" + seconds : "0" + seconds);
+            String mainTime = hours + ":" + m + ":" + s;
+
+            hours = overtimeSeconds / 3600;
+            minutes = (overtimeSeconds % 3600) / 60;
+            seconds = (overtimeSeconds % 3600) % 60;
+            m = (minutes >= 10 ? "" + minutes : "0" + minutes);
+            s = (seconds >= 10 ? "" + seconds : "0" + seconds);
+            String overtimeTime = hours + ":" + m + ":" + s;
+
+            String result = mainTime + " " + overtimeTime + "/" + mOvertimeCount;
             return result;
         }
     }
