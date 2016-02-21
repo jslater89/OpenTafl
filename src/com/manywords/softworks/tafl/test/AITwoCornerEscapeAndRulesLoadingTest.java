@@ -29,6 +29,11 @@ class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements UiCallbac
     }
 
     @Override
+    public void timeUpdate(Side side) {
+
+    }
+
+    @Override
     public void moveResult(CommandResult result, MoveRecord move) {
 
     }

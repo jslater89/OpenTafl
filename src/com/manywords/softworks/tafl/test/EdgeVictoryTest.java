@@ -24,6 +24,11 @@ class EdgeVictoryTest extends TaflTest implements UiCallback {
     }
 
     @Override
+    public void timeUpdate(Side side) {
+
+    }
+
+    @Override
     public void moveResult(CommandResult result, MoveRecord move) {
 
     }
