@@ -1,9 +1,11 @@
 package com.manywords.softworks.tafl.ui.command;
 
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Coord;
+import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -32,7 +34,9 @@ public class CommandEngine {
     }
 
     public void startGame() {
-        mInGame = true;
+        if(mGame.getClock() != null) {
+            mGame.getClock().setCallback(mClockCallback);
+        }
 
         mThinkTime = TerminalSettings.aiThinkTime;
         mAttacker.setCallback(mMoveCallback);
@@ -44,7 +48,9 @@ public class CommandEngine {
             mCurrentPlayer = mDefender;
         }
 
+        mInGame = true;
         mUiCallback.gameStarting();
+        mGame.start();
         waitForNextMove();
     }
 
@@ -67,6 +73,26 @@ public class CommandEngine {
         mDefender.stop();
         mUiCallback.gameFinished();
     }
+
+    private final GameClock.GameClockCallback mClockCallback = new GameClock.GameClockCallback() {
+        @Override
+        public void timeUpdate(Side currentSide) {
+            mUiCallback.timeUpdate(currentSide);
+        }
+
+        @Override
+        public void timeExpired(Side currentSide) {
+            mUiCallback.statusText("Time expired!");
+            if(currentSide.isAttackingSide()) {
+                mUiCallback.victoryForSide(mGame.getCurrentState().getDefenders());
+            }
+            else {
+                mUiCallback.victoryForSide(mGame.getCurrentState().getAttackers());
+            }
+
+            finishGame();
+        }
+    };
 
     private final Player.MoveCallback mMoveCallback = new Player.MoveCallback() {
 

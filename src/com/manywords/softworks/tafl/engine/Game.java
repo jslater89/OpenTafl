@@ -73,6 +73,8 @@ public class Game {
         return mCallback;
     }
 
+    public GameClock getClock() { return mClock; }
+
     public void setUiCallback(UiCallback mCallback) {
         this.mCallback = mCallback;
     }
@@ -141,10 +143,6 @@ public class Game {
         // Victory
         mCurrentState.checkVictory();
         return mCurrentState;
-    }
-
-    public void timeUpdate(Side side) {
-        mCallback.timeUpdate(side);
     }
 
     public boolean historyContainsHash(long zobrist) {

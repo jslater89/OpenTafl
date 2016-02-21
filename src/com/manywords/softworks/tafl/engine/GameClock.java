@@ -13,6 +13,8 @@ public class GameClock {
     private final long mOvertimeMillis;
     private final long mOvertimeCount;
 
+    private GameClockCallback mCallback;
+
     private UpdateThread mUpdateThread;
     private boolean mOutOfTime = false;
 
@@ -38,17 +40,22 @@ public class GameClock {
         mClocks[DEFENDERS] = new ClockEntry(this, defenders, mainTime, overtimeTime, overtimeCount);
     }
 
+    public void setCallback(GameClockCallback callback) {
+        mCallback = callback;
+    }
+
     public ClockEntry start(Side startingSide) {
+        mLastStartTime = System.currentTimeMillis();
         mUpdateThread = new UpdateThread();
         mUpdateThread.start();
 
         if(startingSide.isAttackingSide()) {
             mCurrentPlayer = ATTACKERS;
-            return mClocks[ATTACKERS];
+            return new ClockEntry(mClocks[ATTACKERS]);
         }
         else {
             mCurrentPlayer = DEFENDERS;
-            return mClocks[DEFENDERS];
+            return new ClockEntry(mClocks[DEFENDERS]);
         }
     }
 
@@ -76,31 +83,13 @@ public class GameClock {
                 clock.mOvertimeMillis = mOvertimeMillis + mIncrementMillis;
             }
         }
-        mGame.timeUpdate(mClocks[mCurrentPlayer].mSide);
-        return mClocks[mCurrentPlayer];
+        mCallback.timeUpdate(mClocks[mCurrentPlayer].mSide);
+        return new ClockEntry(mClocks[mCurrentPlayer]);
     }
 
-    private class UpdateThread extends Thread {
-        private boolean mRunning = true;
-        private static final int UPDATE_INTERVAL = 100;
-
-        @Override
-        public void run() {
-            while(mRunning) {
-                try {
-                    Thread.sleep(UPDATE_INTERVAL);
-                } catch (InterruptedException e) {
-                    // no-op
-                }
-
-                updateClocks();
-                mGame.timeUpdate(mClocks[mCurrentPlayer].mSide);
-            }
-        }
-
-        public void cancel() {
-            mRunning = false;
-        }
+    public ClockEntry getClockEntry(Side side) {
+        if(side.isAttackingSide()) return new ClockEntry(mClocks[ATTACKERS]);
+        else return new ClockEntry(mClocks[DEFENDERS]);
     }
 
     private void updateClocks() {
@@ -123,6 +112,8 @@ public class GameClock {
             else {
                 leftover = elapsed;
             }
+
+            if(leftover == 0) return;
 
             if (currentEntry.mOvertimeMillis > 0 && currentEntry.mOvertimeCount > 0) {
                 currentEntry.mOvertimeMillis -= leftover;
@@ -147,18 +138,56 @@ public class GameClock {
         }
     }
 
+    private class UpdateThread extends Thread {
+        private boolean mRunning = true;
+        private static final int UPDATE_INTERVAL = 100;
+
+        @Override
+        public void run() {
+            while(mRunning) {
+                try {
+                    Thread.sleep(UPDATE_INTERVAL);
+                } catch (InterruptedException e) {
+                    // no-op
+                }
+
+                updateClocks();
+                mCallback.timeUpdate(mClocks[mCurrentPlayer].mSide);
+                if(mOutOfTime) {
+                    mCallback.timeExpired(mClocks[mCurrentPlayer].mSide);
+                }
+            }
+        }
+
+        public void cancel() {
+            mRunning = false;
+        }
+    }
+
     public static class TimeSpec {
         long mainTime = 0;
         long overtimeTime = 0;
         int overtimeCount = 0;
         long incrementTime = 0;
+
+        public TimeSpec(long mainTime, long overtimeTime, int overtimeCount, long incrementTime) {
+            this.mainTime = mainTime;
+            this.overtimeTime = overtimeTime;
+            this.overtimeCount = overtimeCount;
+            this.incrementTime = incrementTime;
+        }
+    }
+
+    public interface GameClockCallback {
+        public void timeUpdate(Side currentSide);
+        public void timeExpired(Side currentSide);
     }
 
     public static class ClockEntry {
         private GameClock mGameClock;
         private Side mSide;
         private long mMainTimeMillis;
-        private long mOvertimeMillis;
+        private long mOvertimeMillis                ;
         private int mOvertimeCount;
 
         public ClockEntry(GameClock clock, Side side, long mainTime, long overtimeTime, int overtimeCount) {
@@ -167,6 +196,14 @@ public class GameClock {
             mMainTimeMillis = mainTime;
             mOvertimeMillis = overtimeTime;
             mOvertimeCount = overtimeCount;
+        }
+
+        public ClockEntry(ClockEntry copyFrom) {
+            mGameClock = copyFrom.mGameClock;
+            mSide = copyFrom.mSide;
+            mMainTimeMillis = copyFrom.mMainTimeMillis;
+            mOvertimeMillis = copyFrom.mOvertimeMillis;
+            mOvertimeCount = copyFrom.mOvertimeCount;
         }
 
         public GameClock getClock() {
@@ -179,6 +216,12 @@ public class GameClock {
 
         public int getOvertimeCount() {
             return mOvertimeCount;
+        }
+
+        public String toString() {
+            String result = "";
+            result += (mSide.isAttackingSide() ? "Attacker clock " : "Defender clock ") + mMainTimeMillis / 1000d + " " + mOvertimeMillis / 1000d + "/" + mOvertimeCount;
+            return result;
         }
     }
 }

@@ -7,6 +7,7 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
+        tests.add(new GameClockTest());
         tests.add(new ThreefoldDrawTest());
         tests.add(new ThreefoldVictoryTest());
         tests.add(new MoveSerializerConsistencyTest());
@@ -38,10 +39,11 @@ public class Test {
 
         for (TaflTest test : tests) {
             try {
+                System.out.print(test.getClass().getSimpleName() + ": ");
                 test.run();
-                System.out.println(test.getClass().getSimpleName() + ": passed");
+                System.out.println("passed");
             } catch (AssertionError e) {
-                System.out.println(test.getClass().getSimpleName() + ": FAILED");
+                System.out.println("FAILED");
                 e.printStackTrace(System.out);
                 System.exit(0);
             } catch (Exception e) {
