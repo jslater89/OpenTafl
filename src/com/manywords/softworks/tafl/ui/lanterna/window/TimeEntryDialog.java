@@ -40,10 +40,10 @@ public class TimeEntryDialog extends DialogWindow {
         final Button finishButton = new Button("OK", new Runnable() {
             @Override
             public void run() {
-                long mainTimeMillis = Integer.parseInt(mainTimeInput.getText()) * 1000;
-                long overtimeTimeMillis = Integer.parseInt(overtimeInput.getText()) * 1000;
-                int overtimeCount = Integer.parseInt(overtimeCountInput.getText());
-                long incrementTimeMillis = Integer.parseInt(incrementTimeInput.getText()) * 1000;
+                long mainTimeMillis = Integer.parseInt(mainTimeInput.getTextOrDefault("0")) * 1000;
+                long overtimeTimeMillis = Integer.parseInt(overtimeInput.getTextOrDefault("0")) * 1000;
+                int overtimeCount = Integer.parseInt(overtimeCountInput.getTextOrDefault("0"));
+                long incrementTimeMillis = Integer.parseInt(incrementTimeInput.getTextOrDefault("0")) * 1000;
 
                 GameClock.TimeSpec ts = new GameClock.TimeSpec(mainTimeMillis, overtimeTimeMillis, overtimeCount, incrementTimeMillis);
                 TerminalSettings.timeSpec = ts;

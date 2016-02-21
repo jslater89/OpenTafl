@@ -21,7 +21,7 @@ class GameClockTest extends TaflTest implements UiCallback {
     public void run() {
         // n.b. all times here are padded by 150 msec or so, because our tick thread
         // only runs once per tenth-second.
-        
+
         // Let time run out for the starting player.
         Rules rules = Berserk.newCommanderCornerCaptureKingTest();
         mGame = new Game(rules, null, new GameClock.TimeSpec(500, 0, 0, 0));
