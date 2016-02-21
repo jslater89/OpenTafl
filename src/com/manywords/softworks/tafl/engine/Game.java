@@ -62,11 +62,15 @@ public class Game {
     private List<GameState> mHistory;
 
     public void start() {
-        mClock.start(getGameRules().getStartingSide());
+        if(mClock != null) {
+            mClock.start(getGameRules().getStartingSide());
+        }
     }
 
     public void finish() {
-        mClock.stop();
+        if(mClock != null) {
+            mClock.stop();
+        }
     }
 
     public UiCallback getUiCallback() {

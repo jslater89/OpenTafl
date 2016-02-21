@@ -38,7 +38,15 @@ public class MainMenuWindow extends BasicWindow {
         Button playButton = new Button("Play", new Runnable() {
             @Override
             public void run() {
-                Game g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), mTerminalCallback.getUiCallback(), new GameClock.TimeSpec(600000, 30000, 3, 0));
+                GameClock.TimeSpec ts = TerminalSettings.timeSpec;
+                Game g;
+                if(ts.mainTime == 0 && (ts.overtimeTime == 0 ||ts.overtimeCount == 0)) {
+                    g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), mTerminalCallback.getUiCallback());
+                }
+                else {
+                    g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), mTerminalCallback.getUiCallback(), ts);
+                }
+
                 TerminalBoardImage.init(g.getGameRules().getBoard().getBoardDimension());
 
                 BoardWindow bw = new BoardWindow(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant), g, mTerminalCallback);

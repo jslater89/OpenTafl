@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
+import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
@@ -83,6 +84,17 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(aiDepth);
 
+        Button clockSettingSelect = new Button("Clock setting", new Runnable() {
+            @Override
+            public void run() {
+                showTimeSpecDialog();
+            }
+        });
+        Label clockSettingLabel = new Label(TerminalSettings.timeSpec.toString());
+        optionsPanel.addComponent(clockSettingSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(clockSettingLabel);
+
         Button backButton = new Button("Back", new Runnable() {
             @Override
             public void run() {
@@ -101,6 +113,12 @@ public class OptionsMenuWindow extends BasicWindow {
 
     private EmptySpace newSpacer() {
         return new EmptySpace(new TerminalSize(4, 0));
+    }
+
+    private void showTimeSpecDialog() {
+        new TimeEntryDialog("Clock settings").showDialog(getTextGUI());
+
+        refreshSettings();
     }
 
     private void showAiDepthEntryDialog() {

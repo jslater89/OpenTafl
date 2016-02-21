@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.ui.lanterna.settings;
 
+import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.ui.player.Player;
 
 import java.io.File;
@@ -22,6 +23,8 @@ public class TerminalSettings {
     public static int aiThinkTime = 10;
 
     public static int variant = 1;
+
+    public static GameClock.TimeSpec timeSpec = new GameClock.TimeSpec(0, 0, 0, 0);
 
     public static String labelForPlayerType(int i) {
         switch(i) {

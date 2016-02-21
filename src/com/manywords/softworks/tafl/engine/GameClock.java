@@ -53,12 +53,13 @@ public class GameClock {
 
         if(startingSide.isAttackingSide()) {
             mCurrentPlayer = ATTACKERS;
-            return mClocks[ATTACKERS];
         }
         else {
             mCurrentPlayer = DEFENDERS;
-            return mClocks[DEFENDERS];
         }
+
+        mClocks[mCurrentPlayer].mMainTimeMillis += mIncrementMillis;
+        return mClocks[ATTACKERS];
     }
 
     public void stop() {
@@ -167,16 +168,20 @@ public class GameClock {
     }
 
     public static class TimeSpec {
-        long mainTime = 0;
-        long overtimeTime = 0;
-        int overtimeCount = 0;
-        long incrementTime = 0;
+        public long mainTime = 0;
+        public long overtimeTime = 0;
+        public int overtimeCount = 0;
+        public long incrementTime = 0;
 
         public TimeSpec(long mainTime, long overtimeTime, int overtimeCount, long incrementTime) {
             this.mainTime = mainTime;
             this.overtimeTime = overtimeTime;
             this.overtimeCount = overtimeCount;
             this.incrementTime = incrementTime;
+        }
+
+        public String toString() {
+            return mainTime / 1000 + " " + overtimeTime / 1000 + "/" + overtimeCount + " " + incrementTime / 1000 + "i";
         }
     }
 
