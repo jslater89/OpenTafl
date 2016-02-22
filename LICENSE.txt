@@ -1,6 +1,6 @@
 Copyright Jay Slater, 2014-
 
-OpenTafl is licensed under the Stout Free-As-In-Beer License (http://softworks.many-words.com/the-free-as-in-beer-license), and is a product of Jay Slater and Many Words Softworks:
+OpenTafl is licensed under the Stout Free-As-In-Beer License (http://softworks.many-words.com/the-free-as-in-beer-license), and is a product of Jay Slater and Many Words Softworks.
 
 Stout Free-As-In-Beer License, v0.4:
 
@@ -162,6 +162,7 @@ conditions.
 ##############################################################
 
 JLine is provided under the BSD license:
+http://jline.sourceforge.net/
 
 Copyright (c) 2002-2006, Marc Prud'hommeaux <mwp1@cornell.edu>
 All rights reserved.
@@ -199,8 +200,28 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 ##############################################################
 
 lanterna is provided under the GNU LGPL:
+https://github.com/mabe02/lanterna
 
 - http://www.gnu.org/licenses/gpl.txt
 - http://www.gnu.org/licenses/lgpl.txt
+
+##############################################################
+
+ini4j is provided under the Apache 2.0 license:
+http://ini4j.sourceforge.net/
+
+Copyright 2005,2009 Ivan SZKIBA
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 ##############################################################

@@ -86,19 +86,35 @@ public class AiWorkspace extends Game {
 
         int movesMade = g.getHistory().size() / 2;
         int movesLeft = mainTimeMoves - movesMade;
+        long mainTime = g.getClock().getMainTime();
         long overtimeTime = g.getClock().getOvertimeTime();
         long overtimeCount = g.getClock().getOvertimeCount();
+        long incrementTime = g.getClock().getIncrementTime();
 
 
         GameClock.ClockEntry entry = g.getClock().getClockEntry(g.getCurrentState().getCurrentSide());
 
         if(overtimeCount == 0 || overtimeTime == 0) {
-            // If we don't have overtimes, do a fixed proportion of whatever we have left.
-            return entry.getMainTime() / mainTimeMoves;
+            if(movesMade < mainTimeMoves / 2) {
+                // Opening game: use 5% of the time
+                long openingTime = (long) (mainTime * 0.05);
+                return openingTime / (mainTimeMoves / 2) + (long)(incrementTime * 0.9);
+            }
+            else if (entry.getMainTime() > mainTime * 0.2) {
+                // Midgame: expect to make about mainTimeMoves for the next 75% of the time.
+                long midgameTime = (long) (mainTime * 0.75);
+                return midgameTime / (mainTimeMoves) + (long)(incrementTime * 0.9);
+            }
+            else {
+                // Endgame: use a constant portion of the main time, until that turns out to be three seconds,
+                // then just use three seconds and hope we're close enough to a win to make that work.
+                long remainingTime = entry.getMainTime() / mainTimeMoves;
+                return Math.max(remainingTime, 3);
+            }
         }
         else {
-            // If we do have overtime, work out the time we have left per move, and return overtime length
-            // otherwise.
+            // If we do have overtime, work out the time we have left per main time move and return that. Otherwise
+            // return the overtime time.
             long mainTimeRemaining = entry.getMainTime();
             long timePerMove = mainTimeRemaining / movesLeft;
             if(movesLeft > 0 && mainTimeRemaining + overtimeTime > timePerMove) {
