@@ -13,7 +13,7 @@ public class GameClock {
     private final long mMainTimeMillis;
     private final long mIncrementMillis;
     private final long mOvertimeMillis;
-    private final long mOvertimeCount;
+    private final int mOvertimeCount;
 
     private GameClockCallback mCallback;
 
@@ -88,6 +88,22 @@ public class GameClock {
         }
         mCallback.timeUpdate(mClocks[mCurrentPlayer].mSide);
         return mClocks[mCurrentPlayer];
+    }
+
+    public long getMainTime() {
+        return mMainTimeMillis;
+    }
+
+    public long getOvertimeTime() {
+        return mOvertimeMillis;
+    }
+
+    public int getOvertimeCount() {
+        return mOvertimeCount;
+    }
+
+    public long getIncrementTime() {
+        return mIncrementMillis;
     }
 
     public ClockEntry getClockEntry(Side side) {

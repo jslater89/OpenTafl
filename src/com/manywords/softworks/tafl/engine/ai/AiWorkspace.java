@@ -1,11 +1,11 @@
 package com.manywords.softworks.tafl.engine.ai;
 
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
-import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.text.DecimalFormat;
@@ -35,6 +35,7 @@ public class AiWorkspace extends Game {
      * In milliseconds
      */
     private long mThinkTime = -1;
+    private long mMaxThinkTime = -1;
 
     public boolean mNoTime = false;
     public boolean mExtensionTime = false;
@@ -67,7 +68,47 @@ public class AiWorkspace extends Game {
     }
 
     private long planTimeUsage(Game g) {
-        return 10000;
+        // We Math.min the return from this with the requested think time
+        if(g.getClock() == null) return Long.MAX_VALUE;
+
+        int boardDimension = g.getGameRules().boardSize;
+
+        // Aim to make a certain number of moves in main time, using overtimes
+        // for the rest.
+        int mainTimeMoves;
+        if(boardDimension == 7) {
+            mainTimeMoves = 6;
+        }
+        else if(boardDimension == 9) {
+            mainTimeMoves = 10;
+        }
+        else mainTimeMoves = 20;
+
+        int movesMade = g.getHistory().size() / 2;
+        int movesLeft = mainTimeMoves - movesMade;
+        long overtimeTime = g.getClock().getOvertimeTime();
+        long overtimeCount = g.getClock().getOvertimeCount();
+
+
+        GameClock.ClockEntry entry = g.getClock().getClockEntry(g.getCurrentState().getCurrentSide());
+
+        if(overtimeCount == 0 || overtimeTime == 0) {
+            // If we don't have overtimes, do a fixed proportion of whatever we have left.
+            return entry.getMainTime() / mainTimeMoves;
+        }
+        else {
+            // If we do have overtime, work out the time we have left per move, and return overtime length
+            // otherwise.
+            long mainTimeRemaining = entry.getMainTime();
+            long timePerMove = mainTimeRemaining / movesLeft;
+            if(movesLeft > 0 && mainTimeRemaining + overtimeTime > timePerMove) {
+                return timePerMove;
+            }
+            else {
+                //TODO: use multiple overtimes to think about harder positions
+                return mainTimeRemaining + overtimeTime;
+            }
+        }
     }
 
     private boolean canDoDeeperSearch(int nextDepth) {
@@ -83,19 +124,14 @@ public class AiWorkspace extends Game {
         return timeLeft < (long) Math.min(mThinkTime * 0.05, 250);
     }
 
-    public void explore(int thinkTime) {
-        if(thinkTime == 0) {
-            mThinkTime = -1;
-        }
-        else {
-            mThinkTime = thinkTime * 1000;
-        }
+    public void explore(int maxThinkTime) {
+        mMaxThinkTime = maxThinkTime * 1000;
 
         mStartTime = System.currentTimeMillis();
         int maxDepth = 10;
-        if(mThinkTime == -1) {
-            mThinkTime = planTimeUsage(mGame);
-        }
+
+        mThinkTime = Math.min(planTimeUsage(mGame), mMaxThinkTime);
+        mUiCallback.statusText("Using " + mThinkTime + "msec");
 
         //mThreadPool.start();
         Timer t = new Timer();
