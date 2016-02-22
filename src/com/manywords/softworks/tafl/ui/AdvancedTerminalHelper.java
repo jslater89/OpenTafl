@@ -42,7 +42,7 @@ import java.util.List;
 /**
  * Created by jay on 2/15/16.
  */
-public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
+public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     public interface TerminalCallback {
         public void onMenuNavigation(Window destination);
         public void onEnteringGame(Game g, BoardWindow bw, StatusWindow sw, CommandWindow cw);
@@ -51,6 +51,8 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
 
         public UiCallback getUiCallback();
     }
+
+    private T mTerminal;
 
     private MultiWindowTextGUI mGui;
 
@@ -64,15 +66,20 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
 
     private boolean mInGame;
 
-    public AdvancedTerminal() {
+    public AdvancedTerminalHelper(T terminal) {
         super();
-        setTitle("OpenTafl");
-        setSize(1024, 768);
-        setResizable(true);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setVisible(true);
-        addResizeListener(new ResizeListener() {
+        mTerminal = terminal;
+
+        if(terminal instanceof SwingTerminalFrame) {
+            SwingTerminalFrame stf = (SwingTerminalFrame) terminal;
+            stf.setTitle("OpenTafl");
+            stf.setSize(1024, 768);
+            stf.setResizable(true);
+            stf.setLocationRelativeTo(null);
+            stf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            stf.setVisible(true);
+        }
+        mTerminal.addResizeListener(new ResizeListener() {
             @Override
             public void onResized(Terminal terminal, TerminalSize terminalSize) {
                 layoutGameWindows(terminalSize);
@@ -81,12 +88,18 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
 
         Screen s = null;
         try {
-            s = new TerminalScreen(this);
+            s = new TerminalScreen(mTerminal);
             s.startScreen();
         }
         catch(IOException e) {
             System.out.println("Failed to start");
             System.exit(0);
+        }
+
+        try {
+            mTerminal.enterPrivateMode();
+        } catch (IOException e) {
+            // Best effort
         }
 
         TerminalSettings.loadFromFile();
@@ -248,6 +261,13 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
         @Override
         public void onMenuNavigation(Window destination) {
             if(destination == null) {
+
+                try {
+                    mTerminal.exitPrivateMode();
+                } catch (IOException e) {
+                    // Best effort
+                }
+
                 TerminalSettings.savetoFile();
                 System.exit(0);
             }
@@ -275,7 +295,7 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
                 @Override
                 public void run() {
                     mGame = g;
-                    mCommandEngine = new CommandEngine(g, AdvancedTerminal.this, TerminalSettings.getNewPlayer(TerminalSettings.attackers), TerminalSettings.getNewPlayer(TerminalSettings.defenders));
+                    mCommandEngine = new CommandEngine(g, AdvancedTerminalHelper.this, TerminalSettings.getNewPlayer(TerminalSettings.attackers), TerminalSettings.getNewPlayer(TerminalSettings.defenders));
                     mCommandEngine.startGame();
                 }
             });
@@ -361,7 +381,7 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
 
         @Override
         public UiCallback getUiCallback() {
-            return AdvancedTerminal.this;
+            return AdvancedTerminalHelper.this;
         }
     };
 }

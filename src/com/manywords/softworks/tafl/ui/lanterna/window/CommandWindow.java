@@ -4,16 +4,16 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalEnterTerminatedTextBox;
 
 /**
  * Created by jay on 2/15/16.
  */
 public class CommandWindow extends BasicWindow {
-    private AdvancedTerminal.TerminalCallback mCallback;
+    private AdvancedTerminalHelper.TerminalCallback mCallback;
     private TerminalEnterTerminatedTextBox mTextBox;
-    public CommandWindow(Game g, AdvancedTerminal.TerminalCallback callback) {
+    public CommandWindow(Game g, AdvancedTerminalHelper.TerminalCallback callback) {
         super("Command");
         mCallback = callback;
 

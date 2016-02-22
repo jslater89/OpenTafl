@@ -8,9 +8,8 @@ import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
-import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
 /**
  * Created by jay on 2/15/16.
@@ -19,7 +18,7 @@ public class StatusWindow extends BasicWindow {
     private Game mGame;
     private ScrollingLabel mTextDisplay;
     private Label mAttackerClockDisplay, mDefenderClockDisplay;
-    public StatusWindow(Game g, AdvancedTerminal.TerminalCallback callback) {
+    public StatusWindow(Game g, AdvancedTerminalHelper.TerminalCallback callback) {
         super("Information");
 
         mGame = g;

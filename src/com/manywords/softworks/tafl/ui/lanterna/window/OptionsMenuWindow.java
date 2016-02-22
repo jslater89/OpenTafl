@@ -7,7 +7,7 @@ import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
-import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.math.BigInteger;
@@ -17,8 +17,8 @@ import java.util.List;
  * Created by jay on 2/15/16.
  */
 public class OptionsMenuWindow extends BasicWindow {
-    private AdvancedTerminal.TerminalCallback mTerminalCallback;
-    public OptionsMenuWindow(AdvancedTerminal.TerminalCallback callback) {
+    private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
+    public OptionsMenuWindow(AdvancedTerminalHelper.TerminalCallback callback) {
         mTerminalCallback = callback;
 
         refreshSettings();

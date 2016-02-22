@@ -5,18 +5,16 @@ import com.googlecode.lanterna.gui2.*;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
-import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
-import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
-import com.manywords.softworks.tafl.ui.lanterna.component.TerminalImagePanel;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 /**
  * Created by jay on 2/15/16.
  */
 public class MainMenuWindow extends BasicWindow {
-    private AdvancedTerminal.TerminalCallback mTerminalCallback;
-    public MainMenuWindow(AdvancedTerminal.TerminalCallback callback) {
+    private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
+    public MainMenuWindow(AdvancedTerminalHelper.TerminalCallback callback) {
         mTerminalCallback = callback;
 
         Panel p = new Panel();

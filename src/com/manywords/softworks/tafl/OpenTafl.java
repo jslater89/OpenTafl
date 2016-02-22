@@ -1,10 +1,13 @@
 package com.manywords.softworks.tafl;
 
+import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.test.Test;
-import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +35,12 @@ public class OpenTafl {
         }
 
         if(advanced) {
-            AdvancedTerminal t = new AdvancedTerminal();
+            DefaultTerminalFactory factory = new DefaultTerminalFactory();
+            Terminal t = null;
+
+            t = factory.createSwingTerminal();
+
+            AdvancedTerminalHelper<? extends Terminal> th = new AdvancedTerminalHelper<>(t);
         }
         else if (window) {
             SwingWindow w = new SwingWindow();
@@ -40,7 +48,6 @@ public class OpenTafl {
         else {
             RawTerminal display = new RawTerminal();
             display.runUi();
-            System.exit(0);
         }
     }
 

@@ -1,8 +1,11 @@
 package com.manywords.softworks.tafl;
 
-import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class Debug {
@@ -19,12 +22,26 @@ public class Debug {
         RawTerminal.renderBoard(b);
         */
 
+        DefaultTerminalFactory factory = new DefaultTerminalFactory();
+        Terminal t = null;
+
         if(args.size() == 1) {
-            AdvancedTerminal t = new AdvancedTerminal();
+            t = factory.createSwingTerminal();
         }
         else {
-            RawTerminal display = new RawTerminal();
-            display.runUi();
+            factory.setForceTextTerminal(true);
+            try {
+                t = factory.createTerminal();
+            } catch(IOException e) {
+                System.out.println("Unable to start.");
+            }
+        }
+
+        if(t != null) {
+            AdvancedTerminalHelper<? extends Terminal> th = new AdvancedTerminalHelper<>(t);
+        }
+        else {
+            System.out.println("Exiting");
         }
 
 		/*
