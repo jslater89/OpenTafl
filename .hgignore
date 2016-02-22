@@ -3,6 +3,7 @@ syntax: glob
 OpenTafl.jar
 OpenTafl.zip
 hprof.txt
+settings.ini
 bin*
 .settings*
 profile*

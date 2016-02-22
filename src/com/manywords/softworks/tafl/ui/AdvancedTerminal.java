@@ -88,6 +88,9 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
             System.out.println("Failed to start");
             System.exit(0);
         }
+
+        TerminalSettings.loadFromFile();
+
         mGui = new MultiWindowTextGUI(s, new DefaultWindowManager(new TerminalWindowDecorationRenderer()), new TerminalWindowPostRenderer(), new EmptySpace(TextColor.ANSI.BLACK));
         mGui.setTheme(new TerminalTheme());
         Window mainMenuWindow = new MainMenuWindow(mTerminalCallback);
@@ -244,7 +247,10 @@ public class AdvancedTerminal extends SwingTerminalFrame implements UiCallback {
     private TerminalCallback mTerminalCallback = new TerminalCallback() {
         @Override
         public void onMenuNavigation(Window destination) {
-            if(destination == null) System.exit(0);
+            if(destination == null) {
+                TerminalSettings.savetoFile();
+                System.exit(0);
+            }
 
             mGui.removeWindow(mGui.getActiveWindow());
             destination.setHints(TerminalThemeConstants.CENTERED);
