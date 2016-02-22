@@ -8,6 +8,8 @@ third-party AI engines, among others.
 
 You can follow the development of OpenTafl at soapbox.manywords.press/tag/tafl.
 
+You can find the latest version of OpenTafl at softworks.manywords.press/opentafl.
+
 2. How-to
 Run the OpenTafl script file corresponding to your platform:
 OpenTafl32.bat (Windows, 32-bit java)
@@ -21,7 +23,38 @@ java -version
 
 If you see '64-bit' in the output from that command, you have 64-bit Java.
 
-3. Version history
+3. The game clock
+Since there are no conventions for how to time tafl games, I've invented a few
+of my own. The game clock in OpenTafl comprises a sudden-death main time, go-
+style byo-yomi overtimes, and a Fisher increment. These function as follows:
+
+    - Main time: when the main time expires, provided there are no overtimes
+      configured, the game is over, and the player whose time expired loses.
+    - Overtime: each player receives a certain number of overtime periods.
+      If a player makes a move before an overtime period expires, the overtime
+      period refills at the start of his next turn. Only when a player uses a
+      full overtime does his stock of overtime periods decrease.
+    - Increment: at the start of each turn, the increment is added to
+      whichever form of timing is currently active. The increment, when applied
+      to main time, can increase the amount of main time remaining above its
+      starting value. Overtime periods always start at the overtime period
+      length plus the increment, and can never be longer than that.
+
+These options provide a fair amount of flexibility in terms of timing, and
+can be combined in interesting ways. (A quick-play game might use overtime
+exclusively, for instance.) Please try several things and let me know what
+works best for you.
+
+4. Version history
+
+v0.1.9b (released xx/xx/xx):
+- Implement game clock, along with AI time usage features
+- Save settings between runs (OpenTafl creates settings.ini in the working
+  directory)
+- Genericize Lanterna-based terminal UI, so it can theoretically run in any
+  terminal supported by Lanterna (note: it doesn't work for me in gnome-
+  terminal, and for portability, Lanterna's Swing terminal emulator remains
+  the default)
 
 v0.1.8b (released 02/20/16):
 - Speed and memory usage improvements
