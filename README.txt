@@ -45,6 +45,10 @@ can be combined in interesting ways. (A quick-play game might use overtime
 exclusively, for instance.) Please try several things and let me know what
 works best for you.
 
+Note that the AI search time setting supercedes the AI's time usage planning—
+you can use the search time to cap the AI's thinking time, and thereby set
+its difficulty.
+
 4. Version history
 
 v0.1.9b (released xx/xx/xx):

@@ -246,8 +246,8 @@ public class GameClock {
             int hours = mainTimeSeconds / 3600;
             int minutes = (mainTimeSeconds % 3600) / 60;
             int seconds = (mainTimeSeconds % 3600) % 60;
-            String m = (minutes > 10 ? "" + minutes : "0" + minutes);
-            String s = (seconds > 10 ? "" + seconds : "0" + seconds);
+            String m = (minutes >= 10 ? "" + minutes : "0" + minutes);
+            String s = (seconds >= 10 ? "" + seconds : "0" + seconds);
             String mainTime = hours + ":" + m + ":" + s;
 
             hours = overtimeSeconds / 3600;
