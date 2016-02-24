@@ -96,11 +96,13 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             System.exit(0);
         }
 
+        /* crashes bash?
         try {
             mTerminal.enterPrivateMode();
         } catch (IOException e) {
             // Best effort
         }
+        */
 
         TerminalSettings.loadFromFile();
 
@@ -262,11 +264,13 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         public void onMenuNavigation(Window destination) {
             if(destination == null) {
 
+                /* crashes bash?
                 try {
                     mTerminal.exitPrivateMode();
                 } catch (IOException e) {
                     // Best effort
                 }
+                */
 
                 TerminalSettings.savetoFile();
                 System.exit(0);
