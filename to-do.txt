@@ -1,5 +1,15 @@
 Tafl To-Do
 
+v0.2 features:
+1. Engine mode
+2. Engine validation
+3. Tactical validation
+
+General features:
+1. Unchattify tests.
+2. CommandEngine requires a start command. (UI callback and notification to player, so AIs know to start.)
+
+AI stuff:
 1. Aspiration windows (i.e. initial alpha-beta in a window around last iterative deepening)
 2. Killer-move heuristic (array indexed by: ply, fromindex, toindex to track counts, list of: ply, move for moves)
 3. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)
