@@ -51,7 +51,7 @@ its difficulty.
 
 4. Version history
 
-v0.1.9b (released xx/xx/xx):
+v0.1.9b (released 02/23/16):
 - Implement game clock, along with AI time usage features
 - Save settings between runs (OpenTafl creates settings.ini in the working
   directory)
