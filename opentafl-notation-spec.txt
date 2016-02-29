@@ -151,10 +151,10 @@ are present only for organizational purposes.
 			"c": corner
 			"e": edge
 		threefold-rule:
-		    "i": ignore
-		    "d": draw
-		    "w": player who makes the threefold repetition wins
-		    "l": player who makes the threefold repetition loses
+			"i": ignore
+			"d": draw
+			"w": player who makes the threefold repetition wins
+			"l": player who makes the threefold repetition loses
 		yes-no:
 			"y": yes
 			"n": no
@@ -191,10 +191,10 @@ Explanatory notes:
 		(attackers first) should the attacking side go first? Defaults to "y" (yes).
 		If "n", the defenders move first.
 	tfr:
-	    (threefold repetition) what should happen in the case of a threefold repetition?
-	    if "w", the player forced to respond wins. If "l", the player forced to respond
-	    loses. If "d", the game is a draw (default). If "i", threefold repetitions are
-	    ignored.
+	    	(threefold repetition) what should happen in the case of a threefold repetition?
+		if "w", the player forced to respond wins. If "l", the player forced to respond
+		loses. If "d", the game is a draw (default). If "i", threefold repetitions are
+		ignored.
 	ka: 
 		(king armed) does the king participate in captures? Defaults to "y" (yes).
 	ks: 
