@@ -152,7 +152,7 @@ public class AiWorkspace extends Game {
         int maxDepth = 10;
 
         mThinkTime = Math.min(planTimeUsage(mGame), mMaxThinkTime);
-        mUiCallback.statusText("Using " + mThinkTime + "msec");
+        if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec");
 
         //mThreadPool.start();
         Timer t = new Timer();
