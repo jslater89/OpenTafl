@@ -1,5 +1,8 @@
 package com.manywords.softworks.tafl.ui.player.external.engine;
 
+import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.rules.Rules;
+
 /**
  * Created by jay on 3/10/16.
  */
@@ -13,12 +16,15 @@ public class ExternalEngineClient {
     public CommunicationThread mCommThread;
     public CommunicationThread.CommunicationThreadCallback mCommCallback;
 
+    public Rules mRules;
+    public Game mGame;
+
     public void start() {
         mCommCallback = new CommCallback();
         mCommThread = new CommunicationThread(System.out, System.in, mCommCallback);
         mCommThread.start();
 
-        mCommThread.sendCommand("Hello".getBytes());
+        mCommThread.sendCommand("hello\n".getBytes());
     }
 
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
@@ -28,10 +34,6 @@ public class ExternalEngineClient {
 
             String received = "Client received: " + strCommand;
             mCommThread.sendCommand(received.getBytes());
-
-            if(strCommand.equals("Hello")) {
-                mCommThread.sendCommand("How are you?".getBytes());
-            }
         }
     }
 }

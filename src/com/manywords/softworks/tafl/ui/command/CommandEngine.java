@@ -25,8 +25,14 @@ public class CommandEngine {
     public CommandEngine(Game g, UiCallback callback, Player attacker, Player defender) {
         mGame = g;
         mUiCallback = callback;
+
         mAttacker = attacker;
+        mAttacker.setAttackingSide(true);
+        mAttacker.setGame(g);
+
         mDefender = defender;
+        mDefender.setAttackingSide(false);
+        mDefender.setGame(g);
     }
 
     public void setSearchDepth(int depth) {

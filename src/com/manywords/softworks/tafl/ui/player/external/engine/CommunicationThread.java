@@ -25,7 +25,7 @@ public class CommunicationThread extends Thread {
         running = false;
     }
 
-    public void sendCommand(byte[] command) {
+    public synchronized void sendCommand(byte[] command) {
         new Thread(() -> {
             try {
                 output.write(command);

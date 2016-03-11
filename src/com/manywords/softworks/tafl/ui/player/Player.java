@@ -6,6 +6,9 @@ import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 public abstract class Player {
+    private Game mGame;
+    private boolean mAttackingSide;
+
     public enum Type {
         HUMAN,
         NETWORK,
@@ -15,6 +18,23 @@ public abstract class Player {
 
     public interface MoveCallback {
         public void onMoveDecided(Player player, MoveRecord record);
+    }
+
+
+    public Game getGame() {
+        return mGame;
+    }
+
+    public boolean isAttackingSide() {
+        return mAttackingSide;
+    }
+
+    public void setGame(Game game) {
+        mGame = game;
+    }
+
+    public void setAttackingSide(boolean isAttackingSide) {
+        mAttackingSide = isAttackingSide;
     }
 
     public abstract void getNextMove(UiCallback ui, Game game, int thinkTime);
@@ -33,7 +53,7 @@ public abstract class Player {
             case AI:
                 return new LocalAi();
             case ENGINE:
-                return new LocalAi();
+                return new ExternalEnginePlayer();
         }
 
         return null;

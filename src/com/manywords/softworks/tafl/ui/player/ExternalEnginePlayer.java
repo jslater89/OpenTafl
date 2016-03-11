@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,8 +20,19 @@ public class ExternalEnginePlayer extends Player {
     private MoveRecord mMyLastMove;
 
     public void setupEngine(File iniFile) {
-        mHost = new ExternalEngineHost(iniFile);
+        mHost = new ExternalEngineHost(this, iniFile);
         mMyLastMove = null;
+        if(getGame() == null) throw new IllegalStateException("ExternalEnginePlayer game is null when setting up engine!");
+        mHost.setGame(getGame());
+    }
+
+    public ExternalEngineHost getExternalEngineHost() {
+        return mHost;
+    }
+
+    @Override
+    public void setGame(Game game) {
+        super.setGame(game);
     }
 
     @Override
@@ -31,12 +43,13 @@ public class ExternalEnginePlayer extends Player {
         int historySize = game.getHistory().size();
         for(int i = historySize - 1; i >= 0; i--) {
             GameState s = game.getHistory().get(i);
-            if(s.getEnteringMove() != mMyLastMove) movesSinceMyLastMove.add(s.getEnteringMove());
+            if(s.getEnteringMove().equals(mMyLastMove)) movesSinceMyLastMove.add(s.getEnteringMove());
             else break;
         }
 
+        Collections.reverse(movesSinceMyLastMove);
         mHost.notifyMovesMade(movesSinceMyLastMove);
-        //mHost.playForSide();
+        mHost.playForCurrentSide(game);
     }
 
     @Override

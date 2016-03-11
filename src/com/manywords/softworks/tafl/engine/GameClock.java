@@ -229,6 +229,8 @@ public class GameClock {
             return mMainTimeMillis;
         }
 
+        public long getOvertimeTime() { return mOvertimeMillis; }
+
         public int getOvertimeCount() {
             return mOvertimeCount;
         }
