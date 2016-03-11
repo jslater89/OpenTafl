@@ -51,6 +51,11 @@ its difficulty.
 
 4. Version history
 
+v0.1.9.1b (released 03/11/16):
+- Possible bug-fixes for non-Swing terminals, which you, as a user, can't use
+- Text fixes, which you, as a user, can't see
+- Updated license
+
 v0.1.9b (released 02/23/16):
 - Implement game clock, along with AI time usage features
 - Save settings between runs (OpenTafl creates settings.ini in the working
