@@ -1,6 +1,4 @@
-package com.manywords.softworks.tafl.ui.player.external;
-
-import java.io.BufferedInputStream;
+package com.manywords.softworks.tafl.ui.player.external.engine;
 
 /**
  * Created by jay on 3/10/16.

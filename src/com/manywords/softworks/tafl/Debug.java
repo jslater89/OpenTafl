@@ -3,9 +3,8 @@ package com.manywords.softworks.tafl;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.player.ExternalEnginePlayer;
-import com.manywords.softworks.tafl.ui.player.external.ExternalEngineClient;
+import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
 
 import java.io.IOException;
 import java.util.Map;

@@ -6,9 +6,8 @@ import com.manywords.softworks.tafl.test.Test;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
-import com.manywords.softworks.tafl.ui.player.external.ExternalEngineClient;
+import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

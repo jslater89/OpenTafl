@@ -1,6 +1,9 @@
-package com.manywords.softworks.tafl.ui.player.external;
+package com.manywords.softworks.tafl.ui.player.external.engine;
+
+import com.manywords.softworks.tafl.engine.MoveRecord;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * Created by jay on 3/10/16.
@@ -34,6 +37,10 @@ public class ExternalEngineHost {
             System.out.println("Failed to start: " + e);
             System.exit(0);
         }
+    }
+
+    public void notifyMovesMade(List<MoveRecord> moves) {
+
     }
 
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {

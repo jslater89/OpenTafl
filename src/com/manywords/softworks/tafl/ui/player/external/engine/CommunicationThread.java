@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.ui.player.external;
+package com.manywords.softworks.tafl.ui.player.external.engine;
 
 import java.io.*;
 
