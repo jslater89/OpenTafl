@@ -2,9 +2,11 @@ OTEP - OpenTafl Engine Protocol
 
 The OpenTafl Engine Protocol is a bidirectional communications protocol used by
 OpenTafl to communicate with external tafl engines. For simplicity, it uses
-piped text input and output, with human-readable commands.
+piped text input and output, with human-readable commands. OpenTafl sends all
+commands using the US-ASCII character set, and expects to receive responses
+in the same. Command will be separated by the newline character \n.
 
-To avoid complicated bookkeeping, commands are unacknowledged. 
+To avoid complicated bookkeeping, commands are unacknowledged.
 
 0. Simple Algebraic Tafl Notation
 Since both OpenTafl and the external engines maintain game state, detailed
@@ -64,15 +66,14 @@ a side command immediately prior to game start.
 
 7. clock
 Direction: OpenTafl <-> Engine
-Command: 'clock [attacker-seconds] [defender-seconds] [overtime-seconds] [attacker-overtimes] [defender-overtimes]'
+Command: 'clock [attacker-millis] [defender-millis] [overtime-seconds] [attacker-overtimes] [defender-overtimes]'
 
-OpenTafl provides the engine with the time left for both players in seconds. If
-overtime timing is enabled, also provides the length of each overtime period in
-seconds, and how many overtime periods the attacker and defender have left. If
-standard timing is not enabled, [attacker-seconds] and [defender-seconds] will
-be -1.
+OpenTafl provides the engine with the time left for both players in 
+milliseconds. If overtime timing is enabled, also provides the length of each
+overtime period in seconds, and how many overtime periods the attacker and 
+defender have left.
 
-If main time has expired, [attacker-seconds] or [defender-seconds] will list the
+If main time has expired, [attacker-millis] or [defender-millis] will list the
 amount of time remaining in the current overtime period.
 
 OpenTafl will send clock commands at three times:
@@ -124,7 +125,10 @@ Direction: OpenTafl <-> Engine
 Command: 'error [error-code]
 
 Error code can be one of the following:
+Engine -> OpenTafl:
 0: rules not supported
+
+OpenTafl -> Engine:
 1: wrong side
 2: no piece at start
 3: illegal move (blocked, piece at end, &c.)
@@ -134,15 +138,16 @@ Error code can be one of the following:
 
 13. opponent-move
 Direction: OpenTafl -> Engine
-Command: 'opponent-move [move-record] [position-record]'
+Command: 'opponent-move [move-list] [position-record]'
 
 OpenTafl informs the engine that the other side has made a move, given as
-[move-record] in whichever algebraic tafl notation the engine is configured
+[move-list] in whichever algebraic tafl notation the engine is configured
 to use. [position-record] gives the current state of the board.
 
-If berserk moves are made, the engine will issue opponent-move commands without
-position-record elements for all moves except the most recent move. The most
-recent move will include a position record.
+[move-list] is a string of move records separated by the pipe character '|',
+and will only be more than one move in the case of berserk tafl and berserk
+moves. Moves are listed from oldest to newest. [position-record] is always
+the state of the board at the end of the move list.
 
 14. finish
 Direction: OpenTafl -> Engine
@@ -153,3 +158,9 @@ OpenTafl informs the engine that the game has ended. Result codes:
 1: draw
 2: attackers win
 3: defenders win
+
+15. goodbye
+Direction: OpenTafl -> Engine
+Command: 'goodbye'
+
+OpenTafl informs the engine that it may safely shut down.
