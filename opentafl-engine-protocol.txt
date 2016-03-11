@@ -4,21 +4,26 @@ The OpenTafl Engine Protocol is a bidirectional communications protocol used by
 OpenTafl to communicate with external tafl engines. For simplicity, it uses
 piped text input and output, with human-readable commands.
 
+0. Simple Algebraic Tafl Notation
+Since both OpenTafl and the external engines maintain game state, detailed
+notation is unnecessary. Therefore, OpenTafl by default uses a very simple move
+notation: the starting space, a dash, and the finishing space: 'a4-a1'. 
+OpenTafl can be configured to use full OpenTafl move notation, if desired.
+
 1. hello
-Direction: Engine -> OpenTafl
+Direction: Engine <-> OpenTafl
 Command: 'hello'
 
-Alerts OpenTafl that the engine is active.
+Alerts OpenTafl that the engine is active. Send 'hello' once your engine has
+started.
 
-2. verbose-moves
+2. simple-moves
 Direction: Engine -> OpenTafl
-Command: 'verbose-moves <on|off>'
+Command: 'simple-moves <on|off>'
 Default: on
 
-When set to on, OpenTafl will provide the engine with enhanced algebraic tafl
-notation (as described in the OpenTafl Notation specificiation). When set to 
-off, OpenTafl will provide standard algebraic tafl notation, as designed by
-Damian Walker (see the OpenTafl Notation specification).
+When set to on, OpenTafl provides the external engine with simple move records.
+When set to off, OpenTafl provides full OpenTafl Algebraic Tafl Notation.
 
 3. rules
 Direction: OpenTafl <-> Engine
@@ -54,6 +59,8 @@ overtime timing is enabled, also provides the length of each overtime period in
 seconds, and how many overtime periods the attacker and defender have left. If
 standard timing is not enabled, [attacker-seconds] and [defender-seconds] will
 be -1.
+
+If main time has expired, [attacker-seconds] or [defender-seconds] will list the
 
 7. analyze
 Direction: OpenTafl -> Engine
@@ -94,11 +101,12 @@ Command: 'move [move-record]'
 The engine submits the given move to OpenTafl. May return an error. (See
 'move-error').
 
-11. move-error
-Direction: OpenTafl -> Engine
-Command: 'move-error [error-code]
+11. error
+Direction: OpenTafl <-> Engine
+Command: 'error [error-code]
 
 Error code can be one of the following:
+-1: rules not supported
 1: wrong side
 2: no piece at start
 3: illegal move (blocked, piece at end, &c.)
@@ -112,4 +120,4 @@ Command: 'opponent-move [move-record] [position-record]'
 
 OpenTafl informs the engine that the other side has made a move, given as
 [move-record] in whichever algebraic tafl notation the engine is configured
-to use. [position-record] gives the new state of the board.
+to use. [position-record] gives the current state of the board.
