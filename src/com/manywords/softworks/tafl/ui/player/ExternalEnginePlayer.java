@@ -36,7 +36,7 @@ public class ExternalEnginePlayer extends Player {
         }
 
         mHost.notifyMovesMade(movesSinceMyLastMove);
-        mHost.
+        //mHost.playForSide();
     }
 
     @Override
