@@ -214,7 +214,6 @@ public class RulesSerializer {
     }
 
     public static Rules loadRulesRecord(String otnrString) {
-        int boardSize = 0;
         boolean attackerCommanders = false;
         boolean defenderCommanders = false;
         boolean attackerKnights = false;
@@ -224,6 +223,7 @@ public class RulesSerializer {
         Map<String, String> config = getRulesMap(otnrString);
 
         int boardDimension = Integer.parseInt(config.get("dim"));
+        Coord.initialize(boardDimension);
         String startPosition = config.get("start");
         startingTaflmen = parseTaflmenFromPosition(startPosition);
 
