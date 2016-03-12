@@ -13,6 +13,14 @@ public class MoveRecord {
 
     public final List<Coord> captures;
 
+    public static MoveRecord getMoveRecordFromSimpleString(String simpleMoveRecord) {
+        String[] coordStrings = simpleMoveRecord.split("-");
+        Coord start = Board.getCoordFromChessNotation(coordStrings[0]);
+        Coord end = Board.getCoordFromChessNotation(coordStrings[1]);
+
+        return new MoveRecord(start, end);
+    }
+
     public MoveRecord(Coord start, Coord end) {
         this.start = start;
         this.end = end;
@@ -25,6 +33,12 @@ public class MoveRecord {
         this.end = end;
 
         this.captures = captures;
+    }
+
+    public String toSimpleString() {
+        Map<String, String> start = Board.getChessNotation(this.start);
+        Map<String, String> end = Board.getChessNotation(this.end);
+        return start.get("file") + start.get("rank") + "-" + end.get("file") + end.get("rank");
     }
 
     public String toString() {
