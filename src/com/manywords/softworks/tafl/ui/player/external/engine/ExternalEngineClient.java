@@ -10,6 +10,7 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
+import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.Player;
 import com.manywords.softworks.tafl.ui.player.UiWorkerThread;
 
@@ -38,6 +39,7 @@ public class ExternalEngineClient implements UiCallback {
         mCommThread = new CommunicationThread(System.out, System.in, mCommCallback);
         mCommThread.start();
 
+        TerminalSettings.loadFromFile();
         mCommThread.sendCommand("hello\n".getBytes());
     }
 
@@ -59,13 +61,14 @@ public class ExternalEngineClient implements UiCallback {
 
             @Override
             public void run() {
-                workspace.explore(60);
+                workspace.explore(TerminalSettings.aiThinkTime);
                 workspace.stopExploring();
                 GameTreeNode bestMove = workspace.getTreeRoot().getBestChild();
                 sendMoveCommand(bestMove.getEnteringMove());
                 mGame.getCurrentState().makeMove(bestMove.getEnteringMove());
             }
         });
+        mAiThread.start();
     }
 
     private void handleOpponentMoveCommand(String command) {
@@ -88,8 +91,10 @@ public class ExternalEngineClient implements UiCallback {
             String[] commands = strCommand.split("\n");
 
             for(String cmd : commands) {
+                //System.out.println("Client received: " + cmd);
                 if (cmd.startsWith("rules")) {
                     handleRulesCommand(cmd);
+                    //System.out.println("Client view of rules: " + mRules.getOTRString());
                 }
                 else if (cmd.startsWith("play")) {
                     handlePlayCommand(cmd);

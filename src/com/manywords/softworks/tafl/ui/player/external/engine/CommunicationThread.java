@@ -42,9 +42,15 @@ public class CommunicationThread extends Thread {
         while(running) {
             try {
                 int i = input.read(buffer);
-                byte[] command = new byte[i];
-                System.arraycopy(buffer, 0, command, 0, i);
-                callback.onCommandReceived(command);
+                if(i > 0) {
+                    byte[] command = new byte[i];
+                    System.arraycopy(buffer, 0, command, 0, i);
+                    callback.onCommandReceived(command);
+                }
+                else {
+                    System.out.println("EOF in stream");
+                    running = false;
+                }
             } catch (IOException e) {
                 System.out.println("Exception reading command: " + e);
             }

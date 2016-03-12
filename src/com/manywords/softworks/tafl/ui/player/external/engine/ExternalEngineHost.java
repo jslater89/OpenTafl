@@ -51,12 +51,14 @@ public class ExternalEngineHost {
     }
 
     public void setGame(Game g) {
+        setRules(g.getGameRules());
         mGame = g;
     }
 
     public String setRules(Rules rules) {
         String command = "rules ";
         command += rules.getOTRString();
+        //System.out.println("Host view of rules: " + rules.getOTRString());
         command += "\n";
 
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
@@ -185,11 +187,14 @@ public class ExternalEngineHost {
         @Override
         public void onCommandReceived(byte[] command) {
             String strCommand = new String(command);
+            String[] commands = strCommand.split("\n");
 
-            System.out.println("Host received: " + strCommand);
+            for(String cmd : commands) {
+                System.out.println("Host received: " + cmd);
 
-            if(strCommand.equals("hello")) {
-                mCommThread.sendCommand("hello\n".getBytes());
+                if (cmd.equals("hello")) {
+                    mCommThread.sendCommand("hello\n".getBytes());
+                }
             }
         }
     }
