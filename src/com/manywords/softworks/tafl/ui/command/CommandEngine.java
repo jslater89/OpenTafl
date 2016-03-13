@@ -29,10 +29,12 @@ public class CommandEngine {
         mAttacker = attacker;
         mAttacker.setAttackingSide(true);
         mAttacker.setGame(g);
+        mAttacker.setupPlayer();
 
         mDefender = defender;
         mDefender.setAttackingSide(false);
         mDefender.setGame(g);
+        mDefender.setupPlayer();
     }
 
     public void setSearchDepth(int depth) {

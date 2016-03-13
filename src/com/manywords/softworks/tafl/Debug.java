@@ -20,7 +20,7 @@ public class Debug {
             ExternalEngineClient.run();
         }
         else {
-            Rules r = Brandub.newBrandub7();
+            /*Rules r = Brandub.newBrandub7();
             Game g = new Game(r, null, new GameClock.TimeSpec(300000, 30000, 3, 5000));
             ExternalEnginePlayer p = new ExternalEnginePlayer();
             p.setGame(g);
@@ -30,6 +30,7 @@ public class Debug {
             h.start(p.getGame());
             h.clockUpdate(p.getGame().getClock().getClockEntry(g.getCurrentState().getAttackers()), p.getGame().getClock().getClockEntry(g.getCurrentState().getDefenders()));
             h.analyze(5, 30);
+            */
 
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
             Terminal t = null;

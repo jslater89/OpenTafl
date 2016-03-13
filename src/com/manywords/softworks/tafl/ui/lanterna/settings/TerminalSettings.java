@@ -52,7 +52,7 @@ public class TerminalSettings {
             case NETWORK:
                 return Player.getNewPlayer(Player.Type.HUMAN);
             case ENGINE:
-                return Player.getNewPlayer(Player.Type.AI);
+                return Player.getNewPlayer(Player.Type.ENGINE);
         }
 
         return null;

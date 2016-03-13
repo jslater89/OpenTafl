@@ -91,6 +91,10 @@ public class Game {
         this.mGameRules = mGameRules;
     }
 
+    public void setCurrentState(GameState state) {
+        mCurrentState = state;
+    }
+
     public GameState getCurrentState() {
         return mCurrentState;
     }

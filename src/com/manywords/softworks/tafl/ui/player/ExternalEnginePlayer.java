@@ -31,6 +31,12 @@ public class ExternalEnginePlayer extends Player {
     }
 
     @Override
+    public void setupPlayer() {
+        super.setupPlayer();
+        setupEngine(null);
+    }
+
+    @Override
     public void setGame(Game game) {
         super.setGame(game);
     }
@@ -43,18 +49,20 @@ public class ExternalEnginePlayer extends Player {
         int historySize = game.getHistory().size();
         for(int i = historySize - 1; i >= 0; i--) {
             GameState s = game.getHistory().get(i);
-            if(s.getEnteringMove().equals(mMyLastMove)) movesSinceMyLastMove.add(s.getEnteringMove());
+            if(!s.getExitingMove().equals(mMyLastMove)) movesSinceMyLastMove.add(s.getExitingMove());
             else break;
         }
 
-        Collections.reverse(movesSinceMyLastMove);
-        mHost.notifyMovesMade(movesSinceMyLastMove);
+        if(movesSinceMyLastMove.size() > 0) {
+            Collections.reverse(movesSinceMyLastMove);
+            mHost.notifyMovesMade(movesSinceMyLastMove);
+        }
         mHost.playForCurrentSide(game);
     }
 
     @Override
     public void stop() {
-
+        mHost.finish(0);
     }
 
     @Override

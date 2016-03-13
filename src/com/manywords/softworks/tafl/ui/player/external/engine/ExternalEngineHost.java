@@ -182,6 +182,13 @@ public class ExternalEngineHost {
         return "quit\n";
     }
 
+    public void handleMoveCommand(String command) {
+        command = command.replace("move ", "");
+        MoveRecord move = MoveRecord.getMoveRecordFromSimpleString(command);
+
+        mPlayer.onMoveDecided(move);
+    }
+
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
 
         @Override
@@ -192,8 +199,11 @@ public class ExternalEngineHost {
             for(String cmd : commands) {
                 System.out.println("Host received: " + cmd);
 
-                if (cmd.equals("hello")) {
+                if (cmd.startsWith("hello")) {
                     mCommThread.sendCommand("hello\n".getBytes());
+                }
+                else if(cmd.startsWith("move")) {
+                    handleMoveCommand(cmd);
                 }
             }
         }

@@ -20,6 +20,9 @@ public abstract class Player {
         public void onMoveDecided(Player player, MoveRecord record);
     }
 
+    public void setupPlayer() {
+
+    }
 
     public Game getGame() {
         return mGame;

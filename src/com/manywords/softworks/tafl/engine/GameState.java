@@ -29,6 +29,24 @@ public class GameState {
         mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
     }
 
+    public GameState(Game game, Rules startingRules, Board board, Side attackers, Side defenders) {
+        mBoard = board;
+        mAttackers = attackers;
+        mDefenders = defenders;
+        mGame = game;
+        mBoard.setState(this);
+        mBoard.setupTaflmen(attackers, defenders);
+
+        if (mBoard.getRules().getStartingSide().isAttackingSide()) {
+            mCurrentSide = mAttackers;
+        } else {
+            mCurrentSide = mDefenders;
+        }
+
+        mZobristHash = zobristHash();
+        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
+    }
+
     public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist) {
         this(previousState);
 

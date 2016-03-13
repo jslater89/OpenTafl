@@ -225,7 +225,7 @@ public class RulesSerializer {
         int boardDimension = Integer.parseInt(config.get("dim"));
         Coord.initialize(boardDimension);
         String startPosition = config.get("start");
-        startingTaflmen = parseTaflmenFromPosition(startPosition);
+        startingTaflmen = PositionSerializer.parseTaflmenFromPosition(startPosition);
 
         Board board = new GenericBoard(boardDimension);
         Side attackers = new GenericSide(board, true, startingTaflmen.get(0));
@@ -304,33 +304,6 @@ public class RulesSerializer {
         }
 
         return config;
-    }
-
-    private static List<List<Side.TaflmanHolder>> parseTaflmenFromPosition(String startPosition) {
-        List<Side.TaflmanHolder> attackers = new ArrayList<Side.TaflmanHolder>();
-        List<Side.TaflmanHolder> defenders = new ArrayList<Side.TaflmanHolder>();
-        List<List<Side.TaflmanHolder>> taflmen = new ArrayList<>();
-        taflmen.add(attackers);
-        taflmen.add(defenders);
-
-        char[][] boardArray = PositionSerializer.loadPositionRecord(startPosition);
-
-        for(int y = 0; y < boardArray.length; y++) {
-            for(int x = 0; x < boardArray.length; x++) {
-                char taflman = boardArray[y][x];
-                if(taflman != Taflman.EMPTY) {
-                    Side.TaflmanHolder holder = new Side.TaflmanHolder(taflman, Coord.get(x, y));
-                    if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
-                        attackers.add(holder);
-                    }
-                    else {
-                        defenders.add(holder);
-                    }
-                }
-            }
-        }
-
-        return taflmen;
     }
 
     public static boolean isNumeric(String str) {
