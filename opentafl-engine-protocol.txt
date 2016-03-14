@@ -6,6 +6,9 @@ piped text input and output, with human-readable commands. OpenTafl sends all
 commands using the US-ASCII character set, and expects to receive responses
 in the same. Commands will be separated by the newline character \n.
 
+Anywhere an ordering of commands is specified in this document, that ordering
+is guaranteed.
+
 To avoid complicated bookkeeping, commands are unacknowledged.
 
 1. External engine .ini file
@@ -171,6 +174,12 @@ and will only be more than one move in the case of berserk tafl and berserk
 moves. Moves are listed from oldest to newest. [position-record] is always
 the state of the board at the end of the move list.
 
+OpenTafl will always send an 'opponent-move' command immediately before a
+'play' command, even if the 'play' command is a repeat after an 'error'
+command. Note that, in case of an erroneous move, OpenTafl will send three
+commands: 'error', 'opponent-move' (containing the prior move, and the correct
+board position), and 'play'.
+
 16. finish
 Direction: OpenTafl -> Engine
 Command: 'finish <finish-code>'
@@ -186,3 +195,10 @@ Direction: OpenTafl -> Engine
 Command: 'goodbye'
 
 OpenTafl informs the engine that it may safely shut down.
+
+18. status
+Direction: Engine -> OpenTafl
+Command: 'status [text]'
+
+All text between the end of 'status' and the next newline character will be
+output to the OpenTafl status display.

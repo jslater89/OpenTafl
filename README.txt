@@ -62,14 +62,19 @@ Note that the AI think time setting only affects OpenTafl.
 5. Links
 http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt
 
-5. Version history
+6. Version history
 
-v0.2.0b (released xx/xx/16):
+v0.2.0b (released 03/14/16):
 - Functional but incomplete implementation of external engine mode
 - Not yet implemented:
+    - Tests
     - Errors and error codes
-    - 'simple-moves' command
+    - Finish codes
     - Engine-initiated informational commands (e.g. rules, move, position, &c.)
+    - 'analyze' command and 'analysis' response handling
+    - 'clock' commands after main time or overtime expiration
+    - 'simple-moves' command
+    - 'status' command
 
 
 v0.1.9.1b (released 03/11/16):
