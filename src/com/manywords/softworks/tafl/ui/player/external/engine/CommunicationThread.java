@@ -10,12 +10,14 @@ public class CommunicationThread extends Thread {
         public void onCommandReceived(byte[] command);
     }
 
+    private Process process;
     private OutputStream output;
     private InputStream input;
     private boolean running = true;
     private CommunicationThreadCallback callback;
 
-    public CommunicationThread(OutputStream output, InputStream input, CommunicationThreadCallback callback) {
+    public CommunicationThread(Process process, OutputStream output, InputStream input, CommunicationThreadCallback callback) {
+        this.process = process;
         this.output = output;
         this.input = input;
         this.callback = callback;
@@ -26,14 +28,12 @@ public class CommunicationThread extends Thread {
     }
 
     public synchronized void sendCommand(byte[] command) {
-        new Thread(() -> {
-            try {
-                output.write(command);
-                output.flush();
-            } catch (IOException e) {
-                System.out.println("Exception writing command: " + e);
-            }
-        }).start();
+        try {
+            output.write(command);
+            output.flush();
+        } catch (IOException e) {
+            System.out.println("Exception writing command: " + e);
+        }
     }
 
     @Override
@@ -49,10 +49,17 @@ public class CommunicationThread extends Thread {
                 }
                 else {
                     System.out.println("EOF in stream");
+                    if(process != null) {
+                        process.waitFor();
+                        System.out.println("Other process ended with: " + process.exitValue());
+                    }
                     running = false;
                 }
             } catch (IOException e) {
                 System.out.println("Exception reading command: " + e);
+            } catch (InterruptedException e) {
+                System.out.println("Interrupted while waiting for stopped process exit");
+                e.printStackTrace(System.out);
             }
         }
     }
