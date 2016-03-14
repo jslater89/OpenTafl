@@ -57,7 +57,7 @@ public class RulesSerializer {
         map.put("dforp", "TCNK");
 
         map.put("cors", "K");
-        map.put("cens", "tcnkTCNK");
+        map.put("cens", "K");
         map.put("afors", "tcnkTCNK");
         map.put("dfors", "TCNK");
 
@@ -283,6 +283,10 @@ public class RulesSerializer {
         if(config.containsKey("dforh")) hostile = getTaflmanTypeListForString(config.get("dforh"));
         rules.setDefenderFortParameters(passable, stoppable, hostile);
 
+        if(rules.centerStoppableFor[1] == true) {
+            System.out.println("Ack!");
+            System.exit(0);
+        }
         return rules;
     }
 
