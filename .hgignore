@@ -18,6 +18,7 @@ out*
 
 package/README.txt
 package/LICENSE.txt
+package/engines/*
 
 **~
 **local.properties
