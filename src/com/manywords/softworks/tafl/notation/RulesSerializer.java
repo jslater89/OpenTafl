@@ -214,10 +214,6 @@ public class RulesSerializer {
     }
 
     public static Rules loadRulesRecord(String otnrString) {
-        boolean attackerCommanders = false;
-        boolean defenderCommanders = false;
-        boolean attackerKnights = false;
-        boolean defenderKnights = false;
         List<List<Side.TaflmanHolder>> startingTaflmen;
 
         Map<String, String> config = getRulesMap(otnrString);

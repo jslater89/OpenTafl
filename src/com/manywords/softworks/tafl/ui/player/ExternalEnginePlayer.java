@@ -4,6 +4,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.ui.UiCallback;
+import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
 import java.io.File;
@@ -33,7 +34,7 @@ public class ExternalEnginePlayer extends Player {
     @Override
     public void setupPlayer() {
         super.setupPlayer();
-        setupEngine(null);
+        setupEngine(this.isAttackingSide() ? TerminalSettings.attackerEngineFile : TerminalSettings.defenderEngineFile);
     }
 
     @Override
@@ -49,7 +50,9 @@ public class ExternalEnginePlayer extends Player {
         int historySize = game.getHistory().size();
         for(int i = historySize - 1; i >= 0; i--) {
             GameState s = game.getHistory().get(i);
-            if(!s.getExitingMove().equals(mMyLastMove)) movesSinceMyLastMove.add(s.getExitingMove());
+            // We only want to check the start and end space, since the incoming move may not
+            // record captures.
+            if(!s.getExitingMove().softEquals(mMyLastMove)) movesSinceMyLastMove.add(s.getExitingMove());
             else break;
         }
 

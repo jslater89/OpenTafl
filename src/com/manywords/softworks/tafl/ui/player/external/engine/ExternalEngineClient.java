@@ -39,7 +39,9 @@ public class ExternalEngineClient implements UiCallback {
     public void start() {
         System.setErr(System.out);
         mCommCallback = new CommCallback();
-        mCommThread = new CommunicationThread(System.out, System.in, mCommCallback);
+        // We can't get the parent process reliably, and we don't care, either: this is
+        // mostly for hosts diagnosing why the clients won't start.
+        mCommThread = new CommunicationThread(null, System.out, System.in, mCommCallback);
         mCommThread.start();
 
         TerminalSettings.loadFromFile();
@@ -116,7 +118,7 @@ public class ExternalEngineClient implements UiCallback {
                 System.out.println("Client received: " + cmd);
                 if (cmd.startsWith("rules")) {
                     handleRulesCommand(cmd);
-                    //System.out.println("Client view of rules: " + mRules.getOTRString());
+                    System.out.println("Client view of rules: " + mRules.getOTRString());
                 }
                 else if (cmd.startsWith("play")) {
                     handlePlayCommand(cmd);

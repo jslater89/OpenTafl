@@ -65,4 +65,10 @@ public class MoveRecord {
                 && this.end.equals(((MoveRecord) o).end)
                 && this.captures.equals(((MoveRecord) o).captures);
     }
+
+    public boolean softEquals(Object o) {
+        return (o instanceof MoveRecord)
+                && this.start.equals(((MoveRecord) o).start)
+                && this.end.equals(((MoveRecord) o).end);
+    }
 }

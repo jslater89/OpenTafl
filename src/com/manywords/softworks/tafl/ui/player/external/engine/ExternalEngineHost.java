@@ -17,8 +17,8 @@ import java.util.List;
  */
 public class ExternalEngineHost {
     private Process mExternalEngine;
-    private BufferedInputStream mInboundPipe;
-    private BufferedOutputStream mOutboundPipe;
+    private InputStream mInboundPipe;
+    private OutputStream mOutboundPipe;
     private CommunicationThread mCommThread;
     private CommunicationThread.CommunicationThreadCallback mCommCallback = new CommCallback();
     private Game mGame;
@@ -30,14 +30,13 @@ public class ExternalEngineHost {
             Wini ini = new Wini(iniFile);
             String dir = ini.get("engine", "directory", String.class);
             String filename = ini.get("engine", "filename", String.class);
+            String command = ini.get("engine", "command", String.class);
             String args = ini.get("engine", "arguments", String.class);
 
-            if(dir == null || dir.equals("") || filename == null || filename.equals("")) {
+            if(dir == null || dir.equals("") || command == null || command.equals("") || filename == null || filename.equals("")) {
                 System.out.println("Missing elements");
                 return false;
             }
-
-            if(args == null) args = "";
 
             File engineFileDir = new File("engines");
             File engineDir = new File(engineFileDir, dir);
@@ -57,26 +56,51 @@ public class ExternalEngineHost {
     public ExternalEngineHost(Player player, File iniFile) {
         mPlayer = player;
 
-        File directory = new File(".");
-        String[] command = {
-                "./linux-debug.sh",
-                "--engine"
-        };
+        String dirName;
+        String fileName;
+        String command;
+        String args;
+        try {
+            if(!validateEngineFile(iniFile)) {
+                throw new IllegalStateException("Missing engine file for " + (player.isAttackingSide() ? "attacker" : "defender") + ": " + iniFile);
+            }
+            Wini ini = new Wini(iniFile);
+            dirName = ini.get("engine", "directory", String.class);
+            fileName = ini.get("engine", "filename", String.class);
+            command = ini.get("engine", "command", String.class);
+            args = ini.get("engine", "arguments", String.class);
+            if(args == null) args = "";
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+            throw new IllegalStateException("Missing engine file for " + (player.isAttackingSide() ? "attacker" : "defender"));
+        }
+
+        File engineFileDir = new File("engines");
+        File directory = new File(engineFileDir, dirName);
+        File absoluteDirectory = directory.getAbsoluteFile();
+
+        String[] argArray = args.split(" ");
+        String[] commandLine = new String[argArray.length + 1];
+        commandLine[0] = command;
+        System.arraycopy(argArray, 0, commandLine, 1, argArray.length);
+
         ProcessBuilder b = new ProcessBuilder();
-        b.directory(directory);
-        b.command(command);
+        b.directory(absoluteDirectory);
+        b.command(commandLine);
+        System.out.println(b.command());
 
         try {
             mExternalEngine = b.start();
             mInboundPipe = new BufferedInputStream(mExternalEngine.getInputStream());
             mOutboundPipe = new BufferedOutputStream(mExternalEngine.getOutputStream());
 
-            mCommThread = new CommunicationThread(mOutboundPipe, mInboundPipe, mCommCallback);
+            mCommThread = new CommunicationThread(mExternalEngine, mOutboundPipe, mInboundPipe, mCommCallback);
             mCommThread.start();
 
         } catch (IOException e) {
             System.out.println("Failed to start: " + e);
-            System.exit(0);
+            e.printStackTrace(System.out);
+            System.exit(1);
         }
     }
 
