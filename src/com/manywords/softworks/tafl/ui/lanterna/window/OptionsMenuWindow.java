@@ -3,13 +3,13 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
-import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
+import com.googlecode.lanterna.gui2.dialogs.*;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
+import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -62,6 +62,23 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(attackerType);
 
+        if(TerminalSettings.attackers == TerminalSettings.ENGINE) {
+            Button attackerFileSelect = new Button("Attacker config", () -> {
+               showFileSelectDialog(true);
+            });
+            Label attackerFile;
+            if(TerminalSettings.attackerEngineFile == null) {
+                attackerFile = new Label("<none>");
+            }
+            else {
+                attackerFile = new Label(TerminalSettings.attackerEngineFile.getName());
+            }
+
+            optionsPanel.addComponent(attackerFileSelect);
+            optionsPanel.addComponent(newSpacer());
+            optionsPanel.addComponent(attackerFile);
+        }
+
         Button defenderSelect = new Button("Defenders", new Runnable() {
             @Override
             public void run() {
@@ -72,6 +89,23 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(defenderSelect);
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(defenderType);
+
+        if(TerminalSettings.defenders == TerminalSettings.ENGINE) {
+            Button defenderFileSelect = new Button("Attacker config", () -> {
+                showFileSelectDialog(false);
+            });
+            Label defenderFile;
+            if(TerminalSettings.defenderEngineFile == null) {
+                defenderFile = new Label("<none>");
+            }
+            else {
+                defenderFile = new Label(TerminalSettings.attackerEngineFile.getName());
+            }
+
+            optionsPanel.addComponent(defenderFileSelect);
+            optionsPanel.addComponent(newSpacer());
+            optionsPanel.addComponent(defenderFile);
+        }
 
         Button aiDepthSelect = new Button("AI think time", new Runnable() {
             @Override
@@ -113,6 +147,31 @@ public class OptionsMenuWindow extends BasicWindow {
 
     private EmptySpace newSpacer() {
         return new EmptySpace(new TerminalSize(4, 0));
+    }
+
+    private void showFileSelectDialog(boolean attackers) {
+        FileDialogBuilder b = new FileDialogBuilder();
+        b.setActionLabel("Select");
+
+        File f = new File("engines");
+        if(f.exists()) b.setSelectedFile(f);
+
+        FileDialog d = b.build();
+        File configFile = d.showDialog(getTextGUI());
+
+        if(ExternalEngineHost.validateEngineFile(configFile)) {
+            if (attackers) {
+                TerminalSettings.attackerEngineFile = configFile;
+            }
+            else {
+                TerminalSettings.defenderEngineFile = configFile;
+            }
+        }
+        else {
+            MessageDialog.showMessageDialog(getTextGUI(), "Invalid file", "File does not contain required engine elements.");
+        }
+
+        refreshSettings();
     }
 
     private void showTimeSpecDialog() {

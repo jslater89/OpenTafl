@@ -2,12 +2,14 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
+import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
 /**
  * Created by jay on 2/15/16.
@@ -36,6 +38,15 @@ public class MainMenuWindow extends BasicWindow {
         Button playButton = new Button("Play", new Runnable() {
             @Override
             public void run() {
+                if(TerminalSettings.attackers == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.attackerEngineFile)) {
+                    MessageDialog.showMessageDialog(getTextGUI(), "Incomplete configuration", "Attacker engine missing configuration file!");
+                    return;
+                }
+                if(TerminalSettings.defenders == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.defenderEngineFile)) {
+                    MessageDialog.showMessageDialog(getTextGUI(), "Incomplete configuration", "Defender engine missing configuration file!");
+                    return;
+                }
+
                 GameClock.TimeSpec ts = TerminalSettings.timeSpec;
                 Game g;
                 if(ts.mainTime == 0 && (ts.overtimeTime == 0 ||ts.overtimeCount == 0)) {

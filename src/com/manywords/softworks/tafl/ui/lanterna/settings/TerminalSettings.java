@@ -67,7 +67,9 @@ public class TerminalSettings {
             }
             Wini ini = new Wini(f);
             ini.put("config", "attacker", attackers + 1);
+            ini.put("config", "attackerfile", (attackerEngineFile != null ? attackerEngineFile.getCanonicalPath() : ""));
             ini.put("config", "defender", defenders + 1);
+            ini.put("config", "defenderfile", (defenderEngineFile != null ? defenderEngineFile.getCanonicalPath() : ""));
             ini.put("config", "variant", variant+ 1);
             ini.put("config", "thinktime", aiThinkTime);
             ini.put("clock", "maintime", timeSpec.mainTime);
@@ -96,8 +98,14 @@ public class TerminalSettings {
             int attacker = ini.get("config", "attacker", int.class);
             if(attacker != 0) attackers = attacker - 1;
 
+            String attackerFile = ini.get("config", "attackerfile", String.class);
+            if(attackerFile != null && !attackerFile.equals("")) attackerEngineFile = new File(attackerFile);
+
             int defender = ini.get("config", "defender", int.class);
             if(defender != 0) defenders = defender - 1;
+
+            String defenderFile = ini.get("config", "attackerfile", String.class);
+            if(defenderFile != null && !defenderFile.equals("")) defenderEngineFile = new File(defenderFile);
 
             int v = ini.get("config", "variant", int.class);
             if(v != 0) variant = v - 1;

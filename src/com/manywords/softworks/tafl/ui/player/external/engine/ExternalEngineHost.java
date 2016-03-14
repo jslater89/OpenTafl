@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.player.Player;
+import org.ini4j.Wini;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -23,6 +24,35 @@ public class ExternalEngineHost {
     private Game mGame;
     private Player mPlayer;
     private boolean mSimpleNotation = true;
+
+    public static boolean validateEngineFile(File iniFile) {
+        try {
+            Wini ini = new Wini(iniFile);
+            String dir = ini.get("engine", "directory", String.class);
+            String filename = ini.get("engine", "filename", String.class);
+            String args = ini.get("engine", "arguments", String.class);
+
+            if(dir == null || dir.equals("") || filename == null || filename.equals("")) {
+                System.out.println("Missing elements");
+                return false;
+            }
+
+            if(args == null) args = "";
+
+            File engineFileDir = new File("engines");
+            File engineDir = new File(engineFileDir, dir);
+            File engineFile = new File(engineDir, filename);
+            if(!engineFile.exists()) {
+                System.out.println("File does not exist: " + engineFile);
+                System.out.println(engineFile.getAbsolutePath());
+                return false;
+            }
+
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
 
     public ExternalEngineHost(Player player, File iniFile) {
         mPlayer = player;
