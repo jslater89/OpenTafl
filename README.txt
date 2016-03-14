@@ -45,11 +45,32 @@ can be combined in interesting ways. (A quick-play game might use overtime
 exclusively, for instance.) Please try several things and let me know what
 works best for you.
 
-Note that the AI search time setting supercedes the AI's time usage planning—
+Note that the AI search time setting supersedes the AI's time usage planning—
 you can use the search time to cap the AI's thinking time, and thereby set
 its difficulty.
 
-4. Version history
+4. External engines
+OpenTafl supports external artificial intelligence engines, using the OpenTafl
+Engine Protocol. (You can find a link in the links section below, if you are
+interested in developing an OpenTafl-compatible AI.)
+
+Use the options menu to configure the external AI. You must select the .ini
+file provided by your engine to instruct OpenTafl how to start it. If your
+engine does not provide an .ini file, please contact your engine's author.
+Note that the AI think time setting only affects OpenTafl.
+
+5. Links
+http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt
+
+5. Version history
+
+v0.2.0b (released xx/xx/16):
+- Functional but incomplete implementation of external engine mode
+- Not yet implemented:
+    - Errors and error codes
+    - 'simple-moves' command
+    - Engine-initiated informational commands (e.g. rules, move, position, &c.)
+
 
 v0.1.9.1b (released 03/11/16):
 - Possible bug-fixes for non-Swing terminals, which you, as a user, can't use
