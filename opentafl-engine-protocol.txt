@@ -4,24 +4,46 @@ The OpenTafl Engine Protocol is a bidirectional communications protocol used by
 OpenTafl to communicate with external tafl engines. For simplicity, it uses
 piped text input and output, with human-readable commands. OpenTafl sends all
 commands using the US-ASCII character set, and expects to receive responses
-in the same. Command will be separated by the newline character \n.
+in the same. Commands will be separated by the newline character \n.
 
 To avoid complicated bookkeeping, commands are unacknowledged.
 
-0. Simple Algebraic Tafl Notation
+1. External engine .ini file
+OpenTafl requires that external engines provide an .ini file containing basic
+configuration information. The file must contain a section with the [engine]
+heading, and entries with the names 'directory', 'filename', and 'command'. It
+may optionally contain an entry named 'arguments'.
+
+'directory' must contain the path to the directory in which your engine is
+installed, relative to <opentafl-dir>/engines.
+
+'filename' must contain the name of your engine's executable file inside the
+directory specified in 'directory'. This entry is used to verify that your
+engine file exists and can be accessed by OpenTafl.
+
+'command' must contain the command used to run your engine. OpenTafl will
+execute it, using the directory specified in 'directory' as the working
+directory.
+
+'arguments' need not be present. If it is, its contents will be treated as
+command-line arguments to your engine.
+
+See the opentafl.ini file in any distribution of OpenTafl for an example.
+
+2. Simple Algebraic Tafl Notation
 Since both OpenTafl and the external engines maintain game state, detailed
 notation is unnecessary. Therefore, OpenTafl by default uses a very simple move
 notation: the starting space, a dash, and the finishing space: 'a4-a1'. 
 OpenTafl can be configured to use full OpenTafl move notation, if desired.
 
-1. hello
+3. hello
 Direction: Engine <-> OpenTafl
 Command: 'hello'
 
 Alerts OpenTafl that the engine is active. Send 'hello' once your engine has
 started.
 
-2. simple-moves
+4. simple-moves
 Direction: Engine -> OpenTafl
 Command: 'simple-moves <on|off>'
 Default: on
@@ -29,7 +51,7 @@ Default: on
 When set to on, OpenTafl provides the external engine with simple move records.
 When set to off, OpenTafl provides full OpenTafl Algebraic Tafl Notation.
 
-3. rules
+5. rules
 Direction: OpenTafl <-> Engine
 Command: 'rules [rules-string]'
 
@@ -42,13 +64,13 @@ board position. If the engine sends a 'rules' command, OpenTafl will reply with
 a 'rules' command; in this case, initialize to the starting board position only
 if the game has not yet begun.
 
-4. start
+6. start
 Direction: OpenTafl -> Engine
 Command: 'start'
 
 OpenTafl notifies the engine that the game has started.
 
-5. position
+7. position
 Direction: OpenTafl <-> Engine
 Command: 'position [position-record]'
 
@@ -57,14 +79,14 @@ defined in the OpenTafl Notation specification, representing the current game
 state. OpenTafl will not send a position command unless the engine sends a
 position command first, or unless the engine is in analysis mode.
 
-6. side
+8. side
 Direction: OpenTafl <-> Engine
 Command: 'side [attackers|defenders]'
 
 OpenTafl informs the engine which side it is to play for. OpenTafl will send
 a side command immediately prior to game start.
 
-7. clock
+9. clock
 Direction: OpenTafl <-> Engine
 Command: 'clock [attacker-millis] [defender-millis] [overtime-seconds] [attacker-overtimes] [defender-overtimes]'
 
@@ -81,7 +103,7 @@ OpenTafl will send clock commands at three times:
 2. When main time expires.
 3. When an overtime period expires.
 
-8. analyze
+10. analyze
 Direction: OpenTafl -> Engine
 Command: 'analyze [number] [seconds]'
 
@@ -90,7 +112,7 @@ given number of possible moves with evaluations (see 'analysis') and taking up
 to the given amount of time. Engines are not required to return exactly
 [number] moves, provided they return at least one move.
 
-9. analysis
+11. analysis
 Direction: Engine -> OpenTafl
 Command: 'analysis [number] [<move-list> <evaluation>]...'
 
@@ -105,7 +127,7 @@ Engines are not required to return a full move list, and may elect to simply
 provide the first move in the list (the move which exits the current game
 state).
 
-10. play
+12. play
 Direction: OpenTafl -> Engine
 Command: 'play [attackers|defenders]'
 
@@ -113,14 +135,14 @@ OpenTafl instructs the engine to play for the given side from the current
 board state. The game clock runs from the moment the OpenTafl sends the 'play'
 command to the moment that OpenTafl receives the 'move' command.
 
-11. move
+13. move
 Direction: Engine -> OpenTafl
 Command: 'move [move-record]'
 
 The engine submits the given move to OpenTafl. May return an error. (See
-'move-error').
+'error').
 
-12. error
+14. error
 Direction: OpenTafl <-> Engine
 Command: 'error [error-code]
 
@@ -136,7 +158,7 @@ OpenTafl -> Engine:
 5: no piece at start/non-berserk piece at start (berserk move)
 6: illegal move (berserk)
 
-13. opponent-move
+15. opponent-move
 Direction: OpenTafl -> Engine
 Command: 'opponent-move [move-list] [position-record]'
 
@@ -149,7 +171,7 @@ and will only be more than one move in the case of berserk tafl and berserk
 moves. Moves are listed from oldest to newest. [position-record] is always
 the state of the board at the end of the move list.
 
-14. finish
+16. finish
 Direction: OpenTafl -> Engine
 Command: 'finish <finish-code>'
 
@@ -159,7 +181,7 @@ OpenTafl informs the engine that the game has ended. Result codes:
 2: attackers win
 3: defenders win
 
-15. goodbye
+17. goodbye
 Direction: OpenTafl -> Engine
 Command: 'goodbye'
 
