@@ -91,7 +91,7 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(defenderType);
 
         if(TerminalSettings.defenders == TerminalSettings.ENGINE) {
-            Button defenderFileSelect = new Button("Attacker config", () -> {
+            Button defenderFileSelect = new Button("Defender config", () -> {
                 showFileSelectDialog(false);
             });
             Label defenderFile;
@@ -99,7 +99,7 @@ public class OptionsMenuWindow extends BasicWindow {
                 defenderFile = new Label("<none>");
             }
             else {
-                defenderFile = new Label(TerminalSettings.attackerEngineFile.getName());
+                defenderFile = new Label(TerminalSettings.defenderEngineFile.getName());
             }
 
             optionsPanel.addComponent(defenderFileSelect);
