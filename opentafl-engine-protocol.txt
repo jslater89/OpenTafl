@@ -142,8 +142,10 @@ command to the moment that OpenTafl receives the 'move' command.
 Direction: Engine -> OpenTafl
 Command: 'move [move-record]'
 
-The engine submits the given move to OpenTafl. May return an error. (See
-'error').
+The engine submits the given move to OpenTafl. If the move is made
+successfully, OpenTafl returns a 'position' command. If the move is not
+successful, OpenTafl returns an 'error' command. See 'error' and 
+'opponent-move' below.
 
 14. error
 Direction: OpenTafl <-> Engine
