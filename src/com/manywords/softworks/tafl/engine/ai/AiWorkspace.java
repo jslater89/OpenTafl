@@ -119,7 +119,10 @@ public class AiWorkspace extends Game {
             // If we do have overtime, work out the time we have left per main time move and return that. Otherwise
             // return the overtime time.
             long mainTimeRemaining = entry.mainTime;
-            if(movesLeft > 0) {
+
+            // If we still want to make moves in main time, and if main time would allow us to consider those moves
+            // for longer than just spending one overtime every time, figure that out.
+            if(movesLeft > 0 && (entry.mainTime > movesLeft * overtimeTime)) {
                 long timePerMove = mainTimeRemaining / movesLeft;
                 if(mainTimeRemaining + overtimeTime > timePerMove) {
                     return timePerMove;
@@ -129,8 +132,14 @@ public class AiWorkspace extends Game {
                 }
             }
             else {
-                //TODO: use multiple overtimes to think about harder positions
-                return mainTimeRemaining + overtimeTime;
+                if(movesLeft > 0) {
+                    long timePerMove = mainTimeRemaining / movesLeft;
+                    return overtimeTime + timePerMove;
+                }
+                else {
+                    // TODO: use multiple overtimes if things get dicey
+                    return mainTimeRemaining + overtimeTime;
+                }
             }
         }
     }
