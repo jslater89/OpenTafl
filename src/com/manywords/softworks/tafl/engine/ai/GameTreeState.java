@@ -512,9 +512,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // All moves explored; minify this state
             if(mDepth != 0) {
                 if(mValue == Evaluator.NO_VALUE) {
-                    System.out.println("Entering moves " + getEnteringMoveSequence());
-                    System.out.println("No value");
-                    System.exit(0);
+                    short evaluation = workspace.transpositionTable.getValue(mValue, mCurrentMaxDepth - mDepth, mGameLength);
+                    if(evaluation == Evaluator.NO_VALUE) {
+                        evaluation = workspace.evaluator.evaluate(GameTreeState.this);
+                    }
+                    setValue(evaluation);
+                    System.out.println("Warning: provisional evaluation for state at depth " + mDepth);
                 }
                 MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
                 if (mParent != null) {
