@@ -172,6 +172,8 @@ public class ExternalEngineHost {
         GameClock.ClockEntry attackerClock = mGame.getClock().getClockEntry(mGame.getCurrentState().getAttackers());
         GameClock.ClockEntry defenderClock = mGame.getClock().getClockEntry(mGame.getCurrentState().getDefenders());
         String command = "clock ";
+        boolean attackerOvertime = false;
+        boolean defenderOvertime = false;
         long attackerMillis = -1;
         long defenderMillis = -1;
         int overtimeSeconds = 0;
@@ -183,6 +185,7 @@ public class ExternalEngineHost {
         }
         else {
             attackerMillis = attackerClock.getOvertimeTime();
+            attackerOvertime = true;
         }
 
         if(defenderClock.getMainTime() > 0) {
@@ -190,13 +193,18 @@ public class ExternalEngineHost {
         }
         else {
             defenderMillis = defenderClock.getOvertimeTime();
+            defenderOvertime = true;
         }
 
         overtimeSeconds = (int)(attackerClock.getClock().getOvertimeTime() / 1000);
         attackerOvertimes = attackerClock.getOvertimeCount();
         defenderOvertimes = defenderClock.getOvertimeCount();
 
-        command += attackerMillis + " " + defenderMillis + " " + overtimeSeconds + " " + attackerOvertimes + " " + defenderOvertimes;
+        command += attackerMillis + (attackerOvertime ? "* " : " ")
+                + defenderMillis + (defenderOvertime ? "* " : " ")
+                + overtimeSeconds + " "
+                + attackerOvertimes + " "
+                + defenderOvertimes + " ";
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));

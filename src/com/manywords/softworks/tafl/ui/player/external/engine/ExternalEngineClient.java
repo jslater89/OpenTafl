@@ -107,6 +107,19 @@ public class ExternalEngineClient implements UiCallback {
         command = command.replace("clock ", "");
         String[] commandParts = command.split(" ");
 
+        boolean attackerOvertime = false;
+        boolean defenderOvertime = false;
+
+        if(commandParts[0].contains("*")) {
+            commandParts[0] = commandParts[0].replace("*", "");
+            attackerOvertime = true;
+        }
+
+        if(commandParts[1].contains("*")) {
+            commandParts[1] = commandParts[1].replace("*", "");
+            defenderOvertime = true;
+        }
+
         long attackerMillis = Long.parseLong(commandParts[0]);
         long defenderMillis = Long.parseLong(commandParts[1]);
         int overtimeSeconds = Integer.parseInt(commandParts[2]);
@@ -118,8 +131,19 @@ public class ExternalEngineClient implements UiCallback {
             mAttackerClock = mDefenderClock = mClockLength;
         }
         else {
-            mAttackerClock = new GameClock.TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
-            mDefenderClock = new GameClock.TimeSpec(defenderMillis, overtimeSeconds * 1000, defenderOvertimes, 0);
+            if(attackerOvertime) {
+                mAttackerClock = new GameClock.TimeSpec(0, attackerMillis, attackerOvertimes, 0);
+            }
+            else {
+                mAttackerClock = new GameClock.TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
+            }
+
+            if(defenderOvertime) {
+                mDefenderClock = new GameClock.TimeSpec(0, defenderMillis, defenderOvertimes, 0);
+            }
+            else {
+                mDefenderClock = new GameClock.TimeSpec(defenderMillis, overtimeSeconds * 1000, defenderOvertimes, 0);
+            }
         }
     }
 
@@ -135,6 +159,9 @@ public class ExternalEngineClient implements UiCallback {
 
     private void handleFinishCommand(String command) {
         mAiThread.cancel();
+        mAttackerClock = null;
+        mDefenderClock = null;
+        mClockLength = null;
     }
 
     private void sendMoveCommand(MoveRecord move) {

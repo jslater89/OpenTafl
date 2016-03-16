@@ -91,7 +91,7 @@ a side command immediately prior to game start.
 
 9. clock
 Direction: OpenTafl <-> Engine
-Command: 'clock [attacker-millis] [defender-millis] [overtime-seconds] [attacker-overtimes] [defender-overtimes]'
+Command: 'clock [attacker-millis][*] [defender-millis][*] [overtime-seconds] [attacker-overtimes] [defender-overtimes]'
 
 OpenTafl provides the engine with the time left for both players in 
 milliseconds. If overtime timing is enabled, also provides the length of each
@@ -99,7 +99,8 @@ overtime period in seconds, and how many overtime periods the attacker and
 defender have left.
 
 If main time has expired, [attacker-millis] or [defender-millis] will list the
-amount of time remaining in the current overtime period.
+amount of time remaining in the current overtime period, followed by an
+asterisk.
 
 OpenTafl will send clock commands at three times:
 1. At the start of every turn, immediately following the 'play' command.
