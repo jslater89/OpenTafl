@@ -64,6 +64,20 @@ http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt
 
 6. Version history
 
+v0.2.1b (released xx/xx/xx):
+- Ongoing implementation of external engine mode
+- Newly implemented:
+    - OpenTafl-initiated errors and error codes
+    - Finish codes
+    - Engine-initiated informational commands
+    - 'status' command
+    - 'clock' updates
+- Remaining:
+    - Tests
+    - Handling of engine-initiated error codes
+    - 'analyze' command and related matters
+    - 'simple-moves' command
+
 v0.2.0b (released 03/14/16):
 - Functional but incomplete implementation of external engine mode
 - Not yet implemented:

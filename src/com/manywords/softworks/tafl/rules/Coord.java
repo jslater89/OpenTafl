@@ -30,6 +30,10 @@ public class Coord {
     private static List<Coord> mAllEdges;
 
     public static void initialize(int dimension) {
+        if(dimension == 0) {
+            throw new IllegalStateException("Cannot initialize Coord to dimension 0");
+        }
+
         if(mDimension == dimension) {
             return;
         }

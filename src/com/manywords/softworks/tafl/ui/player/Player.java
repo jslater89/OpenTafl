@@ -40,8 +40,15 @@ public abstract class Player {
         mAttackingSide = isAttackingSide;
     }
 
+    public void statusText(String text) {
+        mGame.getUiCallback().statusText(text);
+    }
+
     public abstract void getNextMove(UiCallback ui, Game game, int thinkTime);
+    public abstract void moveResult(int moveResult);
+    public abstract void opponentMove(MoveRecord move);
     public abstract void stop();
+    public abstract void timeUpdate();
     public abstract void onMoveDecided(MoveRecord record);
     public abstract void setCallback(MoveCallback callback);
 

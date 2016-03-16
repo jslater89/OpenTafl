@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.ui.player;
 
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.ui.UiCallback;
@@ -19,6 +20,11 @@ public class ExternalEnginePlayer extends Player {
     private MoveCallback mCallback;
     private ExternalEngineHost mHost;
     private MoveRecord mMyLastMove;
+
+    boolean mAttackerExpired = false;
+    boolean mDefenderExpired = false;
+    private int mAttackerOvertimes = 0;
+    private int mDefenderOvertimes = 0;
 
     public void setupEngine(File iniFile) {
         mHost = new ExternalEngineHost(this, iniFile);
@@ -40,6 +46,9 @@ public class ExternalEnginePlayer extends Player {
     @Override
     public void setGame(Game game) {
         super.setGame(game);
+        if(getGame().getClock() != null) {
+            mAttackerOvertimes = mDefenderOvertimes = getGame().getClock().getOvertimeCount();
+        }
     }
 
     @Override
@@ -64,8 +73,49 @@ public class ExternalEnginePlayer extends Player {
     }
 
     @Override
+    public void moveResult(int moveResult) {
+        mHost.moveResult(moveResult);
+    }
+
+    @Override
+    public void opponentMove(MoveRecord move) {
+        // EE host has a hacky fix for this already
+    }
+
+    @Override
     public void stop() {
-        mHost.finish(0);
+        mHost.finish();
+    }
+
+    @Override
+    public void timeUpdate() {
+        boolean sendUpdate = false;
+        GameClock clock = getGame().getClock();
+        GameClock.ClockEntry attackerClock = clock.getClockEntry(getGame().getCurrentState().getAttackers());
+        GameClock.ClockEntry defenderClock = clock.getClockEntry(getGame().getCurrentState().getDefenders());
+
+        if(!mAttackerExpired && attackerClock.mainTimeExpired()) {
+            mAttackerExpired = true;
+            sendUpdate = true;
+        }
+        else if(!mDefenderExpired && defenderClock.mainTimeExpired()) {
+            mDefenderExpired = true;
+            sendUpdate = true;
+        }
+        else if(attackerClock.getOvertimeCount() < mAttackerOvertimes) {
+            mAttackerOvertimes = attackerClock.getOvertimeCount();
+            sendUpdate = true;
+        }
+        else if(defenderClock.getOvertimeCount() < mDefenderOvertimes) {
+            mDefenderOvertimes = defenderClock.getOvertimeCount();
+            sendUpdate = true;
+        }
+
+        if(sendUpdate) {
+            new Thread(() -> {
+                mHost.clockUpdate();
+            }).start();
+        }
     }
 
     @Override

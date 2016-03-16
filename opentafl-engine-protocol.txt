@@ -143,11 +143,17 @@ Direction: Engine -> OpenTafl
 Command: 'move [move-record]'
 
 The engine submits the given move to OpenTafl. If the move is made
-successfully, OpenTafl returns a 'position' command. If the move is not
-successful, OpenTafl returns an 'error' command. See 'error' and 
-'opponent-move' below.
+successfully, OpenTafl returns a 'move' command. If the move is not successful,
+OpenTafl returns an 'error' command. See 'error' and 'opponent-move' below.
 
-14. error
+14. move
+Direction: OpenTafl -> Engine
+Command: 'move [position-record]'
+
+The move the engine last submitted to OpenTafl completed successfully. The
+position record provided is the board state following your move.
+
+15. error
 Direction: OpenTafl <-> Engine
 Command: 'error [error-code]
 
@@ -157,13 +163,11 @@ Engine -> OpenTafl:
 
 OpenTafl -> Engine:
 1: wrong side
-2: no piece at start
-3: illegal move (blocked, piece at end, &c.)
-4: wrong side (berserk move)
-5: no piece at start/non-berserk piece at start (berserk move)
-6: illegal move (berserk)
+2: illegal move (blocked, piece at end, &c.)
+3: wrong side (berserk move)
+4: illegal move (berserk)
 
-15. opponent-move
+16. opponent-move
 Direction: OpenTafl -> Engine
 Command: 'opponent-move [move-list] [position-record]'
 
@@ -182,23 +186,23 @@ command. Note that, in case of an erroneous move, OpenTafl will send three
 commands: 'error', 'opponent-move' (containing the prior move, and the correct
 board position), and 'play'.
 
-16. finish
+17. finish
 Direction: OpenTafl -> Engine
 Command: 'finish <finish-code>'
 
 OpenTafl informs the engine that the game has ended. Result codes:
-0: other side exited
+0: exit before victory
 1: draw
 2: attackers win
 3: defenders win
 
-17. goodbye
+18. goodbye
 Direction: OpenTafl -> Engine
 Command: 'goodbye'
 
 OpenTafl informs the engine that it may safely shut down.
 
-18. status
+19. status
 Direction: Engine -> OpenTafl
 Command: 'status [text]'
 

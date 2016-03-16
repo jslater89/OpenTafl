@@ -36,8 +36,23 @@ public class LocalHuman extends Player {
     }
 
     @Override
+    public void moveResult(int moveResult) {
+
+    }
+
+    @Override
+    public void opponentMove(MoveRecord move) {
+
+    }
+
+    @Override
     public void stop() {
         if(mWorker != null) mWorker.cancel();
+    }
+
+    @Override
+    public void timeUpdate() {
+
     }
 
     @Override

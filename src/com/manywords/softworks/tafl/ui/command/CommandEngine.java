@@ -16,6 +16,7 @@ public class CommandEngine {
     private Player mAttacker;
     private Player mDefender;
     private Player mCurrentPlayer;
+    private Player mLastPlayer;
     private UiCallback mUiCallback;
 
     private boolean mInGame = false;
@@ -86,6 +87,7 @@ public class CommandEngine {
         @Override
         public void timeUpdate(Side currentSide) {
             mUiCallback.timeUpdate(currentSide);
+
         }
 
         @Override
@@ -140,12 +142,36 @@ public class CommandEngine {
                     message += "Move disallowed.";
                 }
 
+                if(mCurrentPlayer.isAttackingSide()) {
+                    mAttacker.moveResult(result);
+                }
+                else {
+                    mDefender.moveResult(result);
+                }
+
                 mUiCallback.moveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), move);
             }
             else {
+                mLastPlayer = mCurrentPlayer;
                 mCurrentPlayer = (mGame.getCurrentSide().isAttackingSide() ? mAttacker : mDefender);
                 mUiCallback.moveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", null), move);
                 mUiCallback.gameStateAdvanced();
+
+                // Send a move result to the last player to move.
+                if(mLastPlayer.isAttackingSide()) {
+                    mAttacker.moveResult(result);
+                }
+                else {
+                    mDefender.moveResult(result);
+                }
+
+                // Send an opponent move update to the other player.
+                if(mAttacker != mLastPlayer) {
+                    mAttacker.opponentMove(move);
+                }
+                else {
+                    mDefender.opponentMove(move);
+                }
             }
 
             waitForNextMove();

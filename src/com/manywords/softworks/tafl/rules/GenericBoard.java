@@ -10,8 +10,14 @@ public class GenericBoard extends BoardImpl {
     private int mBoardDimension = 11;
 
     public GenericBoard(int boardSize) {
+        super(boardSize);
         mBoardDimension = boardSize;
-        Coord.initialize(mBoardDimension);
+    }
+
+    public GenericBoard(Rules rules) {
+        super(rules.boardSize);
+        mBoardDimension = rules.boardSize;
+        setRules(rules);
     }
 
     public GenericBoard(Board b) {

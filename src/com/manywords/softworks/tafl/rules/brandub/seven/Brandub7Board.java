@@ -6,7 +6,7 @@ import com.manywords.softworks.tafl.rules.BoardImpl;
 
 public class Brandub7Board extends BoardImpl {
     public Brandub7Board() {
-        super();
+        super(7);
     }
 
     public Brandub7Board(Board board) {

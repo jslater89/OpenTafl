@@ -5,7 +5,7 @@ import com.manywords.softworks.tafl.rules.BoardImpl;
 
 public class Berserk11Board extends BoardImpl {
     public Berserk11Board() {
-        super();
+        super(11);
     }
 
     public Berserk11Board(Board board) {

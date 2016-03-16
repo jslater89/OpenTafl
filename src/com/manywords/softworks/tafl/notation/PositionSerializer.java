@@ -123,13 +123,13 @@ public class PositionSerializer {
         return board;
     }
 
-    public static GameState loadPositionRecord(String otnPosition, Game g) {
-        char[][] board = loadPositionRecord(otnPosition);
+    public static GameState loadPositionRecord(Rules rules, String otnPosition, Game g) {
+        //char[][] board = loadPositionRecord(otnPosition);
+        Board b = new GenericBoard(rules);
         List<List<Side.TaflmanHolder>> positionTaflmen = parseTaflmenFromPosition(otnPosition);
-
-        Board b = new GenericBoard(g.getGameRules().boardSize);
         Side attackers = new GenericSide(b, true, positionTaflmen.get(0));
-        Side defenders = new GenericSide(b, true, positionTaflmen.get(1));
+        Side defenders = new GenericSide(b, false, positionTaflmen.get(1));
+        b.setupTaflmen(attackers, defenders);
 
         return new GameState(g, g.getGameRules(), b, attackers, defenders);
     }

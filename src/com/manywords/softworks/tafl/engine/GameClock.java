@@ -42,6 +42,10 @@ public class GameClock {
         mClocks[DEFENDERS] = new ClockEntry(this, defenders, mainTime, overtimeTime, overtimeCount);
     }
 
+    public TimeSpec toTimeSpec() {
+        return new TimeSpec(mMainTimeMillis, mOvertimeMillis, mOvertimeCount, mIncrementMillis);
+    }
+
     public void setCallback(GameClockCallback callback) {
         mCallback = callback;
     }
@@ -233,6 +237,14 @@ public class GameClock {
 
         public int getOvertimeCount() {
             return mOvertimeCount;
+        }
+
+        public boolean mainTimeExpired() {
+            return mMainTimeMillis <= 0;
+        }
+
+        public TimeSpec toTimeSpec() {
+            return new TimeSpec(mMainTimeMillis, mOvertimeMillis, mOvertimeCount, 0);
         }
 
         public String toString() {

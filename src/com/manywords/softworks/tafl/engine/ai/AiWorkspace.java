@@ -21,6 +21,8 @@ public class AiWorkspace extends Game {
     public static final Evaluator evaluator = new FishyEvaluator();
 
     private Game mGame;
+    private GameClock.TimeSpec mClockLength;
+    private GameClock.TimeSpec mTimeRemaining;
     private GameTreeState mStartingState;
 
     public long[] mAlphaCutoffs;
@@ -67,14 +69,17 @@ public class AiWorkspace extends Game {
         transpositionTable = new TranspositionTable((transpositionTable != null? transpositionTable.size() : 5));
     }
 
-    private long planTimeUsage(Game g) {
-        // We Math.min the return from this with the requested think time
-        if(g.getClock() == null) return Long.MAX_VALUE;
+    public void setTimeRemaining(GameClock.TimeSpec length, GameClock.TimeSpec entry) {
+        mClockLength = length;
+        mTimeRemaining = entry;
+    }
 
-        int boardDimension = g.getGameRules().boardSize;
-
+    private long planTimeUsage(Game g, GameClock.TimeSpec entry) {
+        // Math.minned against
+        if(entry == null) return Long.MAX_VALUE;
         // Aim to make a certain number of moves in main time, using overtimes
         // for the rest.
+        int boardDimension = g.getGameRules().getBoard().getBoardDimension();
         int mainTimeMoves;
         if(boardDimension == 7) {
             mainTimeMoves = 6;
@@ -84,38 +89,35 @@ public class AiWorkspace extends Game {
         }
         else mainTimeMoves = 20;
 
+        // Moves the current side has made
         int movesMade = g.getHistory().size() / 2;
         int movesLeft = mainTimeMoves - movesMade;
-        long mainTime = g.getClock().getMainTime();
-        long overtimeTime = g.getClock().getOvertimeTime();
-        long overtimeCount = g.getClock().getOvertimeCount();
-        long incrementTime = g.getClock().getIncrementTime();
-
-
-        GameClock.ClockEntry entry = g.getClock().getClockEntry(g.getCurrentState().getCurrentSide());
+        long mainTime = mClockLength.mainTime;
+        long overtimeTime = mClockLength.overtimeTime;
+        long overtimeCount = mClockLength.overtimeCount;
 
         if(overtimeCount == 0 || overtimeTime == 0) {
             if(movesMade < mainTimeMoves / 2) {
                 // Opening game: use 5% of the time
                 long openingTime = (long) (mainTime * 0.05);
-                return openingTime / (mainTimeMoves / 2) + (long)(incrementTime * 0.9);
+                return openingTime / (mainTimeMoves / 2);
             }
-            else if (entry.getMainTime() > mainTime * 0.2) {
+            else if (entry.mainTime > mainTime * 0.2) {
                 // Midgame: expect to make about mainTimeMoves for the next 75% of the time.
                 long midgameTime = (long) (mainTime * 0.75);
-                return midgameTime / (mainTimeMoves) + (long)(incrementTime * 0.9);
+                return midgameTime / (mainTimeMoves);
             }
             else {
                 // Endgame: use a constant portion of the main time, until that turns out to be three seconds,
                 // then just use three seconds and hope we're close enough to a win to make that work.
-                long remainingTime = entry.getMainTime() / mainTimeMoves;
+                long remainingTime = entry.mainTime / mainTimeMoves;
                 return Math.max(remainingTime, 3);
             }
         }
         else {
             // If we do have overtime, work out the time we have left per main time move and return that. Otherwise
             // return the overtime time.
-            long mainTimeRemaining = entry.getMainTime();
+            long mainTimeRemaining = entry.mainTime;
             if(movesLeft > 0) {
                 long timePerMove = mainTimeRemaining / movesLeft;
                 if(mainTimeRemaining + overtimeTime > timePerMove) {
@@ -151,7 +153,11 @@ public class AiWorkspace extends Game {
         mStartTime = System.currentTimeMillis();
         int maxDepth = 10;
 
-        mThinkTime = Math.min(planTimeUsage(mGame), mMaxThinkTime);
+        if(mTimeRemaining == null && mGame.getClock() != null) {
+            mClockLength = mGame.getClock().toTimeSpec();
+            mTimeRemaining = mGame.getClock().getClockEntry(mGame.getCurrentSide()).toTimeSpec();
+        }
+        mThinkTime = Math.min(planTimeUsage(mGame, mTimeRemaining), mMaxThinkTime);
         if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec");
 
         //mThreadPool.start();

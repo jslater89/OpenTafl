@@ -104,47 +104,73 @@ public class ExternalEngineHost {
         }
     }
 
+    public void moveResult(int result) {
+        if(result == GameState.GOOD_MOVE) {
+            move(mGame.getCurrentState());
+        }
+        else if(result == GameState.ILLEGAL_SIDE) {
+            error(1);
+        }
+        else if(result == GameState.ILLEGAL_MOVE) {
+            error(2);
+        }
+        else if(result == GameState.ILLEGAL_SIDE_BERSERKER) {
+            error(3);
+        }
+        else if(result == GameState.ILLEGAL_MOVE_BERSERKER) {
+            error(4);
+        }
+    }
+
     public void setGame(Game g) {
-        setRules(g.getGameRules());
+        rules(g.getGameRules());
         mGame = g;
     }
 
-    public String setRules(Rules rules) {
+    public void rules(Rules rules) {
         String command = "rules ";
         command += rules.getOTRString();
         //System.out.println("Host view of rules: " + rules.getOTRString());
         command += "\n";
 
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
-        return command;
     }
 
-    public String start(Game game) {
+    public void start(Game game) {
         mGame = game;
         side(mPlayer.isAttackingSide());
         mCommThread.sendCommand("start\n".getBytes(Charset.forName("US-ASCII")));
-        return "start\n";
     }
 
-    public String setPosition(GameState state) {
+    public void position(GameState state) {
         String command = "position ";
         command += state.getOTNPositionString();
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
-        return command;
     }
 
-    public String side(boolean isAttackingSide) {
+    public void move(GameState state) {
+        String command = "move ";
+        command += state.getOTNPositionString();
+
+        command += "\n";
+        mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
+    }
+
+    public void side(boolean isAttackingSide) {
         String command = "side ";
         command += (isAttackingSide ? "attackers" : "defenders");
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
-        return command;
     }
 
-    public String clockUpdate(GameClock.ClockEntry attackerClock, GameClock.ClockEntry defenderClock) {
+    public void clockUpdate() {
+        if(mGame == null || mGame.getClock() == null) return;
+
+        GameClock.ClockEntry attackerClock = mGame.getClock().getClockEntry(mGame.getCurrentState().getAttackers());
+        GameClock.ClockEntry defenderClock = mGame.getClock().getClockEntry(mGame.getCurrentState().getDefenders());
         String command = "clock ";
         long attackerMillis = -1;
         long defenderMillis = -1;
@@ -174,35 +200,34 @@ public class ExternalEngineHost {
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
-        return command;
     }
 
-    public String analyze(int moves, int seconds) {
+    public void analyze(int moves, int seconds) {
+        clockUpdate();
         String command = "analyze " + moves + " " + seconds;
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
-        return command;
     }
 
-    public String playForCurrentSide(Game game) {
+    public void playForCurrentSide(Game game) {
+        clockUpdate();
+
         String command = "play ";
         command += (game.getCurrentSide().isAttackingSide() ? "attackers" : "defenders");
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
-        return command;
     }
 
-    public String error(int code) {
+    public void error(int code) {
         String command = "error " + code;
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
-        return command;
     }
 
-    public String notifyMovesMade(List<MoveRecord> moves) {
+    public void notifyMovesMade(List<MoveRecord> moves) {
         String command = "opponent-move ";
         int index = 0;
         for(MoveRecord move : moves) {
@@ -220,20 +245,29 @@ public class ExternalEngineHost {
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
-        return command;
     }
 
-    public String finish(int code) {
+    public void finish() {
+        int code = 0;
+
+        if(mGame.getCurrentState().checkVictory() == GameState.DRAW) {
+            code = 1;
+        }
+        else if(mGame.getCurrentState().checkVictory() == GameState.ATTACKER_WIN) {
+            code = 2;
+        }
+        else if(mGame.getCurrentState().checkVictory() == GameState.DEFENDER_WIN) {
+            code = 3;
+        }
+
         String command = "finish " + code;
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
-        return command;
     }
 
-    public String quit() {
-        mCommThread.sendCommand("quit\n".getBytes(Charset.forName("US-ASCII")));
-        return "quit\n";
+    public void goodbye() {
+        mCommThread.sendCommand("goodbye\n".getBytes(Charset.forName("US-ASCII")));
     }
 
     public void handleMoveCommand(String command) {
@@ -241,6 +275,11 @@ public class ExternalEngineHost {
         MoveRecord move = MoveRecord.getMoveRecordFromSimpleString(command);
 
         mPlayer.onMoveDecided(move);
+    }
+
+    public void handleStatusCommand(String command) {
+        command = command.replace("status ", "");
+        mPlayer.statusText(command);
     }
 
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
@@ -258,6 +297,25 @@ public class ExternalEngineHost {
                 }
                 else if(cmd.startsWith("move")) {
                     handleMoveCommand(cmd);
+                }
+                else if(cmd.startsWith("rules")) {
+                    if(mGame != null) {
+                        rules(mGame.getGameRules());
+                    }
+                }
+                else if(cmd.startsWith("side")) {
+                    side(mPlayer.isAttackingSide());
+                }
+                else if(cmd.startsWith("position")) {
+                    position(mGame.getCurrentState());
+                }
+                else if(cmd.startsWith("clock")) {
+                    GameClock.ClockEntry attackerClock = mGame.getClock().getClockEntry(mGame.getCurrentState().getAttackers());
+                    GameClock.ClockEntry defenderClock = mGame.getClock().getClockEntry(mGame.getCurrentState().getDefenders());
+                    clockUpdate();
+                }
+                else if(cmd.startsWith("status")) {
+                    handleStatusCommand(cmd);
                 }
             }
         }

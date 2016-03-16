@@ -283,10 +283,6 @@ public class RulesSerializer {
         if(config.containsKey("dforh")) hostile = getTaflmanTypeListForString(config.get("dforh"));
         rules.setDefenderFortParameters(passable, stoppable, hostile);
 
-        if(rules.centerStoppableFor[1] == true) {
-            System.out.println("Ack!");
-            System.exit(0);
-        }
         return rules;
     }
 

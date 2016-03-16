@@ -5,7 +5,7 @@ import com.manywords.softworks.tafl.rules.BoardImpl;
 
 public class Tawlbwrdd11Board extends BoardImpl {
     public Tawlbwrdd11Board() {
-        super();
+        super(11);
     }
 
     public Tawlbwrdd11Board(Board board) {

@@ -33,8 +33,11 @@ public class ExternalEngineClient implements UiCallback {
 
     private Rules mRules;
     private Game mGame;
-    private GameClock.ClockEntry mTimeRemaining;
+    private GameClock.TimeSpec mClockLength;
+    private GameClock.TimeSpec mAttackerClock;
+    private GameClock.TimeSpec mDefenderClock;
     private UiWorkerThread mAiThread;
+    private boolean mIsAttackingSide;
 
     public void start() {
         System.setErr(System.out);
@@ -56,7 +59,7 @@ public class ExternalEngineClient implements UiCallback {
 
     private void handlePositionCommand(String command) {
         command = command.replace("position ", "");
-        GameState state = PositionSerializer.loadPositionRecord(command, mGame);
+        GameState state = PositionSerializer.loadPositionRecord(mRules, command, mGame);
         mGame.setCurrentState(state);
     }
 
@@ -64,12 +67,21 @@ public class ExternalEngineClient implements UiCallback {
         boolean attackers = false;
         if(command.contains("attackers")) attackers = true;
         Side s = (attackers ? mGame.getCurrentState().getAttackers() : mGame.getCurrentState().getDefenders());
+        mIsAttackingSide = attackers;
 
         mGame.getCurrentState().setCurrentSide(s);
     }
 
     private void handlePlayCommand(String command) {
+        if(command.contains("attackers")) {
+            mGame.getCurrentState().setCurrentSide(mGame.getCurrentState().getAttackers());
+        }
+        else {
+            mGame.getCurrentState().setCurrentSide(mGame.getCurrentState().getDefenders());
+        }
         AiWorkspace workspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), 50);
+
+        if(mClockLength != null) workspace.setTimeRemaining(mClockLength, (mIsAttackingSide ? mAttackerClock : mDefenderClock));
 
         mAiThread = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
             private boolean mRunning = true;
@@ -90,6 +102,26 @@ public class ExternalEngineClient implements UiCallback {
         mAiThread.start();
     }
 
+    private void handleClockCommand(String command) {
+        command = command.replace("clock ", "");
+        String[] commandParts = command.split(" ");
+
+        long attackerMillis = Long.parseLong(commandParts[0]);
+        long defenderMillis = Long.parseLong(commandParts[1]);
+        int overtimeSeconds = Integer.parseInt(commandParts[2]);
+        int attackerOvertimes = Integer.parseInt(commandParts[3]);
+        int defenderOvertimes = Integer.parseInt(commandParts[4]);
+
+        if(mClockLength == null) {
+            mClockLength = new GameClock.TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
+            mAttackerClock = mDefenderClock = mClockLength;
+        }
+        else {
+            mAttackerClock = new GameClock.TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
+            mDefenderClock = new GameClock.TimeSpec(defenderMillis, overtimeSeconds * 1000, defenderOvertimes, 0);
+        }
+    }
+
     private void handleOpponentMoveCommand(String command) {
         command = command.replace("opponent-move ", "");
         String[] commandParts = command.split(" ");
@@ -98,6 +130,10 @@ public class ExternalEngineClient implements UiCallback {
         for(String move : moves) {
             mGame.getCurrentState().makeMove(MoveRecord.getMoveRecordFromSimpleString(move));
         }
+    }
+
+    private void handleFinishCommand(String command) {
+        mAiThread.cancel();
     }
 
     private void sendMoveCommand(MoveRecord move) {
@@ -132,6 +168,12 @@ public class ExternalEngineClient implements UiCallback {
                 else if (cmd.startsWith("position")) {
                     handlePositionCommand(cmd);
                 }
+                else if(cmd.startsWith("finish")) {
+                    handleFinishCommand(cmd);
+                }
+                else if(cmd.startsWith("clock")) {
+                    handleClockCommand(cmd);
+                }
             }
         }
     }
@@ -161,7 +203,7 @@ public class ExternalEngineClient implements UiCallback {
 
     @Override
     public void statusText(String text) {
-
+        
     }
 
     @Override

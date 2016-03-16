@@ -7,8 +7,8 @@ import com.manywords.softworks.tafl.ui.RawTerminal;
 import java.util.*;
 
 public abstract class BoardImpl extends Board {
-    public BoardImpl() {
-        Coord.initialize(getBoardDimension());
+    public BoardImpl(int dimension) {
+        Coord.initialize(dimension);
     }
 
     public BoardImpl(Board board) {
