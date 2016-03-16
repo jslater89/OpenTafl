@@ -88,6 +88,8 @@ public class CommandEngine {
         public void timeUpdate(Side currentSide) {
             mUiCallback.timeUpdate(currentSide);
 
+            mAttacker.timeUpdate();
+            mDefender.timeUpdate();
         }
 
         @Override
