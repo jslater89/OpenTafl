@@ -506,6 +506,17 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 }
             }
 
+            // If we have no legal moves, the other side wins
+            if(mBranches.size() == 0) {
+                if(getCurrentSide().isAttackingSide()) {
+                    mVictory = DEFENDER_WIN;
+                }
+                else {
+                    mVictory = ATTACKER_WIN;
+                }
+                mValue = evaluate();
+            }
+
             workspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
             mTaflmanMoveCache = null;
 
@@ -517,7 +528,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                         evaluation = workspace.evaluator.evaluate(GameTreeState.this);
                     }
                     setValue(evaluation);
-                    System.out.println("Warning: provisional evaluation for state at depth " + mDepth);
+                    System.out.println("Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
                 }
                 MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
                 if (mParent != null) {
