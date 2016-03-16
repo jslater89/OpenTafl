@@ -95,17 +95,18 @@ public class AiWorkspace extends Game {
         long mainTime = mClockLength.mainTime;
         long overtimeTime = mClockLength.overtimeTime;
         long overtimeCount = mClockLength.overtimeCount;
+        long incrementTime = (mClockLength.incrementTime > 0 ? mClockLength.incrementTime : 3000);
 
         if(overtimeCount == 0 || overtimeTime == 0) {
             if(movesMade < mainTimeMoves / 2) {
                 // Opening game: use 5% of the time
                 long openingTime = (long) (mainTime * 0.05);
-                return openingTime / (mainTimeMoves / 2);
+                return openingTime / (mainTimeMoves / 2) + (long)(incrementTime * 0.9);
             }
             else if (entry.mainTime > mainTime * 0.2) {
                 // Midgame: expect to make about mainTimeMoves for the next 75% of the time.
                 long midgameTime = (long) (mainTime * 0.75);
-                return midgameTime / (mainTimeMoves);
+                return midgameTime / (mainTimeMoves) + (long)(incrementTime * 0.9);
             }
             else {
                 // Endgame: use a constant portion of the main time, until that turns out to be three seconds,
