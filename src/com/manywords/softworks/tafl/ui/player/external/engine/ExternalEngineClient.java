@@ -92,6 +92,7 @@ public class ExternalEngineClient implements UiCallback {
 
             @Override
             public void run() {
+                workspace.chatty = true;
                 workspace.explore(TerminalSettings.aiThinkTime);
                 workspace.stopExploring();
                 GameTreeNode bestMove = workspace.getTreeRoot().getBestChild();
@@ -139,6 +140,14 @@ public class ExternalEngineClient implements UiCallback {
     private void sendMoveCommand(MoveRecord move) {
         String command = "move ";
         command += move.toSimpleString();
+
+        command += "\n";
+        mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
+    }
+
+    private void sendStatusCommand(String text) {
+        String command = "status ";
+        command += text;
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
@@ -203,7 +212,10 @@ public class ExternalEngineClient implements UiCallback {
 
     @Override
     public void statusText(String text) {
-        
+        String[] lines = text.split("\n");
+        for(String line : lines) {
+            sendStatusCommand(line);
+        }
     }
 
     @Override
