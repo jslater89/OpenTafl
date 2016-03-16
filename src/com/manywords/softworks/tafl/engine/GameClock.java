@@ -62,7 +62,12 @@ public class GameClock {
             mCurrentPlayer = DEFENDERS;
         }
 
-        mClocks[mCurrentPlayer].mMainTimeMillis += mIncrementMillis;
+        if(mMainTimeMillis == 0) {
+            mClocks[mCurrentPlayer].mOvertimeMillis += mIncrementMillis;
+        }
+        else {
+            mClocks[mCurrentPlayer].mMainTimeMillis += mIncrementMillis;
+        }
         return mClocks[ATTACKERS];
     }
 
