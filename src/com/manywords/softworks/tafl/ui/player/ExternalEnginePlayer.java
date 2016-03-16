@@ -21,10 +21,10 @@ public class ExternalEnginePlayer extends Player {
     private ExternalEngineHost mHost;
     private MoveRecord mMyLastMove;
 
-    boolean mAttackerExpired = false;
-    boolean mDefenderExpired = false;
-    private int mAttackerOvertimes = 0;
-    private int mDefenderOvertimes = 0;
+    boolean mAttackerExpired = true;
+    boolean mDefenderExpired = true;
+    private int mAttackerOvertimes = -1;
+    private int mDefenderOvertimes = -1;
 
     public void setupEngine(File iniFile) {
         mHost = new ExternalEngineHost(this, iniFile);
@@ -40,6 +40,8 @@ public class ExternalEnginePlayer extends Player {
     @Override
     public void setupPlayer() {
         super.setupPlayer();
+        mAttackerOvertimes = -1;
+        mDefenderOvertimes = -1;
         setupEngine(this.isAttackingSide() ? TerminalSettings.attackerEngineFile : TerminalSettings.defenderEngineFile);
     }
 
@@ -94,19 +96,27 @@ public class ExternalEnginePlayer extends Player {
         GameClock.ClockEntry attackerClock = clock.getClockEntry(getGame().getCurrentState().getAttackers());
         GameClock.ClockEntry defenderClock = clock.getClockEntry(getGame().getCurrentState().getDefenders());
 
+        if(mAttackerOvertimes == -1) {
+            mAttackerOvertimes = attackerClock.getOvertimeCount();
+        }
+        if(mDefenderOvertimes == -1) {
+            mDefenderOvertimes = defenderClock.getOvertimeCount();
+        }
+
         if(!mAttackerExpired && attackerClock.mainTimeExpired()) {
             mAttackerExpired = true;
             sendUpdate = true;
         }
-        else if(!mDefenderExpired && defenderClock.mainTimeExpired()) {
+        if(!mDefenderExpired && defenderClock.mainTimeExpired()) {
             mDefenderExpired = true;
             sendUpdate = true;
         }
-        else if(attackerClock.getOvertimeCount() < mAttackerOvertimes) {
+
+        if(attackerClock.getOvertimeCount() < mAttackerOvertimes) {
             mAttackerOvertimes = attackerClock.getOvertimeCount();
             sendUpdate = true;
         }
-        else if(defenderClock.getOvertimeCount() < mDefenderOvertimes) {
+        if(defenderClock.getOvertimeCount() < mDefenderOvertimes) {
             mDefenderOvertimes = defenderClock.getOvertimeCount();
             sendUpdate = true;
         }
