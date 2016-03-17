@@ -219,21 +219,21 @@ public class CommandEngine {
         else if(command instanceof HumanCommandParser.Show) {
             return new CommandResult(CommandResult.Type.SHOW, CommandResult.SUCCESS, "", null);
         }
-        // 5. HISTORY COMMAND: SUCCESS
+        // 6. HISTORY COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.History) {
             String gameRecord = mGame.getHistoryString();
 
             return new CommandResult(CommandResult.Type.HISTORY, CommandResult.SUCCESS, "", gameRecord);
         }
-        // 5. HELP COMMAND: SUCCESS
+        // 7. HELP COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Help) {
             return new CommandResult(CommandResult.Type.HELP, CommandResult.SUCCESS, "", null);
         }
-        // 5. QUIT COMMAND: SUCCESS
+        // 8. QUIT COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Rules) {
             return new CommandResult(CommandResult.Type.RULES, CommandResult.SUCCESS, "", null);
         }
-        // 5. QUIT COMMAND: SUCCESS
+        // 9. QUIT COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Quit) {
             return new CommandResult(CommandResult.Type.QUIT, CommandResult.SUCCESS, "", null);
         }
