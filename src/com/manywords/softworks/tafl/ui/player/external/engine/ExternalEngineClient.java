@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
+import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -17,6 +18,8 @@ import com.manywords.softworks.tafl.ui.player.Player;
 import com.manywords.softworks.tafl.ui.player.UiWorkerThread;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jay on 3/10/16.
@@ -164,6 +167,41 @@ public class ExternalEngineClient implements UiCallback {
         mClockLength = null;
     }
 
+    private void handleAnalyzeCommand(String command) {
+        command = command.replace("analyze ", "");
+        String[] commandParts = command.split(" ");
+
+
+        int moves = 5;
+        int time = 30;
+
+        AiWorkspace workspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), 50);
+
+        if(mClockLength != null) workspace.setTimeRemaining(mClockLength, (mIsAttackingSide ? mAttackerClock : mDefenderClock));
+
+        mAiThread = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
+            private boolean mRunning = true;
+            @Override
+            public void cancel() {
+                mRunning = false;
+            }
+
+            @Override
+            public void run() {
+                workspace.chatty = true;
+                workspace.explore(time);
+                workspace.stopExploring();
+
+                List<GameTreeNode> bestNodes = new ArrayList<>(moves);
+                for(int i = 0; i < 5; i++) {
+                    bestNodes.add(workspace.getTreeRoot().getNthChild(i));
+                    sendAnalysisCommand(workspace, bestNodes);
+                }
+            }
+        });
+        mAiThread.start();
+    }
+
     private void sendMoveCommand(MoveRecord move) {
         String command = "move ";
         command += move.toSimpleString();
@@ -177,6 +215,24 @@ public class ExternalEngineClient implements UiCallback {
         command += text;
 
         command += "\n";
+        mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
+    }
+
+    private void sendAnalysisCommand(AiWorkspace workspace, List<GameTreeNode> bestNodes) {
+        String command = "analysis " + bestNodes.size();
+
+        for(GameTreeNode node : bestNodes) {
+            String moveList = " ";
+            for(GameTreeNode pathNode : GameTreeState.getPathForChild(node)) {
+                moveList += "|" + pathNode.getEnteringMove();
+            }
+            moveList = moveList.replaceFirst("\\|", "");
+
+            String analysis = " " + node.getValue();
+
+            command += moveList + analysis;
+        }
+
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
     }
 

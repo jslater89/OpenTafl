@@ -4,12 +4,15 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.player.Player;
 import org.ini4j.Wini;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -125,6 +128,22 @@ public class ExternalEngineHost {
     public void setGame(Game g) {
         rules(g.getGameRules());
         mGame = g;
+    }
+
+    public void analyzePosition(GameState state) {
+        analyzePosition(5, 30, state);
+    }
+
+    public void analyzePosition(int moves, int seconds, GameState state) {
+        // This is a passable but not perfectly ideal way to check for rules equality.
+        if(!mGame.getGameRules().getOTRString().equals(state.mGame.getGameRules().getOTRString())) {
+            rules(state.mGame.getGameRules());
+        }
+
+        position(state);
+        side(state.getCurrentSide().isAttackingSide());
+
+        analyze(moves, seconds);
     }
 
     public void rules(Rules rules) {
@@ -290,6 +309,37 @@ public class ExternalEngineHost {
         mPlayer.statusText(command);
     }
 
+    public void handleAnalysisCommand(String command) {
+        command = command.replace("analysis ", "");
+        String[] commandParts = command.split(" ");
+
+        if(commandParts.length % 2 != 1) {
+            error(5);
+            mPlayer.statusText("Engine returned improperly-formatted analysis result");
+        }
+        else {
+            DecimalFormat f = new DecimalFormat("#.##");
+            for(int i = 1; i < commandParts.length; i += 2) {
+                int moveIndex = i;
+                int analysisIndex = i + 1;
+
+                String moveString = commandParts[moveIndex];
+                String analysisString = commandParts[analysisIndex];
+
+                double analysis = Double.parseDouble(analysisString);
+                String[] moveArray = moveString.split("\\|");
+                List<MoveRecord> moves = new ArrayList<>(moveArray.length);
+
+                for(String move : moveArray) {
+                    MoveRecord record = MoveSerializer.loadMoveRecord(move);
+                    moves.add(record);
+                }
+
+                mPlayer.statusText(moves.get(0).toString() + ": " + f.format(analysis));
+            }
+        }
+    }
+
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
 
         @Override
@@ -324,6 +374,9 @@ public class ExternalEngineHost {
                 }
                 else if(cmd.startsWith("status")) {
                     handleStatusCommand(cmd);
+                }
+                else if(cmd.startsWith("analysis")) {
+                    handleAnalysisCommand(cmd);
                 }
             }
         }
