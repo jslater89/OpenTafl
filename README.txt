@@ -72,10 +72,10 @@ v0.2.1b (released xx/xx/xx):
     - Engine-initiated informational commands
     - 'status' command
     - 'clock' updates
+    - 'analyze' command and related matters
 - Remaining:
     - Tests
     - Handling of engine-initiated error codes
-    - 'analyze' command and related matters
     - 'simple-moves' command
 
 v0.2.0b (released 03/14/16):
