@@ -31,6 +31,9 @@ public class HumanCommandParser {
         else if(command.startsWith("quit")) {
             return newQuitCommand(engine, command);
         }
+        else if(command.startsWith("analyze")) {
+            return newAnalyzeCommand(engine, command);
+        }
         return null;
     }
 
@@ -42,6 +45,7 @@ public class HumanCommandParser {
     public static History newHistoryCommand(CommandEngine engine, String command) { return new History(engine, command); }
     public static Help newHelpCommand(CommandEngine engine, String command) { return new Help(engine, command); }
     public static Quit newQuitCommand(CommandEngine engine, String command) { return new Quit(engine, command); }
+    public static Analyze newAnalyzeCommand(CommandEngine engine, String command) { return new Analyze(engine, command); }
 
     public static class Move extends Command {
         public final Coord from;
@@ -145,6 +149,45 @@ public class HumanCommandParser {
             // Always succeeds
         }
     }
+    public static class Analyze extends Command {
+        public final int moves;
+        public final int seconds;
+
+        public Analyze(CommandEngine engine, String command) {
+            String[] commandParts = command.split(" ");
+            if(commandParts.length == 3) {
+                int tempMoves, tempSecs;
+                try {
+                    tempMoves = Integer.parseInt(commandParts[1]);
+                }
+                catch(NumberFormatException e) {
+                    mError = "Non-numeric moves";
+                    tempMoves = -1;
+                }
+                try {
+                    tempSecs = Integer.parseInt(commandParts[2]);
+                }
+                catch(NumberFormatException e) {
+                    mError = "Non-numeric seconds";
+                    tempSecs = -1;
+                }
+
+                if(!(tempMoves == -1 || tempSecs == -1)) {
+                    moves = tempMoves;
+                    seconds = tempSecs;
+                }
+                else {
+                    moves = -1;
+                    seconds = -1;
+                }
+            }
+            else {
+                moves = -1;
+                seconds = -1;
+                mError = "Improperly-formatted command";
+            }
+        }
+    }
 
     public static String getHelpString(List<CommandResult.Type> types) {
         StringBuilder help = new StringBuilder();
@@ -181,10 +224,16 @@ public class HumanCommandParser {
                 return
                         "history\n" +
                                 "Show the game history so far.\n\n";
+            case ANALYZE:
+                return
+                        "analyze [moves-to-return] [seconds]\n" +
+                                "e.g. analyze 5 30\n" +
+                                "Instruct the analysis engine to analyze the current board state, returning scores for up to moves-to-return potential moves.\n\n";
+
             case HELP:
                 return
                         "help\n" +
-                                "Show this message.\n\n";
+                                "Show this message, but you could have figured that out yourself.\n\n";
             case RULES:
                 return
                         "rules\n" +

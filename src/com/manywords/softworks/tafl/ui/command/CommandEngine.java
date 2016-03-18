@@ -9,7 +9,9 @@ import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
+import com.manywords.softworks.tafl.ui.player.ExternalEnginePlayer;
 import com.manywords.softworks.tafl.ui.player.Player;
+import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
 public class CommandEngine {
     private Game mGame;
@@ -17,6 +19,8 @@ public class CommandEngine {
     private Player mDefender;
     private Player mCurrentPlayer;
     private Player mLastPlayer;
+    private ExternalEnginePlayer mDummyAnalysisPlayer;
+    private ExternalEngineHost mAnalysisEngine;
     private UiCallback mUiCallback;
 
     private boolean mInGame = false;
@@ -36,6 +40,13 @@ public class CommandEngine {
         mDefender.setAttackingSide(false);
         mDefender.setGame(g);
         mDefender.setupPlayer();
+
+        if(TerminalSettings.analysisEngine && ExternalEngineHost.validateEngineFile(TerminalSettings.analysisEngineFile)) {
+            mDummyAnalysisPlayer = new ExternalEnginePlayer();
+            mDummyAnalysisPlayer.setGame(g);
+            mAnalysisEngine = new ExternalEngineHost(mDummyAnalysisPlayer, TerminalSettings.analysisEngineFile);
+            mAnalysisEngine.setGame(g);
+        }
     }
 
     public void setSearchDepth(int depth) {
@@ -236,6 +247,18 @@ public class CommandEngine {
         // 9. QUIT COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Quit) {
             return new CommandResult(CommandResult.Type.QUIT, CommandResult.SUCCESS, "", null);
+        }
+        // 10. ANALYZE COMMAND
+        else if(command instanceof HumanCommandParser.Analyze) {
+            HumanCommandParser.Analyze a = (HumanCommandParser.Analyze) command;
+
+            if(mAnalysisEngine == null) {
+                return new CommandResult(CommandResult.Type.ANALYZE, CommandResult.FAIL, "No analysis engine loaded", null);
+            }
+            else {
+                mAnalysisEngine.analyzePosition(a.moves, a.seconds, mGame.getCurrentState());
+                return new CommandResult(CommandResult.Type.ANALYZE, CommandResult.SUCCESS, "", null);
+            }
         }
 
         return new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, "Command not recognized", null);

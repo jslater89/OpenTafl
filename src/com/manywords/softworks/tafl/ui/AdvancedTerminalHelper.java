@@ -358,6 +358,9 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                     leaveGameUi();
                 }
             }
+            else if(r.type == CommandResult.Type.ANALYZE) {
+                statusText("AI analysis beginning");
+            }
         }
 
         private List<CommandResult.Type> getCurrentCommands() {
@@ -369,6 +372,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
             types.add(CommandResult.Type.INFO);
             types.add(CommandResult.Type.SHOW);
+            types.add(CommandResult.Type.ANALYZE);
             types.add(CommandResult.Type.HISTORY);
             types.add(CommandResult.Type.HELP);
             types.add(CommandResult.Type.QUIT);

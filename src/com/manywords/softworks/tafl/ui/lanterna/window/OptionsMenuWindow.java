@@ -17,6 +17,12 @@ import java.util.List;
  * Created by jay on 2/15/16.
  */
 public class OptionsMenuWindow extends BasicWindow {
+    private enum EngineType {
+        ATTACKER,
+        DEFENDER,
+        ANALYSIS
+    }
+
     private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
     public OptionsMenuWindow(AdvancedTerminalHelper.TerminalCallback callback) {
         mTerminalCallback = callback;
@@ -51,6 +57,23 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(variantName);
 
+
+        Button clockSettingSelect = new Button("Clock setting", new Runnable() {
+            @Override
+            public void run() {
+                showTimeSpecDialog();
+            }
+        });
+        Label clockSettingLabel = new Label(TerminalSettings.timeSpec.toString());
+        optionsPanel.addComponent(clockSettingSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(clockSettingLabel);
+
+        // Blank line
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+
         Button attackerSelect = new Button("Attackers", new Runnable() {
             @Override
             public void run() {
@@ -64,7 +87,7 @@ public class OptionsMenuWindow extends BasicWindow {
 
         if(TerminalSettings.attackers == TerminalSettings.ENGINE) {
             Button attackerFileSelect = new Button("Attacker config", () -> {
-               showFileSelectDialog(true);
+               showFileSelectDialog(EngineType.ATTACKER);
             });
             Label attackerFile;
             if(TerminalSettings.attackerEngineFile == null) {
@@ -79,6 +102,11 @@ public class OptionsMenuWindow extends BasicWindow {
             optionsPanel.addComponent(attackerFile);
         }
 
+        // Blank line
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+
         Button defenderSelect = new Button("Defenders", new Runnable() {
             @Override
             public void run() {
@@ -92,7 +120,7 @@ public class OptionsMenuWindow extends BasicWindow {
 
         if(TerminalSettings.defenders == TerminalSettings.ENGINE) {
             Button defenderFileSelect = new Button("Defender config", () -> {
-                showFileSelectDialog(false);
+                showFileSelectDialog(EngineType.DEFENDER);
             });
             Label defenderFile;
             if(TerminalSettings.defenderEngineFile == null) {
@@ -107,6 +135,47 @@ public class OptionsMenuWindow extends BasicWindow {
             optionsPanel.addComponent(defenderFile);
         }
 
+        // Blank line
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+
+        Button analysisButton = new Button("Analysis engine", new Runnable() {
+            @Override
+            public void run() {
+                TerminalSettings.analysisEngine = !TerminalSettings.analysisEngine;
+                refreshSettings();
+            }
+        });
+        Label analysisLabel = new Label(TerminalSettings.analysisEngine ? "On" : "Off");
+
+        optionsPanel.addComponent(analysisButton);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(analysisLabel);
+
+        if(TerminalSettings.analysisEngine) {
+            Button analysisFileSelect = new Button("Analysis config", () -> {
+                showFileSelectDialog(EngineType.ANALYSIS);
+            });
+            Label analysisFile;
+            if(TerminalSettings.analysisEngineFile == null) {
+                analysisFile = new Label("<none>");
+            }
+            else {
+                analysisFile = new Label(TerminalSettings.analysisEngineFile.getName());
+            }
+
+            optionsPanel.addComponent(analysisFileSelect);
+            optionsPanel.addComponent(newSpacer());
+            optionsPanel.addComponent(analysisFile);
+        }
+
+
+        // Blank line
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+
         Button aiDepthSelect = new Button("AI think time", new Runnable() {
             @Override
             public void run() {
@@ -117,17 +186,6 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(aiDepthSelect);
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(aiDepth);
-
-        Button clockSettingSelect = new Button("Clock setting", new Runnable() {
-            @Override
-            public void run() {
-                showTimeSpecDialog();
-            }
-        });
-        Label clockSettingLabel = new Label(TerminalSettings.timeSpec.toString());
-        optionsPanel.addComponent(clockSettingSelect);
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(clockSettingLabel);
 
         Button backButton = new Button("Back", new Runnable() {
             @Override
@@ -146,10 +204,10 @@ public class OptionsMenuWindow extends BasicWindow {
     }
 
     private EmptySpace newSpacer() {
-        return new EmptySpace(new TerminalSize(4, 0));
+        return new EmptySpace(new TerminalSize(4, 1));
     }
 
-    private void showFileSelectDialog(boolean attackers) {
+    private void showFileSelectDialog(EngineType type) {
         FileDialogBuilder b = new FileDialogBuilder();
         b.setActionLabel("Select");
 
@@ -160,11 +218,17 @@ public class OptionsMenuWindow extends BasicWindow {
         File configFile = d.showDialog(getTextGUI());
 
         if(ExternalEngineHost.validateEngineFile(configFile)) {
-            if (attackers) {
-                TerminalSettings.attackerEngineFile = configFile;
-            }
-            else {
-                TerminalSettings.defenderEngineFile = configFile;
+            switch(type) {
+
+                case ATTACKER:
+                    TerminalSettings.attackerEngineFile = configFile;
+                    break;
+                case DEFENDER:
+                    TerminalSettings.defenderEngineFile = configFile;
+                    break;
+                case ANALYSIS:
+                    TerminalSettings.analysisEngineFile = configFile;
+                    break;
             }
         }
         else {

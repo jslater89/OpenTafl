@@ -171,11 +171,9 @@ public class ExternalEngineClient implements UiCallback {
         command = command.replace("analyze ", "");
         String[] commandParts = command.split(" ");
 
-
-        int moves = 5;
-        int time = 30;
-
-        AiWorkspace workspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), 50);
+        final int moves = Integer.parseInt(commandParts[0]);
+        final int time = Integer.parseInt(commandParts[1]);
+        final AiWorkspace workspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), 50);
 
         if(mClockLength != null) workspace.setTimeRemaining(mClockLength, (mIsAttackingSide ? mAttackerClock : mDefenderClock));
 
@@ -193,10 +191,11 @@ public class ExternalEngineClient implements UiCallback {
                 workspace.stopExploring();
 
                 List<GameTreeNode> bestNodes = new ArrayList<>(moves);
-                for(int i = 0; i < 5; i++) {
+                for(int i = 0; i < moves; i++) {
                     bestNodes.add(workspace.getTreeRoot().getNthChild(i));
-                    sendAnalysisCommand(workspace, bestNodes);
                 }
+
+                sendAnalysisCommand(workspace, bestNodes);
             }
         });
         mAiThread.start();
@@ -233,6 +232,7 @@ public class ExternalEngineClient implements UiCallback {
             command += moveList + analysis;
         }
 
+        command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
     }
 
@@ -265,6 +265,9 @@ public class ExternalEngineClient implements UiCallback {
                 }
                 else if(cmd.startsWith("clock")) {
                     handleClockCommand(cmd);
+                }
+                else if(cmd.startsWith("analyze")) {
+                    handleAnalyzeCommand(cmd);
                 }
             }
         }

@@ -21,6 +21,7 @@ public class CommandResult {
         HELP,
         RULES,
         QUIT,
+        ANALYZE,
     }
 
     public final Type type;
