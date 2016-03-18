@@ -23,14 +23,26 @@ public class OptionsMenuWindow extends BasicWindow {
         ANALYSIS
     }
 
+    private Label mVariantLabel;
+    private Label mClockLabel;
+    private Label mAttackerLabel;
+    private Label mAttackerConfigLabel;
+    private Label mDefenderLabel;
+    private Label mDefenderConfigLabel;
+    private Label mAnalysisLabel;
+    private Label mAnalysisConfigLabel;
+    private Label mThinkTimeLabel;
+
+    private Interactable mLastFocused;
+
     private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
     public OptionsMenuWindow(AdvancedTerminalHelper.TerminalCallback callback) {
         mTerminalCallback = callback;
 
-        refreshSettings();
+        buildSettings();
     }
 
-    public void refreshSettings() {
+    private void buildSettings() {
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
 
@@ -52,10 +64,10 @@ public class OptionsMenuWindow extends BasicWindow {
                 showVariantSelectDialog();
             }
         });
-        Label variantName = new Label(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        mVariantLabel = new Label(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
         optionsPanel.addComponent(variantSelect);
         optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(variantName);
+        optionsPanel.addComponent(mVariantLabel);
 
 
         Button clockSettingSelect = new Button("Clock setting", new Runnable() {
@@ -64,10 +76,10 @@ public class OptionsMenuWindow extends BasicWindow {
                 showTimeSpecDialog();
             }
         });
-        Label clockSettingLabel = new Label(TerminalSettings.timeSpec.toString());
+        mClockLabel = new Label(TerminalSettings.timeSpec.toString());
         optionsPanel.addComponent(clockSettingSelect);
         optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(clockSettingLabel);
+        optionsPanel.addComponent(mClockLabel);
 
         // Blank line
         optionsPanel.addComponent(newSpacer());
@@ -80,27 +92,25 @@ public class OptionsMenuWindow extends BasicWindow {
                 showPlayerSelectDialog(true);
             }
         });
-        Label attackerType = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
+        mAttackerLabel = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
         optionsPanel.addComponent(attackerSelect);
         optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(attackerType);
+        optionsPanel.addComponent(mAttackerLabel);
 
-        if(TerminalSettings.attackers == TerminalSettings.ENGINE) {
-            Button attackerFileSelect = new Button("Attacker config", () -> {
-               showFileSelectDialog(EngineType.ATTACKER);
-            });
-            Label attackerFile;
-            if(TerminalSettings.attackerEngineFile == null) {
-                attackerFile = new Label("<none>");
-            }
-            else {
-                attackerFile = new Label(TerminalSettings.attackerEngineFile.getName());
-            }
+        Button attackerFileSelect = new Button("Attacker config", () -> {
+           showFileSelectDialog(EngineType.ATTACKER);
+        });
 
-            optionsPanel.addComponent(attackerFileSelect);
-            optionsPanel.addComponent(newSpacer());
-            optionsPanel.addComponent(attackerFile);
+        if(TerminalSettings.attackerEngineFile == null) {
+            mAttackerConfigLabel = new Label("<none>");
         }
+        else {
+            mAttackerConfigLabel = new Label(TerminalSettings.attackerEngineFile.getName());
+        }
+
+        optionsPanel.addComponent(attackerFileSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mAttackerConfigLabel);
 
         // Blank line
         optionsPanel.addComponent(newSpacer());
@@ -113,27 +123,25 @@ public class OptionsMenuWindow extends BasicWindow {
                 showPlayerSelectDialog(false);
             }
         });
-        Label defenderType = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.defenders));
+        mDefenderLabel = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.defenders));
         optionsPanel.addComponent(defenderSelect);
         optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(defenderType);
+        optionsPanel.addComponent(mDefenderLabel);
 
-        if(TerminalSettings.defenders == TerminalSettings.ENGINE) {
-            Button defenderFileSelect = new Button("Defender config", () -> {
-                showFileSelectDialog(EngineType.DEFENDER);
-            });
-            Label defenderFile;
-            if(TerminalSettings.defenderEngineFile == null) {
-                defenderFile = new Label("<none>");
-            }
-            else {
-                defenderFile = new Label(TerminalSettings.defenderEngineFile.getName());
-            }
+        Button defenderFileSelect = new Button("Defender config", () -> {
+            showFileSelectDialog(EngineType.DEFENDER);
+        });
 
-            optionsPanel.addComponent(defenderFileSelect);
-            optionsPanel.addComponent(newSpacer());
-            optionsPanel.addComponent(defenderFile);
+        if(TerminalSettings.defenderEngineFile == null) {
+            mDefenderConfigLabel = new Label("<none>");
         }
+        else {
+            mDefenderConfigLabel = new Label(TerminalSettings.defenderEngineFile.getName());
+        }
+
+        optionsPanel.addComponent(defenderFileSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mDefenderConfigLabel);
 
         // Blank line
         optionsPanel.addComponent(newSpacer());
@@ -147,28 +155,26 @@ public class OptionsMenuWindow extends BasicWindow {
                 refreshSettings();
             }
         });
-        Label analysisLabel = new Label(TerminalSettings.analysisEngine ? "On" : "Off");
+        mAnalysisLabel = new Label(TerminalSettings.analysisEngine ? "On" : "Off");
 
         optionsPanel.addComponent(analysisButton);
         optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(analysisLabel);
+        optionsPanel.addComponent(mAnalysisLabel);
 
-        if(TerminalSettings.analysisEngine) {
-            Button analysisFileSelect = new Button("Analysis config", () -> {
-                showFileSelectDialog(EngineType.ANALYSIS);
-            });
-            Label analysisFile;
-            if(TerminalSettings.analysisEngineFile == null) {
-                analysisFile = new Label("<none>");
-            }
-            else {
-                analysisFile = new Label(TerminalSettings.analysisEngineFile.getName());
-            }
+        Button analysisFileSelect = new Button("Analysis config", () -> {
+            showFileSelectDialog(EngineType.ANALYSIS);
+        });
 
-            optionsPanel.addComponent(analysisFileSelect);
-            optionsPanel.addComponent(newSpacer());
-            optionsPanel.addComponent(analysisFile);
+        if(TerminalSettings.analysisEngineFile == null) {
+            mAnalysisConfigLabel = new Label("<none>");
         }
+        else {
+            mAnalysisConfigLabel = new Label(TerminalSettings.analysisEngineFile.getName());
+        }
+
+        optionsPanel.addComponent(analysisFileSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mAnalysisConfigLabel);
 
 
         // Blank line
@@ -182,10 +188,10 @@ public class OptionsMenuWindow extends BasicWindow {
                 showAiDepthEntryDialog();
             }
         });
-        Label aiDepth = new Label("" + TerminalSettings.aiThinkTime);
+        mThinkTimeLabel = new Label("" + TerminalSettings.aiThinkTime);
         optionsPanel.addComponent(aiDepthSelect);
         optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(aiDepth);
+        optionsPanel.addComponent(mThinkTimeLabel);
 
         Button backButton = new Button("Back", new Runnable() {
             @Override
@@ -201,6 +207,39 @@ public class OptionsMenuWindow extends BasicWindow {
         p.addComponent(optionsPanel);
 
         this.setComponent(p);
+    }
+
+    private void refreshSettings() {
+        mVariantLabel.setText(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        mClockLabel.setText(TerminalSettings.timeSpec.toString());
+        mAttackerLabel.setText(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
+
+        if(TerminalSettings.attackerEngineFile == null) {
+            mAttackerConfigLabel.setText("<none>");
+        }
+        else {
+            mAttackerConfigLabel.setText(TerminalSettings.attackerEngineFile.getName());
+        }
+
+        mDefenderLabel.setText(TerminalSettings.labelForPlayerType(TerminalSettings.defenders));
+
+        if(TerminalSettings.defenderEngineFile == null) {
+            mDefenderConfigLabel.setText("<none>");
+        }
+        else {
+            mDefenderConfigLabel.setText(TerminalSettings.defenderEngineFile.getName());
+        }
+
+        mAnalysisLabel.setText(TerminalSettings.analysisEngine ? "On" : "Off");
+
+        if(TerminalSettings.analysisEngineFile == null) {
+            mAnalysisConfigLabel.setText("<none>");
+        }
+        else {
+            mAnalysisConfigLabel.setText(TerminalSettings.analysisEngineFile.getName());
+        }
+
+        mThinkTimeLabel.setText("" + TerminalSettings.aiThinkTime);
     }
 
     private EmptySpace newSpacer() {
