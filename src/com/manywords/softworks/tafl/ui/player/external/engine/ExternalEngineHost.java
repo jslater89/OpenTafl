@@ -299,7 +299,7 @@ public class ExternalEngineHost {
 
     public void handleMoveCommand(String command) {
         command = command.replace("move ", "");
-        MoveRecord move = MoveRecord.getMoveRecordFromSimpleString(command);
+        MoveRecord move = MoveSerializer.loadMoveRecord(command);
 
         mPlayer.onMoveDecided(move);
     }
@@ -340,6 +340,11 @@ public class ExternalEngineHost {
         }
     }
 
+    private void handleSimpleMovesCommand(String command) {
+        if(command.contains("on")) mSimpleNotation = true;
+        else mSimpleNotation = false;
+    }
+
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
 
         @Override
@@ -377,6 +382,9 @@ public class ExternalEngineHost {
                 }
                 else if(cmd.startsWith("analysis")) {
                     handleAnalysisCommand(cmd);
+                }
+                else if(cmd.startsWith("simple-moves")) {
+                    handleSimpleMovesCommand(cmd);
                 }
             }
         }

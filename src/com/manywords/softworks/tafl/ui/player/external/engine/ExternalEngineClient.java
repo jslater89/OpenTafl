@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -156,7 +157,7 @@ public class ExternalEngineClient implements UiCallback {
         String[] moves = commandParts[0].split("\\|");
 
         for(String move : moves) {
-            mGame.getCurrentState().makeMove(MoveRecord.getMoveRecordFromSimpleString(move));
+            mGame.getCurrentState().makeMove(MoveSerializer.loadMoveRecord(move));
         }
     }
 
@@ -199,6 +200,13 @@ public class ExternalEngineClient implements UiCallback {
             }
         });
         mAiThread.start();
+    }
+
+    private void sendSimpleMovesCommand(boolean on) {
+        String command = "simple-moves ";
+        command += (on ? "on" : "off");
+        command += "\n";
+        mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
     }
 
     private void sendMoveCommand(MoveRecord move) {
