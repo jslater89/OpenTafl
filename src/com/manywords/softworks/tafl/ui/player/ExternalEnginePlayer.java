@@ -4,11 +4,14 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
 import java.io.File;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +32,12 @@ public class ExternalEnginePlayer extends Player {
     public void setupEngine(File iniFile) {
         mHost = new ExternalEngineHost(this, iniFile);
         mMyLastMove = null;
+        if(getGame() == null) throw new IllegalStateException("ExternalEnginePlayer game is null when setting up engine!");
+        mHost.setGame(getGame());
+    }
+
+    public void setupTestEngine(TaflTest host, PipedInputStream connectToOutput, PipedOutputStream connectToInput) {
+        mHost = new ExternalEngineHost(this, host, connectToOutput, connectToInput);
         if(getGame() == null) throw new IllegalStateException("ExternalEnginePlayer game is null when setting up engine!");
         mHost.setGame(getGame());
     }

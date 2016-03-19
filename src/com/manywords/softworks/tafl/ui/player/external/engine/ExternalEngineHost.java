@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
+import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.player.Player;
 import org.ini4j.Wini;
 
@@ -54,6 +55,22 @@ public class ExternalEngineHost {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    public ExternalEngineHost(Player player, TaflTest host, PipedInputStream connectToOutput, PipedOutputStream connectToInput) {
+        mPlayer = player;
+        try {
+            mInboundPipe = new BufferedInputStream(new PipedInputStream(connectToInput));
+            mOutboundPipe = new BufferedOutputStream(new PipedOutputStream(connectToOutput));
+        }
+        catch(IOException e) {
+            System.out.println("Could not connect input streams");
+            e.printStackTrace(System.out);
+            System.exit(-1);
+        }
+
+        mCommThread = new CommunicationThread(null, mOutboundPipe, mInboundPipe, mCommCallback);
+        mCommThread.start();
     }
 
     public ExternalEngineHost(Player player, File iniFile) {
@@ -341,8 +358,7 @@ public class ExternalEngineHost {
     }
 
     private void handleSimpleMovesCommand(String command) {
-        if(command.contains("on")) mSimpleNotation = true;
-        else mSimpleNotation = false;
+        mSimpleNotation = command.contains("on");
     }
 
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {

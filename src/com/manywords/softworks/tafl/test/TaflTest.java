@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test;
 
-abstract class TaflTest {
+public abstract class TaflTest {
     public void println(Object o) {
         System.out.println(o);
     }
