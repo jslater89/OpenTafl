@@ -73,10 +73,10 @@ v0.2.1b (released xx/xx/xx):
     - 'status' command
     - 'clock' updates
     - 'analyze' command and related matters
-- Remaining:
-    - Tests
-    - Handling of engine-initiated error codes
     - 'simple-moves' command
+    - Tests
+- Remaining:
+    - Handling of engine-initiated error codes
 
 v0.2.0b (released 03/14/16):
 - Functional but incomplete implementation of external engine mode
