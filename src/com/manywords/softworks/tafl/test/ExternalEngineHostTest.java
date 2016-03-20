@@ -122,21 +122,6 @@ public class ExternalEngineHostTest extends TaflTest implements UiCallback {
                     String string = new String(buffer);
                     String[] commands = string.split("\n");
 
-
-                    /**
-                     private boolean mRulesResponse = false;
-                     private boolean mMoveResponse = false;
-                     private boolean mErrorResponse = false;
-                     private boolean mAnalyzeResponse = false;
-                     private boolean mSideResponse = false;
-                     private boolean mPositionResponse = false;
-                     private boolean mClockResponse = false;
-                     private boolean mPlayResponse = false;
-                     private boolean mOpponentMoveResponse = false;
-                     private boolean mFinishResponse = false;
-                     private boolean mGoodbyeResponse = false;
-                     */
-
                     for(String command : commands) {
                         //System.out.println("Received command: " + command);
                         if(command.startsWith("rules dim:7 surf:n ks:n nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/")) {
