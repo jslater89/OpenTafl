@@ -64,7 +64,7 @@ http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt
 
 6. Version history
 
-v0.2.1b (released xx/xx/xx):
+v0.2.1b (released 03/20/16):
 - Ongoing implementation of external engine mode
 - Newly implemented:
     - OpenTafl-initiated errors and error codes

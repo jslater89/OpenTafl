@@ -166,11 +166,17 @@ position record provided is the board state following your move.
 
 16. error
 Direction: OpenTafl <-> Engine
-Command: 'error <error-code>'
+Command: 'error <error-code> [message]'
+
+OpenTafl will send errors for incorrectly-proposed moves. OpenTafl can
+receive two kinds of error messages from the engine. A non-critical error
+will be presented to the user, and the game will continue. A critical error
+will be presented to the user, and the game will end.
 
 Error code can be one of the following:
 Engine -> OpenTafl:
-0: rules not supported
+-1: critical error
+0: non-critical error
 
 OpenTafl -> Engine:
 1: wrong side
