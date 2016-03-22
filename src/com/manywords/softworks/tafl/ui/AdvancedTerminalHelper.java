@@ -15,6 +15,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.command.Command;
 import com.manywords.softworks.tafl.ui.command.CommandEngine;
@@ -315,6 +316,13 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
         @Override
         public void handleInGameCommand(String command) {
+            /*
+            if(command.startsWith("dump")) {
+                System.out.println(GameSerializer.getGameRecord(mGame));
+                return;
+            }
+            */
+
             Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
             CommandResult r = mCommandEngine.executeCommand(c);
 

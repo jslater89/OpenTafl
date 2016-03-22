@@ -293,16 +293,17 @@ Sea Battle 9x9:
 9x9, escape to the edges, king unarmed, center and corners not hostile, all pieces may
 move through and stop on the center and corners.
 
-dim:9 esc:e ka:n cen: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
+dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
 
 4. Game Records
 	# These elements should be separated by newlines. Tags may be placed on individual
-	# lines, or 
-	# Rules strings should not
-	# contain any newlines.
+	# lines, or on the same line.
+	# Rules strings should not contain any newlines.
+	# A position string element may be included if the game does not start at the
+	# start position given in the rules string.
 	[tags]
-	<rules-string>
-	[position-string]
+	<rules-tag>
+	[position-tag]
 	
 	# This pattern should be separated from the header by newlines.
 	# This pattern repeats for the whole game. The final element may omit
@@ -335,21 +336,26 @@ dim:9 esc:e ka:n cen: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3t
 		"compiler": 
 			person assembling this file, in lastname, firstname format
 		"time-control": 
-			<main-time-seconds> [<overtime-periods>:<overtime-length]
+			<main-time-seconds> [<overtime-periods><"/"><overtime-length]
+			e.g. "3600 3/30": 1 hour, 3 30-second overtimes
 		"termination": 
 			human-readable definition of how the game ended
 		"variant":
 			name of the tafl variant being played
 
-	rules-string:
-		an OTN rules string.
+	rules-tag:
+		<"[rules:"><rules-string><"]">
+
+		rules-string is an OTN rules string.
 	
-	position-string:
+	position-tag:
+		<"[position:"><position-string><"]">
+
 		optionally, a starting position for the game, if not the starting position
 		in the rules string.
 
 	turn-number:
-		the number of times each player has moved, starting at 1.
+		the number of times both players have moved, starting at 1.
 	
 	move-record:
 		an OTN move record.

@@ -167,8 +167,9 @@ public class AiWorkspace extends Game {
             mClockLength = mGame.getClock().toTimeSpec();
             mTimeRemaining = mGame.getClock().getClockEntry(mGame.getCurrentSide()).toTimeSpec();
         }
-        mThinkTime = Math.min(planTimeUsage(mGame, mTimeRemaining), mMaxThinkTime);
-        if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec");
+        long desiredTime = planTimeUsage(mGame, mTimeRemaining);
+        mThinkTime = Math.min(desiredTime, mMaxThinkTime);
+        if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec, desired " + desiredTime);
 
         //mThreadPool.start();
         Timer t = new Timer();
