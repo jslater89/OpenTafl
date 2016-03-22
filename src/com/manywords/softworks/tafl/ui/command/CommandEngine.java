@@ -13,6 +13,9 @@ import com.manywords.softworks.tafl.ui.player.ExternalEnginePlayer;
 import com.manywords.softworks.tafl.ui.player.Player;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CommandEngine {
     private Game mGame;
     private Player mAttacker;
@@ -21,7 +24,8 @@ public class CommandEngine {
     private Player mLastPlayer;
     private ExternalEnginePlayer mDummyAnalysisPlayer;
     private ExternalEngineHost mAnalysisEngine;
-    private UiCallback mUiCallback;
+    private List<UiCallback> mUiCallbacks = new ArrayList<UiCallback>(1);
+    private UiCallback mPrimaryUiCallback;
 
     private boolean mInGame = false;
 
@@ -29,7 +33,8 @@ public class CommandEngine {
 
     public CommandEngine(Game g, UiCallback callback, Player attacker, Player defender) {
         mGame = g;
-        mUiCallback = callback;
+        mUiCallbacks.add(callback);
+        mPrimaryUiCallback = callback;
 
         mAttacker = attacker;
         mAttacker.setAttackingSide(true);
@@ -47,6 +52,18 @@ public class CommandEngine {
             mAnalysisEngine = new ExternalEngineHost(mDummyAnalysisPlayer, TerminalSettings.analysisEngineFile);
             mAnalysisEngine.setGame(g);
         }
+    }
+
+    public void addUiCallback(UiCallback callback) {
+        if(mUiCallbacks.contains(callback)) return;
+
+        mUiCallbacks.add(callback);
+    }
+
+    public void removeUiCallback(UiCallback callback) {
+        if(callback.equals(mPrimaryUiCallback)) throw new IllegalArgumentException("Can't remove primary UI callback!");
+
+        mUiCallbacks.remove(callback);
     }
 
     public void setSearchDepth(int depth) {
@@ -69,7 +86,7 @@ public class CommandEngine {
         }
 
         mInGame = true;
-        mUiCallback.gameStarting();
+        callbackGameStarting();
         mGame.start();
         waitForNextMove();
     }
@@ -81,8 +98,8 @@ public class CommandEngine {
     private void waitForNextMove() {
         if(!mInGame) return;
 
-        mUiCallback.awaitingMove(mCurrentPlayer, mGame.getCurrentSide().isAttackingSide());
-        mCurrentPlayer.getNextMove(mUiCallback, mGame, mThinkTime);
+        callbackAwaitingMove(mCurrentPlayer, mGame.getCurrentSide().isAttackingSide());
+        mCurrentPlayer.getNextMove(mPrimaryUiCallback, mGame, mThinkTime);
     }
 
     public void finishGame() {
@@ -91,13 +108,13 @@ public class CommandEngine {
         mGame.finish();
         mAttacker.stop();
         mDefender.stop();
-        mUiCallback.gameFinished();
+        callbackGameFinished();
     }
 
     private final GameClock.GameClockCallback mClockCallback = new GameClock.GameClockCallback() {
         @Override
         public void timeUpdate(Side currentSide) {
-            mUiCallback.timeUpdate(currentSide);
+            callbackTimeUpdate(currentSide);
 
             mAttacker.timeUpdate();
             mDefender.timeUpdate();
@@ -105,12 +122,12 @@ public class CommandEngine {
 
         @Override
         public void timeExpired(Side currentSide) {
-            mUiCallback.statusText("Time expired!");
+            mPrimaryUiCallback.statusText("Time expired!");
             if(currentSide.isAttackingSide()) {
-                mUiCallback.victoryForSide(mGame.getCurrentState().getDefenders());
+                callbackVictoryForSide(mGame.getCurrentState().getDefenders());
             }
             else {
-                mUiCallback.victoryForSide(mGame.getCurrentState().getAttackers());
+                callbackVictoryForSide(mGame.getCurrentState().getAttackers());
             }
 
             finishGame();
@@ -124,7 +141,7 @@ public class CommandEngine {
             String message = "Illegal play. ";
             if(player != mCurrentPlayer) {
                 message += "Not your turn.";
-                mUiCallback.moveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), null);
+                callbackMoveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), null);
                 return;
             }
             int result =
@@ -133,17 +150,17 @@ public class CommandEngine {
                             mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y)).getLastMoveResult();
 
             if (result == GameState.ATTACKER_WIN) {
-                mUiCallback.victoryForSide(mGame.getCurrentState().getAttackers());
+                callbackVictoryForSide(mGame.getCurrentState().getAttackers());
                 finishGame();
                 return;
             }
             else if (result == GameState.DEFENDER_WIN) {
-                mUiCallback.victoryForSide(mGame.getCurrentState().getDefenders());
+                callbackVictoryForSide(mGame.getCurrentState().getDefenders());
                 finishGame();
                 return;
             }
             else if (result == GameState.DRAW) {
-                mUiCallback.victoryForSide(null);
+                callbackVictoryForSide(null);
                 finishGame();
                 return;
             }
@@ -162,13 +179,13 @@ public class CommandEngine {
                     mDefender.moveResult(result);
                 }
 
-                mUiCallback.moveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), move);
+                callbackMoveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), move);
             }
             else {
                 mLastPlayer = mCurrentPlayer;
                 mCurrentPlayer = (mGame.getCurrentSide().isAttackingSide() ? mAttacker : mDefender);
-                mUiCallback.moveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", null), move);
-                mUiCallback.gameStateAdvanced();
+                callbackMoveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", null), move);
+                callbackGameStateAdvanced();
 
                 // Send a move result to the last player to move.
                 if(mLastPlayer.isAttackingSide()) {
@@ -266,5 +283,47 @@ public class CommandEngine {
 
     public Game getGame() {
         return mGame;
+    }
+
+    private void callbackGameStarting() {
+        for(UiCallback c : mUiCallbacks) {
+            c.gameStarting();
+        }
+    }
+
+    private void callbackAwaitingMove(Player p, boolean isAttackingSide) {
+        for(UiCallback c : mUiCallbacks) {
+            c.awaitingMove(p, isAttackingSide);
+        }
+    }
+
+    private void callbackGameFinished() {
+        for(UiCallback c : mUiCallbacks) {
+            c.gameFinished();
+        }
+    }
+
+    private void callbackTimeUpdate(Side side) {
+        for(UiCallback c : mUiCallbacks) {
+            c.timeUpdate(side);
+        }
+    }
+
+    private void callbackVictoryForSide(Side side) {
+        for(UiCallback c : mUiCallbacks) {
+            c.victoryForSide(side);
+        }
+    }
+
+    private void callbackMoveResult(CommandResult result, MoveRecord move) {
+        for(UiCallback c : mUiCallbacks) {
+            c.moveResult(result, move);
+        }
+    }
+
+    private void callbackGameStateAdvanced() {
+        for(UiCallback c : mUiCallbacks) {
+            c.gameStateAdvanced();
+        }
     }
 }

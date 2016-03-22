@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
@@ -38,31 +39,7 @@ public class MainMenuWindow extends BasicWindow {
         Button playButton = new Button("Play", new Runnable() {
             @Override
             public void run() {
-                if(TerminalSettings.attackers == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.attackerEngineFile)) {
-                    MessageDialog.showMessageDialog(getTextGUI(), "Incomplete configuration", "Attacker engine missing configuration file!");
-                    return;
-                }
-                if(TerminalSettings.defenders == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.defenderEngineFile)) {
-                    MessageDialog.showMessageDialog(getTextGUI(), "Incomplete configuration", "Defender engine missing configuration file!");
-                    return;
-                }
-
-                GameClock.TimeSpec ts = TerminalSettings.timeSpec;
-                Game g;
-                if(ts.mainTime == 0 && (ts.overtimeTime == 0 ||ts.overtimeCount == 0)) {
-                    g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), mTerminalCallback.getUiCallback());
-                }
-                else {
-                    g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), mTerminalCallback.getUiCallback(), ts);
-                }
-
-                TerminalBoardImage.init(g.getGameRules().getBoard().getBoardDimension());
-
-                BoardWindow bw = new BoardWindow(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant), g, mTerminalCallback);
-                CommandWindow cw = new CommandWindow(g, mTerminalCallback);
-                StatusWindow sw = new StatusWindow(g, mTerminalCallback);
-
-                mTerminalCallback.onEnteringGame(g, bw, sw, cw);
+                TerminalUtils.startGame(getTextGUI(), mTerminalCallback);
             }
         });
         p.addComponent(playButton);

@@ -14,7 +14,6 @@ import com.googlecode.lanterna.terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.command.Command;
@@ -27,10 +26,7 @@ import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowDecorationRenderer;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowPostRenderer;
-import com.manywords.softworks.tafl.ui.lanterna.window.BoardWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.CommandWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.MainMenuWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.StatusWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.*;
 import com.manywords.softworks.tafl.ui.player.Player;
 import com.manywords.softworks.tafl.ui.player.UiWorkerThread;
 
@@ -50,6 +46,8 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         public void handleKeyStroke(KeyStroke key);
 
         public UiCallback getUiCallback();
+
+        public void setTournamentWindow(Window tournamentWindow);
     }
 
     private T mTerminal;
@@ -64,6 +62,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     private Game mGame;
     private CommandEngine mCommandEngine;
 
+    private TournamentWindow mTournamentWindow = null;
     private boolean mInGame;
 
     public AdvancedTerminalHelper(T terminal) {
@@ -247,6 +246,11 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     @Override
     public void gameFinished() {
         mInGame = false;
+
+        if(mTournamentWindow != null) {
+            mTournamentWindow.notifyGameFinished();
+            mTerminalCallback.onMenuNavigation(mTournamentWindow);
+        }
     }
 
     @Override
@@ -390,6 +394,11 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         @Override
         public UiCallback getUiCallback() {
             return AdvancedTerminalHelper.this;
+        }
+
+        @Override
+        public void setTournamentWindow(Window w) {
+            mTournamentWindow = (TournamentWindow) w;
         }
     };
 }
