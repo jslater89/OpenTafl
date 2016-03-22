@@ -68,6 +68,8 @@ v0.2.2b (released xx/xx/xx):
 - Improvements to OpenTafl AI's time control handling
 - Fix for OpenTafl incorrectly using the opponent's clock when playing as an
   engine
+- Properly terminate the built-in AI, and any external AI engines, at the end
+  of a game.
 - Tournament runner
 - Game serializer (output only)
 
