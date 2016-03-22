@@ -79,9 +79,11 @@ public class ExternalEngineClient implements UiCallback {
     private void handlePlayCommand(String command) {
         if(command.contains("attackers")) {
             mGame.getCurrentState().setCurrentSide(mGame.getCurrentState().getAttackers());
+            mIsAttackingSide = true;
         }
         else {
             mGame.getCurrentState().setCurrentSide(mGame.getCurrentState().getDefenders());
+            mIsAttackingSide = false;
         }
         AiWorkspace workspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), 50);
 
