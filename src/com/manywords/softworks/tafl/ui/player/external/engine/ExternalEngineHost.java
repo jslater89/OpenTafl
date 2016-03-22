@@ -291,6 +291,11 @@ public class ExternalEngineHost {
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
     }
 
+    public void stopEngine() {
+        finish();
+        goodbye();
+    }
+
     public void finish() {
         int code = 0;
 

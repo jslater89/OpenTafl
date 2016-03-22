@@ -74,6 +74,10 @@ public class AiWorkspace extends Game {
         mTimeRemaining = entry;
     }
 
+    public void crashStop() {
+        mNoTime = true;
+    }
+
     private long planTimeUsage(Game g, GameClock.TimeSpec entry) {
         // Math.minned against
         if(entry == null) return Long.MAX_VALUE;

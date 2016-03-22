@@ -22,16 +22,18 @@ public class LocalAi extends Player {
         ui.statusText("Waiting for computer move.");
 
         mWorker = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
+            AiWorkspace workspace = new AiWorkspace(ui, game, game.getCurrentState(), 50);
+
             private boolean mRunning = true;
 
             @Override
             public void cancel() {
+                workspace.crashStop();
                 mRunning = false;
             }
 
             @Override
             public void run() {
-                AiWorkspace workspace = new AiWorkspace(ui, game, game.getCurrentState(), 50);
                 workspace.chatty = true;
 
                 workspace.explore(thinkTime);

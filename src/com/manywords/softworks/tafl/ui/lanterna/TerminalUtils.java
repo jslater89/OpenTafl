@@ -1,6 +1,5 @@
 package com.manywords.softworks.tafl.ui.lanterna;
 
-import com.googlecode.lanterna.gui2.TextGUI;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.manywords.softworks.tafl.engine.Game;

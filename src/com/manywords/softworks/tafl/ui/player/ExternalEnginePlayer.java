@@ -95,7 +95,7 @@ public class ExternalEnginePlayer extends Player {
 
     @Override
     public void stop() {
-        mHost.finish();
+        mHost.stopEngine();
     }
 
     @Override

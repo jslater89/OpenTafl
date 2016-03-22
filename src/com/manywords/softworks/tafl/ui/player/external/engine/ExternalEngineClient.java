@@ -85,14 +85,15 @@ public class ExternalEngineClient implements UiCallback {
             mGame.getCurrentState().setCurrentSide(mGame.getCurrentState().getDefenders());
             mIsAttackingSide = false;
         }
-        AiWorkspace workspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), 50);
 
+        final AiWorkspace workspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), 50);
         if(mClockLength != null) workspace.setTimeRemaining(mClockLength, (mIsAttackingSide ? mAttackerClock : mDefenderClock));
 
         mAiThread = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
             private boolean mRunning = true;
             @Override
             public void cancel() {
+                workspace.crashStop();
                 mRunning = false;
             }
 
@@ -204,6 +205,11 @@ public class ExternalEngineClient implements UiCallback {
         mAiThread.start();
     }
 
+    private void handleGoodbyeCommand(String command) {
+        mAiThread.cancel();
+        System.exit(0);
+    }
+
     private void sendSimpleMovesCommand(boolean on) {
         String command = "simple-moves ";
         command += (on ? "on" : "off");
@@ -278,6 +284,9 @@ public class ExternalEngineClient implements UiCallback {
                 }
                 else if(cmd.startsWith("analyze")) {
                     handleAnalyzeCommand(cmd);
+                }
+                else if(cmd.startsWith("goodbye")) {
+                    handleGoodbyeCommand(cmd);
                 }
             }
         }

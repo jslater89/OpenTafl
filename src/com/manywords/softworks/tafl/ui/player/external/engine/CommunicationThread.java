@@ -62,5 +62,17 @@ public class CommunicationThread extends Thread {
                 e.printStackTrace(System.out);
             }
         }
+
+        try {
+            input.close();
+        } catch (IOException e) {
+            //best effort
+        }
+
+        try {
+            output.close();
+        } catch (IOException e) {
+            //best effort
+        }
     }
 }
