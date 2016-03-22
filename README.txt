@@ -64,6 +64,13 @@ http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt
 
 6. Version history
 
+v0.2.2b (released xx/xx/xx):
+- Improvements to OpenTafl AI's time control handling
+- Fix for OpenTafl incorrectly using the opponent's clock when playing as an
+  engine
+- Tournament runner
+- Game serializer (output only)
+
 v0.2.1b (released 03/20/16):
 - Ongoing implementation of external engine mode
 - Newly implemented:
