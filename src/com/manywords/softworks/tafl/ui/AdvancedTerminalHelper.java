@@ -249,8 +249,22 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         mInGame = false;
 
         if(mTournamentWindow != null) {
-            mTournamentWindow.notifyGameFinished();
-            mTerminalCallback.onMenuNavigation(mTournamentWindow);
+            // Run this stuff on the UI thread.
+            mGui.getGUIThread().invokeLater(() -> {
+                System.out.println("Leaving game, entering tournament window");
+                mTournamentWindow.notifyGameFinished(mGame);
+
+                System.out.println("Removing windows");
+                mBoardWindow.close();
+                System.out.println("Removed board");
+                mStatusWindow.close();
+                System.out.println("Removed status");
+                mCommandWindow.close();
+                System.out.println("Removed command");
+                System.out.println("Removed windows");
+            });
+
+            System.out.println("Started tournament window thread");
         }
     }
 
@@ -361,6 +375,10 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 dialog.showDialog(mGui);
             }
             else if (r.type == CommandResult.Type.QUIT) {
+                if(mTournamentWindow != null) {
+                    mTournamentWindow = null;
+                }
+
                 if(mInGame) {
                     // Leave the game thread running for history.
                     statusText("Finished game. Enter 'quit' again to return to menu.");

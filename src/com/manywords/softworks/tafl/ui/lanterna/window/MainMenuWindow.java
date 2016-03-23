@@ -52,6 +52,14 @@ public class MainMenuWindow extends BasicWindow {
         });
         p.addComponent(optionsButton);
 
+        Button tourneyButton = new Button("AI tournament", new Runnable() {
+            @Override
+            public void run() {
+                mTerminalCallback.onMenuNavigation(new TournamentWindow(mTerminalCallback));
+            }
+        });
+        p.addComponent(tourneyButton);
+
         Button quitButton = new Button("Quit", new Runnable() {
             @Override
             public void run() {

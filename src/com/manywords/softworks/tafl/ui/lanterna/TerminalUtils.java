@@ -42,6 +42,7 @@ public class TerminalUtils {
         CommandWindow cw = new CommandWindow(g, callback);
         StatusWindow sw = new StatusWindow(g, callback);
 
+        // Blocks here
         callback.onEnteringGame(g, bw, sw, cw);
         return g;
     }
