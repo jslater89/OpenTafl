@@ -376,7 +376,14 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             }
             else if (r.type == CommandResult.Type.QUIT) {
                 if(mTournamentWindow != null) {
+                    TournamentWindow w = mTournamentWindow;
                     mTournamentWindow = null;
+                    mCommandEngine.finishGame();
+                    mGui.removeWindow(mBoardWindow);
+                    mGui.removeWindow(mCommandWindow);
+                    mGui.removeWindow(mStatusWindow);
+                    w.getRunner().finishTournament();
+                    return;
                 }
 
                 if(mInGame) {
