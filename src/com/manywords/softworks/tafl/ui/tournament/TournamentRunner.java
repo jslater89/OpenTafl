@@ -41,6 +41,10 @@ public class TournamentRunner {
         mMatchResults = new ArrayList<>(mMatchCount);
     }
 
+    public void setMatchCount(int count) {
+        mMatchCount = count;
+    }
+
     public void startTournament() {
         mHost.getTerminalCallback().setTournamentWindow(mHost);
 
