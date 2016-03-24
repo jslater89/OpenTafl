@@ -19,6 +19,10 @@ public class TournamentWindow extends BasicWindow {
         mRunner.startTournament();
     }
 
+    public TournamentRunner getRunner() {
+        return mRunner;
+    }
+
     public AdvancedTerminalHelper.TerminalCallback getTerminalCallback() {
         return mTerminalCallback;
     }
