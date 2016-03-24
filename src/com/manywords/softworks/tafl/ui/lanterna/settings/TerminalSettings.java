@@ -61,7 +61,7 @@ public class TerminalSettings {
         return null;
     }
 
-    public static File savetoFile() {
+    public static File saveToFile() {
         File f = new File(SETTINGS_PATH);
 
         try {

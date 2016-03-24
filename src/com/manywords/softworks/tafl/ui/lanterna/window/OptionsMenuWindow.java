@@ -196,7 +196,7 @@ public class OptionsMenuWindow extends BasicWindow {
         Button backButton = new Button("Back", new Runnable() {
             @Override
             public void run() {
-                TerminalSettings.savetoFile();
+                TerminalSettings.saveToFile();
                 mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
             }
         });

@@ -15,7 +15,6 @@ import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.command.Command;
 import com.manywords.softworks.tafl.ui.command.CommandEngine;
@@ -291,7 +290,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 }
                 */
 
-                TerminalSettings.savetoFile();
+                TerminalSettings.saveToFile();
                 System.exit(0);
             }
 
