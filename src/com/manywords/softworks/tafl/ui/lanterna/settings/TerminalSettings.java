@@ -109,7 +109,7 @@ public class TerminalSettings {
             int defender = ini.get("config", "defender", int.class);
             if(defender != 0) defenders = defender - 1;
 
-            String defenderFile = ini.get("config", "attackerfile", String.class);
+            String defenderFile = ini.get("config", "defenderfile", String.class);
             if(defenderFile != null && !defenderFile.equals("")) defenderEngineFile = new File(defenderFile);
 
             String analysisFile = ini.get("config", "analysisfile", String.class);
