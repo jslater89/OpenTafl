@@ -9,6 +9,8 @@ bin*
 profile*
 debug-positions*
 out*
+tournament-results*
+engines/opentafl-debug-2.ini
 
 .idea/workspace.xml
 .idea/tasks.xml
