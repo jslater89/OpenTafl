@@ -6,6 +6,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
+import com.manywords.softworks.tafl.ui.selfplay.MatchResult;
 import com.manywords.softworks.tafl.ui.selfplay.SelfplayRunner;
 
 import java.math.BigInteger;
@@ -22,14 +23,14 @@ public class SelfplayWindow extends BasicWindow {
 
     public SelfplayWindow(AdvancedTerminalHelper.TerminalCallback callback) {
         mTerminalCallback = callback;
+        mRunner = new SelfplayRunner(this, 10);
 
+        setupUi();
+    }
+
+    public void setupUi() {
         Panel p = new Panel();
         p.setLayoutManager(new GridLayout(3));
-
-        Label l1 = new Label("AI Self-Play Mode");
-        p.addComponent(l1);
-        p.addComponent(newSpacer());
-        p.addComponent(newSpacer());
 
         Button iterationsButton = new Button("Iterations", this::showIterationsDialog);
         p.addComponent(iterationsButton);
@@ -39,15 +40,17 @@ public class SelfplayWindow extends BasicWindow {
         mIterationsLabel = new Label("" + mIterations);
         p.addComponent(mIterationsLabel);
 
+        Button menuButton= new Button("Main Menu", () -> {
+            mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
+        });
+
         Button startButton = new Button("Start", () -> {
             mRunner.setMatchCount(mIterations);
             mRunner.startTournament();
         });
         p.addComponent(newSpacer());
-        p.addComponent(newSpacer());
         p.addComponent(startButton);
-
-        mRunner = new SelfplayRunner(this, 10);
+        p.addComponent(menuButton);
 
         setComponent(p);
     }

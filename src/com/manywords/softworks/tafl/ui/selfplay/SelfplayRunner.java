@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.window.MainMenuWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.SelfplayResultWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.SelfplayWindow;
 
 import java.io.File;
@@ -31,6 +32,8 @@ public class SelfplayRunner {
     private MatchResult mCurrentMatch;
     private Game mLastGame = null;
 
+    private boolean mFinished = false;
+
     public SelfplayRunner(SelfplayWindow host, int matchCount) {
         mHost = host;
         mMatchCount = matchCount;
@@ -49,6 +52,14 @@ public class SelfplayRunner {
         mHost.getTerminalCallback().setSelfplayWindow(mHost);
 
         runTournamentMatch();
+    }
+
+    public boolean tournamentFinished() {
+        return mFinished;
+    }
+
+    public List<MatchResult> getMatchResults() {
+        return mMatchResults;
     }
 
     public void notifyGameFinished(Game g) {
@@ -130,11 +141,13 @@ public class SelfplayRunner {
             }
         }
 
+        mFinished = true;
+
         mHost.getTerminalCallback().setSelfplayWindow(null);
-        mHost.getTerminalCallback().onMenuNavigation(new MainMenuWindow(mHost.getTerminalCallback()));
+        mHost.getTerminalCallback().onMenuNavigation(new SelfplayResultWindow(mHost.getTerminalCallback(), this));
     }
 
-    private String drawOrName(File f) {
+    public static String drawOrName(File f) {
         return (f == null? "Draw" : f.getName());
     }
 

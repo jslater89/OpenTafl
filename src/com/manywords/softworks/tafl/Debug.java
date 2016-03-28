@@ -35,9 +35,8 @@ public class Debug {
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
             Terminal t = null;
 
-            if (args.size() == 1) {
-                t = factory.createSwingTerminal();
-            }
+            t = factory.createSwingTerminal();
+            /*
             else {
                 factory.setForceTextTerminal(true);
                 try {
@@ -46,6 +45,7 @@ public class Debug {
                     System.out.println("Unable to start.");
                 }
             }
+            */
 
             if (t != null) {
                 AdvancedTerminalHelper<? extends Terminal> th = new AdvancedTerminalHelper<>(t);
