@@ -60,20 +60,35 @@ engine does not provide an .ini file, please contact your engine's author.
 Note that the AI think time setting only affects OpenTafl.
 
 5. AI self-play mode
-For external AI developers, OpenTafl
+For external AI developers, OpenTafl provides a mode by which two AIs, or two
+versions of the same AI, can be made to play each other repeatedly, to judge
+relative strength. Start OpenTafl with the '--dev' switch to enable the AI
+self-play menu item. Set the attacker engine, defender engine, and game clock
+in the options menu, then select the self-play menu item. The iteration count
+is the number of matches the self-play runner will run. A match is a two-game
+series. The player who wins both games wins the match; if the players each win
+one game, the player who wins in the fewest moves win. If the players tie, the
+match is considered drawn.
+
+At the end of the self-play matches, a summary will be displayed on screen.
+Detailed results, including game records for every game, will be saved in the
+'selfplay-results' subdirectory under the main OpenTafl directory.
 
 6. Links
+http://softworks.manywords.press/opentafl
+http://soapbox.manywords.press/tag/tafl
 http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt
+http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 7. Version history
 
-v0.2.2b (released xx/xx/xx):
+v0.2.2b (released 03/28/16):
 - Improvements to OpenTafl AI's time control handling
 - Fix for OpenTafl incorrectly using the opponent's clock when playing as an
   engine
 - Properly terminate the built-in AI, and any external AI engines, at the end
   of a game.
-- Tournament runner
+- AI self-play mode
 - Game serializer (output only)
 - Remaining:
     - Handling of engine-initiated errors
