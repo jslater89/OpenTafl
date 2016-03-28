@@ -10,6 +10,7 @@ profile*
 debug-positions*
 out*
 tournament-results*
+selfplay-results*
 engines/opentafl-debug-2.ini
 
 .idea/workspace.xml
