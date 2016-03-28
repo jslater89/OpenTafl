@@ -59,10 +59,13 @@ file provided by your engine to instruct OpenTafl how to start it. If your
 engine does not provide an .ini file, please contact your engine's author.
 Note that the AI think time setting only affects OpenTafl.
 
-5. Links
+5. AI self-play mode
+For external AI developers, OpenTafl
+
+6. Links
 http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt
 
-6. Version history
+7. Version history
 
 v0.2.2b (released xx/xx/xx):
 - Improvements to OpenTafl AI's time control handling
@@ -72,6 +75,8 @@ v0.2.2b (released xx/xx/xx):
   of a game.
 - Tournament runner
 - Game serializer (output only)
+- Remaining:
+    - Handling of engine-initiated errors
 
 v0.2.1b (released 03/20/16):
 - Ongoing implementation of external engine mode

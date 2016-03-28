@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.ui.tournament;
+package com.manywords.softworks.tafl.ui.selfplay;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;

@@ -6,8 +6,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
-import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.tournament.TournamentRunner;
+import com.manywords.softworks.tafl.ui.selfplay.SelfplayRunner;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -15,13 +14,13 @@ import java.util.List;
 /**
  * Created by jay on 3/22/16.
  */
-public class TournamentWindow extends BasicWindow {
+public class SelfplayWindow extends BasicWindow {
     private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
-    private TournamentRunner mRunner;
+    private SelfplayRunner mRunner;
     private int mIterations = 10;
     private Label mIterationsLabel;
 
-    public TournamentWindow(AdvancedTerminalHelper.TerminalCallback callback) {
+    public SelfplayWindow(AdvancedTerminalHelper.TerminalCallback callback) {
         mTerminalCallback = callback;
 
         Panel p = new Panel();
@@ -48,12 +47,12 @@ public class TournamentWindow extends BasicWindow {
         p.addComponent(newSpacer());
         p.addComponent(startButton);
 
-        mRunner = new TournamentRunner(this, 10);
+        mRunner = new SelfplayRunner(this, 10);
 
         setComponent(p);
     }
 
-    public TournamentRunner getRunner() {
+    public SelfplayRunner getRunner() {
         return mRunner;
     }
 

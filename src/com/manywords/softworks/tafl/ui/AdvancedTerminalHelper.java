@@ -47,7 +47,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
         public UiCallback getUiCallback();
 
-        public void setTournamentWindow(Window tournamentWindow);
+        public void setSelfplayWindow(Window tournamentWindow);
     }
 
     private T mTerminal;
@@ -62,7 +62,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     private Game mGame;
     private CommandEngine mCommandEngine;
 
-    private TournamentWindow mTournamentWindow = null;
+    private SelfplayWindow mSelfplayWindow = null;
     private boolean mInGame;
 
     public AdvancedTerminalHelper(T terminal) {
@@ -247,11 +247,11 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     public void gameFinished() {
         mInGame = false;
 
-        if(mTournamentWindow != null) {
+        if(mSelfplayWindow != null) {
             // Run this stuff on the UI thread.
             mGui.getGUIThread().invokeLater(() -> {
-                System.out.println("Leaving game, entering tournament window");
-                mTournamentWindow.notifyGameFinished(mGame);
+                System.out.println("Leaving game, entering selfplay window");
+                mSelfplayWindow.notifyGameFinished(mGame);
 
                 System.out.println("Removing windows");
                 mBoardWindow.close();
@@ -263,7 +263,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 System.out.println("Removed windows");
             });
 
-            System.out.println("Started tournament window thread");
+            System.out.println("Started selfplay window thread");
         }
     }
 
@@ -374,9 +374,9 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 dialog.showDialog(mGui);
             }
             else if (r.type == CommandResult.Type.QUIT) {
-                if(mTournamentWindow != null) {
-                    TournamentWindow w = mTournamentWindow;
-                    mTournamentWindow = null;
+                if(mSelfplayWindow != null) {
+                    SelfplayWindow w = mSelfplayWindow;
+                    mSelfplayWindow = null;
                     mCommandEngine.finishGame();
                     mGui.removeWindow(mBoardWindow);
                     mGui.removeWindow(mCommandWindow);
@@ -429,8 +429,8 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         }
 
         @Override
-        public void setTournamentWindow(Window w) {
-            mTournamentWindow = (TournamentWindow) w;
+        public void setSelfplayWindow(Window w) {
+            mSelfplayWindow = (SelfplayWindow) w;
         }
     };
 }

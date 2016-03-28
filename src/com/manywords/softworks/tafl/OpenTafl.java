@@ -20,6 +20,9 @@ public class OpenTafl {
         EXTERNAL_ENGINE,
         FALLBACK
     }
+
+    public static boolean DEV_MODE = false;
+
     public static void main(String[] args) {
         Map<String, String> mapArgs = getArgs(args);
         Mode runMode = Mode.ADVANCED_TERMINAL;
@@ -39,6 +42,9 @@ public class OpenTafl {
             }
             else if(arg.contains("--fallback")) {
                 runMode = Mode.FALLBACK;
+            }
+            else if(arg.contains("--dev")) {
+                DEV_MODE = true;
             }
         }
 

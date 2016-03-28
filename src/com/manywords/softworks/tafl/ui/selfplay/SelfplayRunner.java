@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.ui.tournament;
+package com.manywords.softworks.tafl.ui.selfplay;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
@@ -7,7 +7,7 @@ import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.window.MainMenuWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.TournamentWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.SelfplayWindow;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -20,18 +20,18 @@ import java.util.List;
 /**
  * Created by jay on 3/22/16.
  */
-public class TournamentRunner {
+public class SelfplayRunner {
     private File mFirstEngineFile;
     private File mSecondEngineFile;
     private int mMatchCount;
     private GameClock.TimeSpec mGameTimeSpec;
     private List<MatchResult> mMatchResults;
-    private TournamentWindow mHost;
+    private SelfplayWindow mHost;
 
     private MatchResult mCurrentMatch;
     private Game mLastGame = null;
 
-    public TournamentRunner(TournamentWindow host, int matchCount) {
+    public SelfplayRunner(SelfplayWindow host, int matchCount) {
         mHost = host;
         mMatchCount = matchCount;
 
@@ -46,7 +46,7 @@ public class TournamentRunner {
     }
 
     public void startTournament() {
-        mHost.getTerminalCallback().setTournamentWindow(mHost);
+        mHost.getTerminalCallback().setSelfplayWindow(mHost);
 
         runTournamentMatch();
     }
@@ -89,7 +89,7 @@ public class TournamentRunner {
 
             String tourneySummary = builder.toString();
 
-            File f = new File("tournament-results");
+            File f = new File("selfplay-results");
             f.mkdirs();
             if (f.exists()) {
                 SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmm");
@@ -114,7 +114,7 @@ public class TournamentRunner {
                             fw.write(GameSerializer.getGameRecord(result.getGame(1)));
                             fw.flush();
                         } catch (IOException e) {
-                            System.out.println("Failed to write tournament result");
+                            System.out.println("Failed to write selfplay result");
                         }
                     }
 
@@ -124,13 +124,13 @@ public class TournamentRunner {
                         fw.write(tourneySummary);
                         fw.flush();
                     } catch (IOException e) {
-                        System.out.println("Failed to write tournament summary");
+                        System.out.println("Failed to write selfplay summary");
                     }
                 }
             }
         }
 
-        mHost.getTerminalCallback().setTournamentWindow(null);
+        mHost.getTerminalCallback().setSelfplayWindow(null);
         mHost.getTerminalCallback().onMenuNavigation(new MainMenuWindow(mHost.getTerminalCallback()));
     }
 

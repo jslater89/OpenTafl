@@ -2,15 +2,9 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
-import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
-import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
-import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
-import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
 /**
  * Created by jay on 2/15/16.
@@ -52,13 +46,15 @@ public class MainMenuWindow extends BasicWindow {
         });
         p.addComponent(optionsButton);
 
-        Button tourneyButton = new Button("AI tournament", new Runnable() {
-            @Override
-            public void run() {
-                mTerminalCallback.onMenuNavigation(new TournamentWindow(mTerminalCallback));
-            }
-        });
-        p.addComponent(tourneyButton);
+        if(OpenTafl.DEV_MODE) {
+            Button tourneyButton = new Button("AI selfplay", new Runnable() {
+                @Override
+                public void run() {
+                    mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback));
+                }
+            });
+            p.addComponent(tourneyButton);
+        }
 
         Button quitButton = new Button("Quit", new Runnable() {
             @Override
