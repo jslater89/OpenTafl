@@ -394,8 +394,6 @@ public class ExternalEngineHost {
                     position(mGame.getCurrentState());
                 }
                 else if(cmd.startsWith("clock")) {
-                    GameClock.ClockEntry attackerClock = mGame.getClock().getClockEntry(mGame.getCurrentState().getAttackers());
-                    GameClock.ClockEntry defenderClock = mGame.getClock().getClockEntry(mGame.getCurrentState().getDefenders());
                     clockUpdate();
                 }
                 else if(cmd.startsWith("status")) {
