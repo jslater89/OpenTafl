@@ -12,6 +12,7 @@ import com.manywords.softworks.tafl.ui.player.LocalAi;
 import com.manywords.softworks.tafl.ui.player.LocalHuman;
 import com.manywords.softworks.tafl.ui.player.Player;
 import com.manywords.softworks.tafl.ui.player.Player.MoveCallback;
+import com.sun.istack.internal.NotNull;
 import jline.console.ConsoleReader;
 
 import java.io.IOException;
@@ -234,6 +235,11 @@ public class RawTerminal implements UiCallback {
     @Override
     public void statusText(String text) {
         println(text);
+    }
+
+    @Override
+    public void modalStatus(String title, String text) {
+        statusText((title == null || title.equals("") ? "" : title + ": ") + text);
     }
 
     public void gameStateAdvanced() {

@@ -324,6 +324,11 @@ public class ExternalEngineClient implements UiCallback {
     }
 
     @Override
+    public void modalStatus(String title, String text) {
+        statusText((title == null || title.equals("") ? "" : title + ": ") + text);
+    }
+
+    @Override
     public void gameStateAdvanced() {
 
     }

@@ -15,6 +15,7 @@ public interface UiCallback {
     public void timeUpdate(Side side);
     public void moveResult(CommandResult result, MoveRecord move);
     public void statusText(String text);
+    public void modalStatus(String title, String text);
     public void gameStateAdvanced();
     public void victoryForSide(Side side);
     public void gameFinished();

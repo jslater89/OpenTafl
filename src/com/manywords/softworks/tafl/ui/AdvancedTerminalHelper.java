@@ -217,6 +217,11 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     }
 
     @Override
+    public void modalStatus(String title, String text) {
+        new ScrollingMessageDialog(title, text, MessageDialogButton.Close).showDialog(mGui);
+    }
+
+    @Override
     public void gameStateAdvanced() {
         mBoardWindow.rerenderBoard();
     }

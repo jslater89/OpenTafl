@@ -40,6 +40,11 @@ class ThreefoldDrawTest extends TaflTest implements UiCallback {
     }
 
     @Override
+    public void modalStatus(String title, String text) {
+
+    }
+
+    @Override
     public void gameStateAdvanced() {
         // TODO Auto-generated method stub
 
