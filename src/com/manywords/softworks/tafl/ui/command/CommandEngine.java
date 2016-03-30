@@ -110,6 +110,9 @@ public class CommandEngine {
         mGame.finish();
         mAttacker.stop();
         mDefender.stop();
+        if(mDummyAnalysisPlayer != null) {
+            mDummyAnalysisPlayer.stop();
+        }
         callbackGameFinished();
     }
 
