@@ -93,6 +93,10 @@ public class ExternalEnginePlayer extends Player {
         // EE host has a hacky fix for this already
     }
 
+    public void resign() {
+        mCallback.notifyResignation(this);
+    }
+
     @Override
     public void stop() {
         mHost.stopEngine();

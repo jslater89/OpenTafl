@@ -49,6 +49,8 @@ public class CommandEngine {
         if(TerminalSettings.analysisEngine && ExternalEngineHost.validateEngineFile(TerminalSettings.analysisEngineFile)) {
             mDummyAnalysisPlayer = new ExternalEnginePlayer();
             mDummyAnalysisPlayer.setGame(g);
+            mDummyAnalysisPlayer.setCallback(mPlayerCallback);
+
             mAnalysisEngine = new ExternalEngineHost(mDummyAnalysisPlayer, TerminalSettings.analysisEngineFile);
             mAnalysisEngine.setGame(g);
         }
@@ -138,6 +140,8 @@ public class CommandEngine {
 
         @Override
         public void onMoveDecided(Player player, MoveRecord move) {
+            if(player == mDummyAnalysisPlayer) return;
+
             String message = "Illegal play. ";
             if(player != mCurrentPlayer) {
                 message += "Not your turn.";

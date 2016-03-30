@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.test.TaflTest;
+import com.manywords.softworks.tafl.ui.player.ExternalEnginePlayer;
 import com.manywords.softworks.tafl.ui.player.Player;
 import org.ini4j.Wini;
 
@@ -26,7 +27,7 @@ public class ExternalEngineHost {
     private CommunicationThread mCommThread;
     private CommunicationThread.CommunicationThreadCallback mCommCallback = new CommCallback();
     private Game mGame;
-    private Player mPlayer;
+    private ExternalEnginePlayer mPlayer;
     private boolean mSimpleNotation = true;
 
     public static boolean validateEngineFile(File iniFile) {
@@ -57,7 +58,7 @@ public class ExternalEngineHost {
         }
     }
 
-    public ExternalEngineHost(Player player, TaflTest host, PipedInputStream connectToOutput, PipedOutputStream connectToInput) {
+    public ExternalEngineHost(ExternalEnginePlayer player, TaflTest host, PipedInputStream connectToOutput, PipedOutputStream connectToInput) {
         mPlayer = player;
         try {
             mInboundPipe = new BufferedInputStream(new PipedInputStream(connectToInput));
@@ -73,7 +74,7 @@ public class ExternalEngineHost {
         mCommThread.start();
     }
 
-    public ExternalEngineHost(Player player, File iniFile) {
+    public ExternalEngineHost(ExternalEnginePlayer player, File iniFile) {
         mPlayer = player;
 
         String dirName;
@@ -366,6 +367,18 @@ public class ExternalEngineHost {
         mSimpleNotation = command.contains("on");
     }
 
+    private void handleErrorCommand(String command) {
+        if(command.startsWith("error 0")) {
+            command = command.replace("error 0", "");
+            mPlayer.modalStatus("Engine error!", command);
+        }
+        if(command.startsWith("error -1")) {
+            command = command.replace("error -1", "");
+            mPlayer.modalStatus("Engine error!", command);
+            mPlayer.resign();
+        }
+    }
+
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
 
         @Override
@@ -404,6 +417,9 @@ public class ExternalEngineHost {
                 }
                 else if(cmd.startsWith("simple-moves")) {
                     handleSimpleMovesCommand(cmd);
+                }
+                else if(cmd.startsWith("error")) {
+                    handleErrorCommand(cmd);
                 }
             }
         }

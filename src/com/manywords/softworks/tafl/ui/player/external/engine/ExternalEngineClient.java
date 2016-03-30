@@ -165,7 +165,9 @@ public class ExternalEngineClient implements UiCallback {
     }
 
     private void handleFinishCommand(String command) {
-        mAiThread.cancel();
+        if(mAiThread != null) {
+            mAiThread.cancel();
+        }
         mAttackerClock = null;
         mDefenderClock = null;
         mClockLength = null;
@@ -206,7 +208,9 @@ public class ExternalEngineClient implements UiCallback {
     }
 
     private void handleGoodbyeCommand(String command) {
-        mAiThread.cancel();
+        if(mAiThread != null) {
+            mAiThread.cancel();
+        }
         System.exit(0);
     }
 
@@ -247,6 +251,13 @@ public class ExternalEngineClient implements UiCallback {
 
             command += moveList + analysis;
         }
+
+        command += "\n";
+        mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
+    }
+
+    private void sendErrorCommand(boolean critical, String message) {
+        String command = "error " + (critical ? "-1" : "0") + " " + message;
 
         command += "\n";
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));

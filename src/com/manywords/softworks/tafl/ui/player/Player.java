@@ -44,6 +44,10 @@ public abstract class Player {
         mGame.getUiCallback().statusText(text);
     }
 
+    public void modalStatus(String title, String message) {
+        mGame.getUiCallback().modalStatus(title, message);
+    }
+
     public abstract void getNextMove(UiCallback ui, Game game, int thinkTime);
     public abstract void moveResult(int moveResult);
     public abstract void opponentMove(MoveRecord move);
