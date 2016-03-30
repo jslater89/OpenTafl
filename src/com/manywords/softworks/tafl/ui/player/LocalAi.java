@@ -9,11 +9,11 @@ import com.manywords.softworks.tafl.ui.UiCallback;
 import java.util.List;
 
 public class LocalAi extends Player {
-    private MoveCallback mCallback;
+    private PlayerCallback mCallback;
     private UiWorkerThread mWorker;
 
     @Override
-    public void setCallback(MoveCallback c) {
+    public void setCallback(PlayerCallback c) {
         mCallback = c;
     }
 

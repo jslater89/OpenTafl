@@ -5,11 +5,11 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 public class LocalHuman extends Player {
-    private MoveCallback mCallback;
+    private PlayerCallback mCallback;
     private UiWorkerThread mWorker;
 
     @Override
-    public void setCallback(MoveCallback c) {
+    public void setCallback(PlayerCallback c) {
         mCallback = c;
     }
 

@@ -76,8 +76,8 @@ public class CommandEngine {
         }
 
         mThinkTime = TerminalSettings.aiThinkTime;
-        mAttacker.setCallback(mMoveCallback);
-        mDefender.setCallback(mMoveCallback);
+        mAttacker.setCallback(mPlayerCallback);
+        mDefender.setCallback(mPlayerCallback);
 
         if (mGame.getCurrentState().getCurrentSide().isAttackingSide()) {
             mCurrentPlayer = mAttacker;
@@ -134,7 +134,7 @@ public class CommandEngine {
         }
     };
 
-    private final Player.MoveCallback mMoveCallback = new Player.MoveCallback() {
+    private final Player.PlayerCallback mPlayerCallback = new Player.PlayerCallback() {
 
         @Override
         public void onMoveDecided(Player player, MoveRecord move) {
@@ -205,6 +205,13 @@ public class CommandEngine {
             }
 
             waitForNextMove();
+        }
+
+        @Override
+        public void notifyResignation(Player player) {
+            mGame.getCurrentState().winByResignation(player.isAttackingSide());
+            callbackVictoryForSide(player.isAttackingSide() ? getGame().getCurrentState().getAttackers() : getGame().getCurrentState().getDefenders());
+            finishGame();
         }
     };
 

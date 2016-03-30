@@ -2,7 +2,6 @@ package com.manywords.softworks.tafl.ui.player;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 public abstract class Player {
@@ -16,8 +15,9 @@ public abstract class Player {
         ENGINE
     }
 
-    public interface MoveCallback {
+    public interface PlayerCallback {
         public void onMoveDecided(Player player, MoveRecord record);
+        public void notifyResignation(Player player);
     }
 
     public void setupPlayer() {
@@ -50,7 +50,7 @@ public abstract class Player {
     public abstract void stop();
     public abstract void timeUpdate();
     public abstract void onMoveDecided(MoveRecord record);
-    public abstract void setCallback(MoveCallback callback);
+    public abstract void setCallback(PlayerCallback callback);
 
     public abstract Type getType();
 

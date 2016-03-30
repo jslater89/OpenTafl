@@ -20,7 +20,7 @@ import java.util.List;
  * Created by jay on 3/10/16.
  */
 public class ExternalEnginePlayer extends Player {
-    private MoveCallback mCallback;
+    private PlayerCallback mCallback;
     private ExternalEngineHost mHost;
     private MoveRecord mMyLastMove;
 
@@ -144,7 +144,7 @@ public class ExternalEnginePlayer extends Player {
     }
 
     @Override
-    public void setCallback(MoveCallback callback) {
+    public void setCallback(PlayerCallback callback) {
         mCallback = callback;
     }
 

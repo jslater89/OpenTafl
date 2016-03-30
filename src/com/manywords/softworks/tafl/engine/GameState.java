@@ -135,7 +135,7 @@ public class GameState {
     private static final int VICTORY_UNCHECKED = -50;
     public Game mGame;
     private int mLastMoveResult;
-    protected int mVictory;
+    protected int mVictory = VICTORY_UNCHECKED;
     public long mZobristHash;
     private Board mBoard;
     private Side mAttackers;
@@ -350,11 +350,16 @@ public class GameState {
         return repeats;
     }
 
+    public void winByResignation(boolean isWinnerAttackingSide) {
+        if(isWinnerAttackingSide) mVictory = ATTACKER_WIN;
+        else mVictory = DEFENDER_WIN;
+    }
+
     public int checkVictory() {
         if(mVictory == VICTORY_UNCHECKED) {
             mVictory = checkVictoryInternal();
         }
-        return checkVictoryInternal();
+        return mVictory;
     }
 
     private int checkVictoryInternal() {

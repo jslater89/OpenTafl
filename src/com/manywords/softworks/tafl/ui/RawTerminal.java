@@ -11,14 +11,11 @@ import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
 import com.manywords.softworks.tafl.ui.player.LocalAi;
 import com.manywords.softworks.tafl.ui.player.LocalHuman;
 import com.manywords.softworks.tafl.ui.player.Player;
-import com.manywords.softworks.tafl.ui.player.Player.MoveCallback;
-import com.sun.istack.internal.NotNull;
 import jline.console.ConsoleReader;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
