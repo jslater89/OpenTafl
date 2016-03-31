@@ -50,9 +50,7 @@ public class CommandEngine {
             mDummyAnalysisPlayer = new ExternalEnginePlayer();
             mDummyAnalysisPlayer.setGame(g);
             mDummyAnalysisPlayer.setCallback(mPlayerCallback);
-
-            mAnalysisEngine = new ExternalEngineHost(mDummyAnalysisPlayer, TerminalSettings.analysisEngineFile);
-            mAnalysisEngine.setGame(g);
+            mAnalysisEngine = mDummyAnalysisPlayer.setupAnalysisEngine();
         }
     }
 
@@ -110,7 +108,7 @@ public class CommandEngine {
         mGame.finish();
         mAttacker.stop();
         mDefender.stop();
-        if(mDummyAnalysisPlayer != null) {
+        if(mAnalysisEngine != null) {
             mDummyAnalysisPlayer.stop();
         }
         callbackGameFinished();

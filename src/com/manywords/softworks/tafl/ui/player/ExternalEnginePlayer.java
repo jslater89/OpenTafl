@@ -54,6 +54,15 @@ public class ExternalEnginePlayer extends Player {
         setupEngine(this.isAttackingSide() ? TerminalSettings.attackerEngineFile : TerminalSettings.defenderEngineFile);
     }
 
+    public ExternalEngineHost setupAnalysisEngine() {
+        super.setupPlayer();
+        mAttackerOvertimes = -1;
+        mDefenderOvertimes = -1;
+        setupEngine(TerminalSettings.analysisEngineFile);
+
+        return mHost;
+    }
+
     @Override
     public void setGame(Game game) {
         super.setGame(game);
