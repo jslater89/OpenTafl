@@ -420,12 +420,10 @@ public class Taflman {
         List<Coord> captures = new ArrayList<Coord>(4);
         List<Character> capturedTaflmen = new ArrayList<Character>(4);
 
-        //if(mCachedAllowableDestinations == null) {
         List<Coord> allowableDestinations = getAllowableDestinations(state, taflman);
         List<Coord> capturingMoves = null;
         List<Coord> jumps = null;
         Coord start = getCurrentSpace(state, taflman);
-        //}
 
         if (allowableDestinations.contains(destination)) {
             capturingMoves = getCapturingMoves(state, taflman);
@@ -461,7 +459,9 @@ public class Taflman {
 
         if(detailed) {
             DetailedMoveRecord m = new DetailedMoveRecord(start, destination, taflman, captures, capturedTaflmen, wasJump, wasBerserk);
-            m.setTimeRemaining(state.mGame.getClock().getClockEntry(state.getCurrentSide()).toTimeSpec());
+            if(state.mGame.getClock() != null) {
+                m.setTimeRemaining(state.mGame.getClock().getClockEntry(state.getCurrentSide()).toTimeSpec());
+            }
             return m;
         }
         else {
