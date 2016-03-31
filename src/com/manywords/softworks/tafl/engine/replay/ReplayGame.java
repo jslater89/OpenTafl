@@ -16,6 +16,9 @@ public class ReplayGame {
     private List<DetailedMoveRecord> mMoveHistory;
     private int mStatePosition = 0;
 
+    private GameClock.TimeSpec mAttackerTimeLeft;
+    private GameClock.TimeSpec mDefenderTimeLeft;
+
     private List<GameClock.TimeSpec> mAttackerTimeSpecByIndex;
     private List<GameClock.TimeSpec> mDefenderTimeSpecByIndex;
 
@@ -240,6 +243,19 @@ public class ReplayGame {
                     mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(i - 1));
                 }
             }
+        }
+
+        String remainingTimeString = mGame.getTagMap().get("remaining-time");
+        if(remainingTimeString != null) {
+            String[] remainingTimes = remainingTimeString.split(",");
+            mAttackerTimeLeft = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
+            mDefenderTimeLeft = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
+
+            mAttackerTimeSpecByIndex.add(historySize() - 1, mAttackerTimeLeft);
+            mAttackerTimeSpecByIndex.remove(historySize());
+
+            mDefenderTimeSpecByIndex.add(historySize() - 1, mDefenderTimeLeft);
+            mDefenderTimeSpecByIndex.remove(historySize());
         }
     }
 
