@@ -22,6 +22,12 @@ public class CommandResult {
         RULES,
         QUIT,
         ANALYZE,
+        REPLAY_ENTER,
+        REPLAY_PLAY_HERE,
+        REPLAY_RETURN,
+        REPLAY_NEXT,
+        REPLAY_PREVIOUS,
+        REPLAY_JUMP,
     }
 
     public final Type type;

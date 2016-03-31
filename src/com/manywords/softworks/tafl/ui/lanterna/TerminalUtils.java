@@ -36,14 +36,8 @@ public class TerminalUtils {
             g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), callback.getUiCallback(), ts);
         }
 
-        TerminalBoardImage.init(g.getGameRules().getBoard().getBoardDimension());
-
-        BoardWindow bw = new BoardWindow(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant), g, callback);
-        CommandWindow cw = new CommandWindow(g, callback);
-        StatusWindow sw = new StatusWindow(g, callback);
-
         // Blocks here
-        callback.onEnteringGame(g, bw, sw, cw);
+        callback.onEnteringScreen(g, BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
         return g;
     }
 }

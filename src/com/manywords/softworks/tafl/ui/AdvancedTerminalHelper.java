@@ -15,6 +15,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.command.Command;
@@ -22,6 +23,7 @@ import com.manywords.softworks.tafl.ui.command.CommandEngine;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
+import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
@@ -42,7 +44,13 @@ import java.util.List;
 public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     public interface TerminalCallback {
         public void onMenuNavigation(Window destination);
-        public void onEnteringGame(Game g, BoardWindow bw, StatusWindow sw, CommandWindow cw);
+
+        public void onEnteringScreen(Game g, String title);
+        public void onEnteringScreen(ReplayGame rg, String title);
+
+        public void onEnteringReplay(ReplayGame rg);
+        public void onEnteringGame(Game g);
+
         public void handleInGameCommand(String command);
         public void handleKeyStroke(KeyStroke key);
 
@@ -59,12 +67,16 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     private StatusWindow mStatusWindow;
     private CommandWindow mCommandWindow;
 
-    private UiWorkerThread mGameThread;
+    private UiWorkerThread mCommandEngineThread;
     private Game mGame;
     private CommandEngine mCommandEngine;
 
     private SelfplayWindow mSelfplayWindow = null;
+    private ReplayGame mReplay;
+
     private boolean mInGame;
+    private boolean mInReplay;
+    private boolean mPostGame;
 
     public AdvancedTerminalHelper(T terminal) {
         super();
@@ -173,7 +185,11 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         mGui.removeWindow(mStatusWindow);
         mGui.removeWindow(mCommandWindow);
 
-        //mGameThread.cancel();
+        mBoardWindow = null;
+        mStatusWindow = null;
+        mCommandWindow = null;
+
+        //mCommandEngineThread.cancel();
         mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
     }
 
@@ -190,7 +206,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
     @Override
     public void timeUpdate(Side side) {
-        mStatusWindow.handleTimeUpdate(side);
+        mStatusWindow.handleTimeUpdate(side, mGame.getClock().getClockEntry(true).toTimeSpec(), mGame.getClock().getClockEntry(false).toTimeSpec());
     }
 
     @Override
@@ -257,6 +273,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     @Override
     public void gameFinished() {
         mInGame = false;
+        mPostGame = true;
 
         if(mSelfplayWindow != null) {
             // Run this stuff on the UI thread.
@@ -311,14 +328,46 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         }
 
         @Override
-        public void onEnteringGame(Game g, BoardWindow bw, StatusWindow sw, CommandWindow cw) {
-            mGui.removeWindow(mGui.getActiveWindow());
+        public void onEnteringScreen(Game g, String title) {
+            if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
+                createWindows(g, title);
+
+                // This is our UI thread (blocking call)
+                onEnteringGame(g);
+                addBoardWindows();
+            }
+            else {
+                onEnteringGame(g);
+            }
+        }
+
+        @Override
+        public void onEnteringScreen(ReplayGame rg, String title) {
+            if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
+                createWindows(rg.getGame(), title);
+
+                // This is our UI thread (blocking call)
+                onEnteringReplay(rg);
+                addBoardWindows();
+            }
+            else {
+                onEnteringReplay(rg);
+            }
+        }
+
+        private void createWindows(Game g, String title) {
+            TerminalBoardImage.init(g.getGameRules().getBoard().getBoardDimension());
+            BoardWindow bw = new BoardWindow(title, g, this);
+            CommandWindow cw = new CommandWindow(this);
+            StatusWindow sw = new StatusWindow(this);
+
             mBoardWindow = bw;
             mStatusWindow = sw;
             mCommandWindow = cw;
+        }
 
-            // Set up a game thread
-            mGameThread = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
+        private void startCommandEngineThread(Game g) {
+            mCommandEngineThread = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
                 private boolean mRunning = true;
                 @Override
                 public void cancel() {
@@ -329,13 +378,37 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 public void run() {
                     mGame = g;
                     mCommandEngine = new CommandEngine(g, AdvancedTerminalHelper.this, TerminalSettings.getNewPlayer(TerminalSettings.attackers), TerminalSettings.getNewPlayer(TerminalSettings.defenders));
-                    mCommandEngine.startGame();
                 }
             });
-            mGameThread.start();
+            mCommandEngineThread.start();
+        }
 
-            // This is our UI thread (blocking call)
-            addBoardWindows();
+        @Override
+        public void onEnteringReplay(ReplayGame rg) {
+            mInReplay = true;
+            mReplay = rg;
+
+            mBoardWindow.enterReplay(rg);
+        }
+
+        @Override
+        public void onEnteringGame(Game g) {
+            mInReplay = false;
+            mBoardWindow.setGame(g);
+            mBoardWindow.leaveReplay();
+
+            // Set up a game thread
+            startCommandEngineThread(g);
+
+            while(mCommandEngine == null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            mCommandEngine.startGame();
         }
 
         @Override
@@ -408,6 +481,15 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             else if(r.type == CommandResult.Type.ANALYZE) {
                 statusText("AI analysis beginning");
             }
+            else if(r.type == CommandResult.Type.REPLAY_NEXT) {
+
+            }
+            else if(r.type == CommandResult.Type.REPLAY_PREVIOUS) {
+
+            }
+            else if(r.type == CommandResult.Type.REPLAY_JUMP) {
+
+            }
         }
 
         private List<CommandResult.Type> getCurrentCommands() {
@@ -417,12 +499,23 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 types.add(CommandResult.Type.MOVE);
             }
 
-            types.add(CommandResult.Type.INFO);
-            types.add(CommandResult.Type.SHOW);
-            types.add(CommandResult.Type.ANALYZE);
-            types.add(CommandResult.Type.HISTORY);
-            types.add(CommandResult.Type.HELP);
-            types.add(CommandResult.Type.QUIT);
+            if(mInReplay) {
+                types.add(CommandResult.Type.REPLAY_ENTER);
+                types.add(CommandResult.Type.REPLAY_NEXT);
+                types.add(CommandResult.Type.REPLAY_PREVIOUS);
+                types.add(CommandResult.Type.REPLAY_JUMP);
+                types.add(CommandResult.Type.REPLAY_PLAY_HERE);
+                types.add(CommandResult.Type.REPLAY_RETURN);
+            }
+
+            if(mInGame || mPostGame || mInReplay) {
+                types.add(CommandResult.Type.INFO);
+                types.add(CommandResult.Type.SHOW);
+                types.add(CommandResult.Type.ANALYZE);
+                types.add(CommandResult.Type.HISTORY);
+                types.add(CommandResult.Type.HELP);
+                types.add(CommandResult.Type.QUIT);
+            }
 
             return types;
         }

@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
@@ -41,8 +42,9 @@ public class MainMenuWindow extends BasicWindow {
         p.addComponent(optionsButton);
 
         if(OpenTafl.DEV_MODE) {
-            Button loadGameButton = new Button("Load game", () -> {
-                Game g = GameSerializer.loadGameRecordFile(new File("selfplay-results/gamelog.otg"));
+            Button loadGameButton = new Button("Load replay", () -> {
+                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(new File("selfplay-results/gamelog.otg"));
+                ReplayGame rg = new ReplayGame(g.game, g.moves);
 
             });
             p.addComponent(loadGameButton);

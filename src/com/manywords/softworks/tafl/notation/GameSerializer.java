@@ -13,6 +13,16 @@ import java.util.*;
  * Created by jay on 3/22/16.
  */
 public class GameSerializer {
+    public static class GameContainer {
+        public Game game;
+        public List<DetailedMoveRecord> moves;
+
+        public GameContainer(Game g, List<DetailedMoveRecord> m) {
+            game = g;
+            moves = m;
+        }
+    }
+    
     public static String getGameRecord(Game g, boolean comments) {
         String tagString = "";
 
@@ -56,7 +66,7 @@ public class GameSerializer {
         return tagString + movesString;
     }
 
-    public static Game loadGameRecordFile(File gameFile) {
+    public static GameContainer loadGameRecordFile(File gameFile) {
         String gameString = "";
         try {
             BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(gameFile)));
@@ -74,7 +84,7 @@ public class GameSerializer {
         }
     }
 
-    public static Game loadGameRecord(String gameRecord) {
+    public static GameContainer loadGameRecord(String gameRecord) {
         String[] gameLines = gameRecord.split("\n");
         Map<String, String> tagMap = parseTags(gameLines);
         System.out.println(tagMap);
@@ -85,7 +95,7 @@ public class GameSerializer {
 
         List<DetailedMoveRecord> moves = parseMoves(gameRecord);
 
-        return g;
+        return new GameContainer(g, moves);
     }
 
     public static List<DetailedMoveRecord> parseMoves(String gameRecord) {

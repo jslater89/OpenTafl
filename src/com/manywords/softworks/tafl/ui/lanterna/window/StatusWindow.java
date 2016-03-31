@@ -15,13 +15,11 @@ import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
  * Created by jay on 2/15/16.
  */
 public class StatusWindow extends BasicWindow {
-    private Game mGame;
     private ScrollingLabel mTextDisplay;
     private Label mAttackerClockDisplay, mDefenderClockDisplay;
-    public StatusWindow(Game g, AdvancedTerminalHelper.TerminalCallback callback) {
+    public StatusWindow(AdvancedTerminalHelper.TerminalCallback callback) {
         super("Information");
 
-        mGame = g;
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
 
@@ -57,10 +55,7 @@ public class StatusWindow extends BasicWindow {
         }
     }
 
-    public void handleTimeUpdate(Side side) {
-        GameClock.ClockEntry attackerEntry = mGame.getClock().getClockEntry(mGame.getGameRules().getAttackers());
-        GameClock.ClockEntry defenderEntry = mGame.getClock().getClockEntry(mGame.getGameRules().getDefenders());
-
+    public void handleTimeUpdate(Side side, GameClock.TimeSpec attackerEntry, GameClock.TimeSpec defenderEntry) {
         String attackerString = (side.isAttackingSide() ? "ATTACKER" : "Attacker") + "\n" + attackerEntry.humanReadableString();
         String defenderString = (side.isAttackingSide() ? "Defender" : "DEFENDER") + "\n" + defenderEntry.humanReadableString();
 

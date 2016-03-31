@@ -13,7 +13,7 @@ import com.manywords.softworks.tafl.ui.lanterna.component.TerminalEnterTerminate
 public class CommandWindow extends BasicWindow {
     private AdvancedTerminalHelper.TerminalCallback mCallback;
     private TerminalEnterTerminatedTextBox mTextBox;
-    public CommandWindow(Game g, AdvancedTerminalHelper.TerminalCallback callback) {
+    public CommandWindow(AdvancedTerminalHelper.TerminalCallback callback) {
         super("Command");
         mCallback = callback;
 

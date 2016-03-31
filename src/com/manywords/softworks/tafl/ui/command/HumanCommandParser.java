@@ -34,6 +34,24 @@ public class HumanCommandParser {
         else if(command.startsWith("analyze")) {
             return newAnalyzeCommand(engine, command);
         }
+        else if(command.startsWith("replay")) {
+
+        }
+        else if(command.startsWith("play-here")) {
+
+        }
+        else if(command.startsWith("return")) {
+
+        }
+        else if(command.startsWith("next")) {
+
+        }
+        else if(command.startsWith("previous")) {
+
+        }
+        else if(command.startsWith("jump")) {
+
+        }
         return null;
     }
 

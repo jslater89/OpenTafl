@@ -123,6 +123,11 @@ public class GameClock {
         else return mClocks[DEFENDERS];
     }
 
+    public ClockEntry getClockEntry(boolean attackers) {
+        if(attackers) return mClocks[ATTACKERS];
+        else return mClocks[DEFENDERS];
+    }
+
     private void updateClocks() {
         if(mOutOfTime) return;
 
@@ -214,6 +219,28 @@ public class GameClock {
 
         public String toGameNotationString() {
             return mainTime / 1000 + " " + overtimeTime / 1000 + "/" + overtimeCount;
+        }
+
+        public String humanReadableString() {
+            int mainTimeSeconds = (int) mainTime / 1000;
+            int overtimeSeconds = (int) overtimeTime / 1000;
+
+            int hours = mainTimeSeconds / 3600;
+            int minutes = (mainTimeSeconds % 3600) / 60;
+            int seconds = (mainTimeSeconds % 3600) % 60;
+            String m = (minutes >= 10 ? "" + minutes : "0" + minutes);
+            String s = (seconds >= 10 ? "" + seconds : "0" + seconds);
+            String mainTime = hours + ":" + m + ":" + s;
+
+            hours = overtimeSeconds / 3600;
+            minutes = (overtimeSeconds % 3600) / 60;
+            seconds = (overtimeSeconds % 3600) % 60;
+            m = (minutes >= 10 ? "" + minutes : "0" + minutes);
+            s = (seconds >= 10 ? "" + seconds : "0" + seconds);
+            String overtimeTime = hours + ":" + m + ":" + s;
+
+            String result = mainTime + " " + overtimeTime + "/" + overtimeCount;
+            return result;
         }
     }
 
