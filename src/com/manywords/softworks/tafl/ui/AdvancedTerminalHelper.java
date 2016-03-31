@@ -329,6 +329,9 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
         @Override
         public void onEnteringScreen(Game g, String title) {
+            // Set up a game thread
+            blockUntilCommandEngineReady(g);
+
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
                 createWindows(g, title);
 
@@ -343,6 +346,9 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
         @Override
         public void onEnteringScreen(ReplayGame rg, String title) {
+            // Set up a game thread
+            blockUntilCommandEngineReady(rg.getGame());
+
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
                 createWindows(rg.getGame(), title);
 
@@ -366,6 +372,21 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             mCommandWindow = cw;
         }
 
+        private void blockUntilCommandEngineReady(Game g) {
+            // Set up a game thread
+            if(mCommandEngine == null) {
+                startCommandEngineThread(g);
+            }
+
+            while(mCommandEngine == null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         private void startCommandEngineThread(Game g) {
             mCommandEngineThread = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
                 private boolean mRunning = true;
@@ -376,7 +397,6 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
                 @Override
                 public void run() {
-                    mGame = g;
                     mCommandEngine = new CommandEngine(g, AdvancedTerminalHelper.this, TerminalSettings.getNewPlayer(TerminalSettings.attackers), TerminalSettings.getNewPlayer(TerminalSettings.defenders));
                 }
             });
@@ -396,17 +416,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             mInReplay = false;
             mBoardWindow.setGame(g);
             mBoardWindow.leaveReplay();
-
-            // Set up a game thread
-            startCommandEngineThread(g);
-
-            while(mCommandEngine == null) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            mGame = g;
 
             mCommandEngine.startGame();
         }

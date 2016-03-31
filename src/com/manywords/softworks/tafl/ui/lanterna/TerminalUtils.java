@@ -4,6 +4,7 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
@@ -39,5 +40,14 @@ public class TerminalUtils {
         // Blocks here
         callback.onEnteringScreen(g, BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
         return g;
+    }
+
+    public static void startSavedGame(ReplayGame rg, WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
+        rg.setPosition(rg.historySize() - 1);
+        Game g = rg.getGame();
+    }
+
+    public static void startReplay(ReplayGame rg, WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
+        callback.onEnteringScreen(rg, "OpenTafl");
     }
 }

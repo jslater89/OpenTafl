@@ -45,6 +45,7 @@ public class MainMenuWindow extends BasicWindow {
             Button loadGameButton = new Button("Load replay", () -> {
                 GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(new File("selfplay-results/gamelog.otg"));
                 ReplayGame rg = new ReplayGame(g.game, g.moves);
+                TerminalUtils.startReplay(rg, getTextGUI(), mTerminalCallback);
 
             });
             p.addComponent(loadGameButton);

@@ -4,6 +4,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
@@ -18,6 +19,7 @@ import java.util.List;
 
 public class CommandEngine {
     private Game mGame;
+    private ReplayGame mReplay;
     private Player mAttacker;
     private Player mDefender;
     private Player mCurrentPlayer;

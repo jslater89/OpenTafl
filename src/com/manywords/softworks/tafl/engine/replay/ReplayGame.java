@@ -30,6 +30,8 @@ public class ReplayGame {
 
         mGame = game;
         mMoveHistory = movesToPlay;
+
+        mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
     }
 
     /**
@@ -46,6 +48,8 @@ public class ReplayGame {
                 mMoveHistory.add((DetailedMoveRecord) state.getExitingMove());
             }
         }
+
+        mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
     }
 
     public Game getGame() {
