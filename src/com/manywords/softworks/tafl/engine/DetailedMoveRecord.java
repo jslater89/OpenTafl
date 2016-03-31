@@ -89,7 +89,14 @@ public class DetailedMoveRecord extends MoveRecord {
     }
 
     public void setComment(String comment) {
-        mComment = comment;
+        GameClock.TimeSpec ts = GameClock.getTimeSpecForGameNotationString(comment);
+        if(ts != null) {
+            mComment = comment.replaceFirst(GameClock.TIME_SPEC_REGEX, "");
+            mTimeRemaining = ts;
+        }
+        else {
+            mComment = comment;
+        }
     }
 
     public String getComment() {

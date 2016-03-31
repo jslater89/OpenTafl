@@ -4,11 +4,14 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 
 import java.time.LocalTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by jay on 2/20/16.
  */
 public class GameClock {
+    public static final String TIME_SPEC_REGEX = "(\\d+)(\\s\\d+/\\d+)?(\\s\\d+i)?";
     private final Game mGame;
     private final long mMainTimeMillis;
     private final long mIncrementMillis;
@@ -283,5 +286,30 @@ public class GameClock {
             String result = mainTime + " " + overtimeTime + "/" + mOvertimeCount;
             return result;
         }
+    }
+
+    public static TimeSpec getTimeSpecForGameNotationString(String string) {
+        Pattern p = Pattern.compile(TIME_SPEC_REGEX);
+        Matcher m = p.matcher(string);
+
+        if(m.lookingAt()) {
+            long mainTime = Long.parseLong(m.group(1)) * 1000;
+
+            long overtimeTime = 0;
+            int overtimeCount = 0;
+            if(m.groupCount() >= 3 && m.group(2) != null && m.group(3) != null) {
+                overtimeTime = Long.parseLong(m.group(2)) * 1000;
+                overtimeCount = Integer.parseInt(m.group(3));
+            }
+
+            long incrementTime = 0;
+            if(m.groupCount() >= 4 && m.group(4) != null) {
+                incrementTime = Long.parseLong(m.group(4)) * 1000;
+            }
+
+            return new TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
+        }
+
+        return null;
     }
 }

@@ -7,9 +7,7 @@ import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Game {
     public Game(long[][] zobristTable, List<GameState> history) {
@@ -60,6 +58,7 @@ public class Game {
     private Rules mGameRules;
     private GameState mCurrentState;
     private List<GameState> mHistory;
+    private Map<String, String> mTagMap = new LinkedHashMap<String, String>();
 
     public void start() {
         if(mClock != null) {
@@ -71,6 +70,14 @@ public class Game {
         if(mClock != null) {
             mClock.stop();
         }
+    }
+
+    public void setTagMap(Map<String, String> tagMap) {
+        mTagMap = tagMap;
+    }
+
+    public Map<String, String> getTagMap() {
+        return mTagMap;
     }
 
     public UiCallback getUiCallback() {

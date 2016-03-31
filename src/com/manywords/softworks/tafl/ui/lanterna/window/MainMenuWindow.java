@@ -3,8 +3,12 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
+
+import java.io.File;
 
 /**
  * Created by jay on 2/15/16.
@@ -30,38 +34,23 @@ public class MainMenuWindow extends BasicWindow {
         EmptySpace e1 = new EmptySpace(new TerminalSize(0, 1));
         p.addComponent(e1);
 
-        Button playButton = new Button("Play", new Runnable() {
-            @Override
-            public void run() {
-                TerminalUtils.startGame(getTextGUI(), mTerminalCallback);
-            }
-        });
+        Button playButton = new Button("Play", () -> TerminalUtils.startGame(getTextGUI(), mTerminalCallback));
         p.addComponent(playButton);
 
-        Button optionsButton = new Button("Options", new Runnable() {
-            @Override
-            public void run() {
-                mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback));
-            }
-        });
+        Button optionsButton = new Button("Options", () -> mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback)));
         p.addComponent(optionsButton);
 
         if(OpenTafl.DEV_MODE) {
-            Button tourneyButton = new Button("AI selfplay", new Runnable() {
-                @Override
-                public void run() {
-                    mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback));
-                }
+            Button loadGameButton = new Button("Load game", () -> {
+                Game g = GameSerializer.loadGameRecordFile(new File("selfplay-results/gamelog.otg"));
+
             });
+            p.addComponent(loadGameButton);
+            Button tourneyButton = new Button("AI selfplay", () -> mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback)));
             p.addComponent(tourneyButton);
         }
 
-        Button quitButton = new Button("Quit", new Runnable() {
-            @Override
-            public void run() {
-                mTerminalCallback.onMenuNavigation(null);
-            }
-        });
+        Button quitButton = new Button("Quit", () -> mTerminalCallback.onMenuNavigation(null));
         p.addComponent(quitButton);
 
         /*

@@ -296,24 +296,20 @@ move through and stop on the center and corners.
 dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
 
 4. Game Records
-	# These elements should be separated by newlines. Tags may be placed on individual
-	# lines, or on the same line.
-	# Rules strings should not contain any newlines.
-	# A position string element may be included if the game does not start at the
-	# start position given in the rules string.
 	[tags]
 	<rules-tag>
-	[position-tag]
 	
 	# This pattern should be separated from the header by newlines.
 	# This pattern repeats for the whole game. The final element may omit
-	# one move record, if the game ends. Commentary should be displayed
-	# alongside its turn.
+	# one move record, if the game ends. The host engine should display
+	# commentary, if provided, alongside a loaded game.
 	<<turn-number><"."> <move-record> <move-record>>
 	[[first-half-commentary]|[second-half-commentary]]
 
 	tags: 
 		none, some, or all tags may be included, at the compiler's choice.
+		Tags may not contain newlines. Each tag should be placed on its own
+		line. The rules tag must always be the final tag.
 		[<"["><tag-type><":"><tag-value><"]">]
 		
 	tag-type:
@@ -340,7 +336,7 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 			e.g. "3600 30/3 3i": 1 hour, 3 30-second overtimes, 3-second increment
 			the time allotted per player for this game.
 		"time-remaining":
-		    <main-time-seconds> [<overtime-periods><"/"><overtime-length]
+		    <<main-time-seconds> [<overtime-periods><"/"><overtime-length]> <<main-time-seconds> [<overtime-periods><"/"><overtime-length]>
 		    the time remaining at the end of this game record.
 		"termination": 
 			human-readable definition of how the game ended
@@ -356,7 +352,8 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		<"[position:"><position-string><"]">
 
 		optionally, a starting position for the game. If a position tag is provided,
-		the game
+		the game starts at that position, instead of the starting position in the
+		rules string.
 
 	turn-number:
 		the number of times both players have moved, starting at 1.
@@ -370,6 +367,9 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		for the time-control tag, OpenTafl will omit the clock specification from
 		the displayed commentary, and display the time given by the clock
 		specification in the clock display.
+
+		Comments will be displayed after the move to which they correspond has
+		been played.
 
 	second-half-commentary:
 		comment on the second move of this turn. The same clock display convention
