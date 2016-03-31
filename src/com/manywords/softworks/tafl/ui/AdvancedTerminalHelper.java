@@ -36,6 +36,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jay on 2/15/16.
@@ -414,9 +415,22 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             mInReplay = true;
             mReplay = rg;
 
-            mBoardWindow.enterReplay(rg);
-            GameClock c = mReplay.getGame().getClock();
             tryTimeUpdate();
+
+            Map<String, String> tags = rg.getGame().getTagMap();
+            if(tags != null) {
+                if(tags.containsKey("compiler")) {
+                    statusText("OpenTafl game file compiled by: " + tags.get("compiler"));
+                }
+                if(tags.containsKey("annotator")) {
+                    statusText("Annotations by: " + tags.get("annotator"));
+                }
+                if(tags.containsKey("start-comment")) {
+                    statusText(tags.get("start-comment"));
+                }
+            }
+
+            mBoardWindow.enterReplay(rg);
             mBoardWindow.rerenderBoard();
         }
 
@@ -517,14 +531,17 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             else if(r.type == CommandResult.Type.REPLAY_NEXT) {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
+                updateComments();
             }
             else if(r.type == CommandResult.Type.REPLAY_PREVIOUS) {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
+                updateComments();
             }
             else if(r.type == CommandResult.Type.REPLAY_JUMP) {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
+                updateComments();
             }
         }
 
@@ -534,6 +551,22 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 GameClock.TimeSpec attackerClock = mReplay.getTimeGuess(true);
                 GameClock.TimeSpec defenderClock = mReplay.getTimeGuess(false);
                 mStatusWindow.handleTimeUpdate(currentSide, attackerClock, defenderClock);
+            }
+        }
+
+        private void updateComments() {
+            if(!mInGame) {
+                DetailedMoveRecord m = (DetailedMoveRecord) mReplay.getCurrentState().getEnteringMove();
+                if(m == null) {
+                    statusText("---Start of game---");
+
+                }
+                else {
+                    statusText("Last move: " + m);
+                    if(!m.getComment().trim().isEmpty()) {
+                        statusText(m.getComment());
+                    }
+                }
             }
         }
 
