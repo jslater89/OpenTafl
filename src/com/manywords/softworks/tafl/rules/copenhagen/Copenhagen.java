@@ -219,7 +219,7 @@ public class Copenhagen extends Rules {
 
     @Override
     public int threefoldRepetitionResult() {
-        return Rules.DRAW;
+        return Rules.THIRD_REPETITION_WINS;
     }
 
     @Override
@@ -239,7 +239,7 @@ public class Copenhagen extends Rules {
 
     @Override
     public Side getStartingSide() {
-        return mStartingDefenders;
+        return mStartingAttackers;
     }
 
     @Override
