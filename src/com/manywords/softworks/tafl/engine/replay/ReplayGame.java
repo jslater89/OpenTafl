@@ -1,11 +1,9 @@
 package com.manywords.softworks.tafl.engine.replay;
 
-import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
-import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
+import javax.xml.soap.Detail;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +15,9 @@ public class ReplayGame {
     private List<GameState> mFirstStatesByTurn;
     private List<DetailedMoveRecord> mMoveHistory;
     private int mStatePosition = 0;
+
+    private List<GameClock.TimeSpec> mAttackerTimeSpecByIndex;
+    private List<GameClock.TimeSpec> mDefenderTimeSpecByIndex;
 
     /**
      * This constructor takes a game object and plays the given
@@ -37,9 +38,11 @@ public class ReplayGame {
 
         for(int i = 0; i < movesToPlay.size(); i++) {
             mGame.getHistory().get(i).setExitingMove(movesToPlay.get(i));
+            mGame.getHistory().get(i+1).setEnteringMove(movesToPlay.get(i));
         }
 
         setupFirstStatesList();
+        setupTimeSpecLists();
     }
 
     /**
@@ -60,6 +63,7 @@ public class ReplayGame {
         mGame.getHistory().add(mGame.getCurrentState());
         mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
         setupFirstStatesList();
+        setupTimeSpecLists();
     }
 
     public Game getGame() {
@@ -97,6 +101,13 @@ public class ReplayGame {
         }
 
         return newString;
+    }
+
+    public GameState getPreviousState() {
+        if(mStatePosition - 1 >= 0) {
+            return stateAtIndex(mStatePosition - 1);
+        }
+        else return null;
     }
 
     public GameState nextState() {
@@ -192,5 +203,61 @@ public class ReplayGame {
                 otherSideWent = true;
             }
         }
+    }
+
+    private void setupTimeSpecLists() {
+        mAttackerTimeSpecByIndex = new ArrayList<>();
+        mDefenderTimeSpecByIndex = new ArrayList<>();
+        if(mGame.getClock() == null) return;
+
+        mAttackerTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
+        mDefenderTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
+
+        for(int i = 1; i < historySize(); i++) {
+            GameState current = mGame.getHistory().get(i - 1);
+
+            if(current.getCurrentSide().isAttackingSide()) {
+                // The other side's clock doesn't count down.
+                mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(i - 1));
+
+                // If we have a record, save it; otherwise, get the previous one as a best guess.
+                DetailedMoveRecord dm = mMoveHistory.get(i - 1);
+                if(dm.getTimeRemaining() != null) {
+                    mAttackerTimeSpecByIndex.add(dm.getTimeRemaining());
+                }
+                else {
+                    mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(i - 1));
+                }
+            }
+            else {
+                mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(i - 1));
+
+                DetailedMoveRecord dm = mMoveHistory.get(i - 1);
+                if(dm.getTimeRemaining() != null) {
+                    mDefenderTimeSpecByIndex.add(dm.getTimeRemaining());
+                }
+                else {
+                    mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(i - 1));
+                }
+            }
+        }
+    }
+
+    public GameClock.TimeSpec getTimeGuess(boolean isAttackingSide) {
+        int index = mStatePosition;
+        if(isAttackingSide && mAttackerTimeSpecByIndex.size() > mStatePosition) {
+            return mAttackerTimeSpecByIndex.get(mStatePosition);
+        }
+        else if(isAttackingSide && mAttackerTimeSpecByIndex.size() > 0) {
+            return mAttackerTimeSpecByIndex.get(mAttackerTimeSpecByIndex.size() - 1);
+        }
+        else if (!isAttackingSide && mDefenderTimeSpecByIndex.size() > mStatePosition) {
+            return mDefenderTimeSpecByIndex.get(mStatePosition);
+        }
+        else if(!isAttackingSide && mDefenderTimeSpecByIndex.size() > 0) {
+            return mDefenderTimeSpecByIndex.get(mDefenderTimeSpecByIndex.size() - 1);
+        }
+
+        return null;
     }
 }

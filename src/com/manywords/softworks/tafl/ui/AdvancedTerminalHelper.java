@@ -13,9 +13,7 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
-import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
-import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.rules.Side;
@@ -418,9 +416,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
             mBoardWindow.enterReplay(rg);
             GameClock c = mReplay.getGame().getClock();
-            if(c != null) {
-                mStatusWindow.handleTimeUpdate(mReplay.getGame().getCurrentSide(), c.getClockEntry(true).toTimeSpec(), c.getClockEntry(false).toTimeSpec());
-            }
+            tryTimeUpdate();
             mBoardWindow.rerenderBoard();
         }
 
@@ -520,12 +516,24 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             }
             else if(r.type == CommandResult.Type.REPLAY_NEXT) {
                 mBoardWindow.rerenderBoard();
+                tryTimeUpdate();
             }
             else if(r.type == CommandResult.Type.REPLAY_PREVIOUS) {
                 mBoardWindow.rerenderBoard();
+                tryTimeUpdate();
             }
             else if(r.type == CommandResult.Type.REPLAY_JUMP) {
                 mBoardWindow.rerenderBoard();
+                tryTimeUpdate();
+            }
+        }
+
+        private void tryTimeUpdate() {
+            if(!mInGame) {
+                Side currentSide = mReplay.getCurrentState().getCurrentSide();
+                GameClock.TimeSpec attackerClock = mReplay.getTimeGuess(true);
+                GameClock.TimeSpec defenderClock = mReplay.getTimeGuess(false);
+                mStatusWindow.handleTimeUpdate(currentSide, attackerClock, defenderClock);
             }
         }
 

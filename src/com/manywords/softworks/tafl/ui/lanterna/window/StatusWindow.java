@@ -55,11 +55,15 @@ public class StatusWindow extends BasicWindow {
     }
 
     public void handleTimeUpdate(Side side, GameClock.TimeSpec attackerEntry, GameClock.TimeSpec defenderEntry) {
-        String attackerString = (side.isAttackingSide() ? "ATTACKER" : "Attacker") + "\n" + attackerEntry.toHumanString();
-        String defenderString = (side.isAttackingSide() ? "Defender" : "DEFENDER") + "\n" + defenderEntry.toHumanString();
+        if(attackerEntry != null) {
+            String attackerString = (side.isAttackingSide() ? "ATTACKER" : "Attacker") + "\n" + attackerEntry.toHumanString();
+            mAttackerClockDisplay.setText(attackerString);
+        }
 
-        mAttackerClockDisplay.setText(attackerString);
-        mDefenderClockDisplay.setText(defenderString);
+        if(defenderEntry != null) {
+            String defenderString = (side.isAttackingSide() ? "Defender" : "DEFENDER") + "\n" + defenderEntry.toHumanString();
+            mDefenderClockDisplay.setText(defenderString);
+        }
     }
 
     @Override

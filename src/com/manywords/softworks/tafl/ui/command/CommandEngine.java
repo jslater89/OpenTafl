@@ -72,6 +72,7 @@ public class CommandEngine {
         mMode = UiCallback.Mode.GAME;
         mReplay = null;
         mGame = g;
+        g.setUiCallback(mPrimaryUiCallback);
         mAttacker.setGame(g);
         mDefender.setGame(g);
 
@@ -356,6 +357,15 @@ public class CommandEngine {
 
             Game g = mReplay.getGame();
             mReplay.prepareForGameStart(mReplay.getPosition());
+
+            if(g.getClock() != null) {
+                GameClock.TimeSpec attackerClock = mReplay.getTimeGuess(true);
+                GameClock.TimeSpec defenderClock = mReplay.getTimeGuess(false);
+
+                g.getClock().getClockEntry(true).setTime(attackerClock);
+                g.getClock().getClockEntry(false).setTime(defenderClock);
+            }
+
             enterGame(g);
             return new CommandResult(CommandResult.Type.REPLAY_PLAY_HERE, CommandResult.SUCCESS, "", null);
         }

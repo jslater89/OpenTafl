@@ -1,12 +1,11 @@
 Tafl To-Do
 
-v0.2 features:
-1. Engine mode
-2. Engine validation
-3. Tactical validation
+v0.2 features, bits, and bobs:
+1. Finish saving/loading games/replays (file-chooser dialogs, always save-as, fill in last save name, confirm overwriting files)
+2. Make sure replay mode works postgame.
+3. Annotations as status text. (get entering move's comment)
 
 General features:
-1. Unchattify tests.
 2. CommandEngine requires a start command. (UI callback and notification to player, so AIs know to start.)
 
 AI stuff:

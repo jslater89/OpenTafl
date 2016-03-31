@@ -588,4 +588,8 @@ public class GameState {
     public void setExitingMove(DetailedMoveRecord exitingMove) {
         mExitingMove = exitingMove;
     }
+
+    public void setEnteringMove(DetailedMoveRecord enteringMove) {
+        mEnteringMove = enteringMove;
+    }
 }
