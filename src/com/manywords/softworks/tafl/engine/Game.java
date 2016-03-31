@@ -84,6 +84,12 @@ public class Game {
         return mCallback;
     }
 
+    public void loadClock() {
+        if(mTagMap != null && mTagMap.containsKey("time-control")) {
+            
+        }
+    }
+
     public GameClock getClock() { return mClock; }
 
     public void setUiCallback(UiCallback mCallback) {

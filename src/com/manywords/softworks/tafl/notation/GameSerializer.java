@@ -85,13 +85,13 @@ public class GameSerializer {
     }
 
     public static GameContainer loadGameRecord(String gameRecord) {
-        String[] gameLines = gameRecord.split("\n");
-        Map<String, String> tagMap = parseTags(gameLines);
+        Map<String, String> tagMap = parseTags(gameRecord);
         System.out.println(tagMap);
 
         Rules r = RulesSerializer.loadRulesRecord(tagMap.get("rules"));
         Game g = new Game(r, null);
         g.setTagMap(tagMap);
+        g.loadClock();
 
         List<DetailedMoveRecord> moves = parseMoves(gameRecord);
 
@@ -171,29 +171,54 @@ public class GameSerializer {
         return moves;
     }
 
-    public static Map<String, String> parseTags(String[] gameLines) {
+    public static Map<String, String> parseTags(String gameRecord) {
         Map<String, String> tags = new LinkedHashMap<>();
 
-        for(String line : gameLines) {
-            if(line.matches("\\[.*:.*\\]")) {
-                line = line.replace("[", "");
-                line = line.replace("]", "");
+        String gameStart = "1.";
+        String tagStart = "[";
+        String tagSeparator = ":";
+        String tagEnd = "]";
 
-                int separatorIndex = line.indexOf(':');
-                tags.put(line.substring(0, separatorIndex), line.substring(separatorIndex + 1, line.length()));
+        int matchIndex = -1;
+        int lastMatchIndex = -1;
+        boolean inTagTitle = false;
+        boolean inTagBody = false;
+
+        String currentTagTitle = "";
+        String currentTagBody = "";
+
+        for(int i = 0; i < gameRecord.length(); i++) {
+            if(!inTagTitle && !inTagBody && gameRecord.regionMatches(i, tagStart, 0, tagStart.length())) {
+                lastMatchIndex = matchIndex;
+                matchIndex = i;
+
+                inTagTitle = true;
+                inTagBody = false;
             }
-            else {
+            else if(inTagTitle && !inTagBody && gameRecord.regionMatches(i, tagSeparator, 0, tagSeparator.length())) {
+                lastMatchIndex = matchIndex;
+                matchIndex = i;
+
+                inTagTitle = false;
+                inTagBody = true;
+
+                currentTagTitle = gameRecord.substring(lastMatchIndex + 1, matchIndex);
+            }
+            else if(!inTagTitle && inTagBody && gameRecord.regionMatches(i, tagEnd, 0, tagEnd.length())) {
+                lastMatchIndex = matchIndex;
+                matchIndex = i;
+
+                inTagTitle = false;
+                inTagBody = false;
+
+                currentTagBody = gameRecord.substring(lastMatchIndex + 1, matchIndex);
+                tags.put(currentTagTitle, currentTagBody);
+            }
+            else if(!inTagTitle && !inTagBody && gameRecord.regionMatches(i, gameStart, 0, gameStart.length())) {
                 break;
             }
         }
 
         return tags;
-    }
-
-    public static int ordinalIndexOf(String str, char c, int n) {
-        int pos = str.indexOf(c, 0);
-        while (n-- > 0 && pos != -1)
-            pos = str.indexOf(c, pos+1);
-        return pos;
     }
 }
