@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class Game {
     public Game(long[][] zobristTable, List<GameState> history) {
@@ -140,22 +141,8 @@ public class Game {
 
     public String getHistoryString() {
         String gameRecord = "";
-        int count = 1;
-        for(int i = 0; i < getHistory().size(); ) {
-            if(i + 1 < getHistory().size() && getHistory().get(i+1).getExitingMove() != null) {
-                DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
-                DetailedMoveRecord exitingMove2 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
-                gameRecord += count++ + ". " + exitingMove1 + " " + exitingMove2 + "\n";
-            }
-            else {
-                DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
-                if(exitingMove1 != null) {
-                    gameRecord += count++ + ". " + exitingMove1 + "\n";
-                }
-            }
-
-            if(i == getHistory().size()) break;
-        }
+        gameRecord = Pattern.compile("\\[.*?\\]", Pattern.DOTALL).matcher(getCommentedHistoryString()).replaceAll("");
+        gameRecord = Pattern.compile("\n\n").matcher(gameRecord).replaceAll("\n");
 
         return gameRecord;
     }
