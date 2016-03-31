@@ -59,12 +59,11 @@ public class TerminalUtils {
             return null;
         }
 
-        rg.setPosition(rg.historySize() - 1);
         rg.prepareForGameStart();
         Game g = rg.getGame();
 
         if(g.getCurrentState().checkVictory() > 0) {
-            MessageDialog.showMessageDialog(gui, "Game already ended", "This game record has already finished.\n\nTry loading it as a replay and using the 'play-here' command where you\nwould like to take control.");
+            MessageDialog.showMessageDialog(gui, "Game already ended", "This game record has already finished.\n\nTry loading it as a replay and using the 'play-here'\ncommand where you would like to take control.");
             return null;
         }
 

@@ -4,6 +4,7 @@ import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
  */
 public class ReplayGame {
     private Game mGame;
+    private List<GameState> mFirstStatesByTurn;
     private List<DetailedMoveRecord> mMoveHistory;
     private int mStatePosition = 0;
 
@@ -36,6 +38,8 @@ public class ReplayGame {
         for(int i = 0; i < movesToPlay.size(); i++) {
             mGame.getHistory().get(i).setExitingMove(movesToPlay.get(i));
         }
+
+        setupFirstStatesList();
     }
 
     /**
@@ -55,6 +59,7 @@ public class ReplayGame {
 
         mGame.getHistory().add(mGame.getCurrentState());
         mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
+        setupFirstStatesList();
     }
 
     public Game getGame() {
@@ -72,9 +77,12 @@ public class ReplayGame {
             String[] components = line.split(" ");
             statePosition += components.length - 1;
 
-            if (statePosition >= mStatePosition && !modified) {
-                int component = statePosition - mStatePosition - 1;
-                components[component] = components[component] + "*";
+            if (statePosition > mStatePosition && !modified) {
+                System.out.println(statePosition);
+                System.out.println(mStatePosition);
+                int component = mStatePosition % 2 + 1;
+                System.out.println(component);
+                components[component] = "*" + components[component];
 
                 for(String s : components) {
                     newString += s + " ";
@@ -107,9 +115,29 @@ public class ReplayGame {
         return stateAtIndex(mStatePosition);
     }
 
+    public int setPositionByState(GameState state) {
+        int i = 0;
+        for(GameState history : mGame.getHistory()) {
+            if(state.equals(history)) {
+                setPosition(i);
+                return i;
+            }
+            else {
+                i++;
+            }
+        }
+
+        return -1;
+    }
+
+    public GameState setTurnIndex(int turn) {
+        setPositionByState(mFirstStatesByTurn.get(turn));
+        return getCurrentState();
+    }
+
     public GameState setPosition(int i) {
-        if(i >= historySize() && i < 0) {
-            throw new IllegalArgumentException("Index " + i + " out of range: max is " + (mGame.getHistory().size() - 1));
+        if(i >= historySize() || i < 0) {
+            return null;
         }
 
         mStatePosition = i;
@@ -117,9 +145,21 @@ public class ReplayGame {
         return stateAtIndex(mStatePosition);
     }
 
+    public int getPosition() {
+        return mStatePosition;
+    }
+
     public void prepareForGameStart() {
-        stateAtIndex(historySize() - 1);
-        mGame.getHistory().remove(historySize() - 1);
+        prepareForGameStart(historySize() - 1);
+    }
+
+    public void prepareForGameStart(int index) {
+        stateAtIndex(index);
+        List<GameState> toRemove = new ArrayList<>(historySize() - index);
+        for(int i = index; i < historySize(); i++) {
+            toRemove.add(mGame.getHistory().get(i));
+        }
+        mGame.getHistory().removeAll(toRemove);
     }
 
     private GameState stateAtIndex(int i) {
@@ -133,5 +173,24 @@ public class ReplayGame {
 
     public GameState getCurrentState() {
         return mGame.getHistory().get(mStatePosition);
+    }
+
+    private void setupFirstStatesList() {
+        mFirstStatesByTurn = new ArrayList<>(historySize() / 2);
+
+        GameState firstState = mGame.getHistory().get(0);
+        boolean otherSideWent = false;
+        mFirstStatesByTurn.add(firstState);
+        for(GameState state : mGame.getHistory()) {
+            if(state.getCurrentSide().isAttackingSide() == firstState.getCurrentSide().isAttackingSide()) {
+                if(otherSideWent) {
+                    mFirstStatesByTurn.add(state);
+                    otherSideWent = false;
+                }
+            }
+            else {
+                otherSideWent = true;
+            }
+        }
     }
 }

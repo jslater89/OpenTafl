@@ -508,14 +508,23 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             else if(r.type == CommandResult.Type.ANALYZE) {
                 statusText("AI analysis beginning");
             }
+            else if(r.type == CommandResult.Type.REPLAY_ENTER) {
+                mBoardWindow.rerenderBoard();
+            }
+            else if(r.type == CommandResult.Type.REPLAY_PLAY_HERE) {
+                mBoardWindow.rerenderBoard();
+            }
+            else if(r.type == CommandResult.Type.REPLAY_RETURN) {
+                mBoardWindow.rerenderBoard();
+            }
             else if(r.type == CommandResult.Type.REPLAY_NEXT) {
-
+                mBoardWindow.rerenderBoard();
             }
             else if(r.type == CommandResult.Type.REPLAY_PREVIOUS) {
-
+                mBoardWindow.rerenderBoard();
             }
             else if(r.type == CommandResult.Type.REPLAY_JUMP) {
-
+                mBoardWindow.rerenderBoard();
             }
         }
 

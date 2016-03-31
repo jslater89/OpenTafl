@@ -43,7 +43,7 @@ public class MainMenuWindow extends BasicWindow {
 
         if(OpenTafl.DEV_MODE) {
             Button loadGameButton = new Button("Load game", () -> {
-                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(new File("selfplay-results/savedgame.otg"));
+                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(new File("selfplay-results/gamelog.otg"));
                 ReplayGame rg = new ReplayGame(g.game, g.moves);
                 TerminalUtils.startSavedGame(rg, getTextGUI(), mTerminalCallback);
 

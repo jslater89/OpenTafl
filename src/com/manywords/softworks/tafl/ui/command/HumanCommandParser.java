@@ -4,6 +4,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -35,22 +36,22 @@ public class HumanCommandParser {
             return newAnalyzeCommand(engine, command);
         }
         else if(command.startsWith("replay")) {
-
+            return newReplayEnterCommand(engine, command);
         }
         else if(command.startsWith("play-here")) {
-
+            return newReplayPlayHereCommand(engine, command);
         }
         else if(command.startsWith("return")) {
-
+            return newReplayReturnCommand(engine, command);
         }
         else if(command.startsWith("next")) {
-
+            return newReplayNextCommand(engine, command);
         }
         else if(command.startsWith("previous")) {
-
+            return newReplayPreviousCommand(engine, command);
         }
         else if(command.startsWith("jump")) {
-
+            return newReplayJumpCommand(engine, command);
         }
         return null;
     }
@@ -64,11 +65,20 @@ public class HumanCommandParser {
     public static Help newHelpCommand(CommandEngine engine, String command) { return new Help(engine, command); }
     public static Quit newQuitCommand(CommandEngine engine, String command) { return new Quit(engine, command); }
     public static Analyze newAnalyzeCommand(CommandEngine engine, String command) { return new Analyze(engine, command); }
+    public static ReplayEnter newReplayEnterCommand(CommandEngine engine, String command) { return new ReplayEnter(engine, command); }
+    public static ReplayPlayHere newReplayPlayHereCommand(CommandEngine engine, String command) { return new ReplayPlayHere(engine, command); }
+    public static ReplayReturn newReplayReturnCommand(CommandEngine engine, String command) { return new ReplayReturn(engine, command); }
+    public static ReplayNext newReplayNextCommand(CommandEngine engine, String command) { return new ReplayNext(engine, command); }
+    public static ReplayPrevious newReplayPreviousCommand(CommandEngine engine, String command) { return new ReplayPrevious(engine, command); }
+    public static ReplayJump newReplayJumpCommand(CommandEngine engine, String command) { return new ReplayJump(engine, command); }
 
     public static class Move extends Command {
         public final Coord from;
         public final Coord to;
         public Move(CommandEngine engine, String command) {
+            if(engine.getMode() != UiCallback.Mode.GAME) {
+                mError = "Not in game mode.";
+            }
             String[] commandParts = command.split(" ");
             if (commandParts.length != 3) {
                 mError = "Wrong command format, try move [file+rank] [file+rank] (e.g. move a4 a3)";
@@ -203,6 +213,66 @@ public class HumanCommandParser {
                 moves = -1;
                 seconds = -1;
                 mError = "Improperly-formatted command";
+            }
+        }
+    }
+    public static class ReplayEnter extends Command {
+        public ReplayEnter(CommandEngine engine, String command) {
+            if(engine.getMode() == UiCallback.Mode.REPLAY) {
+                mError = "Already in replay mode.";
+            }
+        }
+    }
+    public static class ReplayPlayHere extends Command {
+        public ReplayPlayHere(CommandEngine engine, String command) {
+            if(engine.getMode() != UiCallback.Mode.REPLAY) {
+                mError = "Not in replay mode.";
+            }
+        }
+    }
+    public static class ReplayReturn extends Command {
+        public ReplayReturn(CommandEngine engine, String command) {
+            if(engine.getMode() != UiCallback.Mode.REPLAY) {
+                mError = "Not in replay mode.";
+            }
+        }
+    }
+    public static class ReplayNext extends Command {
+        public ReplayNext(CommandEngine engine, String command) {
+            if(engine.getMode() != UiCallback.Mode.REPLAY) {
+                mError = "Not in replay mode.";
+            }
+        }
+    }
+    public static class ReplayPrevious extends Command {
+        public ReplayPrevious(CommandEngine engine, String command) {
+            if(engine.getMode() != UiCallback.Mode.REPLAY) {
+                mError = "Not in replay mode.";
+            }
+        }
+    }
+    public static class ReplayJump extends Command {
+        public final int turnIndex;
+
+        public ReplayJump(CommandEngine engine, String command) {
+            if(engine.getMode() != UiCallback.Mode.REPLAY) {
+                mError = "Not in replay mode.";
+            }
+
+            String[] commandParts = command.split(" ");
+            if(commandParts.length != 2) {
+                mError = "Improperly-formatted command.";
+                turnIndex = -1;
+            }
+            else {
+                int index = -1;
+                try {
+                    index = Integer.parseInt(commandParts[1]);
+                }
+                catch(NumberFormatException e) {
+                    mError = "Argument to jump not a number: " + commandParts[1];
+                }
+                turnIndex = index - 1;
             }
         }
     }

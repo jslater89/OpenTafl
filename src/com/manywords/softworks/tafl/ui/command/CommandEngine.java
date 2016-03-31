@@ -64,6 +64,10 @@ public class CommandEngine {
         mReplay = rg;
         callbackModeChange(UiCallback.Mode.REPLAY, rg);
     }
+    public void leaveReplay() {
+        mMode = UiCallback.Mode.GAME;
+        mReplay = null;
+    }
     public void enterGame(Game g) {
         mMode = UiCallback.Mode.GAME;
         mReplay = null;
@@ -91,6 +95,10 @@ public class CommandEngine {
     }
 
     public void startGame() {
+        if(mInGame) {
+            // Don't restart a started game
+            return;
+        }
         if(mGame.getClock() != null) {
             mGame.getClock().setCallback(mClockCallback);
         }
@@ -123,6 +131,10 @@ public class CommandEngine {
     }
 
     public void finishGame() {
+        finishGame(false);
+    }
+
+    private void finishGame(boolean quiet) {
         mInGame = false;
 
         mGame.finish();
@@ -131,7 +143,10 @@ public class CommandEngine {
         if(mAnalysisEngine != null) {
             mDummyAnalysisPlayer.stop();
         }
-        callbackGameFinished();
+
+        if(!quiet) {
+            callbackGameFinished();
+        }
     }
 
     private final GameClock.GameClockCallback mClockCallback = new GameClock.GameClockCallback() {
@@ -251,8 +266,14 @@ public class CommandEngine {
         }
         // 3. MOVE COMMAND: RETURN MOVE RECORD (receiver sends to callback after verifying side &c)
         else if(command instanceof HumanCommandParser.Move) {
+            int replayPosition = -1;
             if(!mInGame) {
                 return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, "Game over", null);
+            }
+            else if(getMode() == UiCallback.Mode.REPLAY) {
+                replayPosition = mReplay.getPosition();
+                mReplay.prepareForGameStart();
+                leaveReplay();
             }
             HumanCommandParser.Move m = (HumanCommandParser.Move) command;
             if(m.from == null || m.to == null) {
@@ -269,6 +290,11 @@ public class CommandEngine {
 
             Coord destination = mGame.getCurrentState().getSpaceAt(m.to.x, m.to.y);
             MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mGame.getCurrentState(), piece), destination);
+
+            if(getMode() == UiCallback.Mode.REPLAY) {
+                enterReplay(new ReplayGame(mGame));
+                mReplay.setPosition(replayPosition);
+            }
             return new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", record);
         }
         // 4. INFO COMMAND: SUCCESS (command parser does all the required verification)
@@ -314,6 +340,49 @@ public class CommandEngine {
                 mAnalysisEngine.analyzePosition(a.moves, a.seconds, mGame.getCurrentState());
                 return new CommandResult(CommandResult.Type.ANALYZE, CommandResult.SUCCESS, "", null);
             }
+        }
+        // 11. REPLAY START COMMAND
+        else if(command instanceof HumanCommandParser.ReplayEnter) {
+            ReplayGame rg = new ReplayGame(mGame);
+            enterReplay(rg);
+            return new CommandResult(CommandResult.Type.REPLAY_ENTER, CommandResult.SUCCESS, "", null);
+        }
+        // 11. REPLAY PLAY HERE COMMAND
+        else if(command instanceof HumanCommandParser.ReplayPlayHere) {
+            if(mInGame) {
+                finishGame(true);
+            }
+
+            Game g = mReplay.getGame();
+            mReplay.prepareForGameStart(mReplay.getPosition());
+            enterGame(g);
+            return new CommandResult(CommandResult.Type.REPLAY_PLAY_HERE, CommandResult.SUCCESS, "", null);
+        }
+        // 11. REPLAY RETURN COMMAND
+        else if(command instanceof HumanCommandParser.ReplayReturn) {
+            mReplay.prepareForGameStart();
+            leaveReplay();
+
+            return new CommandResult(CommandResult.Type.REPLAY_RETURN, CommandResult.SUCCESS, "", null);
+        }
+        // 11. REPLAY NEXT COMMAND
+        else if(command instanceof HumanCommandParser.ReplayNext) {
+            GameState state = mReplay.nextState();
+            if(state != null) return new CommandResult(CommandResult.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", null);
+            else return new CommandResult(CommandResult.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
+        }
+        // 11. REPLAY PREV COMMAND
+        else if(command instanceof HumanCommandParser.ReplayPrevious) {
+            GameState state = mReplay.previousState();
+            if(state != null) return new CommandResult(CommandResult.Type.REPLAY_PREVIOUS, CommandResult.SUCCESS, "", null);
+            else return new CommandResult(CommandResult.Type.REPLAY_PREVIOUS, CommandResult.FAIL, "At the start of the game history.", null);
+        }
+        // 11. REPLAY JUMP COMMAND
+        else if(command instanceof HumanCommandParser.ReplayJump) {
+            HumanCommandParser.ReplayJump j = (HumanCommandParser.ReplayJump) command;
+            GameState state = mReplay.setTurnIndex(j.turnIndex);
+            if(state != null) return new CommandResult(CommandResult.Type.REPLAY_JUMP, CommandResult.SUCCESS, "", null);
+            else return new CommandResult(CommandResult.Type.REPLAY_JUMP, CommandResult.FAIL, "Turn index " + j + " out of bounds.", null);
         }
 
         return new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, "Command not recognized", null);
@@ -369,5 +438,9 @@ public class CommandEngine {
         for(UiCallback c : mUiCallbacks) {
             c.modeChanging(mode, gameObject);
         }
+    }
+
+    public UiCallback.Mode getMode() {
+        return mMode;
     }
 }
