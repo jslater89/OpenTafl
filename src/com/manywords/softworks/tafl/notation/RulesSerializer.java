@@ -88,6 +88,9 @@ public class RulesSerializer {
         if(!rules.getStartingSide().isAttackingSide()) {
             otnrString += "atkf:n ";
         }
+        else {
+            otnrString += "atkf:y";
+        }
 
         if(rules.threefoldRepetitionResult() != Rules.DRAW) {
             otnrString += getStringForThreefoldResult(rules.threefoldRepetitionResult());
