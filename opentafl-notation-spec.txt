@@ -338,6 +338,10 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		"time-control": 
 			<main-time-seconds> [<overtime-periods><"/"><overtime-length]
 			e.g. "3600 3/30": 1 hour, 3 30-second overtimes
+			the time allotted per player for this game.
+		"time-remaining":
+		    <main-time-seconds> [<overtime-periods><"/"><overtime-length]
+		    the time remaining at the end of this game record.
 		"termination": 
 			human-readable definition of how the game ended
 		"variant":
@@ -351,8 +355,8 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 	position-tag:
 		<"[position:"><position-string><"]">
 
-		optionally, a starting position for the game, if not the starting position
-		in the rules string.
+		optionally, a starting position for the game. If a position tag is provided,
+		the game
 
 	turn-number:
 		the number of times both players have moved, starting at 1.
@@ -361,7 +365,12 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		an OTN move record.
 
 	first-half-commentary:
-		comment on the first move of this turn.
+		comment on the first move of this turn. By convention, if the commentary
+		text begins with a clock specification string in the same syntax as used
+		for the time-control tag, OpenTafl will omit the clock specification from
+		the displayed commentary, and display the time given by the clock
+		specification in the clock display.
 
 	second-half-commentary:
-		comment on the second move of this turn.
+		comment on the second move of this turn. The same clock display convention
+		applies.
