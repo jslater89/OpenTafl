@@ -421,6 +421,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             if(c != null) {
                 mStatusWindow.handleTimeUpdate(mReplay.getGame().getCurrentSide(), c.getClockEntry(true).toTimeSpec(), c.getClockEntry(false).toTimeSpec());
             }
+            mBoardWindow.rerenderBoard();
         }
 
         @Override

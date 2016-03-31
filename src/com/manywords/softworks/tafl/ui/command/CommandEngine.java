@@ -65,8 +65,8 @@ public class CommandEngine {
         callbackModeChange(UiCallback.Mode.REPLAY, rg);
     }
     public void leaveReplay() {
+        mReplay.prepareForGameStart();
         mMode = UiCallback.Mode.GAME;
-        mReplay = null;
     }
     public void enterGame(Game g) {
         mMode = UiCallback.Mode.GAME;
@@ -178,6 +178,12 @@ public class CommandEngine {
         public void onMoveDecided(Player player, MoveRecord move) {
             if(player == mDummyAnalysisPlayer) return;
 
+            int replayPosition = -1;
+            if(getMode() == UiCallback.Mode.REPLAY) {
+                replayPosition = mReplay.getPosition();
+                leaveReplay();
+            }
+
             String message = "Illegal play. ";
             if(player != mCurrentPlayer) {
                 message += "Not your turn.";
@@ -244,6 +250,10 @@ public class CommandEngine {
                 }
             }
 
+            if(replayPosition != -1) {
+                enterReplay(new ReplayGame(mGame));
+                mReplay.setPosition(replayPosition);
+            }
             waitForNextMove();
         }
 
@@ -266,15 +276,10 @@ public class CommandEngine {
         }
         // 3. MOVE COMMAND: RETURN MOVE RECORD (receiver sends to callback after verifying side &c)
         else if(command instanceof HumanCommandParser.Move) {
-            int replayPosition = -1;
             if(!mInGame) {
                 return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, "Game over", null);
             }
-            else if(getMode() == UiCallback.Mode.REPLAY) {
-                replayPosition = mReplay.getPosition();
-                mReplay.prepareForGameStart();
-                leaveReplay();
-            }
+
             HumanCommandParser.Move m = (HumanCommandParser.Move) command;
             if(m.from == null || m.to == null) {
                 return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, "Invalid coords", null);
@@ -291,10 +296,6 @@ public class CommandEngine {
             Coord destination = mGame.getCurrentState().getSpaceAt(m.to.x, m.to.y);
             MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mGame.getCurrentState(), piece), destination);
 
-            if(getMode() == UiCallback.Mode.REPLAY) {
-                enterReplay(new ReplayGame(mGame));
-                mReplay.setPosition(replayPosition);
-            }
             return new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", record);
         }
         // 4. INFO COMMAND: SUCCESS (command parser does all the required verification)
@@ -360,7 +361,6 @@ public class CommandEngine {
         }
         // 11. REPLAY RETURN COMMAND
         else if(command instanceof HumanCommandParser.ReplayReturn) {
-            mReplay.prepareForGameStart();
             leaveReplay();
 
             return new CommandResult(CommandResult.Type.REPLAY_RETURN, CommandResult.SUCCESS, "", null);
