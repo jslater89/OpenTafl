@@ -336,8 +336,8 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		"compiler": 
 			person assembling this file, in lastname, firstname format
 		"time-control": 
-			<main-time-seconds> [<overtime-periods><"/"><overtime-length]
-			e.g. "3600 3/30": 1 hour, 3 30-second overtimes
+			<main-time-seconds> [<overtime-periods><"/"><overtime-length] [<increment-length><"i">]
+			e.g. "3600 30/3 3i": 1 hour, 3 30-second overtimes, 3-second increment
 			the time allotted per player for this game.
 		"time-remaining":
 		    <main-time-seconds> [<overtime-periods><"/"><overtime-length]

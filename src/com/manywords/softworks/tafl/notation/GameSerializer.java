@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by jay on 3/22/16.
  */
 public class GameSerializer {
-    public static String getGameRecord(Game g) {
+    public static String getGameRecord(Game g, boolean comments) {
         String tagString = "";
 
         tagString += "[date:";
@@ -33,8 +33,7 @@ public class GameSerializer {
 
         String rulesString = "[rules:" + g.getGameRules().getOTRString() + "]\n\n";
 
-        // TODO: split on moves, add comments
-        String movesString = g.getHistoryString();
+        String movesString = (comments ? g.getCommentedHistoryString() : g.getHistoryString());
 
         return tagString + rulesString + movesString;
     }

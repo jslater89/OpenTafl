@@ -53,6 +53,9 @@ public class DetailedMoveRecord extends MoveRecord {
     private static final char LOCATION_MASK = 16 + 32 + 64 + 128 + 256 + 512 + 1024 + 2048 + 4096; // bits 5-13
     public final char[] captureArray;
 
+    private String mComment = "";
+    private GameClock.TimeSpec mTimeRemaining;
+
     public DetailedMoveRecord(Coord start, Coord end, char mover) {
         super(start, end);
         flags = moveRecordFlagFor(mover);
@@ -75,6 +78,22 @@ public class DetailedMoveRecord extends MoveRecord {
         this.flags = flags;
 
         this.captureArray = buildCaptureArray(captures, capturedTaflmen);
+    }
+
+    public void setTimeRemaining(GameClock.TimeSpec remaining) {
+        mTimeRemaining = remaining;
+    }
+
+    public GameClock.TimeSpec getTimeRemaining() {
+        return mTimeRemaining;
+    }
+
+    public void setComment(String comment) {
+        mComment = comment;
+    }
+
+    public String getComment() {
+        return mComment;
     }
 
     public boolean wasJump() {

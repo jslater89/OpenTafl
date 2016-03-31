@@ -460,7 +460,9 @@ public class Taflman {
         }
 
         if(detailed) {
-            return new DetailedMoveRecord(start, destination, taflman, captures, capturedTaflmen, wasJump, wasBerserk);
+            DetailedMoveRecord m = new DetailedMoveRecord(start, destination, taflman, captures, capturedTaflmen, wasJump, wasBerserk);
+            m.setTimeRemaining(state.mGame.getClock().getClockEntry(state.getCurrentSide()).toTimeSpec());
+            return m;
         }
         else {
             return new MoveRecord(start, destination, captures);

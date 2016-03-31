@@ -121,6 +121,45 @@ public class Game {
         return gameRecord;
     }
 
+    public String getCommentedHistoryString() {
+        String gameRecord = "";
+        int count = 1;
+        for(int i = 0; i < getHistory().size(); ) {
+            gameRecord += count++ + ". ";
+            if(i + 1 < getHistory().size()) {
+                DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
+                DetailedMoveRecord exitingMove2 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
+                gameRecord += exitingMove1 + " " + exitingMove2 + "\n";
+
+                gameRecord += "[";
+                if(exitingMove1.getTimeRemaining() != null) {
+                    gameRecord += exitingMove1.getTimeRemaining().toGameNotationString() + " ";
+                }
+                gameRecord += exitingMove1.getComment() + "|";
+
+                if(exitingMove2.getTimeRemaining() != null) {
+                    gameRecord += exitingMove2.getTimeRemaining().toGameNotationString() + " ";
+                }
+
+                gameRecord += exitingMove2.getComment() + "]\n";
+            }
+            else {
+                DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
+                gameRecord += exitingMove1 + "\n";
+
+                gameRecord += "[";
+                if(exitingMove1.getTimeRemaining() != null) {
+                    gameRecord += exitingMove1.getTimeRemaining().toGameNotationString() + " ";
+                }
+                gameRecord += exitingMove1.getComment() + "|]\n";
+            }
+
+            if(i == getHistory().size()) break;
+        }
+
+        return gameRecord;
+    }
+
     /**
      * Sides do not always go in strict sequence!
      * If the berserker rule is in effect, one side

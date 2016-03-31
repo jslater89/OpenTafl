@@ -208,6 +208,10 @@ public class GameClock {
         public String toString() {
             return mainTime / 1000 + " " + overtimeTime / 1000 + "/" + overtimeCount + " " + incrementTime / 1000 + "i";
         }
+
+        public String toGameNotationString() {
+            return mainTime / 1000 + " " + overtimeTime / 1000 + "/" + overtimeCount;
+        }
     }
 
     public interface GameClockCallback {

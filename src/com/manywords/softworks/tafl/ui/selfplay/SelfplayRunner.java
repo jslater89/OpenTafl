@@ -118,11 +118,11 @@ public class SelfplayRunner {
 
                         try {
                             FileWriter fw = new FileWriter(game1File);
-                            fw.write(GameSerializer.getGameRecord(result.getGame(0)));
+                            fw.write(GameSerializer.getGameRecord(result.getGame(0), true));
                             fw.flush();
 
                             fw = new FileWriter(game2File);
-                            fw.write(GameSerializer.getGameRecord(result.getGame(1)));
+                            fw.write(GameSerializer.getGameRecord(result.getGame(1), true));
                             fw.flush();
                         } catch (IOException e) {
                             System.out.println("Failed to write selfplay result");
