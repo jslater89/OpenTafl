@@ -96,13 +96,8 @@ public class Game {
                 String remainingTimeString = mTagMap.get("time-remaining");
                 String[] remainingTimes = remainingTimeString.split(",");
 
-                System.out.println(remainingTimeString);
-                System.out.println(remainingTimes[0]);
-                System.out.println(remainingTimes[1]);
                 GameClock.TimeSpec attackerTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
                 GameClock.TimeSpec defenderTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
-                System.out.println(attackerTime);
-                System.out.println(defenderTime);
 
                 GameClock.ClockEntry attackerClock = mClock.getClockEntry(true);
                 attackerClock.setTime(attackerTime);

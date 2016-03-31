@@ -337,9 +337,6 @@ public class GameClock {
         Matcher m = p.matcher(string);
 
         if(m.lookingAt()) {
-            for(int i = 0; i < m.groupCount(); i++) {
-                System.out.println("group " + i + ": " + m.group(i));
-            }
             long mainTime = Long.parseLong(m.group(1)) * 1000;
 
             long overtimeTime = 0;
@@ -358,7 +355,6 @@ public class GameClock {
             }
 
             TimeSpec ts = new TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
-            System.out.println(ts.toMillisString());
             return ts;
         }
 
