@@ -273,7 +273,7 @@ public class GameState {
         else {
             GameState nextState = new GameState(this);
 
-            boolean detailed = !(nextState instanceof GameTreeState);
+            boolean detailed = !(this instanceof GameTreeState);
             MoveRecord move = Taflman.moveTo(nextState, taflman, destination, detailed);
             List<Coord> captures = move.captures;
 
