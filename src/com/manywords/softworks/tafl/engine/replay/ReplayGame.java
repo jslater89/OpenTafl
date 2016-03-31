@@ -30,7 +30,12 @@ public class ReplayGame {
      */
     public ReplayGame(Game game, List<DetailedMoveRecord> movesToPlay) {
         for(MoveRecord m : movesToPlay) {
-            game.getCurrentState().makeMove(m);
+            int result = game.getCurrentState().makeMove(m);
+            if(result < GameState.GOOD_MOVE) {
+                RawTerminal.renderGameState(game.getCurrentState());
+                System.out.println(m);
+                throw new IllegalStateException("Failed to make moves!");
+            }
         }
 
         mGame = game;
