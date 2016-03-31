@@ -5,9 +5,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
-import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.player.Player;
@@ -16,6 +14,11 @@ class ThreefoldVictoryTest extends TaflTest implements UiCallback {
 
     @Override
     public void gameStarting() {
+
+    }
+
+    @Override
+    public void modeChanging(Mode mode, Object gameObject) {
 
     }
 

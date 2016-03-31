@@ -201,6 +201,12 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     }
 
     @Override
+    public void modeChanging(Mode mode, Object gameObject) {
+        if(mode == Mode.GAME) mTerminalCallback.onEnteringGame((Game) gameObject);
+        else if(mode == Mode.REPLAY) mTerminalCallback.onEnteringReplay((ReplayGame) gameObject);
+    }
+
+    @Override
     public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
         statusText("Awaiting" + (isAttackingSide ? " attacker " : " defender ") + "move");
     }
@@ -335,13 +341,13 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
                 createWindows(g, title);
+                mCommandEngine.enterGame(g);
 
                 // This is our UI thread (blocking call)
-                onEnteringGame(g);
                 addBoardWindows();
             }
             else {
-                onEnteringGame(g);
+                mCommandEngine.enterGame(g);
             }
         }
 
@@ -352,13 +358,14 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
                 createWindows(rg.getGame(), title);
+                mCommandEngine.enterReplay(rg);
 
                 // This is our UI thread (blocking call)
-                onEnteringReplay(rg);
                 addBoardWindows();
             }
             else {
-                onEnteringReplay(rg);
+                mCommandEngine.enterReplay(rg);
+
             }
         }
 

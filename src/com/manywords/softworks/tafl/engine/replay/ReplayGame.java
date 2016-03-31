@@ -15,7 +15,6 @@ public class ReplayGame {
     private Game mGame;
     private List<DetailedMoveRecord> mMoveHistory;
     private int mStatePosition = 0;
-    private int mMovePosition = -1;
 
     /**
      * This constructor takes a game object and plays the given
@@ -60,6 +59,36 @@ public class ReplayGame {
 
     public Game getGame() {
         return mGame;
+    }
+
+    public String getHistoryStringWithPositionMarker() {
+        String historyString = mGame.getHistoryString();
+        String[] lines = historyString.split("\n");
+
+        String newString = "";
+        int statePosition = 0;
+        boolean modified = false;
+        for (String line : lines) {
+            String[] components = line.split(" ");
+            statePosition += components.length - 1;
+
+            if (statePosition >= mStatePosition && !modified) {
+                int component = statePosition - mStatePosition + 1;
+                components[component] = components[component] + "*";
+
+                for(String s : components) {
+                    newString += s + " ";
+                }
+                newString += "\n";
+
+                modified = true;
+            }
+            else {
+                newString += line + "\n";
+            }
+        }
+
+        return newString;
     }
 
     public GameState nextState() {

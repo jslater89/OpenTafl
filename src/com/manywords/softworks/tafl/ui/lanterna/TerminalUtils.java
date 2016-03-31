@@ -73,7 +73,6 @@ public class TerminalUtils {
     }
 
     public static void startReplay(ReplayGame rg, WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
-        rg.setPosition(rg.historySize() - 1);
         callback.onEnteringScreen(rg, "OpenTafl");
     }
 }

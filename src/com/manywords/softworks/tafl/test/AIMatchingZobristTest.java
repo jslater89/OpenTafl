@@ -3,7 +3,6 @@ package com.manywords.softworks.tafl.test;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -16,6 +15,11 @@ class AIMatchingZobristTest extends TaflTest implements UiCallback {
 
     @Override
     public void gameStarting() {
+
+    }
+
+    @Override
+    public void modeChanging(Mode mode, Object gameObject) {
 
     }
 

@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandEngine {
+    private UiCallback.Mode mMode;
+
     private Game mGame;
     private ReplayGame mReplay;
     private Player mAttacker;
@@ -35,6 +37,7 @@ public class CommandEngine {
 
     public CommandEngine(Game g, UiCallback callback, Player attacker, Player defender) {
         mGame = g;
+        mMode = UiCallback.Mode.GAME;
         mUiCallbacks.add(callback);
         mPrimaryUiCallback = callback;
 
@@ -54,6 +57,21 @@ public class CommandEngine {
             mDummyAnalysisPlayer.setCallback(mPlayerCallback);
             mAnalysisEngine = mDummyAnalysisPlayer.setupAnalysisEngine();
         }
+    }
+
+    public void enterReplay(ReplayGame rg) {
+        mMode = UiCallback.Mode.REPLAY;
+        mReplay = rg;
+        callbackModeChange(UiCallback.Mode.REPLAY, rg);
+    }
+    public void enterGame(Game g) {
+        mMode = UiCallback.Mode.GAME;
+        mReplay = null;
+        mGame = g;
+        mAttacker.setGame(g);
+        mDefender.setGame(g);
+
+        callbackModeChange(UiCallback.Mode.GAME, g);
     }
 
     public void addUiCallback(UiCallback callback) {
@@ -263,7 +281,13 @@ public class CommandEngine {
         }
         // 6. HISTORY COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.History) {
-            String gameRecord = mGame.getHistoryString();
+            String gameRecord;
+            if(mMode == UiCallback.Mode.REPLAY) {
+                gameRecord = mReplay.getHistoryStringWithPositionMarker();
+            }
+            else {
+                gameRecord = mGame.getHistoryString();
+            }
 
             return new CommandResult(CommandResult.Type.HISTORY, CommandResult.SUCCESS, "", gameRecord);
         }
@@ -338,6 +362,12 @@ public class CommandEngine {
     private void callbackGameStateAdvanced() {
         for(UiCallback c : mUiCallbacks) {
             c.gameStateAdvanced();
+        }
+    }
+
+    private void callbackModeChange(UiCallback.Mode mode, Object gameObject) {
+        for(UiCallback c : mUiCallbacks) {
+            c.modeChanging(mode, gameObject);
         }
     }
 }

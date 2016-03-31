@@ -150,6 +150,8 @@ public class Game {
     public String getCommentedHistoryString() {
         String gameRecord = "";
         int count = 1;
+
+        // For each line, get any moves made by the starting player and any moves made by the finishing player.
         for(int i = 0; i < getHistory().size(); ) {
             if(i + 1 < getHistory().size() && getHistory().get(i+1).getExitingMove() != null) {
                 DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
