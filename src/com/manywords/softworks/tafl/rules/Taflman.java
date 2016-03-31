@@ -459,7 +459,7 @@ public class Taflman {
 
         if(detailed) {
             DetailedMoveRecord m = new DetailedMoveRecord(start, destination, taflman, captures, capturedTaflmen, wasJump, wasBerserk);
-            if(state.mGame.getClock() != null) {
+            if(state.mGame.getClock() != null && m.getTimeRemaining() == null) {
                 m.setTimeRemaining(state.mGame.getClock().getClockEntry(state.getCurrentSide()).toTimeSpec());
             }
             return m;
