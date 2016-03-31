@@ -14,6 +14,7 @@ import com.googlecode.lanterna.terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
@@ -409,6 +410,10 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             mReplay = rg;
 
             mBoardWindow.enterReplay(rg);
+            GameClock c = mReplay.getGame().getClock();
+            if(c != null) {
+                mStatusWindow.handleTimeUpdate(mReplay.getGame().getCurrentSide(), c.getClockEntry(true).toTimeSpec(), c.getClockEntry(false).toTimeSpec());
+            }
         }
 
         @Override
@@ -425,7 +430,12 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         public void handleInGameCommand(String command) {
 
             if(command.startsWith("dump")) {
-                System.out.println(GameSerializer.getGameRecord(mGame, true));
+                if(mInGame && !mInReplay) {
+                    System.out.println(GameSerializer.getGameRecord(mGame, true));
+                }
+                else if(mInReplay) {
+                    System.out.println(GameSerializer.getGameRecord(mReplay.getGame(), true));
+                }
                 return;
             }
 

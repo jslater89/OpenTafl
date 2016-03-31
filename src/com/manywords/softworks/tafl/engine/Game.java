@@ -62,7 +62,7 @@ public class Game {
 
     public void start() {
         if(mClock != null) {
-            mClock.start(getGameRules().getStartingSide());
+            mClock.start(getCurrentSide());
         }
     }
 
@@ -86,7 +86,29 @@ public class Game {
 
     public void loadClock() {
         if(mTagMap != null && mTagMap.containsKey("time-control")) {
-            
+            String clockLengthString = mTagMap.get("time-control");
+            GameClock.TimeSpec clockLength = GameClock.getTimeSpecForGameNotationString(clockLengthString);
+
+            mClock = new GameClock(this, getCurrentState().getAttackers(), getCurrentState().getDefenders(), clockLength);
+
+            if(mTagMap.containsKey("time-remaining")) {
+                String remainingTimeString = mTagMap.get("time-remaining");
+                String[] remainingTimes = remainingTimeString.split(",");
+
+                System.out.println(remainingTimeString);
+                System.out.println(remainingTimes[0]);
+                System.out.println(remainingTimes[1]);
+                GameClock.TimeSpec attackerTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
+                GameClock.TimeSpec defenderTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
+                System.out.println(attackerTime);
+                System.out.println(defenderTime);
+
+                GameClock.ClockEntry attackerClock = mClock.getClockEntry(true);
+                attackerClock.setTime(attackerTime);
+
+                GameClock.ClockEntry defenderClock = mClock.getClockEntry(false);
+                defenderClock.setTime(defenderTime);
+            }
         }
     }
 
@@ -120,12 +142,16 @@ public class Game {
         String gameRecord = "";
         int count = 1;
         for(int i = 0; i < getHistory().size(); ) {
-            gameRecord += count++ + ". ";
-            if(i + 1 < getHistory().size()) {
-                gameRecord += getHistory().get(i++).getExitingMove() + " " + getHistory().get(i++).getExitingMove() + "\n";
+            if(i + 1 < getHistory().size() && getHistory().get(i+1).getExitingMove() != null) {
+                DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
+                DetailedMoveRecord exitingMove2 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
+                gameRecord += count++ + ". " + exitingMove1 + " " + exitingMove2 + "\n";
             }
             else {
-                gameRecord += getHistory().get(i++).getExitingMove() + "\n";
+                DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
+                if(exitingMove1 != null) {
+                    gameRecord += count++ + ". " + exitingMove1 + "\n";
+                }
             }
 
             if(i == getHistory().size()) break;
@@ -138,11 +164,10 @@ public class Game {
         String gameRecord = "";
         int count = 1;
         for(int i = 0; i < getHistory().size(); ) {
-            gameRecord += count++ + ". ";
-            if(i + 1 < getHistory().size()) {
+            if(i + 1 < getHistory().size() && getHistory().get(i+1).getExitingMove() != null) {
                 DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
                 DetailedMoveRecord exitingMove2 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
-                gameRecord += exitingMove1 + " " + exitingMove2 + "\n";
+                gameRecord += count++ + ". " + exitingMove1 + " " + exitingMove2 + "\n";
 
                 gameRecord += "[";
                 if(exitingMove1.getTimeRemaining() != null) {
@@ -158,13 +183,15 @@ public class Game {
             }
             else {
                 DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
-                gameRecord += exitingMove1 + "\n";
+                if(exitingMove1 != null) {
+                    gameRecord += count++ + ". " + exitingMove1 + "\n";
 
-                gameRecord += "[";
-                if(exitingMove1.getTimeRemaining() != null) {
-                    gameRecord += exitingMove1.getTimeRemaining().toGameNotationString() + " ";
+                    gameRecord += "[";
+                    if (exitingMove1.getTimeRemaining() != null) {
+                        gameRecord += exitingMove1.getTimeRemaining().toGameNotationString() + " ";
+                    }
+                    gameRecord += exitingMove1.getComment() + "|]\n";
                 }
-                gameRecord += exitingMove1.getComment() + "|]\n";
             }
 
             if(i == getHistory().size()) break;

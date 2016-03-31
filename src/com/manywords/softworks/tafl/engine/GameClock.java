@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * Created by jay on 2/20/16.
  */
 public class GameClock {
-    public static final String TIME_SPEC_REGEX = "(\\d+)(\\s\\d+/\\d+)?(\\s\\d+i)?";
+    public static final String TIME_SPEC_REGEX = "\\s*(\\d+)(\\s\\d+/\\d+)?(\\s\\d+i)?";
     private final Game mGame;
     private final long mMainTimeMillis;
     private final long mIncrementMillis;
@@ -22,6 +22,7 @@ public class GameClock {
 
     private UpdateThread mUpdateThread;
     private boolean mOutOfTime = false;
+    private boolean mRunning = false;
 
     private static final int ATTACKERS = 0;
     private static final int DEFENDERS = 1;
@@ -54,9 +55,8 @@ public class GameClock {
     }
 
     public ClockEntry start(Side startingSide) {
+        mRunning = true;
         mLastStartTime = System.currentTimeMillis();
-        mUpdateThread = new UpdateThread();
-        mUpdateThread.start();
 
         if(startingSide.isAttackingSide()) {
             mCurrentPlayer = ATTACKERS;
@@ -65,16 +65,21 @@ public class GameClock {
             mCurrentPlayer = DEFENDERS;
         }
 
-        if(mMainTimeMillis == 0) {
-            mClocks[mCurrentPlayer].mOvertimeMillis += mIncrementMillis;
+        if(mMainTimeMillis == 0 || mClocks[mCurrentPlayer].mMainTimeMillis == 0) {
+            mClocks[mCurrentPlayer].mOvertimeMillis = mOvertimeMillis + mIncrementMillis;
         }
         else {
             mClocks[mCurrentPlayer].mMainTimeMillis += mIncrementMillis;
         }
-        return mClocks[ATTACKERS];
+
+        mUpdateThread = new UpdateThread();
+        mUpdateThread.start();
+
+        return mClocks[mCurrentPlayer];
     }
 
     public void stop() {
+        mRunning = false;
         mUpdateThread.cancel();
     }
 
@@ -84,6 +89,8 @@ public class GameClock {
      * @return
      */
     public ClockEntry slap(boolean switchSides) {
+        if(!mRunning) return null;
+
         ClockEntry clock;
         synchronized (mClocks) {
             updateClocks();
@@ -221,7 +228,7 @@ public class GameClock {
             return mainTime / 1000 + " " + overtimeTime / 1000 + "/" + overtimeCount;
         }
 
-        public String humanReadableString() {
+        public String toHumanString() {
             int mainTimeSeconds = (int) mainTime / 1000;
             int overtimeSeconds = (int) overtimeTime / 1000;
 
@@ -241,6 +248,10 @@ public class GameClock {
 
             String result = mainTime + " " + overtimeTime + "/" + overtimeCount;
             return result;
+        }
+
+        public String toMillisString() {
+            return mainTime  + " " + overtimeTime + "/" + overtimeCount + " " + incrementTime + "i";
         }
     }
 
@@ -268,6 +279,12 @@ public class GameClock {
             return mGameClock;
         }
 
+        public void setTime(TimeSpec ts) {
+            mMainTimeMillis = ts.mainTime;
+            mOvertimeMillis = ts.overtimeTime;
+            mOvertimeCount = ts.overtimeCount;
+        }
+
         public long getMainTime() {
             return mMainTimeMillis;
         }
@@ -292,7 +309,7 @@ public class GameClock {
             return result;
         }
 
-        public String humanReadableString() {
+        public String toHumanReadableString() {
             int mainTimeSeconds = (int) mMainTimeMillis / 1000;
             int overtimeSeconds = (int) mOvertimeMillis / 1000;
 
@@ -320,21 +337,29 @@ public class GameClock {
         Matcher m = p.matcher(string);
 
         if(m.lookingAt()) {
+            for(int i = 0; i < m.groupCount(); i++) {
+                System.out.println("group " + i + ": " + m.group(i));
+            }
             long mainTime = Long.parseLong(m.group(1)) * 1000;
 
             long overtimeTime = 0;
             int overtimeCount = 0;
-            if(m.groupCount() >= 3 && m.group(2) != null && m.group(3) != null) {
-                overtimeTime = Long.parseLong(m.group(2)) * 1000;
-                overtimeCount = Integer.parseInt(m.group(3));
+            if(m.groupCount() >= 2 && m.group(2) != null) {
+                String trimmed = m.group(2).trim();
+                String[] overtimeParts = trimmed.split("/");
+                overtimeTime = Long.parseLong(overtimeParts[0]) * 1000;
+                overtimeCount = Integer.parseInt(overtimeParts[1]);
             }
 
             long incrementTime = 0;
-            if(m.groupCount() >= 4 && m.group(4) != null) {
-                incrementTime = Long.parseLong(m.group(4)) * 1000;
+            if(m.groupCount() >= 4 && m.group(3) != null) {
+                String trimmed = m.group(3).trim();
+                incrementTime = Long.parseLong(trimmed) * 1000;
             }
 
-            return new TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
+            TimeSpec ts = new TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
+            System.out.println(ts.toMillisString());
+            return ts;
         }
 
         return null;

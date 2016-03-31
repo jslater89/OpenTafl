@@ -42,13 +42,22 @@ public class MainMenuWindow extends BasicWindow {
         p.addComponent(optionsButton);
 
         if(OpenTafl.DEV_MODE) {
-            Button loadGameButton = new Button("Load replay", () -> {
+            Button loadGameButton = new Button("Load game", () -> {
+                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(new File("selfplay-results/savedgame.otg"));
+                ReplayGame rg = new ReplayGame(g.game, g.moves);
+                TerminalUtils.startSavedGame(rg, getTextGUI(), mTerminalCallback);
+
+            });
+            p.addComponent(loadGameButton);
+
+            Button viewReplayButton = new Button("View replay", () -> {
                 GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(new File("selfplay-results/gamelog.otg"));
                 ReplayGame rg = new ReplayGame(g.game, g.moves);
                 TerminalUtils.startReplay(rg, getTextGUI(), mTerminalCallback);
 
             });
-            p.addComponent(loadGameButton);
+            p.addComponent(viewReplayButton);
+
             Button tourneyButton = new Button("AI selfplay", () -> mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback)));
             p.addComponent(tourneyButton);
         }

@@ -31,6 +31,7 @@ public class ReplayGame {
         mGame = game;
         mMoveHistory = movesToPlay;
 
+        mGame.getHistory().add(mGame.getCurrentState());
         mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
     }
 
@@ -49,6 +50,7 @@ public class ReplayGame {
             }
         }
 
+        mGame.getHistory().add(mGame.getCurrentState());
         mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
     }
 
@@ -75,7 +77,7 @@ public class ReplayGame {
     }
 
     public GameState setPosition(int i) {
-        if(i >= mGame.getHistory().size() && i < 0) {
+        if(i >= historySize() && i < 0) {
             throw new IllegalArgumentException("Index " + i + " out of range: max is " + (mGame.getHistory().size() - 1));
         }
 
@@ -85,8 +87,14 @@ public class ReplayGame {
         return stateAtIndex(mStatePosition);
     }
 
+    public void prepareForGameStart() {
+        stateAtIndex(historySize() - 1);
+        mGame.getHistory().remove(historySize() - 1);
+    }
+
     private GameState stateAtIndex(int i) {
-        return mGame.getHistory().get(mStatePosition);
+        mGame.setCurrentState(mGame.getHistory().get(i));
+        return mGame.getHistory().get(i);
     }
 
     public int historySize() {

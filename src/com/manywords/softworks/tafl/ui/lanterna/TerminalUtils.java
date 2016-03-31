@@ -42,12 +42,38 @@ public class TerminalUtils {
         return g;
     }
 
-    public static void startSavedGame(ReplayGame rg, WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
+    /**
+     * Creates a playable game from a replay
+     *
+     * @param rg
+     * @param gui
+     * @param callback
+     */
+    public static Game startSavedGame(ReplayGame rg, WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
+        if(TerminalSettings.attackers == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.attackerEngineFile)) {
+            MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Attacker engine missing configuration file!");
+            return null;
+        }
+        if(TerminalSettings.defenders == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.defenderEngineFile)) {
+            MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Defender engine missing configuration file!");
+            return null;
+        }
+
         rg.setPosition(rg.historySize() - 1);
+        rg.prepareForGameStart();
         Game g = rg.getGame();
+
+        if(g.getCurrentState().checkVictory() > 0) {
+            MessageDialog.showMessageDialog(gui, "Game already ended", "This game record has already finished.\n\nTry loading it as a replay and using the 'play-here' command where you\nwould like to take control.");
+            return null;
+        }
+
+        callback.onEnteringScreen(g, "OpenTafl");
+        return g;
     }
 
     public static void startReplay(ReplayGame rg, WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
+        rg.setPosition(rg.historySize() - 1);
         callback.onEnteringScreen(rg, "OpenTafl");
     }
 }
