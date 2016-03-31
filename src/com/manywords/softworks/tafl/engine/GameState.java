@@ -581,8 +581,8 @@ public class GameState {
         return typeIndex;
     }
 
-    public void makeMove(MoveRecord nextMove) {
-        moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end);
+    public int makeMove(MoveRecord nextMove) {
+        return moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end).getLastMoveResult();
     }
 
     public void setExitingMove(DetailedMoveRecord exitingMove) {
