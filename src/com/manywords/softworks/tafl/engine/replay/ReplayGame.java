@@ -73,7 +73,7 @@ public class ReplayGame {
             statePosition += components.length - 1;
 
             if (statePosition >= mStatePosition && !modified) {
-                int component = statePosition - mStatePosition + 1;
+                int component = statePosition - mStatePosition - 1;
                 components[component] = components[component] + "*";
 
                 for(String s : components) {
