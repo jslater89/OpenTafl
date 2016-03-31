@@ -584,4 +584,8 @@ public class GameState {
     public void makeMove(MoveRecord nextMove) {
         moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end);
     }
+
+    public void setExitingMove(DetailedMoveRecord exitingMove) {
+        mExitingMove = exitingMove;
+    }
 }

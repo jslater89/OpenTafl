@@ -33,6 +33,10 @@ public class ReplayGame {
 
         mGame.getHistory().add(mGame.getCurrentState());
         mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
+
+        for(int i = 0; i < movesToPlay.size(); i++) {
+            mGame.getHistory().get(i).setExitingMove(movesToPlay.get(i));
+        }
     }
 
     /**
@@ -61,7 +65,6 @@ public class ReplayGame {
     public GameState nextState() {
         if(mStatePosition < historySize() - 1) {
             mStatePosition++;
-            mMovePosition++;
         }
 
         return stateAtIndex(mStatePosition);
@@ -70,7 +73,6 @@ public class ReplayGame {
     public GameState previousState() {
         if(mStatePosition > 0) {
             mStatePosition--;
-            mMovePosition--;
         }
 
         return stateAtIndex(mStatePosition);
@@ -82,7 +84,6 @@ public class ReplayGame {
         }
 
         mStatePosition = i;
-        mMovePosition = i - 1;
 
         return stateAtIndex(mStatePosition);
     }
@@ -103,15 +104,5 @@ public class ReplayGame {
 
     public GameState getCurrentState() {
         return mGame.getHistory().get(mStatePosition);
-    }
-
-    public DetailedMoveRecord getEnteringMove() {
-        if(mMovePosition > 0) return mMoveHistory.get(mMovePosition - 1);
-        else return null;
-    }
-
-    public DetailedMoveRecord getExitingMove() {
-        if(mMovePosition < mMoveHistory.size()) return mMoveHistory.get(mMovePosition);
-        else return null;
     }
 }
