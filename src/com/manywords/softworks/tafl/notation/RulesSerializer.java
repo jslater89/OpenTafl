@@ -89,7 +89,7 @@ public class RulesSerializer {
             otnrString += "atkf:n ";
         }
         else {
-            otnrString += "atkf:y";
+            otnrString += "atkf:y ";
         }
 
         if(rules.threefoldRepetitionResult() != Rules.DRAW) {
