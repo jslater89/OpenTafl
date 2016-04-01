@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,8 @@ public class OpenTafl {
     public static boolean DEV_MODE = false;
 
     public static void main(String[] args) {
+        directoryCheck();
+
         Map<String, String> mapArgs = getArgs(args);
         Mode runMode = Mode.ADVANCED_TERMINAL;
 
@@ -100,5 +103,15 @@ public class OpenTafl {
         }
 
         return mapArgs;
+    }
+
+    private static void directoryCheck() {
+        if(!new File("saved-games").exists()) {
+            new File("saved-games/replays").mkdirs();
+        }
+
+        if(!new File("engines").exists()) {
+            new File("engines").mkdirs();
+        }
     }
 }
