@@ -137,16 +137,20 @@ public class CommandEngine {
 
     private void finishGame(boolean quiet) {
         mInGame = false;
-
         mGame.finish();
+
+        shutdown();
+
+        if(!quiet) {
+            callbackGameFinished();
+        }
+    }
+
+    public void shutdown() {
         mAttacker.stop();
         mDefender.stop();
         if(mAnalysisEngine != null) {
             mDummyAnalysisPlayer.stop();
-        }
-
-        if(!quiet) {
-            callbackGameFinished();
         }
     }
 

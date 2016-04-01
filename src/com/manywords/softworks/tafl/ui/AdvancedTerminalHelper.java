@@ -189,7 +189,8 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         mStatusWindow = null;
         mCommandWindow = null;
 
-        //mCommandEngineThread.cancel();
+        mCommandEngine.shutdown();
+        mCommandEngineThread.cancel();
         mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
     }
 
@@ -399,6 +400,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 private boolean mRunning = true;
                 @Override
                 public void cancel() {
+                    mCommandEngine = null;
                     mRunning = false;
                 }
 
