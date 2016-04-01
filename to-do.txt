@@ -1,9 +1,6 @@
 Tafl To-Do
 
 v0.2 features, bits, and bobs:
-1. Finish saving/loading games/replays (file-chooser dialogs, always save-as, fill in last save name, confirm overwriting files)
-2. Make sure replay mode works postgame.
-3. Annotations as status text. (get entering move's comment)
 4. Fix edge fort escapes
 	- The pieces surrounding the king must be an invincible shape.
 	- The spaces inside the fort are: the king's space, and all spaces the king can reach.
