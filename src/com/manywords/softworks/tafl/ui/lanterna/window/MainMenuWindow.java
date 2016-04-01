@@ -2,6 +2,9 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
@@ -43,7 +46,12 @@ public class MainMenuWindow extends BasicWindow {
 
         if(OpenTafl.DEV_MODE) {
             Button loadGameButton = new Button("Load game", () -> {
-                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(new File("selfplay-results/gamelog.otg"));
+                File gameFile = showFileChooserDialog("Select saved game", new File("saved-games"));
+                if(gameFile == null) {
+                    return;
+                }
+
+                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
                 ReplayGame rg = new ReplayGame(g.game, g.moves);
                 TerminalUtils.startSavedGame(rg, getTextGUI(), mTerminalCallback);
 
@@ -51,7 +59,12 @@ public class MainMenuWindow extends BasicWindow {
             p.addComponent(loadGameButton);
 
             Button viewReplayButton = new Button("View replay", () -> {
-                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(new File("selfplay-results/gamelog.otg"));
+                File gameFile = showFileChooserDialog("Select saved replay", new File("saved-games/replays"));
+                if(gameFile == null) {
+                    return;
+                }
+
+                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
                 ReplayGame rg = new ReplayGame(g.game, g.moves);
                 TerminalUtils.startReplay(rg, getTextGUI(), mTerminalCallback);
 
@@ -76,5 +89,15 @@ public class MainMenuWindow extends BasicWindow {
         */
 
         this.setComponent(p);
+    }
+
+    private File showFileChooserDialog(String title, File directory) {
+        if(!directory.exists()) return null;
+
+        FileDialogBuilder builder = new FileDialogBuilder();
+        builder.setSelectedFile(directory);
+        builder.setTitle(title);
+        builder.setActionLabel("Open");
+        return builder.build().showDialog(getTextGUI());
     }
 }
