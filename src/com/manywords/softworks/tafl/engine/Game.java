@@ -11,6 +11,24 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class Game {
+    public static class Tag {
+        public static final String EVENT = "event";
+        public static final String SITE = "site";
+        public static final String DATE = "date";
+        public static final String ROUND = "round";
+        public static final String ATTACKERS = "attackers";
+        public static final String DEFENDERS = "defenders";
+        public static final String RESULT = "result";
+        public static final String ANNOTATOR = "annotator";
+        public static final String COMPILER = "compiler";
+        public static final String TIME_CONTROL = "time-control";
+        public static final String TIME_REMAINING = "time-remaining";
+        public static final String TERMINATION = "termination";
+        public static final String VARIANT = "variant";
+        public static final String START_COMMENT = "start-comment";
+        public static final String RULES = "rules";
+        public static final String POSITION = "position";
+    }
     public Game(long[][] zobristTable, List<GameState> history) {
         if (!(this instanceof AiWorkspace)) {
             throw new IllegalArgumentException("Empty constructor is only for AiWorkspace!");

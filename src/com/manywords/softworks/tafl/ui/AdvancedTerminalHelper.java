@@ -421,19 +421,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             mReplay = rg;
 
             tryTimeUpdate();
-
-            Map<String, String> tags = rg.getGame().getTagMap();
-            if(tags != null) {
-                if(tags.containsKey("compiler")) {
-                    statusText("OpenTafl game file compiled by: " + tags.get("compiler"));
-                }
-                if(tags.containsKey("annotator")) {
-                    statusText("Annotations by: " + tags.get("annotator"));
-                }
-                if(tags.containsKey("start-comment")) {
-                    statusText(tags.get("start-comment"));
-                }
-            }
+            tryStartingComments(rg);
 
             mBoardWindow.enterReplay(rg);
             mBoardWindow.rerenderBoard();
@@ -574,12 +562,49 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             }
         }
 
+        private void tryStartingComments(ReplayGame rg) {
+            Map<String, String> tags = rg.getGame().getTagMap();
+            if(tags != null) {
+                if(tags.containsKey(Game.Tag.COMPILER)) {
+                    statusText("OpenTafl game file compiled by: " + tags.get(Game.Tag.COMPILER));
+                }
+                if(tags.containsKey(Game.Tag.ANNOTATOR)) {
+                    statusText("Annotations by: " + tags.get(Game.Tag.ANNOTATOR));
+                }
+                if(tags.containsKey(Game.Tag.SITE)) {
+                    statusText("Game location: " + tags.get(Game.Tag.SITE));
+                }
+                if(tags.containsKey(Game.Tag.EVENT)) {
+                    statusText("Game played as part of: " + tags.get(Game.Tag.EVENT));
+                }
+                if(tags.containsKey(Game.Tag.DATE)) {
+                    statusText("Game played on: " + tags.get(Game.Tag.DATE));
+                }
+                if(tags.containsKey(Game.Tag.DEFENDERS)) {
+                    statusText("Defenders played by: " + tags.get(Game.Tag.DEFENDERS));
+                }
+                if(tags.containsKey(Game.Tag.ATTACKERS)) {
+                    statusText("Attackers played by: " + tags.get(Game.Tag.ATTACKERS));
+                }
+                if(tags.containsKey(Game.Tag.VARIANT)) {
+                    statusText("Rules variant: " + tags.get(Game.Tag.VARIANT));
+                }
+                if(tags.containsKey(Game.Tag.TIME_CONTROL)) {
+                    statusText("Initial clock setting: " + tags.get(Game.Tag.TIME_CONTROL));
+                }
+                if(tags.containsKey(Game.Tag.START_COMMENT)) {
+                    statusText(tags.get(Game.Tag.START_COMMENT));
+                }
+            }
+
+            statusText("--- Start of replay ---");
+        }
+
         private void updateComments() {
             if(!mInGame) {
                 DetailedMoveRecord m = (DetailedMoveRecord) mReplay.getCurrentState().getEnteringMove();
                 if(m == null) {
-                    statusText("---Start of game---");
-
+                    tryStartingComments(mReplay);
                 }
                 else {
                     statusText("Last move: " + m);
