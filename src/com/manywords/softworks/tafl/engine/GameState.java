@@ -430,6 +430,8 @@ public class GameState {
         if (getBoard().getRules().allowShieldFortEscapes()) {
             List<ShieldwallPosition> defenderShieldwalls = getBoard().detectShieldwallPositionsForSide(getDefenders());
 
+            // A shieldwall shape is a subset of all invincible shapes, so don't bother checking them for
+            // invincibility
             for (ShieldwallPosition position : defenderShieldwalls) {
                 List<Coord> shieldwallInterior = position.surroundedSpaces;
                 for (Coord space : shieldwallInterior) {
@@ -456,10 +458,17 @@ public class GameState {
     }
 
     private boolean checkEdgeFortEscape() {
-        // We have an edge fort escape if three conditions hold:
+        // We have an edge fort escape if four conditions hold:
         // 1. The king can reach an edge, or is on an edge
         // 2. The king has at least one available move
         // 3. No black piece can reach the king, excluding jumps.
+        // 4. The white pieces surrounding the king cannot be captured.
+        //    We can check this by looking at each one in turn, checking its
+        //    horizontal and vertical neighbors, and seeing if any of them
+        //    have two potentially hostile spaces on the same rank or file.
+        //    (A potentially hostile space is a space which is empty, but
+        //    not part of the fort. The spaces the king can reach are the
+        //    fort spaces.
 
         // Get the king.
         char king = Taflman.EMPTY;
@@ -471,6 +480,7 @@ public class GameState {
         }
 
         boolean kingOnEdge = getBoard().isEdgeSpace(Taflman.getCurrentSpace(this, king));
+        List<Coord> fortSpaces = Taflman.getReachableSpaces(this, king, false);
 
         if (kingOnEdge) {
             // If the king is on an edge and his allowable destinations are
@@ -482,10 +492,9 @@ public class GameState {
             // reach an edge. (He must also be allowed to move, but
             // if he can reach an edge from not an edge, he can clearly
             // move.)
-            List<Coord> kingReachable = Taflman.getReachableSpaces(this, king, false);
 
             boolean edgeReachable = false;
-            for (Coord space : kingReachable) {
+            for (Coord space : fortSpaces) {
                 if (getBoard().isEdgeSpace(space)) {
                     edgeReachable = true;
                     break;
@@ -495,21 +504,40 @@ public class GameState {
             if (!edgeReachable) return false;
         }
 
-        // If no attacking pieces can reach the king, given the prior
-        // two conditions, then the king is surrounded by his own pieces,
-        // against an edge, with at least one move, and no black pieces
-        // inside the fort.
-
-        // TODO: this is the general case, for if jumping into edge forts is
-        // allowed. If rules knobs disable that, then we can just check whether
-        // the king can reach any black pieces, and save ourselves the trouble
-        // of calculating reachable spaces for every piece.
-        for (Coord space : Taflman.getReachableSpaces(this, king)) {
+        // If the king can't reach any attacking pieces, then he is surrounded
+        // by friendly taflmen.
+        List<Character> edgefortTaflmen = new ArrayList<>();
+        for (Coord space : fortSpaces) {
             for (char t : getBoard().getAdjacentNeighbors(space)) {
                 if (Taflman.getSide(t).isAttackingSide()) return false;
+                else edgefortTaflmen.add(t);
             }
         }
 
+        // We've established that the king is fully surrounded by friendly taflmen.
+        // Now we have to check to see if they can be captured. Do that this way:
+        // 1. Get the adjacent spaces for each taflman in the edge fort.
+        // 2. Remove any spaces which make up the fort, and any occupied by friendly
+        //    taflmen.
+        // 3. If the number of remaining spaces is not 3, then it can't be captured.
+        //    (Try it yourself on a piece of paper if you don't believe me.)
+
+        for(char taflman : edgefortTaflmen) {
+            List<Coord> adjacent = getBoard().getAdjacentSpaces(Taflman.getCurrentSpace(this, taflman));
+            adjacent.removeAll(fortSpaces);
+
+            int friendlySpaces = 0;
+            for(Coord c : adjacent) {
+                char occupier = getBoard().getOccupier(c);
+                if(occupier != Taflman.EMPTY && !Taflman.getSide(occupier).isAttackingSide()) {
+                    friendlySpaces++;
+                }
+            }
+
+            if(adjacent.size() - friendlySpaces >= 3) {
+                return false;
+            }
+        }
 
         // If we've checked every black piece and none of them can reach the king, then
         // this is a successful edge fort.
