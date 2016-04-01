@@ -327,15 +327,19 @@ public class CommandEngine {
         else if(command instanceof HumanCommandParser.Help) {
             return new CommandResult(CommandResult.Type.HELP, CommandResult.SUCCESS, "", null);
         }
-        // 8. QUIT COMMAND: SUCCESS
+        // 8. RULES COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Rules) {
             return new CommandResult(CommandResult.Type.RULES, CommandResult.SUCCESS, "", null);
         }
-        // 9. QUIT COMMAND: SUCCESS
+        // 9. SAVE COMMAND: SUCCESS
+        else if(command instanceof HumanCommandParser.Save) {
+            return new CommandResult(CommandResult.Type.SAVE, CommandResult.SUCCESS, "", null);
+        }
+        // 10. QUIT COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Quit) {
             return new CommandResult(CommandResult.Type.QUIT, CommandResult.SUCCESS, "", null);
         }
-        // 10. ANALYZE COMMAND
+        // 11. ANALYZE COMMAND
         else if(command instanceof HumanCommandParser.Analyze) {
             HumanCommandParser.Analyze a = (HumanCommandParser.Analyze) command;
 
@@ -347,13 +351,13 @@ public class CommandEngine {
                 return new CommandResult(CommandResult.Type.ANALYZE, CommandResult.SUCCESS, "", null);
             }
         }
-        // 11. REPLAY START COMMAND
+        // 12. REPLAY START COMMAND
         else if(command instanceof HumanCommandParser.ReplayEnter) {
             ReplayGame rg = new ReplayGame(mGame);
             enterReplay(rg);
             return new CommandResult(CommandResult.Type.REPLAY_ENTER, CommandResult.SUCCESS, "", null);
         }
-        // 11. REPLAY PLAY HERE COMMAND
+        // 13. REPLAY PLAY HERE COMMAND
         else if(command instanceof HumanCommandParser.ReplayPlayHere) {
             if(mInGame) {
                 finishGame(true);
@@ -373,25 +377,25 @@ public class CommandEngine {
             enterGame(g);
             return new CommandResult(CommandResult.Type.REPLAY_PLAY_HERE, CommandResult.SUCCESS, "", null);
         }
-        // 11. REPLAY RETURN COMMAND
+        // 14. REPLAY RETURN COMMAND
         else if(command instanceof HumanCommandParser.ReplayReturn) {
             leaveReplay();
 
             return new CommandResult(CommandResult.Type.REPLAY_RETURN, CommandResult.SUCCESS, "", null);
         }
-        // 11. REPLAY NEXT COMMAND
+        // 15. REPLAY NEXT COMMAND
         else if(command instanceof HumanCommandParser.ReplayNext) {
             GameState state = mReplay.nextState();
             if(state != null) return new CommandResult(CommandResult.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", null);
             else return new CommandResult(CommandResult.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
         }
-        // 11. REPLAY PREV COMMAND
+        // 16. REPLAY PREV COMMAND
         else if(command instanceof HumanCommandParser.ReplayPrevious) {
             GameState state = mReplay.previousState();
             if(state != null) return new CommandResult(CommandResult.Type.REPLAY_PREVIOUS, CommandResult.SUCCESS, "", null);
             else return new CommandResult(CommandResult.Type.REPLAY_PREVIOUS, CommandResult.FAIL, "At the start of the game history.", null);
         }
-        // 11. REPLAY JUMP COMMAND
+        // 17. REPLAY JUMP COMMAND
         else if(command instanceof HumanCommandParser.ReplayJump) {
             HumanCommandParser.ReplayJump j = (HumanCommandParser.ReplayJump) command;
             GameState state = mReplay.setTurnIndex(j.turnIndex);

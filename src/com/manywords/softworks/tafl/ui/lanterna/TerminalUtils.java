@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.ui.lanterna;
 
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
@@ -13,6 +14,8 @@ import com.manywords.softworks.tafl.ui.lanterna.window.BoardWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.CommandWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.StatusWindow;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
+
+import java.io.File;
 
 /**
  * Created by jay on 3/22/16.
@@ -73,5 +76,15 @@ public class TerminalUtils {
 
     public static void startReplay(ReplayGame rg, WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
         callback.onEnteringScreen(rg, "OpenTafl");
+    }
+
+    public static File showFileChooserDialog(WindowBasedTextGUI gui, String title, String actionLabel, File directory) {
+        if(!directory.exists()) return null;
+
+        FileDialogBuilder builder = new FileDialogBuilder();
+        builder.setSelectedFile(directory);
+        builder.setTitle(title);
+        builder.setActionLabel(actionLabel);
+        return builder.build().showDialog(gui);
     }
 }

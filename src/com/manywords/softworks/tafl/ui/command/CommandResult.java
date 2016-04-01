@@ -20,6 +20,7 @@ public class CommandResult {
         HISTORY,
         HELP,
         RULES,
+        SAVE,
         QUIT,
         ANALYZE,
         REPLAY_ENTER,

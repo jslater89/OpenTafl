@@ -5,6 +5,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.*;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -21,6 +22,7 @@ import com.manywords.softworks.tafl.ui.command.Command;
 import com.manywords.softworks.tafl.ui.command.CommandEngine;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -33,6 +35,7 @@ import com.manywords.softworks.tafl.ui.player.Player;
 import com.manywords.softworks.tafl.ui.player.UiWorkerThread;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -448,18 +451,6 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
         @Override
         public void handleInGameCommand(String command) {
-
-            if(command.startsWith("dump")) {
-                if(mInGame && !mInReplay) {
-                    System.out.println(GameSerializer.getGameRecord(mGame, true));
-                }
-                else if(mInReplay) {
-                    System.out.println(GameSerializer.getGameRecord(mReplay.getGame(), true));
-                }
-                return;
-            }
-
-
             Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
             CommandResult r = mCommandEngine.executeCommand(c);
 
@@ -497,6 +488,30 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
                 dialog.showDialog(mGui);
             }
+            else if (r.type == CommandResult.Type.SAVE) {
+                String title;
+                if(mInGame) {
+                    title = "Save game";
+                }
+                else {
+                    title = "Save replay";
+                }
+
+                File saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games"));
+
+                if(saveFile == null) {
+                    return;
+                }
+                else if(saveFile.exists()) {
+                    MessageDialogButton result = MessageDialog.showMessageDialog(mGui, "Overwrite file?", "File with name " + saveFile.getName() +  " already exists.\nOverwrite?", MessageDialogButton.Yes, MessageDialogButton.No);
+                    if(result.equals(MessageDialogButton.No)) return;
+                }
+
+                boolean success = GameSerializer.writeGameToFile(mGame, saveFile, true);
+                if(!success) {
+                    MessageDialog.showMessageDialog(mGui, "Unable to save", "Unable to write savegame file.");
+                }
+            }
             else if (r.type == CommandResult.Type.QUIT) {
                 if(mSelfplayWindow != null) {
                     SelfplayWindow w = mSelfplayWindow;
@@ -519,15 +534,18 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 }
             }
             else if(r.type == CommandResult.Type.ANALYZE) {
-                statusText("AI analysis beginning");
+                statusText("AI analysis beginning.");
             }
             else if(r.type == CommandResult.Type.REPLAY_ENTER) {
+                statusText("Entered replay mode.");
                 mBoardWindow.rerenderBoard();
             }
             else if(r.type == CommandResult.Type.REPLAY_PLAY_HERE) {
+                statusText("Starting new game from this position...");
                 mBoardWindow.rerenderBoard();
             }
             else if(r.type == CommandResult.Type.REPLAY_RETURN) {
+                statusText("Returning to game.");
                 mBoardWindow.rerenderBoard();
             }
             else if(r.type == CommandResult.Type.REPLAY_NEXT) {
@@ -580,12 +598,15 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             }
 
             if(mInReplay) {
-                types.add(CommandResult.Type.REPLAY_ENTER);
                 types.add(CommandResult.Type.REPLAY_NEXT);
                 types.add(CommandResult.Type.REPLAY_PREVIOUS);
                 types.add(CommandResult.Type.REPLAY_JUMP);
                 types.add(CommandResult.Type.REPLAY_PLAY_HERE);
                 types.add(CommandResult.Type.REPLAY_RETURN);
+            }
+
+            if(mInGame || mPostGame) {
+                types.add(CommandResult.Type.REPLAY_ENTER);
             }
 
             if(mInGame || mPostGame || mInReplay) {
@@ -594,6 +615,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                 types.add(CommandResult.Type.ANALYZE);
                 types.add(CommandResult.Type.HISTORY);
                 types.add(CommandResult.Type.HELP);
+                types.add(CommandResult.Type.SAVE);
                 types.add(CommandResult.Type.QUIT);
             }
 

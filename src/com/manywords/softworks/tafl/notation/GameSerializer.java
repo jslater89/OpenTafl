@@ -22,6 +22,20 @@ public class GameSerializer {
             moves = m;
         }
     }
+
+    public static boolean writeGameToFile(Game g, File f, boolean comments) {
+        String gameRecord = getGameRecord(g, comments);
+
+        try {
+            PrintWriter pw = new PrintWriter(f);
+            pw.print(gameRecord);
+            pw.flush();
+            pw.close();
+        } catch (FileNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
     
     public static String getGameRecord(Game g, boolean comments) {
         String tagString = "";
@@ -52,7 +66,7 @@ public class GameSerializer {
                 tagString += "[time-control:" + timeString + "]\n";
 
                 String timeRemainingString =
-                        g.getClock().getClockEntry(g.getCurrentState().getAttackers()).toTimeSpec().toGameNotationString() + " " +
+                        g.getClock().getClockEntry(g.getCurrentState().getAttackers()).toTimeSpec().toGameNotationString() + ", " +
                                 g.getClock().getClockEntry(g.getCurrentState().getAttackers()).toTimeSpec().toGameNotationString();
                 tagString += "[time-remaining:" + timeRemainingString + "]\n";
             }

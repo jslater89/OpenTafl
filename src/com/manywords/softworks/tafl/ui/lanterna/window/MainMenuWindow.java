@@ -46,7 +46,7 @@ public class MainMenuWindow extends BasicWindow {
 
         if(OpenTafl.DEV_MODE) {
             Button loadGameButton = new Button("Load game", () -> {
-                File gameFile = showFileChooserDialog("Select saved game", new File("saved-games"));
+                File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved game", "Open", new File("saved-games"));
                 if(gameFile == null) {
                     return;
                 }
@@ -59,7 +59,7 @@ public class MainMenuWindow extends BasicWindow {
             p.addComponent(loadGameButton);
 
             Button viewReplayButton = new Button("View replay", () -> {
-                File gameFile = showFileChooserDialog("Select saved replay", new File("saved-games/replays"));
+                File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved replay", "Open", new File("saved-games/replays"));
                 if(gameFile == null) {
                     return;
                 }
@@ -89,15 +89,5 @@ public class MainMenuWindow extends BasicWindow {
         */
 
         this.setComponent(p);
-    }
-
-    private File showFileChooserDialog(String title, File directory) {
-        if(!directory.exists()) return null;
-
-        FileDialogBuilder builder = new FileDialogBuilder();
-        builder.setSelectedFile(directory);
-        builder.setTitle(title);
-        builder.setActionLabel("Open");
-        return builder.build().showDialog(getTextGUI());
     }
 }
