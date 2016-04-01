@@ -189,7 +189,7 @@ public class Coord {
         return c.y * mDimension + c.x;
     }
 
-    public static List<Coord> getAdjacentSpace(Coord c) {
+    public static List<Coord> getAdjacentSpaces(Coord c) {
         return mAdjacentCoords.get(c);
     }
     public static List<Coord> getDiagonalSpaces(Coord c) {
