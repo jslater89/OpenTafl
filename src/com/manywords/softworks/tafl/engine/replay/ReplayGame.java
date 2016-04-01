@@ -34,7 +34,7 @@ public class ReplayGame {
             if(result < GameState.GOOD_MOVE) {
                 RawTerminal.renderGameState(game.getCurrentState());
                 System.out.println(m);
-                throw new IllegalStateException("Failed to make moves!");
+                throw new IllegalStateException("Failed to make moves! Error: " + result);
             }
         }
 
