@@ -439,6 +439,18 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
         @Override
         public void handleInGameCommand(String command) {
+            /*
+            if(command.startsWith("dump")) {
+                if(mInGame) {
+                    System.out.println(GameSerializer.getGameRecord(mGame, true));
+                }
+                else {
+                    System.out.println(GameSerializer.getGameRecord(mReplay.getGame(), true));
+                }
+                return;
+            }
+            */
+
             Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
             CommandResult r = mCommandEngine.executeCommand(c);
 
