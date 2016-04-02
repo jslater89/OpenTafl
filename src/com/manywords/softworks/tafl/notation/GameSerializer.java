@@ -114,7 +114,7 @@ public class GameSerializer {
 
     public static List<DetailedMoveRecord> parseMoves(String gameRecord) {
         List<DetailedMoveRecord> moves = new ArrayList<>();
-        String moveStart = "1.";
+        String moveStart = "1. ";
         String moveEnd = "\n";
         String commentStart = "[";
         String commentMid = "|";
@@ -124,6 +124,8 @@ public class GameSerializer {
         int matchIndex = -1;
         int lastMatchIndex = -1;
         int lastMovesAdded = -1;
+        int commentIndex = -1;
+        boolean inGame = false;
         boolean inMove = false;
         boolean inComment = false;
         for(int i = 0; i < gameRecord.length(); i++) {
@@ -131,50 +133,54 @@ public class GameSerializer {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
+                inGame = true;
                 inMove = true;
                 currentMove++;
                 moveStart = currentMove + ".";
             }
-            else if(!inComment && inMove && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
+            else if(inGame && !inComment && inMove && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
                 inMove = false;
 
-                String[] moveStrings = gameRecord.substring(lastMatchIndex, matchIndex).split(" ");
-                DetailedMoveRecord m1 = MoveSerializer.loadMoveRecord(moveStrings[1]);
-                moves.add(m1);
-                lastMovesAdded = 1;
-                if(moveStrings.length > 2) {
-                    DetailedMoveRecord m2 = MoveSerializer.loadMoveRecord(moveStrings[2]);
-                    moves.add(m2);
-                    lastMovesAdded = 2;
+                String moveString = gameRecord.substring(lastMatchIndex, matchIndex).replace(currentMove - 1 + ". ", "").trim();
+                String[] moveStrings = moveString.split(" ");
+                lastMovesAdded = 0;
+                commentIndex = moves.size();
+                for(String move : moveStrings) {
+                    DetailedMoveRecord m = MoveSerializer.loadMoveRecord(move);
+                    moves.add(m);
+                    lastMovesAdded++;
                 }
             }
-            else if(!inComment && gameRecord.regionMatches(i, commentStart, 0, commentStart.length())) {
+            else if(inGame && !inComment && gameRecord.regionMatches(i, commentStart, 0, commentStart.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
                 inComment = true;
             }
-            else if(inComment && gameRecord.regionMatches(i, commentMid, 0, commentMid.length())) {
+            else if(inGame && inComment && gameRecord.regionMatches(i, commentMid, 0, commentMid.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
-                DetailedMoveRecord moveForFirstHalfComment = moves.get(moves.size() - lastMovesAdded);
+                if(commentIndex < moves.size()) {
+                    DetailedMoveRecord m = moves.get(commentIndex++);
 
-                // last match index + 1 to skip the opening brace
-                moveForFirstHalfComment.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
+                    // last match index + 1 to skip the opening brace
+                    m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
+                }
+
             }
-            else if(inComment && gameRecord.regionMatches(i, commentEnd, 0, commentEnd.length())) {
+            else if(inGame && inComment && gameRecord.regionMatches(i, commentEnd, 0, commentEnd.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
-                if(lastMovesAdded == 2) {
-                    DetailedMoveRecord moveForSecondHalfComment = moves.get(moves.size() - 1);
+                if(commentIndex < moves.size()) {
+                    DetailedMoveRecord m = moves.get(commentIndex++);
 
                     // last match index + 1 to skip the separator pipe
-                    moveForSecondHalfComment.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
+                    m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
                 }
 
                 inComment = false;

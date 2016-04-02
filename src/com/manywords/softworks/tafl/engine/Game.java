@@ -200,10 +200,12 @@ public class Game {
 
         commentedString += "[";
         for(GameState state : states) {
-            commentedString += "|" + ((DetailedMoveRecord) state.getExitingMove()).getComment();
+            DetailedMoveRecord m = (DetailedMoveRecord) state.getExitingMove();
+            String timeString = m.getTimeRemaining() != null ? m.getTimeRemaining().toString() + " " : "";
+            commentedString += "|" + timeString + m.getComment();
         }
         commentedString = commentedString.replaceFirst("\\|", "");
-        commentedString += "]\n";
+        commentedString += "]";
 
         return commentedString;
     }
