@@ -30,7 +30,7 @@ public class ScrollingLabel extends Label {
     public ScrollingLabel(String text) {
         super(text);
         mStringBuffer = new ArrayList<String>(512);
-        mLineBuffer = new ArrayList<String>(512);
+        mLineBuffer = new ArrayList<String>(1024);
         clearAndAddLine(text);
     }
 
@@ -61,8 +61,6 @@ public class ScrollingLabel extends Label {
             for(String line : lines) {
                 mLineBuffer.add(0, line);
             }
-
-            if(mLineBuffer.size() > 512) break;
         }
 
         if(mStartPosition > (mLineBuffer.size() - mHeight)) {
@@ -102,8 +100,14 @@ public class ScrollingLabel extends Label {
             mLineBuffer.add(0, s);
         }
 
-        while (mStringBuffer.size() >= 512) mStringBuffer.remove(511);
-        while (mLineBuffer.size() >= 512) mLineBuffer.remove(511);
+        while (mStringBuffer.size() > 512) {
+            String s = mStringBuffer.remove(512);
+            List<String> wrappedRemoved = TerminalTextUtils.getWordWrappedText(mWidth, s);
+
+            for(int i = 0; i < wrappedRemoved.size(); i++) {
+                mLineBuffer.remove(mLineBuffer.size() - 1);
+            }
+        }
 
         if(mStartPosition != 0) {
             mStartPosition = Math.min(mStartPosition + wrappedLine.size(), mLineBuffer.size() - mHeight);
