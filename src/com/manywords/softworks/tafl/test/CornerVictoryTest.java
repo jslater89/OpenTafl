@@ -80,6 +80,7 @@ class CornerVictoryTest extends TaflTest implements UiCallback {
         Rules rules = Fetlar.newFetlarTest();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
+        state.setCurrentSide(state.getDefenders());
 
         state.moveTaflman(state.getPieceAt(0, 2), state.getSpaceAt(0, 0));
         state = game.getCurrentState();

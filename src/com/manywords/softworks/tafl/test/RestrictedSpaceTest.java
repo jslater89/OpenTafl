@@ -83,6 +83,7 @@ class RestrictedSpaceTest extends TaflTest implements UiCallback {
         Rules rules = Fetlar.newFetlarTest();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
+        state.setCurrentSide(state.getDefenders());
 
         char ofInterest = state.getPieceAt(5, 6);
         List<Coord> allowableDestinations = Taflman.getAllowableDestinations(state, ofInterest);

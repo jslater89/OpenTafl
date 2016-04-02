@@ -79,6 +79,7 @@ class ThreefoldDrawTest extends TaflTest implements UiCallback {
         Rules rules = Fetlar.newFetlar11();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
+        state.setCurrentSide(state.getDefenders());
 
         // Target: start position
 
