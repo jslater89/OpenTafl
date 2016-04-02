@@ -54,6 +54,7 @@ public class CommandWindow extends BasicWindow {
 
     private void addToBuffer(String input) {
         mCommandBufferPosition = 0;
+        if(input.equals("")) return;
         if(mCommandBuffer.size() > 1 && mCommandBuffer.get(1).equals(input)) return;
 
         mCommandBuffer.add(1, input);
