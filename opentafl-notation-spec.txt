@@ -303,8 +303,8 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 	# This pattern repeats for the whole game. The final element may omit
 	# one move record, if the game ends. The host engine should display
 	# commentary, if provided, alongside a loaded game.
-	<<turn-number><"."> <move-record> <move-record>>
-	[[first-half-commentary]|[second-half-commentary]]
+	<<turn-number><"."> <move-record> <move-record> [move-record]...>
+	[<first-half-commentary>[<"|"><more-commentary>]]
 
 	tags: 
 		none, some, or all tags may be included, at the compiler's choice.
@@ -376,6 +376,8 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		Comments will be displayed after the move to which they correspond has
 		been played.
 
-	second-half-commentary:
-		comment on the second move of this turn. The same clock display convention
-		applies.
+	more-commentary:
+		comment on the second move of this turn (or on any additional moves this
+		turn, for variants including the berserk rule). The same clock display
+		convention applies.
+
