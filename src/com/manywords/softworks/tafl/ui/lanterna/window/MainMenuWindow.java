@@ -40,33 +40,33 @@ public class MainMenuWindow extends BasicWindow {
         Button optionsButton = new Button("Options", () -> mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback)));
         p.addComponent(optionsButton);
 
+        Button loadGameButton = new Button("Load game", () -> {
+            File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved game", "Open", new File("saved-games"));
+            if(gameFile == null) {
+                return;
+            }
+
+            GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
+            ReplayGame rg = new ReplayGame(g.game, g.moves);
+            TerminalUtils.startSavedGame(rg, getTextGUI(), mTerminalCallback);
+
+        });
+        p.addComponent(loadGameButton);
+
+        Button viewReplayButton = new Button("View replay", () -> {
+            File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved replay", "Open", new File("saved-games/replays"));
+            if(gameFile == null) {
+                return;
+            }
+
+            GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
+            ReplayGame rg = new ReplayGame(g.game, g.moves);
+            TerminalUtils.startReplay(rg, getTextGUI(), mTerminalCallback);
+
+        });
+        p.addComponent(viewReplayButton);
+
         if(OpenTafl.DEV_MODE) {
-            Button loadGameButton = new Button("Load game", () -> {
-                File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved game", "Open", new File("saved-games"));
-                if(gameFile == null) {
-                    return;
-                }
-
-                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
-                ReplayGame rg = new ReplayGame(g.game, g.moves);
-                TerminalUtils.startSavedGame(rg, getTextGUI(), mTerminalCallback);
-
-            });
-            p.addComponent(loadGameButton);
-
-            Button viewReplayButton = new Button("View replay", () -> {
-                File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved replay", "Open", new File("saved-games/replays"));
-                if(gameFile == null) {
-                    return;
-                }
-
-                GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
-                ReplayGame rg = new ReplayGame(g.game, g.moves);
-                TerminalUtils.startReplay(rg, getTextGUI(), mTerminalCallback);
-
-            });
-            p.addComponent(viewReplayButton);
-
             Button tourneyButton = new Button("AI selfplay", () -> mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback)));
             p.addComponent(tourneyButton);
         }
