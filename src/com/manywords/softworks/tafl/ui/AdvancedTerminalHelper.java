@@ -228,10 +228,6 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         else {
             statusText("Last move: " + move);
             int repeats = mGame.getCurrentState().countPositionOccurrences();
-            // The number of repeats is the number of times this has happened
-            // in the history. Add one for us, so we can report to the player
-            // more intelligently.
-            repeats++;
             if(repeats > 1) {
                 statusText("This position has repeated " + repeats + " times!");
             }
@@ -400,6 +396,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         }
 
         private void startCommandEngineThread(Game g) {
+
             mCommandEngineThread = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
                 private boolean mRunning = true;
                 @Override
