@@ -24,7 +24,7 @@ package/*
 **~
 **local.properties
 
-syntax:regex
+syntax: regexp
 
 ^saved-games/.*
 ^engines/.*
