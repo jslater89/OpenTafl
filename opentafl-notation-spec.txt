@@ -316,32 +316,37 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		"event": 
 			tournament or match event name
 		"site": 
-			location of game, in city, country format
+			location of game, in city, country format, or as a URL, for online
+			games
 		"date": 
 			date of game: YYYY.MM.DD
 		"round": 
 			round in tournament or match
 		"attackers": 
-			player of the attackers, in lastname, firstname format
+			player of the attackers, in customary format
 		"defenders": 
-			player of the defenders
+			player of the defenders, in customary format
 		"result": 
 			"1" (attackers win), "0" (draw), "-1" (defenders win), or "?" (other)
 		"annotator": 
-			person providing game notes, in lastname, firstname format
+			person providing game notes, in customary format
 		"compiler": 
-			person assembling this file, in lastname, firstname format
+			person assembling this file, in customary format
 		"time-control": 
 			<main-time-seconds> [<overtime-periods><"/"><overtime-length] [<increment-length><"i">]
 			e.g. "3600 30/3 3i": 1 hour, 3 30-second overtimes, 3-second increment
 			the time allotted per player for this game.
 		"time-remaining":
-		    <<main-time-seconds> [<overtime-periods><"/"><overtime-length]> <<main-time-seconds> [<overtime-periods><"/"><overtime-length]>
+		    <<main-time-seconds> [<overtime-periods><"/"><overtime-length]><", ">"<<main-time-seconds> [<overtime-periods><"/"><overtime-length]>
 		    the time remaining at the end of this game record.
 		"termination": 
-			human-readable definition of how the game ended
+			human-readable statement on how the game ended, possibly containing
+			more information than the result tag; e.g. 'Black resigned'
 		"variant":
 			name of the tafl variant being played
+		"start-comment":
+		    a comment to be displayed at the start of the game, or whenever the player navigates
+		    back to the start of the game
 
 	rules-tag:
 		<"[rules:"><rules-string><"]">

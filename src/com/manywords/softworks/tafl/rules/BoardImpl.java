@@ -2,7 +2,6 @@ package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.*;
 
@@ -115,7 +114,7 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public List<Coord> getAdjacentSpaces(Coord space) {
-        return Coord.getAdjacentSpace(space);
+        return Coord.getAdjacentSpaces(space);
     }
 
     @Override
@@ -125,7 +124,7 @@ public abstract class BoardImpl extends Board {
 
         for (Coord adjacent : spaces) {
             char occupier = getOccupier(adjacent);
-            if (occupier != 0) neighbors.add(occupier);
+            if (occupier != Taflman.EMPTY) neighbors.add(occupier);
         }
 
         return neighbors;

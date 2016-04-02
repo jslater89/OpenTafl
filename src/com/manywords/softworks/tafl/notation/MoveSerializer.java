@@ -68,7 +68,7 @@ public class MoveSerializer {
         final int STATUS_CODE = 18;
         Pattern p = Pattern.compile(getMoveRegex());
         Matcher m = p.matcher(record);
-        if(!m.matches()) throw new IllegalArgumentException("Bad move record");
+        if(!m.matches()) throw new IllegalArgumentException("Bad move record: " + record);
 
         String[] groups = new String[19];
 

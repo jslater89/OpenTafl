@@ -1,12 +1,10 @@
 Tafl To-Do
 
-v0.2 features:
-1. Engine mode
-2. Engine validation
-3. Tactical validation
+v0.2 features, bits, and bobs:
+1. Test game serializer, replay functionality with a berserk game that includes berserk moves
+2. Write help messages
 
 General features:
-1. Unchattify tests.
 2. CommandEngine requires a start command. (UI callback and notification to player, so AIs know to start.)
 
 AI stuff:

@@ -20,8 +20,15 @@ public class CommandResult {
         HISTORY,
         HELP,
         RULES,
+        SAVE,
         QUIT,
         ANALYZE,
+        REPLAY_ENTER,
+        REPLAY_PLAY_HERE,
+        REPLAY_RETURN,
+        REPLAY_NEXT,
+        REPLAY_PREVIOUS,
+        REPLAY_JUMP,
     }
 
     public final Type type;

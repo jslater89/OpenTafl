@@ -312,6 +312,11 @@ public class ExternalEngineClient implements UiCallback {
     }
 
     @Override
+    public void modeChanging(Mode mode, Object gameObject) {
+
+    }
+
+    @Override
     public void awaitingMove(Player player, boolean isAttackingSide) {
 
     }
