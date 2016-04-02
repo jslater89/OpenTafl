@@ -162,44 +162,50 @@ public class Game {
 
     public String getCommentedHistoryString() {
         String gameRecord = "";
-        int count = 1;
+        int turnCount = 1;
 
-        // For each line, get any moves made by the starting player and any moves made by the finishing player.
-        for(int i = 0; i < getHistory().size(); ) {
-            if(i + 1 < getHistory().size() && getHistory().get(i+1).getExitingMove() != null) {
-                DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
-                DetailedMoveRecord exitingMove2 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
-                gameRecord += count++ + ". " + exitingMove1 + " " + exitingMove2 + "\n";
-
-                gameRecord += "[";
-                if(exitingMove1.getTimeRemaining() != null) {
-                    gameRecord += exitingMove1.getTimeRemaining().toGameNotationString() + " ";
-                }
-                gameRecord += exitingMove1.getComment() + "|";
-
-                if(exitingMove2.getTimeRemaining() != null) {
-                    gameRecord += exitingMove2.getTimeRemaining().toGameNotationString() + " ";
-                }
-
-                gameRecord += exitingMove2.getComment() + "]\n";
+        int i = 0;
+        List<GameState> thisTurn = new ArrayList<>();
+        boolean startingSideAttackers = getHistory().get(0).getCurrentSide().isAttackingSide();
+        boolean otherSideWent = false;
+        while(i < getHistory().size()) {
+            GameState s = getHistory().get(i++);
+            if(!otherSideWent && s.getCurrentSide().isAttackingSide() == startingSideAttackers) {
+                thisTurn.add(s);
             }
-            else {
-                DetailedMoveRecord exitingMove1 = (DetailedMoveRecord) getHistory().get(i++).getExitingMove();
-                if(exitingMove1 != null) {
-                    gameRecord += count++ + ". " + exitingMove1 + "\n";
-
-                    gameRecord += "[";
-                    if (exitingMove1.getTimeRemaining() != null) {
-                        gameRecord += exitingMove1.getTimeRemaining().toGameNotationString() + " ";
-                    }
-                    gameRecord += exitingMove1.getComment() + "|]\n";
-                }
+            else if(s.getCurrentSide().isAttackingSide() != startingSideAttackers) {
+                thisTurn.add(s);
+                otherSideWent = true;
             }
+            else if(otherSideWent && s.getCurrentSide().isAttackingSide() == startingSideAttackers) {
+                gameRecord += getCommentedStringForMoves(turnCount, thisTurn);
 
-            if(i == getHistory().size()) break;
+                thisTurn.clear();
+                thisTurn.add(s);
+                turnCount++;
+                otherSideWent = false;
+            }
         }
 
         return gameRecord;
+    }
+
+    private String getCommentedStringForMoves(int turnNumber, List<GameState> states) {
+        String commentedString = turnNumber + ". ";
+
+        for(GameState state : states) {
+            commentedString += ((DetailedMoveRecord) state.getExitingMove()) + " ";
+        }
+        commentedString += "\n";
+
+        commentedString += "[";
+        for(GameState state : states) {
+            commentedString += "|" + ((DetailedMoveRecord) state.getExitingMove()).getComment();
+        }
+        commentedString = commentedString.replaceFirst("\\|", "");
+        commentedString += "]\n";
+
+        return commentedString;
     }
 
     /**
