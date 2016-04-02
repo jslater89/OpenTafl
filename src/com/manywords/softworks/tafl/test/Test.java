@@ -10,6 +10,7 @@ public class Test {
         tests.add(new ExternalEngineHostTest());
         tests.add(new ThreefoldDrawTest());
         tests.add(new ThreefoldVictoryTest());
+        tests.add(new GameSerializerConsistencyTest());
         tests.add(new MoveSerializerConsistencyTest());
         tests.add(new PositionSerializerConsistencyTest());
         tests.add(new RulesSerializerConsistencyTest());

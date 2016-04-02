@@ -66,6 +66,9 @@ public class Game {
 
         Taflman.initialize(this, mGameRules);
 
+        // Add the starting state to the history.
+        mHistory.add(mCurrentState);
+
         mCallback = callback;
     }
 
@@ -205,7 +208,7 @@ public class Game {
             commentedString += "|" + timeString + m.getComment();
         }
         commentedString = commentedString.replaceFirst("\\|", "");
-        commentedString += "]";
+        commentedString += "]\n";
 
         return commentedString;
     }
@@ -235,7 +238,7 @@ public class Game {
                 berserkingTaflman);
 
         mCurrentState = nextState;
-        mHistory.add(currentState);
+        mHistory.add(mCurrentState);
 
         if(mClock != null) {
             mClock.slap(advanceTurn);

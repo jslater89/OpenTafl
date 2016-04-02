@@ -100,7 +100,7 @@ public class GameSerializer {
 
     public static GameContainer loadGameRecord(String gameRecord) {
         Map<String, String> tagMap = parseTags(gameRecord);
-        System.out.println(tagMap);
+        //System.out.println(tagMap);
 
         Rules r = RulesSerializer.loadRulesRecord(tagMap.get("rules"));
         Game g = new Game(r, null);
@@ -187,7 +187,7 @@ public class GameSerializer {
             }
         }
 
-        System.out.println(moves);
+        //System.out.println(moves);
         return moves;
     }
 
