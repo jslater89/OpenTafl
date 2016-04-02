@@ -21,6 +21,8 @@ import java.util.List;
  * Created by jay on 3/10/16.
  */
 public class ExternalEngineHost {
+    private boolean mConnected;
+
     private Process mExternalEngine;
     private InputStream mInboundPipe;
     private OutputStream mOutboundPipe;
@@ -146,6 +148,10 @@ public class ExternalEngineHost {
     public void setGame(Game g) {
         rules(g.getGameRules());
         mGame = g;
+    }
+
+    public boolean ready() {
+        return mConnected;
     }
 
     public void analyzePosition(GameState state) {
@@ -390,7 +396,7 @@ public class ExternalEngineHost {
                 System.out.println("Host received: " + cmd);
 
                 if (cmd.startsWith("hello")) {
-                    mCommThread.sendCommand("hello\n".getBytes());
+                    mConnected = true;
                 }
                 else if(cmd.startsWith("move")) {
                     handleMoveCommand(cmd);

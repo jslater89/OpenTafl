@@ -12,9 +12,7 @@ import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost
 import java.io.File;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by jay on 3/10/16.
@@ -71,8 +69,26 @@ public class ExternalEnginePlayer extends Player {
         }
     }
 
+    private int connectAttempts = 0;
     @Override
     public void getNextMove(UiCallback ui, Game game, int thinkTime) {
+        if(!mHost.ready()) {
+            connectAttempts++;
+            if(connectAttempts > 20) {
+                resign();
+                statusText("Engine error! Failed to start.");
+            }
+            else {
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        getNextMove(ui, game, thinkTime);
+                    }
+                }, 250);
+            }
+
+            return;
+        }
         // Support berserk...
         List<MoveRecord> movesSinceMyLastMove = new ArrayList<>(1);
 
@@ -81,7 +97,9 @@ public class ExternalEnginePlayer extends Player {
             GameState s = game.getHistory().get(i);
             // We only want to check the start and end space, since the incoming move may not
             // record captures.
-            if(!s.getExitingMove().softEquals(mMyLastMove)) movesSinceMyLastMove.add(s.getExitingMove());
+            if(s.getExitingMove() != null && !s.getExitingMove().softEquals(mMyLastMove)) {
+                movesSinceMyLastMove.add(s.getExitingMove());
+            }
             else break;
         }
 
