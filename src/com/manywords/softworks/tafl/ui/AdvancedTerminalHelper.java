@@ -478,11 +478,14 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             }
             else if (r.type == CommandResult.Type.SAVE) {
                 String title;
+                Game game;
                 if(mInGame) {
                     title = "Save game";
+                    game = mGame;
                 }
                 else {
                     title = "Save replay";
+                    game = mReplay.getGame();
                 }
 
                 File saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games"));
@@ -495,7 +498,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
                     if(result.equals(MessageDialogButton.No)) return;
                 }
 
-                boolean success = GameSerializer.writeGameToFile(mGame, saveFile, true);
+                boolean success = GameSerializer.writeGameToFile(game, saveFile, true);
                 if(!success) {
                     MessageDialog.showMessageDialog(mGui, "Unable to save", "Unable to write savegame file.");
                 }
