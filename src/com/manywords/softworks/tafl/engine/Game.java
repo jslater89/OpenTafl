@@ -169,7 +169,7 @@ public class Game {
 
         int i = 0;
         List<GameState> thisTurn = new ArrayList<>();
-        boolean startingSideAttackers = getHistory().get(0).getCurrentSide().isAttackingSide();
+        boolean startingSideAttackers = getRules().getStartingSide().isAttackingSide();
         boolean otherSideWent = false;
         while(i < getHistory().size()) {
             GameState s = getHistory().get(i++);

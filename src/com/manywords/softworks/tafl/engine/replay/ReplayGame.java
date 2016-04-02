@@ -221,31 +221,31 @@ public class ReplayGame {
         mAttackerTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
         mDefenderTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
 
-        for(int i = 1; i < historySize(); i++) {
-            GameState current = mGame.getHistory().get(i - 1);
+        for(int i = 0; i < historySize(); i++) {
+            GameState current = mGame.getHistory().get(i);
 
             if(current.getCurrentSide().isAttackingSide()) {
                 // The other side's clock doesn't count down.
-                mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(i - 1));
+                mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(i));
 
                 // If we have a record, save it; otherwise, get the previous one as a best guess.
-                DetailedMoveRecord dm = mMoveHistory.get(i - 1);
+                DetailedMoveRecord dm = mMoveHistory.get(i);
                 if(dm.getTimeRemaining() != null) {
                     mAttackerTimeSpecByIndex.add(dm.getTimeRemaining());
                 }
                 else {
-                    mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(i - 1));
+                    mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(i));
                 }
             }
             else {
-                mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(i - 1));
+                mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(i));
 
-                DetailedMoveRecord dm = mMoveHistory.get(i - 1);
+                DetailedMoveRecord dm = mMoveHistory.get(i);
                 if(dm.getTimeRemaining() != null) {
                     mDefenderTimeSpecByIndex.add(dm.getTimeRemaining());
                 }
                 else {
-                    mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(i - 1));
+                    mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(i));
                 }
             }
         }
@@ -256,11 +256,8 @@ public class ReplayGame {
             mAttackerTimeLeft = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
             mDefenderTimeLeft = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
 
-            mAttackerTimeSpecByIndex.add(historySize() - 1, mAttackerTimeLeft);
-            mAttackerTimeSpecByIndex.remove(historySize());
-
-            mDefenderTimeSpecByIndex.add(historySize() - 1, mDefenderTimeLeft);
-            mDefenderTimeSpecByIndex.remove(historySize());
+            mAttackerTimeSpecByIndex.add(mAttackerTimeLeft);
+            mDefenderTimeSpecByIndex.add(mDefenderTimeLeft);
         }
     }
 
