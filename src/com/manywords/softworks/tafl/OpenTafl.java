@@ -4,7 +4,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.test.Test;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
+import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
@@ -63,7 +63,7 @@ public class OpenTafl {
 
                 t = factory.createSwingTerminal();
 
-                AdvancedTerminalHelper<? extends Terminal> th = new AdvancedTerminalHelper<>(t);
+                AdvancedTerminal<? extends Terminal> th = new AdvancedTerminal<>(t);
                 break;
             case DEBUG:
                 Debug.run(mapArgs);

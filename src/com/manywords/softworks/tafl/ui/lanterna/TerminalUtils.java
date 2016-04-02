@@ -7,12 +7,9 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
-import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
+import com.manywords.softworks.tafl.ui.lanterna.screen.GameScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.lanterna.window.BoardWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.CommandWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.StatusWindow;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
 import java.io.File;
@@ -21,7 +18,7 @@ import java.io.File;
  * Created by jay on 3/22/16.
  */
 public class TerminalUtils {
-    public static Game startGame(WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
+    public static Game startGame(WindowBasedTextGUI gui, UiScreen.TerminalCallback callback) {
         if(TerminalSettings.attackers == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.attackerEngineFile)) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Attacker engine missing configuration file!");
             return null;
@@ -41,7 +38,8 @@ public class TerminalUtils {
         }
 
         // Blocks here
-        callback.onEnteringScreen(g, BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        GameScreen gameScreen = new GameScreen(g, BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        callback.changeActiveScreen(gameScreen);
         return g;
     }
 
@@ -52,7 +50,7 @@ public class TerminalUtils {
      * @param gui
      * @param callback
      */
-    public static Game startSavedGame(ReplayGame rg, WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
+    public static Game startSavedGame(ReplayGame rg, WindowBasedTextGUI gui, UiScreen.TerminalCallback callback) {
         if(TerminalSettings.attackers == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.attackerEngineFile)) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Attacker engine missing configuration file!");
             return null;
@@ -70,12 +68,14 @@ public class TerminalUtils {
             return null;
         }
 
-        callback.onEnteringScreen(g, "OpenTafl");
+        GameScreen gameScreen = new GameScreen(g, "OpenTafl");
+        callback.changeActiveScreen(gameScreen);
         return g;
     }
 
-    public static void startReplay(ReplayGame rg, WindowBasedTextGUI gui, AdvancedTerminalHelper.TerminalCallback callback) {
-        callback.onEnteringScreen(rg, "OpenTafl");
+    public static void startReplay(ReplayGame rg, WindowBasedTextGUI gui, UiScreen.TerminalCallback callback) {
+        GameScreen gameScreen = new GameScreen(rg, "OpenTafl");
+        callback.changeActiveScreen(gameScreen);
     }
 
     public static File showFileChooserDialog(WindowBasedTextGUI gui, String title, String actionLabel, File directory) {

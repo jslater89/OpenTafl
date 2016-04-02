@@ -1,0 +1,10 @@
+The Lantera UI
+
+1. Screens
+Screens are a collection of like-purpose windows, along with methods to manage them.
+e.g. MainMenuScreen, GameScreen, NetworkScreen
+
+They have TerminalCallback methods, and AdvancedTerminalHelper passes through to them.
+
+2. Windows
+Windows are the subunit of screens.

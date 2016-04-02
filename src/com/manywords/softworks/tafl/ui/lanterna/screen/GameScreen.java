@@ -1,23 +1,23 @@
-package com.manywords.softworks.tafl.ui;
+package com.manywords.softworks.tafl.ui.lanterna.screen;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TextColor;
-import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
+import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
-import com.googlecode.lanterna.input.*;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.ResizeListener;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
-import com.manywords.softworks.tafl.engine.*;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
+import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.rules.Side;
+import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.command.Command;
 import com.manywords.softworks.tafl.ui.command.CommandEngine;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
@@ -27,45 +27,20 @@ import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
-import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
-import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowDecorationRenderer;
-import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowPostRenderer;
 import com.manywords.softworks.tafl.ui.lanterna.window.*;
 import com.manywords.softworks.tafl.ui.player.Player;
 import com.manywords.softworks.tafl.ui.player.UiWorkerThread;
 
-import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by jay on 2/15/16.
+ * Created by jay on 4/2/16.
  */
-public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
-    public interface TerminalCallback {
-        public void onMenuNavigation(Window destination);
-
-        public void onEnteringScreen(Game g, String title);
-        public void onEnteringScreen(ReplayGame rg, String title);
-
-        public void onEnteringReplay(ReplayGame rg);
-        public void onEnteringGame(Game g);
-
-        public void handleInGameCommand(String command);
-        public void handleKeyStroke(KeyStroke key);
-
-        public UiCallback getUiCallback();
-
-        public void setSelfplayWindow(Window tournamentWindow);
-    }
-
-    private T mTerminal;
-
-    private MultiWindowTextGUI mGui;
-
+public class GameScreen extends UiScreen implements UiCallback {
+    private String mTitle;
     private BoardWindow mBoardWindow;
     private StatusWindow mStatusWindow;
     private CommandWindow mCommandWindow;
@@ -74,58 +49,43 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     private Game mGame;
     private CommandEngine mCommandEngine;
 
-    private SelfplayWindow mSelfplayWindow = null;
     private ReplayGame mReplay;
 
     private boolean mInGame;
     private boolean mInReplay;
     private boolean mPostGame;
 
-    public AdvancedTerminalHelper(T terminal) {
-        super();
-        mTerminal = terminal;
+    public GameScreen(Game g, String title) {
+        mGame = g;
+        mTitle = title;
+    }
 
-        if(terminal instanceof SwingTerminalFrame) {
-            SwingTerminalFrame stf = (SwingTerminalFrame) terminal;
-            stf.setTitle("OpenTafl");
-            stf.setSize(1024, 768);
-            stf.setResizable(true);
-            stf.setLocationRelativeTo(null);
-            stf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            stf.setVisible(true);
+    public GameScreen(ReplayGame g, String title) {
+        mReplay = g;
+        mTitle = title;
+    }
+
+    @Override
+    public void setActive(AdvancedTerminal t, WindowBasedTextGUI gui) {
+        super.setActive(t, gui);
+        mTerminalCallback = new GameScreenTerminalCallback();
+
+        if(mGame != null) {
+            System.out.println("Callback entering game screen");
+            mTerminalCallback.onEnteringGameScreen(mGame, mTitle);
         }
-        mTerminal.addResizeListener(new ResizeListener() {
-            @Override
-            public void onResized(Terminal terminal, TerminalSize terminalSize) {
-                layoutGameWindows(terminalSize);
-            }
-        });
-
-        Screen s = null;
-        try {
-            s = new TerminalScreen(mTerminal);
-            s.startScreen();
+        else if(mReplay != null) {
+            System.out.println("Callback entering game screen/replay");
+            mTerminalCallback.onEnteringGameScreen(mReplay, mTitle);
         }
-        catch(IOException e) {
-            System.out.println("Failed to start");
-            System.exit(0);
+        else {
+            throw new IllegalStateException("No game for GameScreen!");
         }
+    }
 
-        /* crashes bash?
-        try {
-            mTerminal.enterPrivateMode();
-        } catch (IOException e) {
-            // Best effort
-        }
-        */
-
-        TerminalSettings.loadFromFile();
-
-        mGui = new MultiWindowTextGUI(s, new DefaultWindowManager(new TerminalWindowDecorationRenderer()), new TerminalWindowPostRenderer(), new EmptySpace(TextColor.ANSI.BLACK));
-        mGui.setTheme(new TerminalTheme());
-        Window mainMenuWindow = new MainMenuWindow(mTerminalCallback);
-        mainMenuWindow.setHints(TerminalThemeConstants.CENTERED);
-        mGui.addWindowAndWait(mainMenuWindow);
+    @Override
+    public void onResized(Terminal terminal, TerminalSize terminalSize) {
+        layoutGameWindows(terminalSize);
     }
 
     private void addBoardWindows() {
@@ -194,7 +154,8 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
         mCommandEngine.shutdown();
         mCommandEngineThread.cancel();
-        mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
+
+        mTerminal.changeActiveScreen(new MainMenuScreen());
     }
 
     @Override
@@ -204,9 +165,9 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
     }
 
     @Override
-    public void modeChanging(Mode mode, Object gameObject) {
-        if(mode == Mode.GAME) mTerminalCallback.onEnteringGame((Game) gameObject);
-        else if(mode == Mode.REPLAY) mTerminalCallback.onEnteringReplay((ReplayGame) gameObject);
+    public void modeChanging(UiCallback.Mode mode, Object gameObject) {
+        if(mode == UiCallback.Mode.GAME) mTerminalCallback.onEnteringGame((Game) gameObject);
+        else if(mode == UiCallback.Mode.REPLAY) mTerminalCallback.onEnteringReplay((ReplayGame) gameObject);
     }
 
     @Override
@@ -311,47 +272,35 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         return mInGame;
     }
 
-    private TerminalCallback mTerminalCallback = new TerminalCallback() {
+    private class GameScreenTerminalCallback extends DefaultTerminalCallback {
         @Override
-        public void onMenuNavigation(Window destination) {
-            if(destination == null) {
-
-                /* crashes bash?
-                try {
-                    mTerminal.exitPrivateMode();
-                } catch (IOException e) {
-                    // Best effort
-                }
-                */
-
-                TerminalSettings.saveToFile();
-                System.exit(0);
-            }
-
-            mGui.removeWindow(mGui.getActiveWindow());
-            destination.setHints(TerminalThemeConstants.CENTERED);
-            mGui.addWindowAndWait(destination);
+        public void changeActiveScreen(UiScreen screen) {
+            mTerminal.changeActiveScreen(screen);
         }
 
         @Override
-        public void onEnteringScreen(Game g, String title) {
+        public void onEnteringGameScreen(Game g, String title) {
             // Set up a game thread
             blockUntilCommandEngineReady(g);
+            System.out.println("Command engine ready");
 
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
                 createWindows(g, g.getRules().getName());
+                System.out.println("Windows created");
                 mCommandEngine.enterGame(g);
+                System.out.println("Command engine game started, adding windows");
 
                 // This is our UI thread (blocking call)
                 addBoardWindows();
             }
             else {
+                System.out.println("Have windows already, entering game");
                 mCommandEngine.enterGame(g);
             }
         }
 
         @Override
-        public void onEnteringScreen(ReplayGame rg, String title) {
+        public void onEnteringGameScreen(ReplayGame rg, String title) {
             // Set up a game thread
             blockUntilCommandEngineReady(rg.getGame());
 
@@ -364,7 +313,6 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             }
             else {
                 mCommandEngine.enterReplay(rg);
-
             }
         }
 
@@ -382,16 +330,20 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         private void blockUntilCommandEngineReady(Game g) {
             // Set up a game thread
             if(mCommandEngine == null) {
+                System.out.println("Starting command engine thread");
                 startCommandEngineThread(g);
             }
 
             while(mCommandEngine == null) {
                 try {
+                    System.out.println("Waiting...");
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+
+            System.out.println("Command engine ready");
         }
 
         private void startCommandEngineThread(Game g) {
@@ -406,7 +358,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
                 @Override
                 public void run() {
-                    mCommandEngine = new CommandEngine(g, AdvancedTerminalHelper.this, TerminalSettings.getNewPlayer(TerminalSettings.attackers), TerminalSettings.getNewPlayer(TerminalSettings.defenders));
+                    mCommandEngine = new CommandEngine(g, GameScreen.this, TerminalSettings.getNewPlayer(TerminalSettings.attackers), TerminalSettings.getNewPlayer(TerminalSettings.defenders));
                 }
             });
             mCommandEngineThread.start();
@@ -668,12 +620,13 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
 
         @Override
         public UiCallback getUiCallback() {
-            return AdvancedTerminalHelper.this;
+            return GameScreen.this;
         }
 
         @Override
         public void setSelfplayWindow(Window w) {
-            mSelfplayWindow = (SelfplayWindow) w;
+            mTerminal.setSelfplayWindow(w);
         }
-    };
+    }
+
 }

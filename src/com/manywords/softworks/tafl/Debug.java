@@ -2,16 +2,9 @@ package com.manywords.softworks.tafl;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
-import com.manywords.softworks.tafl.rules.Rules;
-import com.manywords.softworks.tafl.rules.brandub.Brandub;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
-import com.manywords.softworks.tafl.ui.player.ExternalEnginePlayer;
+import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
-import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class Debug {
@@ -48,7 +41,7 @@ public class Debug {
             */
 
             if (t != null) {
-                AdvancedTerminalHelper<? extends Terminal> th = new AdvancedTerminalHelper<>(t);
+                AdvancedTerminal<? extends Terminal> th = new AdvancedTerminal<>(t);
             }
             else {
                 System.out.println("Exiting");

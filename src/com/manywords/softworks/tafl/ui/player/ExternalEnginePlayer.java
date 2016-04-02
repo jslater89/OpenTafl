@@ -93,7 +93,8 @@ public class ExternalEnginePlayer extends Player {
         List<MoveRecord> movesSinceMyLastMove = new ArrayList<>(1);
 
         int historySize = game.getHistory().size();
-        for(int i = historySize - 1; i >= 0; i--) {
+        // Since the top state is the most recent move...
+        for(int i = historySize - 2; i >= 0; i--) {
             GameState s = game.getHistory().get(i);
             // We only want to check the start and end space, since the incoming move may not
             // record captures.

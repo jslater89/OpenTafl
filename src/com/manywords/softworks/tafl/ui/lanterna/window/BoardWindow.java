@@ -6,9 +6,9 @@ import com.googlecode.lanterna.gui2.Panel;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Coord;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalImagePanel;
+import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
 
 import java.util.List;
 
@@ -18,9 +18,9 @@ import java.util.List;
 public class BoardWindow extends BasicWindow {
     private Game mGame;
     private ReplayGame mReplayGame;
-    private AdvancedTerminalHelper.TerminalCallback mCallback;
+    private UiScreen.TerminalCallback mCallback;
     private TerminalBoardImage mBoardImage;
-    public BoardWindow(String title, Game g, AdvancedTerminalHelper.TerminalCallback callback) {
+    public BoardWindow(String title, Game g, UiScreen.TerminalCallback callback) {
         super(title);
         mGame = g;
 

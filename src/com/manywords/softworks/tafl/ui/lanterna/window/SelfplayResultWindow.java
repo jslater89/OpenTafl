@@ -2,7 +2,7 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
+import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
 import com.manywords.softworks.tafl.ui.selfplay.MatchResult;
 import com.manywords.softworks.tafl.ui.selfplay.SelfplayRunner;
 
@@ -10,10 +10,10 @@ import com.manywords.softworks.tafl.ui.selfplay.SelfplayRunner;
  * Created by jay on 3/28/16.
  */
 public class SelfplayResultWindow extends BasicWindow {
-    private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
+    private UiScreen.TerminalCallback mTerminalCallback;
     private SelfplayRunner mRunner;
 
-    public SelfplayResultWindow(AdvancedTerminalHelper.TerminalCallback terminalCallback, SelfplayRunner selfplayRunner) {
+    public SelfplayResultWindow(UiScreen.TerminalCallback terminalCallback, SelfplayRunner selfplayRunner) {
         mTerminalCallback = terminalCallback;
         mRunner = selfplayRunner;
 

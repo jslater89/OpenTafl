@@ -5,7 +5,7 @@ import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.*;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
+import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
@@ -35,8 +35,8 @@ public class OptionsMenuWindow extends BasicWindow {
 
     private Interactable mLastFocused;
 
-    private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
-    public OptionsMenuWindow(AdvancedTerminalHelper.TerminalCallback callback) {
+    private UiScreen.TerminalCallback mTerminalCallback;
+    public OptionsMenuWindow(UiScreen.TerminalCallback callback) {
         mTerminalCallback = callback;
 
         buildSettings();

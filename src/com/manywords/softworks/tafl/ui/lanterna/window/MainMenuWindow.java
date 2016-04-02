@@ -2,15 +2,11 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.manywords.softworks.tafl.OpenTafl;
-import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
+import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
 
 import java.io.File;
 
@@ -18,8 +14,8 @@ import java.io.File;
  * Created by jay on 2/15/16.
  */
 public class MainMenuWindow extends BasicWindow {
-    private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
-    public MainMenuWindow(AdvancedTerminalHelper.TerminalCallback callback) {
+    private UiScreen.TerminalCallback mTerminalCallback;
+    public MainMenuWindow(UiScreen.TerminalCallback callback) {
         mTerminalCallback = callback;
 
         Panel p = new Panel();

@@ -5,8 +5,8 @@ import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
-import com.manywords.softworks.tafl.ui.selfplay.MatchResult;
+import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
 import com.manywords.softworks.tafl.ui.selfplay.SelfplayRunner;
 
 import java.math.BigInteger;
@@ -16,12 +16,12 @@ import java.util.List;
  * Created by jay on 3/22/16.
  */
 public class SelfplayWindow extends BasicWindow {
-    private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
+    private UiScreen.TerminalCallback mTerminalCallback;
     private SelfplayRunner mRunner;
     private int mIterations = 10;
     private Label mIterationsLabel;
 
-    public SelfplayWindow(AdvancedTerminalHelper.TerminalCallback callback) {
+    public SelfplayWindow(UiScreen.TerminalCallback callback) {
         mTerminalCallback = callback;
         mRunner = new SelfplayRunner(this, 10);
 
@@ -41,7 +41,7 @@ public class SelfplayWindow extends BasicWindow {
         p.addComponent(mIterationsLabel);
 
         Button menuButton= new Button("Main Menu", () -> {
-            mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
+            mTerminalCallback.changeActiveScreen(new MainMenuScreen());
         });
 
         Button startButton = new Button("Start", () -> {
@@ -59,7 +59,7 @@ public class SelfplayWindow extends BasicWindow {
         return mRunner;
     }
 
-    public AdvancedTerminalHelper.TerminalCallback getTerminalCallback() {
+    public UiScreen.TerminalCallback getTerminalCallback() {
         return mTerminalCallback;
     }
 
