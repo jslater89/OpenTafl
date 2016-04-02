@@ -56,7 +56,7 @@ public class SeaBattle extends Rules {
 
     @Override
     public String getName() {
-        return "Sea Battle " + boardSize + "x" + boardSize;
+        return "Sea Battle";
     }
 
     private Board mStartingBoard;

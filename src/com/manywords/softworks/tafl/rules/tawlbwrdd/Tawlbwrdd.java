@@ -27,7 +27,7 @@ public class Tawlbwrdd extends Rules {
 
     @Override
     public String getName() {
-        return "Tawlbwrdd " + boardSize + "x" + boardSize;
+        return "Tawlbwrdd";
     }
 
     private Board mStartingBoard;

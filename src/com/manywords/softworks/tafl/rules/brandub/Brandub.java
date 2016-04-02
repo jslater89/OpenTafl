@@ -54,7 +54,7 @@ public class Brandub extends Rules {
 
     @Override
     public String getName() {
-        return "Brandub " + boardSize + "x" + boardSize;
+        return "Brandub";
     }
 
     private Board mStartingBoard;

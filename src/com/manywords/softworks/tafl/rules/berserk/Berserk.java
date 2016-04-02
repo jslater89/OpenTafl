@@ -53,7 +53,7 @@ public class Berserk extends Rules {
 
     @Override
     public String getName() {
-        return "Berserk " + boardSize + "x" + boardSize;
+        return "Berserk";
     }
 
     private Board mStartingBoard;

@@ -79,7 +79,7 @@ public class Copenhagen extends Rules {
 
     @Override
     public String getName() {
-        return "Copenhagen " + boardSize + "x" + boardSize;
+        return "Copenhagen";
     }
 
     private Board mStartingBoard;

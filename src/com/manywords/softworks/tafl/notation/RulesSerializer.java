@@ -31,6 +31,7 @@ public class RulesSerializer {
     public static final Map<String, String> defaults;
     static {
         HashMap<String, String> map = new HashMap<>();
+        map.put("name", "");
         map.put("esc", "c");
         map.put("surf", "y");
         map.put("atkf", "y");
@@ -76,6 +77,8 @@ public class RulesSerializer {
         otnrString += "dim:";
         otnrString += rules.boardSize;
         otnrString += " ";
+
+        otnrString += "name:" + rules.getName().replace(' ', '_') + " ";
 
         if(rules.getEscapeType() == Rules.EDGES) {
             otnrString += "esc:e ";
@@ -233,6 +236,7 @@ public class RulesSerializer {
         //System.out.println(defenders.getStartingTaflmen());
         GenericRules rules = new GenericRules(board, attackers, defenders);
 
+        if(config.containsKey("name")) rules.setName(config.get("name").replace('_', ' '));
         if(config.containsKey("esc")) rules.setEscapeType(getEscapeTypeForString(config.get("esc")));
         if(config.containsKey("surf")) rules.setSurroundingFatal(getBooleanForString(config.get("surf")));
         if(config.containsKey("atkf")) rules.setAttackersFirst(getBooleanForString(config.get("atkf")));

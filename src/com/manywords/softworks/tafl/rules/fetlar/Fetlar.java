@@ -36,7 +36,7 @@ public class Fetlar extends Rules {
 
     @Override
     public String getName() {
-        return "Fetlar " + boardSize + "x" + boardSize;
+        return "Fetlar";
     }
 
     private Board mStartingBoard;

@@ -38,7 +38,7 @@ public class GenericRules extends Rules {
 
     @Override
     public String getName() {
-        return (mName.equals("") ? "Unknown Tafl" : mName) + boardSize + "x" + boardSize;
+        return (mName.equals("") ? "Unknown Tafl" : mName);
     }
 
     /*
@@ -60,6 +60,8 @@ public class GenericRules extends Rules {
     private boolean mShieldwallFlankingRequired = true;
     private boolean mEdgeFortEscape = false;
     private int mBerserkMode = BERSERK_NONE;
+
+    public void setName(String name) { mName = name; }
 
     public void setEscapeType(int escapeType) {
         mEscapeType = escapeType;
