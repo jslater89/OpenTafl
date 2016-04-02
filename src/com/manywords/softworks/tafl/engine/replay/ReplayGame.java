@@ -41,7 +41,6 @@ public class ReplayGame {
         mGame = game;
         mMoveHistory = movesToPlay;
 
-        mGame.getHistory().add(mGame.getCurrentState());
         mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
 
         for(int i = 0; i < movesToPlay.size(); i++) {
@@ -68,7 +67,6 @@ public class ReplayGame {
             }
         }
 
-        mGame.getHistory().add(mGame.getCurrentState());
         mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
         setupFirstStatesList();
         setupTimeSpecLists();
@@ -175,7 +173,7 @@ public class ReplayGame {
     public void prepareForGameStart(int index) {
         stateAtIndex(index);
         List<GameState> toRemove = new ArrayList<>(historySize() - index);
-        for(int i = index; i < historySize(); i++) {
+        for(int i = index + 1; i < historySize(); i++) {
             toRemove.add(mGame.getHistory().get(i));
         }
         mGame.getHistory().removeAll(toRemove);
@@ -221,7 +219,9 @@ public class ReplayGame {
         mAttackerTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
         mDefenderTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
 
-        for(int i = 0; i < historySize(); i++) {
+        // The last state doesn't have an exiting move
+        System.out.println(historySize());
+        for(int i = 0; i < historySize() - 1; i++) {
             GameState current = mGame.getHistory().get(i);
 
             if(current.getCurrentSide().isAttackingSide()) {

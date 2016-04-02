@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.*;
@@ -173,6 +174,8 @@ public class Game {
         boolean otherSideWent = false;
         while(i < getHistory().size()) {
             GameState s = getHistory().get(i++);
+            if(s.getExitingMove() == null) break;
+
             if(!otherSideWent && s.getCurrentSide().isAttackingSide() == startingSideAttackers) {
                 thisTurn.add(s);
             }
@@ -188,12 +191,19 @@ public class Game {
                 turnCount++;
                 otherSideWent = false;
             }
+
+        }
+
+        if(thisTurn.size() > 0) {
+            gameRecord += getCommentedStringForMoves(turnCount, thisTurn);
         }
 
         return gameRecord;
     }
 
     private String getCommentedStringForMoves(int turnNumber, List<GameState> states) {
+
+
         String commentedString = turnNumber + ". ";
 
         for(GameState state : states) {

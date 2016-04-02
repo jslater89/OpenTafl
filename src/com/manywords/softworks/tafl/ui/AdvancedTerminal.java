@@ -110,6 +110,7 @@ public class AdvancedTerminal<T extends Terminal> {
         }
         System.out.println("Deactivated old screen");
         System.out.println("Removed remaining windows");
+        System.out.println("Starting new screen");
 
         mActiveScreen = screen;
         mActiveScreen.setSelfplayWindow(mSelfplayWindow);

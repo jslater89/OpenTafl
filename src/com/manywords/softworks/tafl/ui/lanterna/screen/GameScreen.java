@@ -71,11 +71,9 @@ public class GameScreen extends UiScreen implements UiCallback {
         mTerminalCallback = new GameScreenTerminalCallback();
 
         if(mGame != null) {
-            System.out.println("Callback entering game screen");
             mTerminalCallback.onEnteringGameScreen(mGame, mTitle);
         }
         else if(mReplay != null) {
-            System.out.println("Callback entering game screen/replay");
             mTerminalCallback.onEnteringGameScreen(mReplay, mTitle);
         }
         else {
@@ -286,15 +284,12 @@ public class GameScreen extends UiScreen implements UiCallback {
 
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
                 createWindows(g, g.getRules().getName());
-                System.out.println("Windows created");
                 mCommandEngine.enterGame(g);
-                System.out.println("Command engine game started, adding windows");
 
                 // This is our UI thread (blocking call)
                 addBoardWindows();
             }
             else {
-                System.out.println("Have windows already, entering game");
                 mCommandEngine.enterGame(g);
             }
         }
