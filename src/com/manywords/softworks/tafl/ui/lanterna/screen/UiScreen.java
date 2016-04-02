@@ -33,7 +33,7 @@ public abstract class UiScreen {
 
         public void setSelfplayWindow(Window tournamentWindow);
     }
-    
+
     protected TerminalCallback mTerminalCallback = new TrueDefaultTerminalCallback();
     protected WindowBasedTextGUI mGui;
     protected AdvancedTerminal mTerminal;
