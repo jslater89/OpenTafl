@@ -11,12 +11,19 @@ import java.util.List;
  * Created by jay on 2/15/16.
  */
 public class ScrollingLabel extends Label {
+    public enum Direction {
+        UP,
+        DOWN
+    }
+
     // Queue
     /*
      * mStringBuffer holds up to 512 strings, which are broken up for display
      * by the line buffer.
      */
 
+    private boolean mForceScrollCount;
+    private Direction mDirection = Direction.UP;
     private List<String> mStringBuffer;
     private List<String> mLineBuffer;
     private int mHeight;
@@ -129,6 +136,10 @@ public class ScrollingLabel extends Label {
             mStartPosition = Math.max(mStartPosition - distance, 0);
         }
 
+        handleScroll();
+    }
+
+    private void handleScroll() {
         String out = lineBufferToString(mStartPosition);
         setText(out);
     }
@@ -140,11 +151,9 @@ public class ScrollingLabel extends Label {
 
         for(int i = start; i >= offset; i--) {
             if(offset > 0 && i == offset) {
-                out.append("[Scrolled at ");
-                out.append(mStartPosition);
-                out.append("/");
-                out.append(mLineBuffer.size());
-                out.append("]\n");
+                if(!mForceScrollCount) {
+                    out.append(getScrollCount());
+                }
             }
             else {
                 out.append(mLineBuffer.get(i));
@@ -152,6 +161,54 @@ public class ScrollingLabel extends Label {
             }
         }
 
+        if(mForceScrollCount) {
+            if(start > mLineBuffer.size()) {
+                start -= 1;
+            }
+            else {
+                offset += 1;
+            }
+
+            out.append(getScrollCount());
+        }
+
         return out.toString();
+    }
+
+    private String getScrollCount() {
+        String scrollCount = "[Scrolled at ";
+
+        if(mDirection == Direction.UP) {
+            scrollCount += mStartPosition + "/" + mLineBuffer.size();
+        }
+        else {
+            scrollCount += (mLineBuffer.size() - mStartPosition) + "/" + mLineBuffer.size();
+        }
+        scrollCount += "]\n";
+
+        return scrollCount;
+    }
+
+    public void scrollToStart() {
+        if(mHeight == 0) {
+            mStartPosition = 1024;
+        }
+        else {
+            mStartPosition = Math.max(mLineBuffer.size() - mHeight, 0);
+        }
+        handleScroll();
+    }
+
+    public void scrollToEnd() {
+        mStartPosition = 0;
+        handleScroll();
+    }
+
+    public void forceScrollCount(boolean force) {
+        mForceScrollCount = force;
+    }
+
+    public void setScrollCountDirection(Direction d) {
+        mDirection = d;
     }
 }

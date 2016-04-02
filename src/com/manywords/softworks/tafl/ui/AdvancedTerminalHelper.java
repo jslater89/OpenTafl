@@ -23,6 +23,7 @@ import com.manywords.softworks.tafl.ui.command.CommandEngine;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
+import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;

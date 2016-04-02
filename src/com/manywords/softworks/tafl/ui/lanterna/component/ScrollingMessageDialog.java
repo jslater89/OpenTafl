@@ -20,6 +20,10 @@ public class ScrollingMessageDialog extends DialogWindow {
 
         mLabel = new ScrollingLabel(text);
 
+        getLabel().scrollToStart();
+        getLabel().forceScrollCount(true);
+        getLabel().setScrollCountDirection(ScrollingLabel.Direction.DOWN);
+
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
         p.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
@@ -70,6 +74,10 @@ public class ScrollingMessageDialog extends DialogWindow {
         }
 
         return super.handleInput(key);
+    }
+
+    public ScrollingLabel getLabel() {
+        return mLabel;
     }
 
     @Override
