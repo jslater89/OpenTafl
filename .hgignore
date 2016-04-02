@@ -20,6 +20,8 @@ engines/opentafl-debug-2.ini
 .idea/vcs.xml
 
 package/*
+saved-games/*
+engines/*
 
 **~
 **local.properties
