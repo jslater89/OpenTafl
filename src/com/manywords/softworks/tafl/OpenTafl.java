@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.test.Test;
 import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.RawTerminal;
@@ -26,6 +27,7 @@ public class OpenTafl {
 
     public static void main(String[] args) {
         directoryCheck();
+        BuiltInVariants.loadExternalRules(new File("external-rules.conf"));
 
         Map<String, String> mapArgs = getArgs(args);
         Mode runMode = Mode.ADVANCED_TERMINAL;

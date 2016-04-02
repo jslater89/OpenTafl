@@ -200,7 +200,7 @@ public class Fetlar extends Rules {
 
     @Override
     public Side getStartingSide() {
-        return mStartingDefenders;
+        return mStartingAttackers;
     }
 
     @Override
