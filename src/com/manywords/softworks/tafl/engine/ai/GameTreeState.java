@@ -360,7 +360,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             List<MoveRecord> successorMoves = new ArrayList<MoveRecord>();
 
-            boolean considerJumps = mGame.getGameRules().canSideJump(mState.getCurrentSide());
+            boolean considerJumps = mGame.getRules().canSideJump(mState.getCurrentSide());
 
             // Generate all successor moves.
             for (char taflman : taflmen) {

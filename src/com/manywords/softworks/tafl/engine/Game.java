@@ -46,7 +46,7 @@ public class Game {
         mGameRules = rules;
 
         if(timeSpec != null) {
-            mClock = new GameClock(this, getGameRules().getAttackers(), getGameRules().getDefenders(), timeSpec);
+            mClock = new GameClock(this, getRules().getAttackers(), getRules().getDefenders(), timeSpec);
         }
 
         int boardSquares = rules.getBoard().getBoardDimension() * rules.getBoard().getBoardDimension();
@@ -135,7 +135,7 @@ public class Game {
         this.mCallback = mCallback;
     }
 
-    public Rules getGameRules() {
+    public Rules getRules() {
         return mGameRules;
     }
 

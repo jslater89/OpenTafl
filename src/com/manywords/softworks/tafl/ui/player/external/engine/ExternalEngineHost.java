@@ -8,7 +8,6 @@ import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.player.ExternalEnginePlayer;
-import com.manywords.softworks.tafl.ui.player.Player;
 import org.ini4j.Wini;
 
 import java.io.*;
@@ -146,7 +145,7 @@ public class ExternalEngineHost {
     }
 
     public void setGame(Game g) {
-        rules(g.getGameRules());
+        rules(g.getRules());
         mGame = g;
     }
 
@@ -160,8 +159,8 @@ public class ExternalEngineHost {
 
     public void analyzePosition(int moves, int seconds, GameState state) {
         // This is a passable but not perfectly ideal way to check for rules equality.
-        if(!mGame.getGameRules().getOTRString().equals(state.mGame.getGameRules().getOTRString())) {
-            rules(state.mGame.getGameRules());
+        if(!mGame.getRules().getOTRString().equals(state.mGame.getRules().getOTRString())) {
+            rules(state.mGame.getRules());
         }
 
         position(state);
@@ -403,7 +402,7 @@ public class ExternalEngineHost {
                 }
                 else if(cmd.startsWith("rules")) {
                     if(mGame != null) {
-                        rules(mGame.getGameRules());
+                        rules(mGame.getRules());
                     }
                 }
                 else if(cmd.startsWith("side")) {

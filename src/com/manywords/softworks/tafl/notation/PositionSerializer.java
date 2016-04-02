@@ -131,7 +131,7 @@ public class PositionSerializer {
         Side defenders = new GenericSide(b, false, positionTaflmen.get(1));
         b.setupTaflmen(attackers, defenders);
 
-        return new GameState(g, g.getGameRules(), b, attackers, defenders);
+        return new GameState(g, g.getRules(), b, attackers, defenders);
     }
 
     public static List<List<Side.TaflmanHolder>> parseTaflmenFromPosition(String startPosition) {

@@ -34,6 +34,11 @@ public class Fetlar extends Rules {
         mStartingDefenders = defenders;
     }
 
+    @Override
+    public String getName() {
+        return "Fetlar " + boardSize + "x" + boardSize;
+    }
+
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;

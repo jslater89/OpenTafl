@@ -23,7 +23,6 @@ import com.manywords.softworks.tafl.ui.command.CommandEngine;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
-import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -340,7 +339,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             blockUntilCommandEngineReady(g);
 
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
-                createWindows(g, title);
+                createWindows(g, g.getRules().getName());
                 mCommandEngine.enterGame(g);
 
                 // This is our UI thread (blocking call)
@@ -357,7 +356,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
             blockUntilCommandEngineReady(rg.getGame());
 
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
-                createWindows(rg.getGame(), title);
+                createWindows(rg.getGame(), rg.getGame().getRules().getName());
                 mCommandEngine.enterReplay(rg);
 
                 // This is our UI thread (blocking call)
@@ -370,7 +369,7 @@ public class AdvancedTerminalHelper<T extends Terminal> implements UiCallback {
         }
 
         private void createWindows(Game g, String title) {
-            TerminalBoardImage.init(g.getGameRules().getBoard().getBoardDimension());
+            TerminalBoardImage.init(g.getRules().getBoard().getBoardDimension());
             BoardWindow bw = new BoardWindow(title, g, this);
             CommandWindow cw = new CommandWindow(this);
             StatusWindow sw = new StatusWindow(this);

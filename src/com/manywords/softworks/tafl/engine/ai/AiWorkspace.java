@@ -53,7 +53,7 @@ public class AiWorkspace extends Game {
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory());
         mLastTimeToDepth = new long[20];
-        setGameRules(startingGame.getGameRules());
+        setGameRules(startingGame.getRules());
         setUiCallback(null);
         mOriginalStartingState = startingState;
         mGame = startingGame;
@@ -83,7 +83,7 @@ public class AiWorkspace extends Game {
         if(entry == null) return Long.MAX_VALUE;
         // Aim to make a certain number of moves in main time, using overtimes
         // for the rest.
-        int boardDimension = g.getGameRules().getBoard().getBoardDimension();
+        int boardDimension = g.getRules().getBoard().getBoardDimension();
         int mainTimeMoves;
         if(boardDimension == 7) {
             mainTimeMoves = 6;

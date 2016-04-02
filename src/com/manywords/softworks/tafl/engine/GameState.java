@@ -3,7 +3,6 @@ package com.manywords.softworks.tafl.engine;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.rules.*;
-import org.junit.Ignore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +68,7 @@ public class GameState {
         mExitingMove = copyState.getExitingMove();
         mEnteringMove = copyState.getEnteringMove();
         mBerserkingTaflman = copyState.getBerserkingTaflman();
-        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getGameRules().howManyAttackers(), (byte) mGame.getGameRules().howManyDefenders());
+        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
     }
 
     public void updateGameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist, boolean autoChangeSides, char berserkingTaflman) {
@@ -94,7 +93,7 @@ public class GameState {
             mZobristHash = updateZobristHash(previousState.mZobristHash, previousState.getBoard(), previousState.getExitingMove());
         }
 
-        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getGameRules().howManyAttackers(), (byte) mGame.getGameRules().howManyDefenders());
+        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
 
         if(berserkingTaflman == Taflman.EMPTY) return;
 
@@ -365,7 +364,7 @@ public class GameState {
     private int checkVictoryInternal() {
         if(getAttackers().getTaflmen().size() == 0) return DEFENDER_WIN;
         else if (getDefenders().getTaflmen().size() == 0) return ATTACKER_WIN;
-        int threefoldRepetitionResult = mGame.getGameRules().threefoldRepetitionResult();
+        int threefoldRepetitionResult = mGame.getRules().threefoldRepetitionResult();
         // Threefold repetition cannot occur as the result of a berserk move
         if(threefoldRepetitionResult != Rules.IGNORE && mBerserkingTaflman == Taflman.EMPTY) {
             int repeats = countPositionOccurrences();
@@ -396,7 +395,7 @@ public class GameState {
                         getBoard().isEdgeSpace(Taflman.getCurrentSpace(this, taflman))) {
                     return DEFENDER_WIN;
                 } else if (getBoard().getRules().getEscapeType() == Rules.CORNERS) {
-                    for (Coord corner : mGame.getGameRules().getCornerSpaces()) {
+                    for (Coord corner : mGame.getRules().getCornerSpaces()) {
                         if (mBoard.getOccupier(corner) == taflman) {
                             return DEFENDER_WIN;
                         }

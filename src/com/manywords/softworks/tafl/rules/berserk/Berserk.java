@@ -51,6 +51,11 @@ public class Berserk extends Rules {
         mStartingDefenders = defenders;
     }
 
+    @Override
+    public String getName() {
+        return "Berserk " + boardSize + "x" + boardSize;
+    }
+
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;

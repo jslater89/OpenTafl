@@ -7,7 +7,6 @@ import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.List;
-import java.util.StringJoiner;
 
 /**
  * Created by jay on 2/15/16.
@@ -125,7 +124,7 @@ public class HumanCommandParser {
                 captures = null;
                 return;
             } else {
-                int boardSize = engine.getGame().getGameRules().getBoard().getBoardDimension();
+                int boardSize = engine.getGame().getRules().getBoard().getBoardDimension();
                 String chessString = commandParts[1].toLowerCase();
 
                 if (!Board.validateChessNotation(chessString, boardSize)) {

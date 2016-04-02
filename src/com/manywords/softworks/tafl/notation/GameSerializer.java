@@ -71,7 +71,7 @@ public class GameSerializer {
                 tagString += "[time-remaining:" + timeRemainingString + "]\n";
             }
 
-            tagString += "[rules:" + g.getGameRules().getOTRString() + "]\n\n";
+            tagString += "[rules:" + g.getRules().getOTRString() + "]\n\n";
 
         }
 

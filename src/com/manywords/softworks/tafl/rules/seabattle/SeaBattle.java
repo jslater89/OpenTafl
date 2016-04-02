@@ -7,7 +7,6 @@ import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Defenders;
 import com.manywords.softworks.tafl.rules.seabattle.nine.test.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class SeaBattle extends Rules {
@@ -53,6 +52,11 @@ public class SeaBattle extends Rules {
         mStartingBoard.setRules(this);
         mStartingAttackers = attackers;
         mStartingDefenders = defenders;
+    }
+
+    @Override
+    public String getName() {
+        return "Sea Battle " + boardSize + "x" + boardSize;
     }
 
     private Board mStartingBoard;

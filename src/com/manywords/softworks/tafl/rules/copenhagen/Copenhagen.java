@@ -77,6 +77,11 @@ public class Copenhagen extends Rules {
         mStartingDefenders = defenders;
     }
 
+    @Override
+    public String getName() {
+        return "Copenhagen " + boardSize + "x" + boardSize;
+    }
+
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;

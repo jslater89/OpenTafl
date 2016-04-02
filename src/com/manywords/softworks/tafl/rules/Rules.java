@@ -172,6 +172,8 @@ public abstract class Rules {
         return mDefenderForts;
     }
 
+    public abstract String getName();
+
     /**
      * Set up the centers, corners, and
      */

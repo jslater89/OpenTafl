@@ -52,6 +52,11 @@ public class Brandub extends Rules {
         mStartingDefenders = defenders;
     }
 
+    @Override
+    public String getName() {
+        return "Brandub " + boardSize + "x" + boardSize;
+    }
+
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;

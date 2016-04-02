@@ -36,10 +36,16 @@ public class GenericRules extends Rules {
         }
     }
 
+    @Override
+    public String getName() {
+        return (mName.equals("") ? "Unknown Tafl" : mName) + boardSize + "x" + boardSize;
+    }
+
     /*
     ----------- THIS CODE IS FOR LOADING RULES -----------
      */
 
+    private String mName = "";
     private int mBoardSize;
     private int mEscapeType = CORNERS;
     private boolean mSurroundingFatal = true;

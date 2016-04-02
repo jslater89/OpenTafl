@@ -150,10 +150,10 @@ public class FishyEvaluator implements Evaluator {
 
         Coord kingCoord = board.findTaflmanSpace(king);
 
-        boolean armedKing = state.mGame.getGameRules().isKingArmed();
-        boolean strongKing = state.mGame.getGameRules().isKingStrong();
-        boolean edgeEscape = state.mGame.getGameRules().getEscapeType() == Rules.EDGES;
-        boolean cornerEscape = state.mGame.getGameRules().getEscapeType() == Rules.CORNERS;
+        boolean armedKing = state.mGame.getRules().isKingArmed();
+        boolean strongKing = state.mGame.getRules().isKingStrong();
+        boolean edgeEscape = state.mGame.getRules().getEscapeType() == Rules.EDGES;
+        boolean cornerEscape = state.mGame.getRules().getEscapeType() == Rules.CORNERS;
 
         // ==================== 1. KING FREEDOM ====================
         // If the king can get to an edge in two ways (edge win) or the corner

@@ -24,8 +24,8 @@ class GameClockTest extends TaflTest implements UiCallback {
         Rules rules = Berserk.newCommanderCornerCaptureKingTest();
         mGame = new Game(rules, null, new GameClock.TimeSpec(500, 0, 0, 0));
 
-        Side defenders = mGame.getGameRules().getDefenders();
-        Side attackers = mGame.getGameRules().getAttackers();
+        Side defenders = mGame.getRules().getDefenders();
+        Side attackers = mGame.getRules().getAttackers();
 
         mGame.getClock().setCallback(mClockCallback);
 
