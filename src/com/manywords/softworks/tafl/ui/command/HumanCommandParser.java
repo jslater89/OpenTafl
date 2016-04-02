@@ -298,7 +298,6 @@ public class HumanCommandParser {
 
     public static String getHelpString(CommandResult.Type type) {
         switch (type) {
-
             case NONE:
                 return "";
             case SENT:
@@ -335,10 +334,36 @@ public class HumanCommandParser {
                 return
                         "rules\n" +
                                 "Show the rules of the game.\n\n";
+            case SAVE:
+                break;
             case QUIT:
                 return
                         "quit\n" +
-                                "Quit the current game, or return to the main menu.";
+                                "Quit the current game, or return to the main menu.\n\n";
+            case REPLAY_ENTER:
+                return
+                        "replay\n" +
+                                "Enter replay mode for the current game.\n\n";
+            case REPLAY_PLAY_HERE:
+                return
+                        "play-here\n" +
+                                "Leave replay mode, starting a new game at the currently-displayed state.\n\n";
+            case REPLAY_RETURN:
+                return
+                        "return\n" +
+                                "Leave replay mode, returning to current state of the game in progress.\n\n";
+            case REPLAY_NEXT:
+                return
+                        "next\n" +
+                                "Move forward in the replay one step.\n\n";
+            case REPLAY_PREVIOUS:
+                return
+                        "previous\n" +
+                                "Move backward in the replay one step.\n\n";
+            case REPLAY_JUMP:
+                return
+                        "jump [turn-number]\n" +
+                                "Jump to the beginning of the given turn in the replay.\n\n";
         }
 
         return "";
