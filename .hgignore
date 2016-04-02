@@ -19,9 +19,7 @@ engines/opentafl-debug-2.ini
 .idea/dictionaries/**xml
 .idea/vcs.xml
 
-package/README.txt
-package/LICENSE.txt
-package/engines/*
+package/*
 
 **~
 **local.properties
