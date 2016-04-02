@@ -1,6 +1,15 @@
 README
 
 1. Introduction
+2. How-to
+3. The game clock
+4. External engines
+5. Replay mode
+6. AI self-play mode
+7. Links
+8. Version history
+
+1. Introduction
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
 Norse boardgame. At present, it supports local play against another human
 and an AI. Future features will include network play and support for 
@@ -59,7 +68,21 @@ file provided by your engine to instruct OpenTafl how to start it. If your
 engine does not provide an .ini file, please contact your engine's author.
 Note that the AI think time setting only affects OpenTafl.
 
-5. AI self-play mode
+5. Saved games and replay mode
+Games may be saved by entering 'save' during a game, or while viewing a replay.
+Saved games may be loaded by selecting 'Load game' at the main menu, and
+replays may be loaded by selecting the 'View Replay' menu item in the main
+menu. Enter the 'help' command for more information on in-game replay commands.
+
+You can start a new game at any point in a replay. Note that you will be unable
+to return to the replay in this case; entering replay mode will replay the new
+game, up to the point where the new game started, and featuring any moves you
+have made beyond that point.
+
+Replays which do not result in a completed game are functionally identical to
+saved games, and may be loaded as such.
+
+6. AI self-play mode
 For external AI developers, OpenTafl provides a mode by which two AIs, or two
 versions of the same AI, can be made to play each other repeatedly, to judge
 relative strength. Start OpenTafl with the '--dev' switch to enable the AI
@@ -74,13 +97,45 @@ At the end of the self-play matches, a summary will be displayed on screen.
 Detailed results, including game records for every game, will be saved in the
 'selfplay-results' subdirectory under the main OpenTafl directory.
 
-6. Links
+7. Links
 http://softworks.manywords.press/opentafl
 http://soapbox.manywords.press/tag/tafl
 http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt
 http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
-7. Version history
+8. Version history
+
+v0.2.3b (released 04/02/16):
+- Finish implementation of external engine mode
+    - Implement engine-initiated errors
+    - Improve OpenTafl's handling of engines which fail to start
+    - Instruct external engines to shut down when they are no longer needed
+    - Improvements to OpenTafl's handling of engines used for analysis
+- Internal UI overhaul
+    - Organize Windows (terminal UI components) into Screens (logical groups of
+      Windows with related functions)
+- In-game UI fixes and improvements
+    - Command entry window now has command buffer: up and down arrows show past
+      commands
+    - Status window now correctly handles multi-line additions when the status
+      window string buffer fills up
+- Copenhagen rules fixes
+    - Edge fort escapes require an invincible structure
+    - Attackers get the first move
+- Fetlar rules fixes
+    - Attackers get the first move
+- External rules import
+    - OpenTafl looks at external-rules.conf in its own directory, and loads any
+      OpenTafl Notation rules records in it as built-in variants
+- Saving and restoring games, replay mode
+    - 'Save' command at any time in the game UI will save a game record, in
+      either the 'saved-games' or 'saved-games/replays' folder, depending on
+      whether the game has ended
+    - Replays may contain commentary, which is displayed as the game is played
+      back
+    - Games and replays may be loaded from the main menu
+    - Player may start a new game rooted at any point in a replay
+
 
 v0.2.2b (released 03/28/16):
 - Improvements to OpenTafl AI's time control handling
