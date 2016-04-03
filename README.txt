@@ -105,6 +105,9 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.3.1b (released 04/02/16);
+- Hotfix for crash when saving a game after the game has ended
+
 v0.2.3b (released 04/02/16):
 - Finish implementation of external engine mode
     - Implement engine-initiated errors
