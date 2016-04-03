@@ -435,7 +435,7 @@ public class GameScreen extends UiScreen implements UiCallback {
             else if (r.type == CommandResult.Type.SAVE) {
                 String title;
                 Game game;
-                if(mInGame) {
+                if(mInGame || mPostGame) {
                     title = "Save game";
                     game = mGame;
                 }
