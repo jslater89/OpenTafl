@@ -16,6 +16,7 @@ public class Taflman {
     public static final char ID_MASK = 255; // Eight low bits
     public static final char TYPE_MASK = 256 + 512 + 1024; // Three bits
     public static final char SIDE_MASK = 2048; // One bit
+    public static final char DEVELOPED_MASK = 4096; // One bit
 
     public static final int COUNT_TYPES = 4;
 
@@ -26,6 +27,9 @@ public class Taflman {
 
     public static final char SIDE_ATTACKERS = 2048;
     public static final char SIDE_DEFENDERS = 0;
+
+    public static final char DEVELOPED = 4096;
+    public static final char UNDEVELOPED = 0;
 
     private static Game game;
     private static Rules rules;
@@ -73,6 +77,8 @@ public class Taflman {
     public static char getPackedSide(char packed) {
         return (char) (packed & SIDE_MASK);
     }
+
+    public static boolean getDeveloped(char taflman) { return (taflman & DEVELOPED_MASK) == DEVELOPED; }
 
     public static Game getGame() {
         return game;
@@ -426,6 +432,7 @@ public class Taflman {
         Coord start = getCurrentSpace(state, taflman);
 
         if (allowableDestinations.contains(destination)) {
+            taflman |= DEVELOPED;
             capturingMoves = getCapturingMoves(state, taflman);
             jumps = getJumpsFor(state, taflman);
 
