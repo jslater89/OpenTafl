@@ -1,8 +1,4 @@
-Copyright Jay Slater, 2014-
-
-OpenTafl is licensed under the Stout Free-As-In-Beer License (http://softworks.many-words.com/the-free-as-in-beer-license), and is a product of Jay Slater and Many Words Softworks.
-
-Stout Free-As-In-Beer License, v0.5:
+Stout Free-As-In-Beer License, v0.6:
 
 1. Definitions
 
@@ -25,14 +21,14 @@ Stout Free-As-In-Beer License, v0.5:
 	   Runtime.
 	g. Source Code means all uncompiled source files required to compile or
 	   run the Application.
-	h. Library means any external Application used by a Compiler or
-	   Interpreter to Compile or Run this Application.
-	i. Binary means any standalone executable or packaged version of the
+	h. Binary means any standalone executable or packaged version of the
 	   Application, created by Compilation.
-	j. Sell means require that money be transferred to You in exchange for
+	i. Sell means require that money be transferred to You in exchange for
 	   something, such as the Source Code or Binaries.
-	k. Software means any Compiled or interpreted piece of software not
+	j. Software means any Compiled or interpreted piece of software not
 	   covered by this license.
+	k. Library means any external Software required by a Compiler or 
+	   Interpreter to Compile or Run this Application.
 
 2. License grant
 
@@ -90,7 +86,7 @@ conditions.
 			   followed by a list of section headers (e.g.,
 			   Section 3(a) - Attribution) may be used to declare
 			   this exemption.
-			   
+		   
 				Under Section 3(b)(ii) of the Free-As-In-Beer
 				License, this file is exempted from certain
 				conditions in Section 3 of the license:
@@ -158,70 +154,3 @@ conditions.
 	   the enforceability of the remaining terms and conditions.
 	b. No term or condition of this license will be waived and no failure
 	   to comply consented to unless expressly agreed to by the Licensor.
-
-##############################################################
-
-JLine is provided under the BSD license:
-http://jline.sourceforge.net/
-
-Copyright (c) 2002-2006, Marc Prud'hommeaux <mwp1@cornell.edu>
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or
-without modification, are permitted provided that the following
-conditions are met:
-
-Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with
-the distribution.
-
-Neither the name of JLine nor the names of its contributors
-may be used to endorse or promote products derived from this
-software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
-EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-OF THE POSSIBILITY OF SUCH DAMAGE.
-
-##############################################################
-
-lanterna is provided under the GNU LGPL:
-https://github.com/mabe02/lanterna
-
-- http://www.gnu.org/licenses/gpl.txt
-- http://www.gnu.org/licenses/lgpl.txt
-
-##############################################################
-
-ini4j is provided under the Apache 2.0 license:
-http://ini4j.sourceforge.net/
-
-Copyright 2005,2009 Ivan SZKIBA
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-##############################################################
