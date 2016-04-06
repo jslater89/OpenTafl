@@ -80,10 +80,10 @@ public class FishyEvaluator implements Evaluator {
 
         // Values add to 500--if everything is going one team's way, it's as good
         // as a win (except not really).
-        final int KING_FREEDOM_VALUE = 1500;
-        final int KING_RISK_VALUE = 1500;
-        final int RANK_AND_FILE_VALUE = 0;
-        final int TAFLMAN_RISK_VALUE = 1500;
+        final int KING_FREEDOM_VALUE = 1250;
+        final int KING_RISK_VALUE = 1150;
+        final int RANK_AND_FILE_VALUE = 500;
+        final int TAFLMAN_RISK_VALUE = 1400;
         final int MATERIAL_VALUE = 500;
 
         List<Character> defendingTaflmen = state.getDefenders().getTaflmen();
@@ -212,7 +212,7 @@ public class FishyEvaluator implements Evaluator {
             if (Taflman.getPackedSide(c) == Taflman.SIDE_ATTACKERS) enemyKingAdjacentTaflmen.add(c);
         }
 
-        if (armedKing && strongKing) { // block max: defender 0.7, attacker 0.5
+        if (armedKing && strongKing) { // block max: defender 1, attacker 1
             if (enemyKingAdjacentTaflmen.size() <= 2) {
                 if (debug) debugOutputString += "Strong armed king adjacent to " + enemyKingAdjacentTaflmen.size() + " taflmen, which is cool: " + KING_RISK_VALUE * GameTreeState.DEFENDER * 0.1 * enemyKingAdjacentTaflmen.size();
                 // There's value in having an armed, strong king next to one or two enemy taflmen--leads to captures.
@@ -221,37 +221,40 @@ public class FishyEvaluator implements Evaluator {
             else if (enemyKingAdjacentTaflmen.size() > 2) {
                 // Having a king in check is risky.
                 if (debug) debugOutputString += "Strong armed king adjacent to " + enemyKingAdjacentTaflmen.size() + " taflmen, which is check!: " + KING_RISK_VALUE * GameTreeState.ATTACKER * 0.5;
-                value += KING_RISK_VALUE * GameTreeState.ATTACKER * 0.5;
+                value += KING_RISK_VALUE * GameTreeState.ATTACKER * 1;
             }
 
             if (kingAdjacentTaflmen.size() > enemyKingAdjacentTaflmen.size()) {
                 if (debug) debugOutputString += "King has a bodyguard: " + KING_RISK_VALUE * GameTreeState.DEFENDER * 0.5;
-                value += KING_RISK_VALUE * GameTreeState.DEFENDER * 0.5;
+                value += KING_RISK_VALUE * GameTreeState.DEFENDER * 0.8;
             }
         }
-        else if (strongKing) { // block max: defender 0.5, attacker 0.5
+        else if (strongKing) { // block max: defender 1, attacker 1
             // if unarmed strong king, or weak armed or unarmed king
             if (enemyKingAdjacentTaflmen.size() > 2) {
                 // Having a king in check is risky.
                 if (debug) debugOutputString += "Strong king adjacent to " + enemyKingAdjacentTaflmen.size() + " taflmen, which is check!: " + KING_RISK_VALUE * GameTreeState.ATTACKER * 0.5;
-                value += KING_RISK_VALUE * GameTreeState.ATTACKER * 0.5;
+                value += KING_RISK_VALUE * GameTreeState.ATTACKER * 1;
             }
 
             // A piece next to a king means no check.
             if (kingAdjacentTaflmen.size() > enemyKingAdjacentTaflmen.size()) {
                 if (debug) debugOutputString += "Kng has a bodyguard: " + KING_RISK_VALUE * GameTreeState.DEFENDER * 0.5;
-                value += KING_RISK_VALUE * GameTreeState.DEFENDER * 0.5;
+                value += KING_RISK_VALUE * GameTreeState.DEFENDER * 1;
             }
         }
-        else { // block max: defender 0.0, attacker 0.5
+        else { // block max: defender 0.0, attacker 1
             // armed/unarmed weak kings
             if (enemyKingAdjacentTaflmen.size() == 1) {
                 // Having a king in check is risky.
-                value += KING_RISK_VALUE * GameTreeState.ATTACKER * 0.5;
+                value += KING_RISK_VALUE * GameTreeState.ATTACKER * 1;
             }
         }
 
         // 3. ==================== CONTROL OF IMPORTANT RANKS AND FILES ====================
+        // Attacker max this section: 1
+        // Defender max this section: 1
+
         // The points diagonally adjacent to the corners are important, and it's good for the
         // attackers to occupy them.
         // attacker max: 0.4
@@ -269,18 +272,41 @@ public class FishyEvaluator implements Evaluator {
 
         // It's good for the attacker to control ranks and files. It's good for the defender to be alone
         // on ranks and files.
-
-        // Half of this category's eval goes to rank and file control. Two categories each of boardSize.
-        /*
-        final double valuePerRank = RANK_AND_FILE_VALUE * (0.5 / (2 * boardSize));
+        // attacker max: 0.4
+        // defender max: 0.8
+        final double attackerValuePerRank = RANK_AND_FILE_VALUE * (0.4 / (2 * boardSize));
+        final double defenderValuePerRank = RANK_AND_FILE_VALUE * (0.8 / (2 * boardSize));
         for(int i = 0; i < boardSize; i++) {
-            if(rankControl[i] == DEFENDER && !rankPresence[ATTACKER][i]) value += valuePerRank * GameTreeState.DEFENDER;
-            else if(rankControl[i] == ATTACKER) value += valuePerRank * GameTreeState.ATTACKER;
+            if(rankControl[i] == DEFENDER && !rankPresence[ATTACKER][i]) value += defenderValuePerRank * GameTreeState.DEFENDER;
+            else if(rankControl[i] == ATTACKER) value += attackerValuePerRank * GameTreeState.ATTACKER;
 
-            if(fileControl[i] == DEFENDER && !filePresence[ATTACKER][i]) value += valuePerRank * GameTreeState.DEFENDER;
-            else if(fileControl[i] == ATTACKER) value += valuePerRank * GameTreeState.ATTACKER;
+            if(fileControl[i] == DEFENDER && !filePresence[ATTACKER][i]) value += defenderValuePerRank * GameTreeState.DEFENDER;
+            else if(fileControl[i] == ATTACKER) value += attackerValuePerRank * GameTreeState.ATTACKER;
         }
-        */
+
+        // It's better to have more developed pieces than fewer developed pieces.
+        // attacker max, defender max: 0.2
+        int attackerDeveloped = 0;
+        int defenderDeveloped = 0;
+        final double valuePerAttacker = RANK_AND_FILE_VALUE * 0.2 / startingAttackingTaflmenCount;
+        final double valuePerDefender = RANK_AND_FILE_VALUE * 0.2 / startingAttackingTaflmenCount;
+
+
+        for(char taflman : allTaflmen) {
+            if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
+                if(Taflman.getDeveloped(taflman)) {
+                    attackerDeveloped++;
+                }
+            }
+            else {
+                if(Taflman.getDeveloped(taflman)) {
+                    defenderDeveloped++;
+                }
+            }
+        }
+
+        value += attackerDeveloped * valuePerAttacker * GameTreeState.ATTACKER;
+        value += defenderDeveloped * valuePerDefender * GameTreeState.DEFENDER;
 
         // 4. ==================== TAFLMAN RISK ====================
 
