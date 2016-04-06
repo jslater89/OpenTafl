@@ -69,7 +69,7 @@ public class MatchResult {
             if(gameLengths[0] < gameLengths[1]) {
                 return winners[0];
             }
-            else if(gameLengths[1] > gameLengths[0]){
+            else if(gameLengths[1] < gameLengths[0]){
                 return winners[1];
             }
             else {
