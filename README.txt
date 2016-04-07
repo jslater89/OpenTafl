@@ -105,6 +105,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.3.2b (released 04/07/16):
+- AI improvements: fix coefficients
+- AI improvements: prefer to develop pieces
+- AI selfplay: fix cases where a match win would be reported as a draw
+
 v0.2.3.1b (released 04/02/16);
 - Hotfix for crash when saving a game after the game has ended
 
