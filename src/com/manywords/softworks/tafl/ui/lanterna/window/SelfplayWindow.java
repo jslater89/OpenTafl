@@ -6,7 +6,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
-import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.selfplay.SelfplayRunner;
 
 import java.math.BigInteger;
@@ -16,12 +16,12 @@ import java.util.List;
  * Created by jay on 3/22/16.
  */
 public class SelfplayWindow extends BasicWindow {
-    private UiScreen.TerminalCallback mTerminalCallback;
+    private LogicalScreen.TerminalCallback mTerminalCallback;
     private SelfplayRunner mRunner;
     private int mIterations = 10;
     private Label mIterationsLabel;
 
-    public SelfplayWindow(UiScreen.TerminalCallback callback) {
+    public SelfplayWindow(LogicalScreen.TerminalCallback callback) {
         mTerminalCallback = callback;
         mRunner = new SelfplayRunner(this, 10);
 
@@ -59,7 +59,7 @@ public class SelfplayWindow extends BasicWindow {
         return mRunner;
     }
 
-    public UiScreen.TerminalCallback getTerminalCallback() {
+    public LogicalScreen.TerminalCallback getTerminalCallback() {
         return mTerminalCallback;
     }
 

@@ -1,47 +1,24 @@
 package com.manywords.softworks.tafl.ui;
 
-import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
-import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
-import com.googlecode.lanterna.input.*;
-import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
-import com.manywords.softworks.tafl.engine.*;
-import com.manywords.softworks.tafl.engine.replay.ReplayGame;
-import com.manywords.softworks.tafl.notation.GameSerializer;
-import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.ui.command.Command;
-import com.manywords.softworks.tafl.ui.command.CommandEngine;
-import com.manywords.softworks.tafl.ui.command.CommandResult;
-import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
-import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
-import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
-import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
-import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowDecorationRenderer;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowPostRenderer;
 import com.manywords.softworks.tafl.ui.lanterna.window.*;
-import com.manywords.softworks.tafl.ui.player.Player;
-import com.manywords.softworks.tafl.ui.player.UiWorkerThread;
 
 import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by jay on 2/15/16.
@@ -51,7 +28,7 @@ public class AdvancedTerminal<T extends Terminal> {
     private T mTerminal;
 
     private MultiWindowTextGUI mGui;
-    private UiScreen mActiveScreen;
+    private LogicalScreen mActiveScreen;
 
     private SelfplayWindow mSelfplayWindow;
 
@@ -103,7 +80,7 @@ public class AdvancedTerminal<T extends Terminal> {
         changeActiveScreen(new MainMenuScreen());
     }
 
-    public void changeActiveScreen(UiScreen screen) {
+    public void changeActiveScreen(LogicalScreen screen) {
         System.out.println("Terminal screen changing");
         if(mActiveScreen != null) {
             mActiveScreen.setInactive();

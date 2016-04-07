@@ -12,7 +12,7 @@ import com.manywords.softworks.tafl.ui.lanterna.window.MainMenuWindow;
 /**
  * Created by jay on 4/2/16.
  */
-public class MainMenuScreen extends UiScreen {
+public class MainMenuScreen extends LogicalScreen {
 
     private Window mActiveWindow;
 
@@ -68,7 +68,7 @@ public class MainMenuScreen extends UiScreen {
         }
 
         @Override
-        public void changeActiveScreen(UiScreen screen) {
+        public void changeActiveScreen(LogicalScreen screen) {
             System.out.println("Changing screen");
             mTerminal.changeActiveScreen(screen);
         }

@@ -8,7 +8,7 @@ import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.lanterna.screen.GameScreen;
-import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
@@ -18,7 +18,7 @@ import java.io.File;
  * Created by jay on 3/22/16.
  */
 public class TerminalUtils {
-    public static Game startGame(WindowBasedTextGUI gui, UiScreen.TerminalCallback callback) {
+    public static Game startGame(WindowBasedTextGUI gui, LogicalScreen.TerminalCallback callback) {
         if(TerminalSettings.attackers == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.attackerEngineFile)) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Attacker engine missing configuration file!");
             return null;
@@ -50,7 +50,7 @@ public class TerminalUtils {
      * @param gui
      * @param callback
      */
-    public static Game startSavedGame(ReplayGame rg, WindowBasedTextGUI gui, UiScreen.TerminalCallback callback) {
+    public static Game startSavedGame(ReplayGame rg, WindowBasedTextGUI gui, LogicalScreen.TerminalCallback callback) {
         if(TerminalSettings.attackers == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.attackerEngineFile)) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Attacker engine missing configuration file!");
             return null;
@@ -73,7 +73,7 @@ public class TerminalUtils {
         return g;
     }
 
-    public static void startReplay(ReplayGame rg, WindowBasedTextGUI gui, UiScreen.TerminalCallback callback) {
+    public static void startReplay(ReplayGame rg, WindowBasedTextGUI gui, LogicalScreen.TerminalCallback callback) {
         GameScreen gameScreen = new GameScreen(rg, "OpenTafl");
         callback.changeActiveScreen(gameScreen);
     }

@@ -8,7 +8,7 @@ import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalImagePanel;
-import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
 import java.util.List;
 
@@ -18,9 +18,9 @@ import java.util.List;
 public class BoardWindow extends BasicWindow {
     private Game mGame;
     private ReplayGame mReplayGame;
-    private UiScreen.TerminalCallback mCallback;
+    private LogicalScreen.TerminalCallback mCallback;
     private TerminalBoardImage mBoardImage;
-    public BoardWindow(String title, Game g, UiScreen.TerminalCallback callback) {
+    public BoardWindow(String title, Game g, LogicalScreen.TerminalCallback callback) {
         super(title);
         mGame = g;
 

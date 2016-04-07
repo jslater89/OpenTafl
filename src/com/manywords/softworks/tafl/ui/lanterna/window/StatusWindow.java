@@ -8,7 +8,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
-import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
 /**
  * Created by jay on 2/15/16.
@@ -16,7 +16,7 @@ import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
 public class StatusWindow extends BasicWindow {
     private ScrollingLabel mTextDisplay;
     private Label mAttackerClockDisplay, mDefenderClockDisplay;
-    public StatusWindow(UiScreen.TerminalCallback callback) {
+    public StatusWindow(LogicalScreen.TerminalCallback callback) {
         super("Information");
 
         Panel p = new Panel();

@@ -5,7 +5,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalEnterTerminatedTextBox;
-import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +14,14 @@ import java.util.List;
  * Created by jay on 2/15/16.
  */
 public class CommandWindow extends BasicWindow {
-    private UiScreen.TerminalCallback mCallback;
+    private LogicalScreen.TerminalCallback mCallback;
     private TerminalEnterTerminatedTextBox mTextBox;
 
     private int mCommandBufferSize = 25;
     private int mCommandBufferPosition = 0;
     private List<String> mCommandBuffer = new ArrayList<>(mCommandBufferSize);
 
-    public CommandWindow(UiScreen.TerminalCallback callback) {
+    public CommandWindow(LogicalScreen.TerminalCallback callback) {
         super("Command");
         mCallback = callback;
 

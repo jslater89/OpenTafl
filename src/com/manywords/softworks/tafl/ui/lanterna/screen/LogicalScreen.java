@@ -14,11 +14,11 @@ import com.manywords.softworks.tafl.ui.lanterna.window.SelfplayWindow;
 /**
  * Created by jay on 4/2/16.
  */
-public abstract class UiScreen {
+public abstract class LogicalScreen {
     public interface TerminalCallback {
         public void onMenuNavigation(Window destination);
 
-        public void changeActiveScreen(UiScreen screen);
+        public void changeActiveScreen(LogicalScreen screen);
 
         public void onEnteringGameScreen(Game g, String title);
         public void onEnteringGameScreen(ReplayGame rg, String title);
@@ -61,7 +61,7 @@ public abstract class UiScreen {
 
     private static class TrueDefaultTerminalCallback extends DefaultTerminalCallback {
         @Override
-        public void changeActiveScreen(UiScreen screen) {
+        public void changeActiveScreen(LogicalScreen screen) {
             // no-op--here to prevent NPEs
         }
     }
@@ -74,7 +74,7 @@ public abstract class UiScreen {
         }
 
         @Override
-        public abstract void changeActiveScreen(UiScreen screen);
+        public abstract void changeActiveScreen(LogicalScreen screen);
 
         @Override
         public void onEnteringGameScreen(Game g, String title) {

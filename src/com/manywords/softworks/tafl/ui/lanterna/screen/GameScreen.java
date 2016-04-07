@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * Created by jay on 4/2/16.
  */
-public class GameScreen extends UiScreen implements UiCallback {
+public class GameScreen extends LogicalScreen implements UiCallback {
     private String mTitle;
     private BoardWindow mBoardWindow;
     private StatusWindow mStatusWindow;
@@ -272,7 +272,7 @@ public class GameScreen extends UiScreen implements UiCallback {
 
     private class GameScreenTerminalCallback extends DefaultTerminalCallback {
         @Override
-        public void changeActiveScreen(UiScreen screen) {
+        public void changeActiveScreen(LogicalScreen screen) {
             mTerminal.changeActiveScreen(screen);
         }
 

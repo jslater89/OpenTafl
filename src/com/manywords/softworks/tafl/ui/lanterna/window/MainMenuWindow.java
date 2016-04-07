@@ -6,7 +6,7 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
-import com.manywords.softworks.tafl.ui.lanterna.screen.UiScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
 import java.io.File;
 
@@ -14,8 +14,8 @@ import java.io.File;
  * Created by jay on 2/15/16.
  */
 public class MainMenuWindow extends BasicWindow {
-    private UiScreen.TerminalCallback mTerminalCallback;
-    public MainMenuWindow(UiScreen.TerminalCallback callback) {
+    private LogicalScreen.TerminalCallback mTerminalCallback;
+    public MainMenuWindow(LogicalScreen.TerminalCallback callback) {
         mTerminalCallback = callback;
 
         Panel p = new Panel();
