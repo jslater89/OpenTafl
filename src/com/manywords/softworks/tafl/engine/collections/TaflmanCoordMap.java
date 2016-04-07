@@ -52,7 +52,10 @@ public class TaflmanCoordMap {
         char entry = mTaflmen[index];
         char coord = mCoords[index];
 
-        if(coord != (char) -1 && taflman == entry) {
+        char entrySide = Taflman.getPackedSide(entry);
+        byte entryId = Taflman.getPackedId(entry);
+
+        if(coord != (char) -1 && taflmanSide == entrySide && taflmanId == entryId) {
             return Coord.getCoordForIndex(coord);
         }
         else {
@@ -97,4 +100,14 @@ public class TaflmanCoordMap {
         return mTaflmen;
     }
     public List<Coord> getOccupiedSpaces() { return null; }
+
+    public String toString() {
+        String s = "";
+        for(int i = 0; i < mSize; i++) {
+            s += Taflman.getStringSymbol(mTaflmen[i]) + " id " + Taflman.getPackedId(mTaflmen[i]) + "@" + Coord.getCoordForIndex(mCoords[i]) + ", ";
+        }
+        s += "\n";
+
+        return s;
+    }
 }
