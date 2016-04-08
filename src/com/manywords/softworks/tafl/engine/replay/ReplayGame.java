@@ -85,25 +85,19 @@ public class ReplayGame {
         boolean modified = false;
         for (String line : lines) {
             String[] components = line.split(" ");
-            statePosition += components.length - 1;
 
-            if (statePosition > mStatePosition && !modified) {
-                System.out.println(statePosition);
-                System.out.println(mStatePosition);
-                int component = mStatePosition % 2 + 1;
-                System.out.println(component);
-                components[component] = "*" + components[component];
-
-                for(String s : components) {
-                    newString += s + " ";
+            for(int i = 1; i < components.length; i++) {
+                statePosition++;
+                if(statePosition > mStatePosition && !modified) {
+                    components[i] = "*" + components[i];
+                    modified = true;
                 }
-                newString += "\n";
+            }
 
-                modified = true;
+            for(String s : components) {
+                newString += s + " ";
             }
-            else {
-                newString += line + "\n";
-            }
+            newString += "\n";
         }
 
         return newString;
