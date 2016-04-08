@@ -254,7 +254,12 @@ public class HumanReadableRulesPrinter {
             String[] elements = rule.split(":");
 
             if(elements[0].startsWith(tag)) {
-                return elements[1];
+                if(elements.length == 1) {
+                    return null;
+                }
+                else {
+                    return elements[1];
+                }
             }
         }
 
