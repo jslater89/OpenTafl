@@ -22,7 +22,7 @@ public class ScrollingMessageDialog extends DialogWindow {
 
         getLabel().scrollToStart();
         getLabel().forceScrollCount(true);
-        getLabel().setScrollCountDirection(ScrollingLabel.Direction.DOWN);
+        getLabel().setScrollCountDirection(ScrollingLabel.Direction.SCROLL);
 
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());

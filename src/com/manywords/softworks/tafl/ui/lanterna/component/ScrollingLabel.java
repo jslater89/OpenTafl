@@ -12,8 +12,8 @@ import java.util.List;
  */
 public class ScrollingLabel extends Label {
     public enum Direction {
-        UP,
-        DOWN
+        BACKSCROLL, // Count up when scrolling up the screen
+        SCROLL // Count up when scrolling down the screen
     }
 
     // Queue
@@ -23,7 +23,7 @@ public class ScrollingLabel extends Label {
      */
 
     private boolean mForceScrollCount;
-    private Direction mDirection = Direction.UP;
+    private Direction mDirection = Direction.BACKSCROLL;
     private List<String> mStringBuffer;
     private List<String> mLineBuffer;
     private int mHeight;
@@ -149,11 +149,20 @@ public class ScrollingLabel extends Label {
         int lines = getSize().getRows() + offset;
         int start = Math.min(lines, mLineBuffer.size()) - 1;
 
+        boolean singleScreen = mLineBuffer.size() < lines;
+
+        if(mForceScrollCount && !singleScreen) {
+            if(start < mLineBuffer.size() - 1) {
+                start -= 1;
+            }
+            else {
+                offset += 1;
+            }
+        }
+
         for(int i = start; i >= offset; i--) {
-            if(offset > 0 && i == offset) {
-                if(!mForceScrollCount) {
-                    out.append(getScrollCount());
-                }
+            if(offset > 0 && i == offset && !mForceScrollCount) {
+                out.append(getScrollCount());
             }
             else {
                 out.append(mLineBuffer.get(i));
@@ -161,14 +170,7 @@ public class ScrollingLabel extends Label {
             }
         }
 
-        if(mForceScrollCount) {
-            if(start > mLineBuffer.size()) {
-                start -= 1;
-            }
-            else {
-                offset += 1;
-            }
-
+        if(mForceScrollCount && !singleScreen) {
             out.append(getScrollCount());
         }
 
@@ -178,11 +180,11 @@ public class ScrollingLabel extends Label {
     private String getScrollCount() {
         String scrollCount = "[Scrolled at ";
 
-        if(mDirection == Direction.UP) {
+        if(mDirection == Direction.BACKSCROLL) {
             scrollCount += mStartPosition + "/" + mLineBuffer.size();
         }
         else {
-            scrollCount += (mLineBuffer.size() - mStartPosition) + "/" + mLineBuffer.size();
+            scrollCount += ((mLineBuffer.size() - mStartPosition) - getSize().getRows()) + "/" + (mLineBuffer.size() - getSize().getRows());
         }
         scrollCount += "]\n";
 
