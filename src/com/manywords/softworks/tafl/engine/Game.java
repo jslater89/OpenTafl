@@ -243,8 +243,7 @@ public class Game {
                 nextState.getBoard(),
                 nextState.getAttackers(),
                 nextState.getDefenders(),
-                advanceTurn,
-                true,
+                true, // update zobrist
                 berserkingTaflman);
 
         mCurrentState = nextState;

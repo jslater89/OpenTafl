@@ -7,6 +7,7 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
+        tests.add(new BerserkHistoryDuplicationTest());
         tests.add(new ExternalEngineHostTest());
         tests.add(new ThreefoldDrawTest());
         tests.add(new ThreefoldVictoryTest());

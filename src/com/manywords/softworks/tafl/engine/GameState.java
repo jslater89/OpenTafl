@@ -49,7 +49,7 @@ public class GameState {
     public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist) {
         this(previousState);
 
-        updateGameState(game, previousState, board, attackers, defenders, updateZobrist, true, Taflman.EMPTY);
+        updateGameState(game, previousState, board, attackers, defenders, updateZobrist, Taflman.EMPTY);
     }
 
     public GameState(int moveErrorCode) {
@@ -71,8 +71,8 @@ public class GameState {
         mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
     }
 
-    public void updateGameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist, boolean autoChangeSides, char berserkingTaflman) {
-        if (!((this instanceof GameTreeState) || (this instanceof GameState)) && !autoChangeSides) {
+    public void updateGameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist, char berserkingTaflman) {
+        if (!((this instanceof GameTreeState) || (this instanceof GameState))) {
             throw new IllegalArgumentException("Only internal methods may directly call this constructor!");
         }
 
@@ -84,41 +84,38 @@ public class GameState {
         mGameLength = (char)(previousState.mGameLength + 1);
         mEnteringMove = previousState.getExitingMove();
 
-        if (autoChangeSides) {
-            if (previousState.getCurrentSide().isAttackingSide()) setCurrentSide(getDefenders());
-            else setCurrentSide(getAttackers());
-        }
-
         if(updateZobrist) {
             mZobristHash = updateZobristHash(previousState.mZobristHash, previousState.getBoard(), previousState.getExitingMove());
         }
 
         mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
-
-        if(berserkingTaflman == Taflman.EMPTY) return;
-
         boolean changeSides = true;
 
-        int x = Taflman.getCurrentSpace(this, berserkingTaflman).x;
-        int y = Taflman.getCurrentSpace(this, berserkingTaflman).y;
+        if(berserkingTaflman != Taflman.EMPTY) {
+            int x = Taflman.getCurrentSpace(this, berserkingTaflman).x;
+            int y = Taflman.getCurrentSpace(this, berserkingTaflman).y;
 
-        char taflman = getPieceAt(x, y);
+            char taflman = getPieceAt(x, y);
 
-        if (getBoard().getRules().getBerserkMode() == Rules.BERSERK_CAPTURE_ONLY) {
-            if (Taflman.getCapturingMoves(this, taflman).size() > 0) {
-                setBerserkingTaflman(taflman);
-                changeSides = false;
-            } else {
-                setBerserkingTaflman(Taflman.EMPTY);
-                changeSides = true;
+            if (getBoard().getRules().getBerserkMode() == Rules.BERSERK_CAPTURE_ONLY) {
+                if (Taflman.getCapturingMoves(this, taflman).size() > 0) {
+                    setBerserkingTaflman(taflman);
+                    changeSides = false;
+                }
+                else {
+                    setBerserkingTaflman(Taflman.EMPTY);
+                    changeSides = true;
+                }
             }
-        } else if (getBoard().getRules().getBerserkMode() == Rules.BERSERK_ANY_MOVE) {
-            if (Taflman.getAllowableMoves(this, taflman).size() > 0) {
-                setBerserkingTaflman(taflman);
-                changeSides = false;
-            } else {
-                setBerserkingTaflman(Taflman.EMPTY);
-                changeSides = true;
+            else if (getBoard().getRules().getBerserkMode() == Rules.BERSERK_ANY_MOVE) {
+                if (Taflman.getAllowableMoves(this, taflman).size() > 0) {
+                    setBerserkingTaflman(taflman);
+                    changeSides = false;
+                }
+                else {
+                    setBerserkingTaflman(Taflman.EMPTY);
+                    changeSides = true;
+                }
             }
         }
 

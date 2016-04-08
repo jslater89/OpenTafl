@@ -343,8 +343,7 @@ public class AiWorkspace extends Game {
                 nextState.getBoard(),
                 nextState.getAttackers(),
                 nextState.getDefenders(),
-                true,
-                true,
+                true, // update Zobrist
                 berserkingTaflman);
 
         nextState.checkVictory();
