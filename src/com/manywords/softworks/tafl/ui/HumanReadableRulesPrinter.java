@@ -21,7 +21,7 @@ public class HumanReadableRulesPrinter {
                 "on square boards of odd-numbered size, with asymmetric forces. The defenders, or the king's side, start in the center of the " +
                 "board, and have escape as their objective: the king must reach either an edge space or a corner space, depending on the rules " +
                 "in question. The attackers, or the besieging side, start around the edges of the board, and must prevent the king's escape. The " +
-                "following rules are for this variant: " + r.getName() + " " + r.boardSize + "x" + r.boardSize + "\n\n";
+                "following rules are for this variant: " + r.getName() + " " + r.boardSize + "x" + r.boardSize + ".\n\n";
 
         rules += ruleNumber++ +". The game is played on a board of " + r.boardSize + "x" + r.boardSize + " spaces, with " + r.getDefenders().getStartingTaflmen().size() +
                 " defenders (including one king, marked by the '+' symbol) and " +
@@ -221,7 +221,7 @@ public class HumanReadableRulesPrinter {
         }
 
         if(r.getKingJumpMode() != Taflman.JUMP_NONE) {
-            rules += getJumpModeString("king", r.getKingJumpMode());
+            rules += ruleNumber++ + ". " + getJumpModeString("king", r.getKingJumpMode());
             rules += "\n\n";
         }
 
@@ -232,7 +232,7 @@ public class HumanReadableRulesPrinter {
         String jumpString = "The " + pieceName + " ";
 
         if(jumpMode == Taflman.JUMP_STANDARD) {
-            jumpString += "may jump over adjacent enemy taflmen (but not enemy knights, commanders, or kings). A jumped taflman " +
+            jumpString += "may jump over adjacent enemy taflmen (but not enemy knights, commanders, or kings). The jumped taflman " +
                     "is not captured.";
         }
         else if(jumpMode == Taflman.JUMP_CAPTURE) {
@@ -241,7 +241,7 @@ public class HumanReadableRulesPrinter {
         }
         else if(jumpMode == Taflman.JUMP_RESTRICTED) {
             jumpString += "may jump over adjacent enemy taflmen (but not enemy knights, commanders, or kings), provided that the " +
-                    pieceName + " starts from or lands upon a throne space or a corner space.";
+                    pieceName + " starts from or lands upon a throne space or a corner space. The jumped taflman is not captured.";
         }
 
         return jumpString;
