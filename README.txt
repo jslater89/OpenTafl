@@ -105,6 +105,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.3.3b (released 04/08/16):
+- Fix for berserk moves counting as repeated moves for the purposes of deciding
+  victory
+- Display fixes for berserk replays
+
 v0.2.3.2b (released 04/07/16):
 - AI improvements: fix coefficients
 - AI improvements: prefer to develop pieces
