@@ -163,7 +163,7 @@ public class Fetlar extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         return false;
     }
 

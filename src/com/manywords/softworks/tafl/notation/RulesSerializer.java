@@ -206,7 +206,7 @@ public class RulesSerializer {
             otnrString += "swf:n ";
         }
 
-        if(rules.allowShieldFortEscapes()) {
+        if(rules.allowEdgeFortEscapes()) {
             otnrString += "efe:y ";
         }
 

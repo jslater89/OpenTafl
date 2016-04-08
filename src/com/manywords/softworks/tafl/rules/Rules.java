@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.rules;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public abstract class Rules {
     public static final int TAFLMAN_TYPE_COUNT = Taflman.COUNT_TYPES * 2;
@@ -270,7 +271,7 @@ public abstract class Rules {
      *
      * @return
      */
-    public abstract boolean allowShieldFortEscapes();
+    public abstract boolean allowEdgeFortEscapes();
 
     public static final int CORNERS = 1;
     public static final int EDGES = 0;
@@ -345,9 +346,5 @@ public abstract class Rules {
 
     public String getOTRString() {
         return RulesSerializer.getRulesRecord(this);
-    }
-
-    public String getHumanReadableRules() {
-        return "";
     }
 }

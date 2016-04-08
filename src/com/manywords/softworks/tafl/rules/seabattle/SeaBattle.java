@@ -152,7 +152,7 @@ public class SeaBattle extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         // Sea Battles is an edge-escape ruleset
         return false;
     }

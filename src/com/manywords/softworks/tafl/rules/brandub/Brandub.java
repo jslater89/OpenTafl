@@ -165,7 +165,7 @@ public class Brandub extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         // No edge escape captures.
         return false;
     }

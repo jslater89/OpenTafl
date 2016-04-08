@@ -353,7 +353,7 @@ public class GenericRules extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         return mEdgeFortEscape;
     }
 

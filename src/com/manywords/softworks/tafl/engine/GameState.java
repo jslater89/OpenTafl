@@ -423,7 +423,7 @@ public class GameState {
         }
 
 		/* Handle edge fort escapes */
-        if (getBoard().getRules().allowShieldFortEscapes()) {
+        if (getBoard().getRules().allowEdgeFortEscapes()) {
             List<ShieldwallPosition> defenderShieldwalls = getBoard().detectShieldwallPositionsForSide(getDefenders());
 
             // A shieldwall shape is a subset of all invincible shapes, so don't bother checking them for
