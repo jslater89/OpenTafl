@@ -28,6 +28,9 @@ public class HumanCommandParser {
         else if(command.startsWith("help")) {
             return newHelpCommand(engine, command);
         }
+        else if(command.startsWith("rules")) {
+            return newRulesCommand(engine, command);
+        }
         else if(command.startsWith("save")) {
             return newSaveCommand(engine, command);
         }
@@ -65,6 +68,7 @@ public class HumanCommandParser {
     public static Show newShowCommand(CommandEngine engine, String command) { return new Show(engine, command); }
     public static History newHistoryCommand(CommandEngine engine, String command) { return new History(engine, command); }
     public static Help newHelpCommand(CommandEngine engine, String command) { return new Help(engine, command); }
+    public static Rules newRulesCommand(CommandEngine engine, String command) { return new Rules(engine, command); }
     public static Save newSaveCommand(CommandEngine engine, String command) { return new Save(engine,command); }
     public static Quit newQuitCommand(CommandEngine engine, String command) { return new Quit(engine, command); }
     public static Analyze newAnalyzeCommand(CommandEngine engine, String command) { return new Analyze(engine, command); }

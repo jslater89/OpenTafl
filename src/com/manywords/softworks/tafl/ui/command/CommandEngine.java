@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.HumanReadableRulesPrinter;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.ExternalEnginePlayer;
@@ -329,7 +330,7 @@ public class CommandEngine {
         }
         // 8. RULES COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Rules) {
-            return new CommandResult(CommandResult.Type.RULES, CommandResult.SUCCESS, "", null);
+            return new CommandResult(CommandResult.Type.RULES, CommandResult.SUCCESS, "", HumanReadableRulesPrinter.getHumanReadableRules(getGame().getRules()));
         }
         // 9. SAVE COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Save) {

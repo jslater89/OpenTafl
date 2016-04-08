@@ -459,6 +459,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     MessageDialog.showMessageDialog(mGui, "Unable to save", "Unable to write savegame file.");
                 }
             }
+            else if (r.type == CommandResult.Type.RULES) {
+                String rulesString = (String) r.extra;
+
+                ScrollingMessageDialog dialog = new ScrollingMessageDialog("Rules", rulesString, MessageDialogButton.Close);
+                dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
+                dialog.showDialog(mGui);
+            }
             else if (r.type == CommandResult.Type.QUIT) {
                 if(mSelfplayWindow != null) {
                     SelfplayWindow w = mSelfplayWindow;
