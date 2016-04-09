@@ -7,7 +7,7 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
-        tests.add(new BerserkHistoryDuplicationTest());
+        tests.add(new TablutKingCaptureTest());
         tests.add(new ExternalEngineHostTest());
         tests.add(new ThreefoldDrawTest());
         tests.add(new ThreefoldVictoryTest());
@@ -31,6 +31,7 @@ public class Test {
         tests.add(new CommanderCornerCaptureVictoryTest());
         tests.add(new JumpCaptureBerserkerTest());
         tests.add(new BerserkMoveDuplicationTest());
+        tests.add(new BerserkHistoryDuplicationTest());
         tests.add(new BadFetlarCaptureTest());
         tests.add(new BadCopenhagenCaptureTest());
         tests.add(new GameClockTest());

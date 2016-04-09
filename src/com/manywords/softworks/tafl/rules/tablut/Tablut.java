@@ -1,52 +1,40 @@
-package com.manywords.softworks.tafl.rules.seabattle;
+package com.manywords.softworks.tafl.rules.tablut;
 
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Attackers;
 import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Board;
 import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Defenders;
 import com.manywords.softworks.tafl.rules.seabattle.nine.test.*;
+import com.manywords.softworks.tafl.rules.tablut.nine.Tablut9Attackers;
+import com.manywords.softworks.tafl.rules.tablut.nine.Tablut9Board;
+import com.manywords.softworks.tafl.rules.tablut.nine.Tablut9Defenders;
+import com.manywords.softworks.tafl.rules.tablut.nine.test.CenterKingCaptureAttackers;
+import com.manywords.softworks.tafl.rules.tablut.nine.test.CenterKingCaptureDefenders;
 
 import java.util.ArrayList;
 
 
-public class SeaBattle extends Rules {
-    public static SeaBattle newSeaBattle9() {
-        SeaBattle9Board board = new SeaBattle9Board();
-        SeaBattle9Attackers attackers = new SeaBattle9Attackers(board);
-        SeaBattle9Defenders defenders = new SeaBattle9Defenders(board);
+public class Tablut extends Rules {
+    public static Tablut newTablut9() {
+        Tablut9Board board = new Tablut9Board();
+        Tablut9Attackers attackers = new Tablut9Attackers(board);
+        Tablut9Defenders defenders = new Tablut9Defenders(board);
 
-        SeaBattle rules = new SeaBattle(board, attackers, defenders);
+        Tablut rules = new Tablut(board, attackers, defenders);
         return rules;
     }
 
-    public static SeaBattle newStrongKingTest() {
-        SeaBattle9Board board = new SeaBattle9Board();
-        SimpleVictoryTestAttackers attackers = new SimpleVictoryTestAttackers(board);
-        SimpleVictoryTestDefenders defenders = new SimpleVictoryTestDefenders(board);
+    public static Tablut newCenterKingCaptureTest() {
+        Tablut9Board board = new Tablut9Board();
+        Tablut9Attackers attackers = new CenterKingCaptureAttackers(board);
+        Tablut9Defenders defenders = new CenterKingCaptureDefenders(board);
 
-        SeaBattle rules = new SeaBattle(board, attackers, defenders);
+        Tablut rules = new Tablut(board, attackers, defenders);
         return rules;
     }
 
-    public static SeaBattle newEncirclementTest() {
-        SeaBattle9Board board = new SeaBattle9Board();
-        EncirclementTestAttackers attackers = new EncirclementTestAttackers(board);
-        EncirclementTestDefenders defenders = new EncirclementTestDefenders(board);
-
-        SeaBattle rules = new SeaBattle(board, attackers, defenders);
-        return rules;
-    }
-
-    public static SeaBattle newAiTwoEdgeEscapeTest() {
-        SeaBattle9Board board = new SeaBattle9Board();
-        AITwoEdgeEscapeTestAttackers attackers = new AITwoEdgeEscapeTestAttackers(board);
-        AITwoEdgeEscapeTestDefenders defenders = new AITwoEdgeEscapeTestDefenders(board);
-
-        SeaBattle rules = new SeaBattle(board, attackers, defenders);
-        return rules;
-    }
-
-    public SeaBattle(Board board, Side attackers, Side defenders) {
+    public Tablut(Board board, Side attackers, Side defenders) {
         super(board, attackers, defenders);
         mStartingBoard = board;
         mStartingBoard.setRules(this);
@@ -66,8 +54,21 @@ public class SeaBattle extends Rules {
     @Override
     public void setupSpaceGroups(int boardSize) {
         setDefaultSpaceGroups();
+
+        // No corners
         setCornerSpaces(new ArrayList<Coord>());
-        setCenterSpaces(new ArrayList<Coord>());
+
+        // Empty center hostile to everybody
+        emptyCenterHostileTo = RulesSerializer.getTaflmanTypeListForString("tcnkTCNK");
+
+        // Occupied center hostile to nobody
+        centerHostileTo = RulesSerializer.getTaflmanTypeListForString("");
+
+        // Nobody can stop on the center
+        centerStoppableFor = RulesSerializer.getTaflmanTypeListForString("");
+
+        // Everyone can move through the center
+        centerPassableFor = RulesSerializer.getTaflmanTypeListForString("tcnkTCNK");
     }
 
     @Override
@@ -78,8 +79,8 @@ public class SeaBattle extends Rules {
 
     @Override
     public int getKingStrengthMode() {
-        // King must be surrounded to capture
-        return KING_STRONG;
+        // Tablut-style king strength (duh)
+        return KING_STRONG_CENTER;
     }
 
     @Override
@@ -125,20 +126,30 @@ public class SeaBattle extends Rules {
 
     @Override
     public boolean isSpaceHostileToSide(Board board, Coord space, Side side) {
-        // Sea Battles has no special spaces
+        SpaceType type = board.getSpaceTypeFor(space);
+
+        if(type == SpaceType.CENTER) {
+            if(board.getOccupier(space) == Taflman.EMPTY) {
+                // Always hostile when empty
+                return true;
+            }
+        }
+
         return false;
     }
 
     @Override
     public boolean canTaflmanMoveThrough(Board board, char piece, Coord space) {
-        // Sea Battles has no special spaces
+        // Everyone can move through everything
         return true;
     }
 
     @Override
     public boolean canTaflmanStopOn(Board board, char piece, Coord space) {
-        // Sea Battles has no special spaces
-        return true;
+        SpaceType type = board.getSpaceTypeFor(space);
+
+        if(type == SpaceType.CENTER) return false;
+        else return true;
     }
 
     @Override
@@ -153,7 +164,6 @@ public class SeaBattle extends Rules {
 
     @Override
     public boolean allowEdgeFortEscapes() {
-        // Sea Battles is an edge-escape ruleset
         return false;
     }
 

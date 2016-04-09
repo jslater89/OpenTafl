@@ -95,6 +95,17 @@ public abstract class BoardImpl extends Board {
     }
 
     @Override
+    public List<Coord> getCenterAndAdjacentSpaces() {
+        Set<Coord> spaces = new HashSet<>(5);
+        for(Coord space : getRules().getCenterSpaces()) {
+            spaces.add(space);
+            spaces.addAll(getAdjacentSpaces(space));
+        }
+
+        return new ArrayList<>(spaces);
+    }
+
+    @Override
     public SpaceType getSpaceTypeFor(Coord space) {
         if (getRules().isCenterSpace(space)) {
             return SpaceType.CENTER;

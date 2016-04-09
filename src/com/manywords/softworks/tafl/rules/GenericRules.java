@@ -52,7 +52,7 @@ public class GenericRules extends Rules {
     private boolean mAttackersFirst = true;
     private int mThreefoldResult = DRAW;
     private boolean mKingArmed = true;
-    private boolean mKingStrong = true;
+    private int mKingMode = Rules.KING_STRONG;
     private int mKingJumpMode = Taflman.JUMP_NONE;
     private int mCommanderJumpMode = Taflman.JUMP_STANDARD;
     private int mKnightJumpMode = Taflman.JUMP_CAPTURE;
@@ -81,8 +81,8 @@ public class GenericRules extends Rules {
         mKingArmed = kingArmed;
     }
 
-    public void setKingStrong(boolean kingStrong) {
-        mKingStrong = kingStrong;
+    public void setKingStrength(int kingStrong) {
+        mKingMode = kingStrong;
     }
 
     public void setKingJumpMode(int kingJumpMode) {
@@ -139,29 +139,33 @@ public class GenericRules extends Rules {
         mBerserkMode = berserkMode;
     }
 
-    public void setCenterParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] hostileEmpty) {
+    public void setCenterParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] hostileEmpty, boolean[] reenterable) {
         if(passable != null) centerPassableFor = passable;
         if(stoppable != null) centerStoppableFor = stoppable;
         if(hostile != null) centerHostileTo = hostile;
         if(hostileEmpty != null) emptyCenterHostileTo = hostileEmpty;
+        if(reenterable != null) centerReenterableFor = reenterable;
     }
 
-    public void setCornerParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile) {
+    public void setCornerParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] reenterable) {
         if(passable != null) cornerPassableFor = passable;
         if(stoppable != null) cornerStoppableFor = stoppable;
         if(hostile != null) cornerHostileTo = hostile;
+        if(reenterable != null) cornerReenterableFor = reenterable;
     }
 
-    public void setAttackerFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile) {
+    public void setAttackerFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] reenterable) {
         if(passable != null) attackerFortPassableFor = passable;
         if(stoppable != null) attackerFortStoppableFor = stoppable;
         if(hostile != null) attackerFortHostileTo = hostile;
+        if(reenterable != null) attackerFortReenterableFor = reenterable;
     }
 
-    public void setDefenderFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile) {
+    public void setDefenderFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] reenterable) {
         if(passable != null) defenderFortPassableFor = passable;
         if(stoppable != null) defenderFortStoppableFor = stoppable;
         if(hostile != null) defenderFortHostileTo = hostile;
+        if(reenterable != null) defenderFortReenterableFor = reenterable;
     }
 
     /*
@@ -192,8 +196,8 @@ public class GenericRules extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
-        return mKingStrong;
+    public int getKingStrengthMode() {
+        return mKingMode;
     }
 
     @Override

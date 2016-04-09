@@ -76,9 +76,9 @@ public class Brandub extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
+    public int getKingStrengthMode() {
         // King is captured as a regular piece.
-        return false;
+        return KING_WEAK;
     }
 
     @Override

@@ -124,7 +124,7 @@ public class ExternalEngineHostTest extends TaflTest implements UiCallback {
 
                     for(String command : commands) {
                         //System.out.println("Received command: " + command);
-                        if(command.startsWith("rules dim:7 name:Brandub surf:n atkf:y ks:n nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/")) {
+                        if(command.startsWith("rules dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/")) {
                             mRulesResponse = true;
                         }
                         else if(command.startsWith("move /3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/")) {

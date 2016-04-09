@@ -49,9 +49,9 @@ public class Tawlbwrdd extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
+    public int getKingStrengthMode() {
         // King must be surrounded on four sides
-        return false;
+        return KING_WEAK;
     }
 
     @Override

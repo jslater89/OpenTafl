@@ -37,7 +37,7 @@ public class RulesSerializer {
         map.put("atkf", "y");
         map.put("tfr", "d");
         map.put("ka", "y");
-        map.put("ks", "y");
+        map.put("ks", "s");
         map.put("kj", "n");
         map.put("nj", "c");
         map.put("cj", "j");
@@ -61,6 +61,11 @@ public class RulesSerializer {
         map.put("cens", "K");
         map.put("afors", "tcnkTCNK");
         map.put("dfors", "TCNK");
+
+        map.put("corre", "tcnkTCNK");
+        map.put("cenre", "tcnkTCNK");
+        map.put("aforre", "tcnkTCNK");
+        map.put("dforre", "tcnkTCNK");
 
         map.put("sw", "n");
         map.put("swf", "y");
@@ -103,8 +108,8 @@ public class RulesSerializer {
             otnrString += "ka:n ";
         }
 
-        if(!rules.isKingStrong()) {
-            otnrString += "ks:n ";
+        if(rules.getKingStrengthMode() != Rules.KING_STRONG) {
+            otnrString += "ks:" + getStringForKingMode(rules.getKingStrengthMode()) + " ";
         }
 
         if(rules.getKingJumpMode() != Taflman.JUMP_NONE) {
@@ -181,7 +186,7 @@ public class RulesSerializer {
         if(!afors.equals(defaults.get("afors"))) otnrString += "afors:" + afors + " ";
 
         String dfors = getStringForTaflmanTypeList(rules.defenderFortStoppableFor);
-        if(!dfors.equals(defaults.get("dfors"))) otnrString += "dfors:" + afors + " ";
+        if(!dfors.equals(defaults.get("dfors"))) otnrString += "dfors:" + dfors + " ";
 
         String corh = getStringForTaflmanTypeList(rules.cornerHostileTo);
         if(!corh.equals(defaults.get("corh"))) otnrString += "corh:" + corh + " ";
@@ -197,6 +202,18 @@ public class RulesSerializer {
 
         String dforh = getStringForTaflmanTypeList(rules.defenderFortHostileTo);
         if(!dforh.equals(defaults.get("dforh"))) otnrString += "dforh:" + dforh + " ";
+
+        String corre = getStringForTaflmanTypeList(rules.cornerReenterableFor);
+        if(!corre.equals(defaults.get("corre"))) otnrString += "corre:" + corre + " ";
+
+        String cenre = getStringForTaflmanTypeList(rules.centerReenterableFor);
+        if(!cenre.equals(defaults.get("cenre"))) otnrString += "cenre:" + cenre + " ";
+
+        String aforre = getStringForTaflmanTypeList(rules.attackerFortReenterableFor);
+        if(!aforre.equals(defaults.get("aforre"))) otnrString += "aforre:" + aforre + " ";
+
+        String dforre = getStringForTaflmanTypeList(rules.defenderFortReenterableFor);
+        if(!dforre.equals(defaults.get("dforre"))) otnrString += "dforre:" + dforre + " ";
 
         if(rules.allowShieldWallCaptures() != Rules.NO_SHIELDWALL) {
             otnrString += "sw:" + getStringForShieldwallMode(rules.allowShieldWallCaptures()) + " ";
@@ -242,7 +259,7 @@ public class RulesSerializer {
         if(config.containsKey("atkf")) rules.setAttackersFirst(getBooleanForString(config.get("atkf")));
         if(config.containsKey("tfr")) rules.setThreefoldResult(getThreefoldResultForString(config.get("tfr")));
         if(config.containsKey("ka")) rules.setKingArmed(getBooleanForString(config.get("ka")));
-        if(config.containsKey("ks")) rules.setKingStrong(getBooleanForString(config.get("ks")));
+        if(config.containsKey("ks")) rules.setKingStrength(getKingModeForString(config.get("ks")));
         if(config.containsKey("kj")) rules.setKingJumpMode(getJumpModeForString(config.get("kj")));
         if(config.containsKey("nj")) rules.setKnightJumpMode(getJumpModeForString(config.get("nj")));
         if(config.containsKey("cj")) rules.setCommanderJumpMode(getJumpModeForString(config.get("cj")));
@@ -256,15 +273,16 @@ public class RulesSerializer {
         if(config.containsKey("afor")) rules.setAttackerForts(getCoordListForString(config.get("afor")));
         if(config.containsKey("dfor")) rules.setDefenderForts(getCoordListForString(config.get("dfor")));
 
-        boolean[] passable, stoppable, hostile, emptyHostile;
-        passable = stoppable = hostile = emptyHostile = null;
+        boolean[] passable, stoppable, hostile, emptyHostile, reenterable;
+        passable = stoppable = hostile = emptyHostile = reenterable = null;
 
         // Center
         if(config.containsKey("cenp")) passable = getTaflmanTypeListForString(config.get("cenp"));
         if(config.containsKey("cens")) stoppable = getTaflmanTypeListForString(config.get("cens"));
         if(config.containsKey("cenh")) hostile = getTaflmanTypeListForString(config.get("cenh"));
         if(config.containsKey("cenhe")) emptyHostile = getTaflmanTypeListForString(config.get("cenhe"));
-        rules.setCenterParameters(passable, stoppable, hostile, emptyHostile);
+        if(config.containsKey("cenre")) reenterable = getTaflmanTypeListForString(config.get("cenre"));
+        rules.setCenterParameters(passable, stoppable, hostile, emptyHostile, reenterable);
 
         passable = stoppable = hostile = emptyHostile = null;
 
@@ -272,7 +290,8 @@ public class RulesSerializer {
         if(config.containsKey("corp")) passable = getTaflmanTypeListForString(config.get("corp"));
         if(config.containsKey("cors")) stoppable = getTaflmanTypeListForString(config.get("cors"));
         if(config.containsKey("corh")) hostile = getTaflmanTypeListForString(config.get("corh"));
-        rules.setCornerParameters(passable, stoppable, hostile);
+        if(config.containsKey("cenre")) reenterable = getTaflmanTypeListForString(config.get("corre"));
+        rules.setCornerParameters(passable, stoppable, hostile, reenterable);
 
         passable = stoppable = hostile = emptyHostile = null;
 
@@ -280,7 +299,8 @@ public class RulesSerializer {
         if(config.containsKey("aforp")) passable = getTaflmanTypeListForString(config.get("aforp"));
         if(config.containsKey("afors")) stoppable = getTaflmanTypeListForString(config.get("afors"));
         if(config.containsKey("aforh")) hostile = getTaflmanTypeListForString(config.get("aforh"));
-        rules.setAttackerFortParameters(passable, stoppable, hostile);
+        if(config.containsKey("cenre")) reenterable = getTaflmanTypeListForString(config.get("aforre"));
+        rules.setAttackerFortParameters(passable, stoppable, hostile, reenterable);
 
         passable = stoppable = hostile = emptyHostile = null;
 
@@ -288,7 +308,8 @@ public class RulesSerializer {
         if(config.containsKey("dforp")) passable = getTaflmanTypeListForString(config.get("dforp"));
         if(config.containsKey("dfors")) stoppable = getTaflmanTypeListForString(config.get("dfors"));
         if(config.containsKey("dforh")) hostile = getTaflmanTypeListForString(config.get("dforh"));
-        rules.setDefenderFortParameters(passable, stoppable, hostile);
+        if(config.containsKey("cenre")) reenterable = getTaflmanTypeListForString(config.get("dforre"));
+        rules.setDefenderFortParameters(passable, stoppable, hostile, reenterable);
 
         return rules;
     }
@@ -352,6 +373,23 @@ public class RulesSerializer {
     private static boolean getBooleanForString(String yesNo) {
         if(yesNo.equals("y")) return true;
         else return false;
+    }
+
+    private static String getStringForKingMode(int kingMode) {
+        switch(kingMode) {
+            case Rules.KING_STRONG: return "s";
+            case Rules.KING_STRONG_CENTER: return "c";
+            case Rules.KING_WEAK: return "w";
+            default: return "s";
+        }
+    }
+
+    private static int getKingModeForString(String kingMode) {
+        if(kingMode.equals("s")) return Rules.KING_STRONG;
+        if(kingMode.equals("c")) return Rules.KING_STRONG_CENTER;
+        if(kingMode.equals("w")) return Rules.KING_WEAK;
+
+        return Rules.KING_STRONG;
     }
 
     private static String getStringForJumpMode(int jumpMode) {

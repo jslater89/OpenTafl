@@ -151,7 +151,7 @@ public class FishyEvaluator implements Evaluator {
         Coord kingCoord = board.findTaflmanSpace(king);
 
         boolean armedKing = state.mGame.getRules().isKingArmed();
-        boolean strongKing = state.mGame.getRules().isKingStrong();
+        boolean strongKing = state.mGame.getRules().getKingStrengthMode() == Rules.KING_STRONG;
         boolean edgeEscape = state.mGame.getRules().getEscapeType() == Rules.EDGES;
         boolean cornerEscape = state.mGame.getRules().getEscapeType() == Rules.CORNERS;
 

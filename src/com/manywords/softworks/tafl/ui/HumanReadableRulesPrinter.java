@@ -117,19 +117,26 @@ public class HumanReadableRulesPrinter {
         rules += ruleNumber++ + ". All taflmen move like the rook in chess: any number of vacant spaces along a row or column. Taflmen may " +
                 "not move onto or through a space occupied by another taflman.\n\n";
 
-        rules += ruleNumber++ + ". All taflmen " + (r.isKingStrong() ? "except the king " : "") + "are captured when the opposing side moves " +
+        rules += ruleNumber++ + ". All taflmen " + (r.getKingStrengthMode() != Rules.KING_WEAK ? "except the king " : "") + "are captured when the opposing side moves " +
                 "a taflman such that the captured taflman is surrounded on both sides, along a row or a column, by enemy taflmen or hostile spaces. " +
                 "A taflman is only captured if the opponent's move closes the trap: a taflman may therefore safely move in between two enemy taflmen, or " +
                 "an enemy taflman and a hostile space. Captured taflmen are removed from the game. " + (r.isKingArmed() ? "The king may take part in " +
                 "captures." : "The king may not take part in captures.") + "\n\n";
 
-        if(r.isKingStrong()) {
+        if(r.getKingStrengthMode() == Rules.KING_STRONG) {
             rules += ruleNumber++ + ". The king must be surrounded by enemy taflmen or hostile spaces on all four sides to be captured. " +
                     "The king cannot be captured against the edge of the board. ";
 
-                    if(centers.size() > 0) rules += "The king may be captured by three attacking pieces against an empty throne.";
+                    if(centers.size() > 0) rules += "The king may be captured by three attacking taflmen against an empty throne.";
 
                     rules += "\n\n";
+        }
+        else if(r.getKingStrengthMode() == Rules.KING_STRONG_CENTER && centers.size() > 0) {
+            rules += ruleNumber++ + ". When the king is on the throne, he must be surrounded by attacking taflmen on all sides to be captured. " +
+                    "When the king is adjacent to the throne, he must be surrounded on the other three sides by attacking taflmen to be captured. " +
+                    "When the king is elsewhere on the board, he may be captured by two attacking taflmen, in the same manner as a regular taflman.";
+
+            rules += "\n\n";
         }
 
         rules += ruleNumber++ + ". The defenders win if the king reaches " + (r.getEscapeType() == Rules.EDGES ? "an edge " : "a corner ") + "space. " +

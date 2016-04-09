@@ -55,9 +55,9 @@ public class Fetlar extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
+    public int getKingStrengthMode() {
         // King must be surrounded on four sides
-        return true;
+        return KING_WEAK;
     }
 
     @Override

@@ -506,9 +506,20 @@ public class Taflman {
             return false;
         }
 
+        boolean isKingStrong = false;
+        if(Taflman.isKing(taflman)) {
+            if(getRules().getKingStrengthMode() == Rules.KING_STRONG) isKingStrong = true;
+            else if(getRules().getKingStrengthMode() == Rules.KING_STRONG_CENTER) {
+                Coord current = getCurrentSpace(state, taflman);
+                List<Coord> centerAndAdjacent = getBoard(state).getCenterAndAdjacentSpaces();
+
+                if(centerAndAdjacent.contains(current)) isKingStrong = true;
+            }
+        }
+
         // If this piece is a strong king, we need to check all four squares
-        // around us for hostility.
-        if (Taflman.isKing(taflman) && getRules().isKingStrong()) {
+        // around us for hostility
+        if (Taflman.isKing(taflman) && isKingStrong) {
             int hostileAdjacentSpaces = 0;
             List<Coord> adjacentSpaces = board.getAdjacentSpaces(Taflman.getCurrentSpace(state, taflman));
 
@@ -593,7 +604,8 @@ public class Taflman {
                 return false;
             }
 
-            if (Taflman.isKing(taflman) && getRules().isKingStrong()
+            if (Taflman.isKing(taflman)
+                    && (getRules().getKingStrengthMode() == Rules.KING_STRONG || getRules().getKingStrengthMode() == Rules.KING_STRONG_CENTER)
                     && (Taflman.getSide(capturer).hasCommanders() || Taflman.getSide(capturer).hasKnights())) {
                 // If the other side has commanders or knights and this is a strong
                 // king, we need to check for commander/knight sandwich.
