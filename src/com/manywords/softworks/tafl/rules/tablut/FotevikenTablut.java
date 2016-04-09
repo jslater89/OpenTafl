@@ -108,8 +108,7 @@ public class FotevikenTablut extends Rules {
 
     @Override
     public int getKingStrengthMode() {
-        // Tablut-style king strength (duh)
-        return KING_STRONG_CENTER;
+        return KING_STRONG;
     }
 
     @Override
