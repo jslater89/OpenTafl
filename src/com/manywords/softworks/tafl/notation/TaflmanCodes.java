@@ -39,6 +39,29 @@ public class TaflmanCodes {
     public static final int N = 6;
     public static final int K = 7;
 
+    public static int getIndexForChar(char ch) {
+        switch(ch) {
+            case 't':
+                return t;
+            case 'c':
+                return c;
+            case 'n':
+                return n;
+            case 'k':
+                return k;
+            case 'T':
+                return T;
+            case 'C':
+                return C;
+            case 'N':
+                return N;
+            case 'K':
+                return K;
+            default:
+                throw new IllegalArgumentException("Bad character code");
+        }
+    }
+
     public static boolean isCodeAttackingSide(char code) {
         boolean moverAttacker = true;
         if(Character.isUpperCase(code)) {

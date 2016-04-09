@@ -1,10 +1,13 @@
 package com.manywords.softworks.tafl.ui;
 
 import com.manywords.softworks.tafl.notation.RulesSerializer;
+import com.manywords.softworks.tafl.notation.TaflmanCodes;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -14,6 +17,7 @@ import java.util.regex.Pattern;
 public class HumanReadableRulesPrinter {
     public static String getHumanReadableRules(Rules r) {
         String rules = "";
+        String otrString = r.getOTRString();
         int ruleNumber = 1;
 
         rules += "The tafl games are a collection of Norse board games dating to the Viking age and earlier. They were commonly played in " +
@@ -29,6 +33,8 @@ public class HumanReadableRulesPrinter {
 
         Set<Coord> centers = r.getCenterSpaces();
         Set<Coord> corners = r.getCornerSpaces();
+        Set<Coord> attackerForts = r.getAttackerForts();
+        Set<Coord> defenderForts = r.getDefenderForts();
 
         String centerString = "center space";
         String centerVerb = "is ";
@@ -41,48 +47,132 @@ public class HumanReadableRulesPrinter {
             rules += ruleNumber++ + ". The " + centerString + " " + centerVerb + "known as the throne. The throne is marked on the board with " +
                     "asterisks. ";
 
-            String defenderStoppable = getTaflmanTypeStringForTag(r, false, "cens");
+            List<Character> unallocatedTypes = new ArrayList<>();
+            unallocatedTypes.add('t');
+            unallocatedTypes.add('c');
+            unallocatedTypes.add('n');
+            unallocatedTypes.add('k');
+            unallocatedTypes.add('T');
+            unallocatedTypes.add('C');
+            unallocatedTypes.add('N');
+            unallocatedTypes.add('K');
+            List<Character> allocatedTypes = new ArrayList<>();
 
-            if(defenderStoppable != null) {
-                rules += "The following taflmen may stop on the " + centerString + ": " + defenderStoppable + ". ";
-            }
+            // The following taflmen may freely move past and stop on the throne.
+            // if in cenp, cens, and cenre.
+            boolean[] unrestrictedTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
 
-            String defenderPassable = getTaflmanTypeStringForTag(r, false, "cenp");
-            String attackerPassable = getTaflmanTypeStringForTag(r, true, "cenp");
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
 
-            if(defenderPassable != null && attackerPassable != null) {
-                rules += "The following taflmen may move through the " + centerString + ": " + defenderPassable + ", and " + attackerPassable + ". ";
-            }
-            else if(defenderPassable != null) {
-                rules += "The following taflmen may move through the " + centerString + ": " + defenderPassable + ". ";
-            }
-            else if(attackerPassable != null) {
-                rules += "The following taflmen may move through the " + centerString + ": " + attackerPassable + ". ";
-            }
-
-            String defenderHostile = getTaflmanTypeStringForTag(r, false, "cenh");
-            String attackerHostile = getTaflmanTypeStringForTag(r, true, "cenh");
-            String defenderHostileEmpty = getTaflmanTypeStringForTag(r, false, "cenhe");
-            String attackerHostileEmpty = getTaflmanTypeStringForTag(r, true, "cenhe");
-
-            if(defenderHostile != null && attackerHostile != null) {
-                rules += "The throne is hostile to the following taflmen: " + defenderHostile + ", and " + attackerHostile + ". ";
-            }
-            else if(defenderHostile != null) {
-                rules += "The throne is hostile to the following taflmen: " + defenderHostile + ". ";
-            }
-            else if(attackerHostile != null) {
-                rules += "The throne is hostile to the following taflmen: " + attackerHostile + ". ";
+                String cString = "" + c;
+                if(getValueForTag(otrString, "cenp").contains(cString)
+                        && getValueForTag(otrString, "cens").contains(cString)
+                        && getValueForTag(otrString, "cenre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    unrestrictedTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
             }
 
-            if(defenderHostileEmpty != null && attackerHostileEmpty != null) {
-                rules += "Additionally, when empty, the throne is hostile to the following taflmen: " + defenderHostileEmpty + ", and " + attackerHostileEmpty + ". ";
+            // The following taflmen may freely move past and stop on the throne, if and only if they begin their turn
+            // on a throne space.
+            // if in cenp and cens, but not cenre.
+            boolean[] moveStopNoEntryTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "cenp").contains(cString)
+                        && getValueForTag(otrString, "cens").contains(cString)
+                        && !getValueForTag(otrString, "cenre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    moveStopNoEntryTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
             }
-            else if(defenderHostile != null) {
-                rules += "Additionally, when empty, the throne is hostile to the following taflmen: " + defenderHostileEmpty + ". ";
+
+            // The following taflmen may freely move past the throne, but may not stop on it.
+            // if in cenp and cenre, but not cens.
+            boolean[] moveEntryTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "cenp").contains(cString)
+                        && !getValueForTag(otrString, "cens").contains(cString)
+                        && getValueForTag(otrString, "cenre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    moveEntryTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
             }
-            else if(attackerHostile != null) {
-                rules += "Additionally, when empty, the throne is hostile to the following taflmen: " + attackerHostileEmpty + ". ";
+
+            // The following taflmen may freely move past the throne, if and only if they begin their turn on a throne
+            // space. They may never stop on the throne.
+            // if in cenp, but not cenre or cens.
+            boolean[] moveNoEntryTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "cenp").contains(cString)
+                        && !getValueForTag(otrString, "cens").contains(cString)
+                        && !getValueForTag(otrString, "cenre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    moveNoEntryTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            // The following taflmen may not move past or stop on the throne.
+            // if in neither cenp or cens.
+            boolean[] restrictedTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(!getValueForTag(otrString, "cenp").contains(cString)
+                        && getValueForTag(otrString, "cens").contains(cString)
+                        && !getValueForTag(otrString, "cenre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    restrictedTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            String unrestrictedString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(unrestrictedTaflmen));
+            String moveStopNoEntryString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(moveStopNoEntryTaflmen));
+            String moveEntryString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(moveEntryTaflmen));
+            String moveNoEntryString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(moveNoEntryTaflmen));
+            String restrictedString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(restrictedTaflmen));
+
+            if(!unrestrictedString.contains("no taflmen")) {
+                rules += "The following taflmen may freely move through or stop on the throne: " + unrestrictedString + ". ";
+            }
+
+            if(!moveStopNoEntryString.contains("no taflmen")) {
+                rules += "The following taflmen may move through or stop on the throne, but may not enter it from the outside: " + moveStopNoEntryString + ". ";
+            }
+
+            if(!moveEntryString.contains("no taflmen")) {
+                rules += "The following taflmen may freely move through the throne: " + moveEntryString + ". ";
+            }
+
+            if(!moveNoEntryString.contains("no taflmen")) {
+                rules += "The following taflmen may move through the throne, but may not stop on a throne space or enter the throne from the outside: " + moveNoEntryString + ". ";
+            }
+
+            if(!restrictedString.contains("no taflmen")) {
+                rules += "The following taflmen may neither move through nor stop on the throne: " + restrictedString + ". ";
+            }
+
+            String hostile = getTaflmanTypeStringForTag(r, "cenh");
+            String hostileEmpty = getTaflmanTypeStringForTag(r, "cenhe");
+
+            if(!hostile.isEmpty() && !hostile.contains("no taflmen")) {
+                rules += "The throne is hostile to the following taflmen: " + hostile + ". ";
+            }
+
+            if(!hostileEmpty.isEmpty() && !hostile.contains("no taflmen")) {
+                rules += "Additionally, the throne is hostile to the following taflmen when empty: " + hostileEmpty + ". ";
             }
 
             rules += "\n\n";
@@ -91,23 +181,276 @@ public class HumanReadableRulesPrinter {
         if(corners.size() > 0) {
             rules += ruleNumber++ + ". The corner spaces are marked on the board with asterisks. Only the king may stop on a corner space. ";
 
-            String defenderHostile = getTaflmanTypeStringForTag(r, false, "corh");
-            String attackerHostile = getTaflmanTypeStringForTag(r, true, "corh");
+            String hostile = getTaflmanTypeStringForTag(r, "corh");
 
-            if(defenderHostile != null && attackerHostile != null) {
-                rules += "The corners are hostile to the following taflmen: " + defenderHostile + ", and " + attackerHostile + ". ";
-            }
-            else if(defenderHostile != null) {
-                rules += "The corners are hostile to the following taflmen: " + defenderHostile + ". ";
-            }
-            else if(attackerHostile != null) {
-                rules += "The corners are hostile to the following taflmen: " + attackerHostile + ". ";
+            if(!hostile.isEmpty() && !hostile.contains("no taflmen")) {
+                rules += "The corners are hostile to the following taflmen: " + hostile + ". ";
             }
 
             rules += "\n\n";
         }
 
-        if(centers.size() == 0 && corners.size() == 0) {
+        if(attackerForts.size() > 0) {
+            rules += ruleNumber++ + ". Certain spaces are attacker fortresses. They are marked on the board with " +
+                    "dots. ";
+
+            List<Character> unallocatedTypes = new ArrayList<>();
+            unallocatedTypes.add('t');
+            unallocatedTypes.add('c');
+            unallocatedTypes.add('n');
+            unallocatedTypes.add('k');
+            unallocatedTypes.add('T');
+            unallocatedTypes.add('C');
+            unallocatedTypes.add('N');
+            unallocatedTypes.add('K');
+            List<Character> allocatedTypes = new ArrayList<>();
+
+            // The following taflmen may freely move past and stop on the throne.
+            // if in cenp, cens, and cenre.
+            boolean[] unrestrictedTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "aforp").contains(cString)
+                        && getValueForTag(otrString, "afors").contains(cString)
+                        && getValueForTag(otrString, "aforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    unrestrictedTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            // The following taflmen may freely move past and stop on the throne, if and only if they begin their turn
+            // on a throne space.
+            // if in cenp and cens, but not cenre.
+            boolean[] moveStopNoEntryTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "aforp").contains(cString)
+                        && getValueForTag(otrString, "afors").contains(cString)
+                        && !getValueForTag(otrString, "aforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    moveStopNoEntryTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            // The following taflmen may freely move past the throne, but may not stop on it.
+            // if in cenp and cenre, but not cens.
+            boolean[] moveEntryTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "aforp").contains(cString)
+                        && !getValueForTag(otrString, "afors").contains(cString)
+                        && getValueForTag(otrString, "aforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    moveEntryTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            // The following taflmen may freely move past the throne, if and only if they begin their turn on a throne
+            // space. They may never stop on the throne.
+            // if in cenp, but not cenre or cens.
+            boolean[] moveNoEntryTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "aforp").contains(cString)
+                        && !getValueForTag(otrString, "afors").contains(cString)
+                        && !getValueForTag(otrString, "aforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    moveNoEntryTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            // The following taflmen may not move past or stop on the throne.
+            // if in neither cenp or cens.
+            boolean[] restrictedTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(!getValueForTag(otrString, "aforp").contains(cString)
+                        && getValueForTag(otrString, "afors").contains(cString)
+                        && !getValueForTag(otrString, "aforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    restrictedTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            String unrestrictedString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(unrestrictedTaflmen));
+            String moveStopNoEntryString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(moveStopNoEntryTaflmen));
+            String moveEntryString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(moveEntryTaflmen));
+            String moveNoEntryString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(moveNoEntryTaflmen));
+            String restrictedString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(restrictedTaflmen));
+
+            if(!unrestrictedString.contains("no taflmen")) {
+                rules += "The following taflmen may freely move through or stop on the attacker forts: " + unrestrictedString + ". ";
+            }
+
+            if(!moveStopNoEntryString.contains("no taflmen")) {
+                rules += "The following taflmen may move through or stop on the attacker forts, but may not enter them from the outside: " + moveStopNoEntryString + ". ";
+            }
+
+            if(!moveEntryString.contains("no taflmen")) {
+                rules += "The following taflmen may freely move through the attacker forts: " + moveEntryString + ". ";
+            }
+
+            if(!moveNoEntryString.contains("no taflmen")) {
+                rules += "The following taflmen may move through the attacker forts, but may not stop on an attacker fort space or enter the attacker forts from the outside: " + moveNoEntryString + ". ";
+            }
+
+            if(!restrictedString.contains("no taflmen")) {
+                rules += "The following taflmen may neither move through nor stop on the attacker forts: " + restrictedString + ". ";
+            }
+
+            String hostile = getTaflmanTypeStringForTag(r, "aforh");
+
+            if(!hostile.isEmpty() && !hostile.contains("no taflmen")) {
+                rules += "The attacker forts are hostile to the following taflmen: " + hostile + ". ";
+            }
+
+            rules += "\n\n";
+        }
+
+        if(defenderForts.size() > 0) {
+            rules += ruleNumber++ + ". Certain spaces are defender fortresses. They are marked on the board with " +
+                    "dashes. ";
+
+            List<Character> unallocatedTypes = new ArrayList<>();
+            unallocatedTypes.add('t');
+            unallocatedTypes.add('c');
+            unallocatedTypes.add('n');
+            unallocatedTypes.add('k');
+            unallocatedTypes.add('T');
+            unallocatedTypes.add('C');
+            unallocatedTypes.add('N');
+            unallocatedTypes.add('K');
+            List<Character> allocatedTypes = new ArrayList<>();
+
+            // The following taflmen may freely move past and stop on the throne.
+            // if in cenp, cens, and cenre.
+            boolean[] unrestrictedTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "dforp").contains(cString)
+                        && getValueForTag(otrString, "dfors").contains(cString)
+                        && getValueForTag(otrString, "dforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    unrestrictedTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            // The following taflmen may freely move past and stop on the throne, if and only if they begin their turn
+            // on a throne space.
+            // if in cenp and cens, but not cenre.
+            boolean[] moveStopNoEntryTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "dforp").contains(cString)
+                        && getValueForTag(otrString, "dfors").contains(cString)
+                        && !getValueForTag(otrString, "dforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    moveStopNoEntryTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            // The following taflmen may freely move past the throne, but may not stop on it.
+            // if in cenp and cenre, but not cens.
+            boolean[] moveEntryTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "dforp").contains(cString)
+                        && !getValueForTag(otrString, "dfors").contains(cString)
+                        && getValueForTag(otrString, "dforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    moveEntryTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            // The following taflmen may freely move past the throne, if and only if they begin their turn on a throne
+            // space. They may never stop on the throne.
+            // if in cenp, but not cenre or cens.
+            boolean[] moveNoEntryTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(getValueForTag(otrString, "dforp").contains(cString)
+                        && !getValueForTag(otrString, "dfors").contains(cString)
+                        && !getValueForTag(otrString, "dforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    moveNoEntryTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            // The following taflmen may not move past or stop on the throne.
+            // if in neither cenp or cens.
+            boolean[] restrictedTaflmen = new boolean[Rules.TAFLMAN_TYPE_COUNT];
+            for(char c : unallocatedTypes) {
+                if(allocatedTypes.contains(c)) continue;
+
+                String cString = "" + c;
+                if(!getValueForTag(otrString, "dforp").contains(cString)
+                        && getValueForTag(otrString, "dfors").contains(cString)
+                        && !getValueForTag(otrString, "dforre").contains(cString)) {
+                    allocatedTypes.add(c);
+                    restrictedTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
+                }
+            }
+
+            String unrestrictedString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(unrestrictedTaflmen));
+            String moveStopNoEntryString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(moveStopNoEntryTaflmen));
+            String moveEntryString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(moveEntryTaflmen));
+            String moveNoEntryString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(moveNoEntryTaflmen));
+            String restrictedString = getTaflmanTypeStringFromSpec(r, RulesSerializer.getStringForTaflmanTypeList(restrictedTaflmen));
+
+            if(!unrestrictedString.contains("no taflmen")) {
+                rules += "The following taflmen may freely move through or stop on the defender forts: " + unrestrictedString + ". ";
+            }
+
+            if(!moveStopNoEntryString.contains("no taflmen")) {
+                rules += "The following taflmen may move through or stop on the defender forts, but may not enter it from the outside: " + moveStopNoEntryString + ". ";
+            }
+
+            if(!moveEntryString.contains("no taflmen")) {
+                rules += "The following taflmen may freely move through the defender forts: " + moveEntryString + ". ";
+            }
+
+            if(!moveNoEntryString.contains("no taflmen")) {
+                rules += "The following taflmen may move through the defender forts, but may not stop on a defender fort space or enter the defender forts from the outside: " + moveNoEntryString + ". ";
+            }
+
+            if(!restrictedString.contains("no taflmen")) {
+                rules += "The following taflmen may neither move through nor stop on the defender forts: " + restrictedString + ". ";
+            }
+
+            String hostile = getTaflmanTypeStringForTag(r, "dforh");
+
+            if(!hostile.isEmpty() && !hostile.contains("no taflmen")) {
+                rules += "The defender forts are hostile to the following taflmen: " + hostile + ". ";
+            }
+
+            rules += "\n\n";
+        }
+
+        if(centers.size() == 0 && corners.size() == 0 && attackerForts.size() == 0 && defenderForts.size() == 0) {
             rules += ruleNumber++ + ". There are no special spaces on the board. All taflmen may move through or occupy any space.\n\n";
         }
 
@@ -262,7 +605,7 @@ public class HumanReadableRulesPrinter {
 
             if(elements[0].startsWith(tag)) {
                 if(elements.length == 1) {
-                    return null;
+                    return "";
                 }
                 else {
                     return elements[1];
@@ -274,19 +617,51 @@ public class HumanReadableRulesPrinter {
             return RulesSerializer.defaults.get(tag);
         }
 
-        return null;
+        return "";
+    }
+
+    private static String getTaflmanTypeStringForTag(Rules r, String rulesTag) {
+        String tagValue = getValueForTag(r.getOTRString(), rulesTag);
+
+        String attackerString = getTaflmanTypeStringFromSpec(r, true, tagValue);
+        String defenderString = getTaflmanTypeStringFromSpec(r,false, tagValue);
+
+        if(attackerString.contains("all") && defenderString.contains("all")) {
+            return "all taflmen";
+        }
+        else if(attackerString.contains("no") && defenderString.contains("no")) {
+            return "no taflmen";
+        }
+        else {
+            defenderString += ", and " + attackerString;
+            return defenderString;
+        }
     }
 
     private static String getTaflmanTypeStringForTag(Rules r, boolean attackingSide, String rulesTag) {
         String tagValue = getValueForTag(r.getOTRString(), rulesTag);
-
-        if(tagValue == null) return null;
-        else return getTaflmanTypeStringFromSpec(attackingSide, tagValue);
+        return getTaflmanTypeStringFromSpec(r, attackingSide, tagValue);
     }
 
-    private static String getTaflmanTypeStringFromSpec(boolean attackingSide, String spec) {
+    private static String getTaflmanTypeStringFromSpec(Rules r, String spec) {
+        String attackerString = getTaflmanTypeStringFromSpec(r, true, spec);
+        String defenderString = getTaflmanTypeStringFromSpec(r, false, spec);
+
+        if(attackerString.contains("all") && defenderString.contains("all")) {
+            return "all taflmen";
+        }
+        else if(attackerString.contains("no") && defenderString.contains("no")) {
+            return "no taflmen";
+        }
+        else {
+            defenderString += ", and " + attackerString;
+            return defenderString;
+        }
+    }
+
+    private static String getTaflmanTypeStringFromSpec(Rules r, boolean attackingSide, String spec) {
         Pattern taflmanSpecPattern = Pattern.compile("\\s*t?c?n?k?T?C?N?K?\\s*");
-        if(!taflmanSpecPattern.matcher(spec).matches()) return null;
+        if(!taflmanSpecPattern.matcher(spec).matches()) throw new IllegalArgumentException("Bad taflman spec");
 
         String taflmenString = (attackingSide ? "attacking " : "defending ");
         if(attackingSide) {
@@ -300,8 +675,24 @@ public class HumanReadableRulesPrinter {
         if(spec.equals("tcnk")) {
             return "all " + (attackingSide ? "attacking" : "defending") + " taflmen";
         }
-        else if(spec.equals("")) {
-            return null;
+
+        if(!r.getAttackers().hasKnights()) {
+            spec = spec.replaceAll("n", "");
+        }
+        if(!r.getDefenders().hasKnights()) {
+            spec = spec.replaceAll("N", "");
+        }
+
+        if(!r.getAttackers().hasCommanders()) {
+            spec = spec.replaceAll("c", "");
+        }
+        if(!r.getDefenders().hasCommanders()) {
+            spec = spec.replaceAll("C", "");
+        }
+        spec = spec.replaceAll("k", "");
+
+        if(spec.equals("")) {
+            return "no " + (attackingSide ? "attacking" : "defending") + " taflmen";
         }
 
         for(int i = 0; i < spec.length(); i++) {

@@ -156,10 +156,12 @@ public class TerminalBoardImage extends BasicTextImage {
 
     private void renderSpecialSpaces(Rules rules) {
         TextCharacter star = new TextCharacter('*', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter dot = new TextCharacter('.', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter dash = new TextCharacter('-', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
         fillCoords(star, rules.getCornerSpaces());
         fillCoords(star, rules.getCenterSpaces());
-        fillCoords(star, rules.getAttackerForts());
-        fillCoords(star, rules.getDefenderForts());
+        fillCoords(dot, rules.getAttackerForts());
+        fillCoords(dash, rules.getDefenderForts());
     }
 
     private void renderTaflmen(Board board) {

@@ -122,7 +122,7 @@ class RestrictedFortReentryTest extends TaflTest implements UiCallback {
 
         state.moveTaflman(taflman, Coord.get(1, 4));
         state = game.getCurrentState();
-        
+
         taflman = state.getPieceAt(1,4);
         dests = Taflman.getAllowableDestinations(state, taflman);
         moves = Taflman.getAllowableMoves(state, taflman);

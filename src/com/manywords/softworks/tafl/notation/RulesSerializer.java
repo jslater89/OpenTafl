@@ -433,7 +433,7 @@ public class RulesSerializer {
         return defaultCenter;
     }
 
-    private static String getStringForTaflmanTypeList(boolean[] typeList) {
+    public static String getStringForTaflmanTypeList(boolean[] typeList) {
         String typeString = "";
         for(int i = 0; i < TaflmanCodes.count; i++) {
             if(typeList[i]) typeString += TaflmanCodes.inverse[i];

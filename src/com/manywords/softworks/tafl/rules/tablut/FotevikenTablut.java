@@ -71,7 +71,7 @@ public class FotevikenTablut extends Rules {
         forts.add(Coord.get(8, 3));
         forts.add(Coord.get(8, 4));
         forts.add(Coord.get(8, 5));
-        forts.add(Coord.get(7, 1));
+        forts.add(Coord.get(7, 4));
 
         forts.add(Coord.get(3, 8));
         forts.add(Coord.get(4, 8));
