@@ -105,6 +105,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.4b
+- Implementation of 'rules' command in the UI
+- Scrolling message dialog fixes and improvements
+- Add Tablut variants (Foteviken, with attacker camps, and standard)
+
 v0.2.3.3b (released 04/08/16):
 - Fix for berserk moves counting as repeated moves for the purposes of deciding
   victory
