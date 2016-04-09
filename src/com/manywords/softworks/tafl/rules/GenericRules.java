@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.notation.TaflmanCodes;
 
+import java.util.List;
+
 /**
  * Created by jay on 2/6/16.
  */
@@ -274,19 +276,33 @@ public class GenericRules extends Rules {
         boolean[] passabilityArray = new boolean[TAFLMAN_TYPE_COUNT];
         for(int i = 0; i < passabilityArray.length; i++) passabilityArray[i] = true;
 
+        boolean[] reentryArray = new boolean[TAFLMAN_TYPE_COUNT];
+        for(int i = 0; i < reentryArray.length; i++) reentryArray[i] = true;
+
         switch(type) {
             case CENTER:
                 passabilityArray = centerPassableFor;
+                reentryArray = centerReenterableFor;
                 break;
             case CORNER:
                 passabilityArray = cornerPassableFor;
+                reentryArray = cornerReenterableFor;
                 break;
             case ATTACKER_FORT:
                 passabilityArray = attackerFortPassableFor;
+                reentryArray = attackerFortReenterableFor;
                 break;
             case DEFENDER_FORT:
                 passabilityArray = defenderFortPassableFor;
+                reentryArray = defenderFortReenterableFor;
                 break;
+        }
+
+        // If we can't reenter the destination type, we can't move through
+        // it if we aren't on the same type.
+        if(!reentryArray[index]) {
+            SpaceType startType = board.getSpaceTypeFor(board.findTaflmanSpace(piece));
+            if(startType != type) return false;
         }
 
         return passabilityArray[index];
@@ -300,19 +316,33 @@ public class GenericRules extends Rules {
         boolean[] stoppabilityArray = new boolean[TAFLMAN_TYPE_COUNT];
         for(int i = 0; i < stoppabilityArray.length; i++) stoppabilityArray[i] = true;
 
+        boolean[] reentryArray = new boolean[TAFLMAN_TYPE_COUNT];
+        for(int i = 0; i < reentryArray.length; i++) reentryArray[i] = true;
+
         switch(type) {
             case CENTER:
                 stoppabilityArray = centerStoppableFor;
+                reentryArray = centerReenterableFor;
                 break;
             case CORNER:
                 stoppabilityArray = cornerStoppableFor;
+                reentryArray = cornerReenterableFor;
                 break;
             case ATTACKER_FORT:
                 stoppabilityArray = attackerFortStoppableFor;
+                reentryArray = attackerFortReenterableFor;
                 break;
             case DEFENDER_FORT:
                 stoppabilityArray = defenderFortStoppableFor;
+                reentryArray = defenderFortReenterableFor;
                 break;
+        }
+
+        // If there are any non-reenterable spaces, we need to see if we're starting on the same
+        // kind of space. If not, we can't make this move.
+        if(!reentryArray[index]) {
+            SpaceType startType = board.getSpaceTypeFor(board.findTaflmanSpace(piece));
+            if(startType != type) return false;
         }
 
         return stoppabilityArray[index];

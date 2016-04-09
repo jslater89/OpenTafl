@@ -52,10 +52,11 @@ public class RulesSerializer {
         map.put("aforh", "TCNK");
         map.put("dforh", "tcnk");
 
+        // Most rulesets don't have impassable spaces.
         map.put("corp", "K");
         map.put("cenp", "tcnkTCNK");
         map.put("aforp", "tcnkTCNK");
-        map.put("dforp", "TCNK");
+        map.put("dforp", "tcnkTCNK");
 
         map.put("cors", "K");
         map.put("cens", "K");
@@ -443,6 +444,8 @@ public class RulesSerializer {
 
     public static boolean[] getTaflmanTypeListForString(String typeString) {
         boolean[] typeList = new boolean[TaflmanCodes.count];
+        if(typeString == null) return typeList;
+
         for(int i = 0; i < typeString.length(); i++) {
             char c = typeString.charAt(i);
             int index = indexOf(TaflmanCodes.inverse, c);

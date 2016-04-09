@@ -15,6 +15,7 @@ import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
@@ -383,17 +384,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void handleInGameCommand(String command) {
-            /*
+
             if(command.startsWith("dump")) {
-                if(mInGame) {
-                    System.out.println(GameSerializer.getGameRecord(mGame, true));
-                }
-                else {
-                    System.out.println(GameSerializer.getGameRecord(mReplay.getGame(), true));
-                }
+                System.out.println(RulesSerializer.getRulesRecord(mGame.getRules()));
                 return;
             }
-            */
+
 
             Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
             CommandResult r = mCommandEngine.executeCommand(c);

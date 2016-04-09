@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
+import com.manywords.softworks.tafl.rules.tablut.FotevikenTablut;
 import com.manywords.softworks.tafl.rules.tablut.Tablut;
 import com.manywords.softworks.tafl.rules.tawlbwrdd.Tawlbwrdd;
 
@@ -23,7 +24,8 @@ public class BuiltInVariants {
             Berserk.newBerserk11(),
             Brandub.newBrandub7(),
             Tawlbwrdd.newTawlbwrdd11(),
-            Tablut.newTablut9()
+            Tablut.newTablut9(),
+            FotevikenTablut.newFotevikenTablut9()
     ));
 
     public static List<String> rulesDescriptions = new ArrayList<>(Arrays.asList(
@@ -34,7 +36,8 @@ public class BuiltInVariants {
             "5. Berserk 11x11",
             "6. Brandub 7x7",
             "7. Tawlbwrdd 11x11",
-            "8. Tablut 9x9"
+            "8. Tablut 9x9",
+            "9. Foteviken Tablut 9x9"
     ));
 
     public static void loadExternalRules(File externalRulesFile) {
