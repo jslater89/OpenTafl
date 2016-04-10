@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.rules;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
@@ -58,7 +59,26 @@ public class BuiltInVariants {
             System.out.println("Couldn't read file: not found");
         } catch (IOException e) {
             System.out.println("Couldn't read file: read error");
+        }
 
+        if(OpenTafl.DEV_MODE) {
+            dumpRules();
+        }
+    }
+
+    private static void dumpRules() {
+        try {
+            BufferedWriter w = new BufferedWriter(new FileWriter(new File("rules-dump.otr")));
+
+            for(Rules r : availableRules) {
+                String rulesString = RulesSerializer.getRulesRecord(r);
+                w.write(rulesString + "\n");
+            }
+
+            w.flush();
+            w.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

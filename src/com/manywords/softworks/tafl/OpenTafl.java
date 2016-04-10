@@ -26,9 +26,6 @@ public class OpenTafl {
     public static boolean DEV_MODE = false;
 
     public static void main(String[] args) {
-        directoryCheck();
-        BuiltInVariants.loadExternalRules(new File("external-rules.conf"));
-
         Map<String, String> mapArgs = getArgs(args);
         Mode runMode = Mode.ADVANCED_TERMINAL;
 
@@ -52,6 +49,9 @@ public class OpenTafl {
                 DEV_MODE = true;
             }
         }
+
+        directoryCheck();
+        BuiltInVariants.loadExternalRules(new File("external-rules.conf"));
 
         switch(runMode) {
             case WINDOW:
