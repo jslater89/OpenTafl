@@ -102,8 +102,7 @@ public class FotevikenTablut extends Rules {
 
     @Override
     public boolean isKingArmed() {
-        // King does not capture
-        return false;
+        return true;
     }
 
     @Override
@@ -123,12 +122,12 @@ public class FotevikenTablut extends Rules {
 
     @Override
     public int getCommanderJumpMode() {
-        return Taflman.JUMP_NONE;
+        return Taflman.JUMP_STANDARD;
     }
 
     @Override
     public int getMercenaryJumpMode() {
-        return Taflman.JUMP_NONE;
+        return Taflman.JUMP_CAPTURE;
     }
 
     @Override
