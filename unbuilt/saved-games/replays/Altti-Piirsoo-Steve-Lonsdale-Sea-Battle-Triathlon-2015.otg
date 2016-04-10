@@ -1,0 +1,117 @@
+[date:2015.05.04]
+[event:Tafl Triathlon 2015]
+[round:Sea Battle]
+[site:aagenielsen.dk]
+[result:1]
+[attackers:Steve Lonsdale]
+[defenders:Altti Piirsoo]
+[termination:White resigns]
+[compiler:Jay Slater]
+[annotator:Tim Millar]
+[rules:dim:9 name:Tablut esc:e atkf:y ka:y ks:c nj:n cj:n cor: cens: cenh: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/]
+[start-comment:This commentary was originally posted on the World Tafl Federation's Facebook page by Tim Millar.
+
+This game is 9x9 Tablut or Saami Tafl, taken from the second round of the Tafl Triathlon. The Players are Steve Lonsdale playing as "Xerxes" (black) and Altti Piirsoo (white), and the game ended in a victory for Xerxes, after a long struggle.
+
+This was no mean feat, as Altti is an exceptionally strong player, and incidentally the USA hnefatafl champion of 2015. It could be that the variant is slightly unbalanced in favour of the attackers, though the data set is not yet complete, and results will follow later. Certainly Altti has won all of his games as black, and only lost two as white, which is also the case for me ("crust"). Still, this is a very fine performance from Xerxes, who shows exemplary tactics as black in this game.
+
+(ed. Tim goes on to discuss the rules for this variant, which you can view in OpenTafl by typing 'rules'.)]
+
+1. e2-g2 e3-h3
+[There are two common opening moves; this one e2-g2, or alternatively f1-f2 (or its equivalent somewhere else around the board; at this stage it doesn't matter where). The e2-g2 opening which Xerxes is using here has the advantage of half-closing the g-file, which from the black player's point of view, is very useful. If this move were repeated around the board in a "windmill effect" it would be a very effective defense.
+
+The other option, favoured by Altti when playing as black, namely the f1-f2 move, moves in towards the centre without relinquishing the strategic e2 square. in fact it defends e2 from attack and effectively prevents the king from moving to e3, where he could be captured immediately. True, it does not lay claim to an open file such as the g-file. But remember that in this game there are no hostile corners, so the third ranks and files are not quite as strategically important here.|Altti's first move is e3-h3. This prevents black from completely closing off one corner with h5-h3, and also exploits black's move away from e2 by threatening to clear a path for the king to move to e3, which would be a very strong move if white could manage it.
+
+It makes sense to open the defenders' formation on this side, because on this side the king is able to move two or even three squares away from the throne, whereas on the other three sides he is severely hampered by black's possession of b5, e8 and h5.]
+
+2. b5-b3 e4-f4
+[Xerxes' second move is a repeat of the first, but rotated through 90 degrees. This is the so-called "windmill effect" - he is aiming to do the same move all the way around the board, if white permits it. Once complete, all ranks and files will be either closed or half-closed by black warriors, and it's hard to see how white could get through.|Altti's response is e4-f4, an interesting move that looks like the kind of doubling we saw in the Brandubh game; getting two warriors on to the same file can be a very good tactic, as the front one can go into attack, while the back one guards the rear. Of course, white starts off with all the warriors doubled, but they're all on the same rank or file as the throne square, where attack opportunities are rare. The doubling needs to be made on another rank or file, such as the f-file in this case.
+
+The attack could be f5-f8 (attacking e8) or f4-f2 (attacking g2), though the latter move is vulnerable to capture by b3-f3.]
+
+3. e1-e3 c5-c2
+[Xerxes abandons his windmill development for a lurch towards the centre with e1-e3. Perhaps the possibility of the king moving to e3 is the cause, and the move certainly cuts into white's territory and deprives Altti of space. However, it introduces a weakness in the black position, as the advanced piece at e3 is pinned and rather exposed to attack.|White moves another warrior into the contested lower half of the board. The plan here might be to move the king to e4, threatening either to exit to the undefended c-file at c4, or alternatively to capture e3 with c2-e2x.]
+
+4. e8-b8 f4-f3
+[Black returns to the windmill development, which does have the advantage of half-closing the c-file. This takes the sting out of Altti's potential e5-e4 move.|White here is trying to use the doubled pieces on the f-file to attack the exposed warrior on e3. Remember, e3 is pinned; he can't move to either side or the king would be able to win instantly by moving to e1. However, the pinned warrior does have the option to move forward and back, as long as he remains on the e-file. a move back to e2 or e-1, for instance, would preserve the warrior, though it does rather leave white in increased control of the 3rd rank, with white warriors now doubled on that rank as well as the f-file.]
+
+5. d1-d3 g5-g4
+[Instead of the retreat, Xerxes moves up another warrior to defend his colleague on e3. Sometimes in hnefatafl, you have to make this choice, whether to pull back an advanced piece, or to double down on your advance by bringing up reinforcements. Both options carry their different risks. Here, in order to defend an exposed piece, black has moved another one forward, and there is the risk that the white warrior on c2 could get behind them and make a capture.|Altti moves g5-g4. Not quite sure what the idea is here, I would have been strongly tempted by the e5-e4 king move at this point, which would have caused more hassle for the e3 warrior. But let's see what emerges from this.]
+
+6. i4-h4 g4-d4
+[Xerxes moves i4-h4, an aggressive move that threatens both g4 and h4 at the same time - this is a fork. Since white's piece on f3 is already "en prise" (available to be captured) white's position looks a little bit unstable to say the least.|This may well have been Altti's plan with the previous g5-g4 move, to move it here to d4 and threaten the d3 warrior which is pinned because it is defending the e3 warrior. Altti is hoping to destroy the black formation in the lower half of the board and break through with the king, winning on e1 probably. This does at least illustrate the risk Xerxes took, in moving up a reinforcement, rather than retreating the advanced warrior to safety. Now there are two black warriors in danger instead of one.]
+
+7. i5-i3 c2-d2xd3
+[With this move i5-i3, Xerxes develops his position on the right, and also closes off the third rank, neutralising the doubled white warriors on f3 and h3, and incidentally setting them up for a double capture (with g2-g3xx - the "xx" shows a double capture). Although an exchange of pieces would work in white's favour, losing two pieces for nothing would be very bad. Altti has an agonizing choice now - whether to press on with the attack by moving c2-d2x, or to save either f3 or h3 (as they are both en prise, both cannot be saved in one move).|Altti presses on with the attack, with c2-d2x. It's not unreasonable, since the e3 warrior is the only thing standing between the king and victory, so Altti is perhaps accepting the loss of the two white warriors at f3 and h3 in order to gain enough time to clear a pathway to the edge. He is hoping to follow up with d4-d3x, which would put him in a very strong position.]
+
+8. g2-g3xf3/h3 f5-f3
+[Xerxes performs the double capture set up last move. g2-g3xx must have been a very satisfying move to carry out. It temporarily takes the pressure off e3 as well, by removing the threatening warrior at f3. White is now looking a little bit short of manpower.|Altti replaces the lost f3 warrior with its colleague, thanks to the doubling move he made earlier. the threat to e3 is renewed, and black is by no means out of danger. However he has still the option to retreat to e1 if necessary, or move in b3-d3 to defend.]
+
+9. b3-d3 d4-e4
+[Xerxes opts for the (again) more aggressive b3-d3, sending in another reinforcement with the same attendant risks as before. Retreating is also risky though, as it loses tempo and gives up space obviously. Whether you choose to defend or flee depends on the circumstances, and occasionally on personal preference too.|White moves d4-e4, setting up a capture of either d3 or e3 next move. However, there is a problem. It all depends on d2 being "behind enemy lines", and unfortunately d2 is en prise, and likely to be slaughtered before he can do his job. I think d2-c2 would have been a better move here.]
+
+10. f1-d1xd2 e4-c4
+[Sure enough, Xerxes takes steps to protect his warriors and remove the irritating warrior on d2. An enemy warrior behind your defensive line is always a danger, and should be dealt with as soon as possible. This effectively stalls white's attack on this side of the board; Altti may already be looking at other parts of the board to see if they offer easier approaches. However, he sacrificed three warriors to get this far, and has only five left besides the king, so the odds do not look so good.|White moves e4-c4. As this is the same piece that just moved from d4-e4 last move, it represents a slight loss of tempo, but Altti needs to open up some sort of avenue on another side, maybe prepare for a king exit on the left hand side of the board, where at least there are only three black warriors; the other three sides of the board look quite well-staffed in comparison.]
+
+11. e3-e2 Ke5-f5
+[Now black allows the e3 warrior to retreat to e2, setting up a potential attack on f3 next move. It also has the advantage of placing a man on the empty second rank; it's never wise, when playing as the attackers, to leave open ranks or files.|Altti's first king move is to f5. The king must be hoping to get to the undefended 7th rank; he could even move safely to the 8th, though it would not help him to do so. Much better to place the king on an open or undefended rank or file such as the seventh.]
+
+12. h5-g5 Kf5-f7
+[Xerxes moves g5-h5; of course this does not capture the king, though it would have captured an ordinary white warrior. In fact, now that the king has moved off the throne, the white warrior on d5 is suddenly en prise.
+
+I think I would have preferred to move f9-f7 at this point, as it blocks the king and also attacks e7 at the same time, but I'm sure Xerxes had his reasons.|Altti moves the king to a strong square on an undefended rank; black could have avoided this danger with f9-f7, instead of h5-g5. Still, thanks to that white warrior on e7, black still (just) has time to deal with this threat. This is one of those cases where the king is blocked by one of his own men, and despite his slight shortage of personnel, Altti could have done with one less right here.]
+
+13. g5-g7 f3-f6
+[Xerxes blocks the king's path to the edge with g5-g7.|This is an interesting one. I'm guessing the plan is to move e7-e8, forcing black to block with something like d9-d7, then Altti would follow up with f6-g6, opening the f-file for the king to win and forcing black to block again. Whatever black does to block the f-file, white would then be in a position to capture g7 with e8-g8x. I think that's the plan.]
+
+14. f9-f8 f6-h6
+[Whether Xerxes figured that out or not, this move effectively puts an end to such shenanigans. It's a good move anyway, as diagonal lines are impossible to penetrate and hard to attack. Also notice how the king is attacked on two sides, though not opposite ones. Altti must be very careful how he gets the king out of this potentially sticky situation. The opportunities for sudden death look very threatening.|This is a pretty good attack, as it simultaneously opens the f-file and attacks the warrior on g7. Black must block the king's path to the edge, so his warrior on g7 must be doomed...maybe... But the king is in a dicey position. Say black moves d3-f3 to block the king. If Altti then proceeds with capturing g7, he will immediately lose the game, because Xerxes can move f3-f6 and capture the king. So in fact it is not certain that white will be able to capture anything.]
+
+15. d3-f3 Kf7-f5
+[Well, there it is. Xerxes move d3-f3 not only blocks the king's path, it threatens immediate capture of the king next move. Altti can either block this move (say, with e6-f6) which may have the disadvantage of further limiting the king's mobility, or move the king to safety and lose the chance of capturing g7.|Altti opts to move the king, losing the chance of taking out the warrior on g7. At least this move preserves the king's mobility and gains a little tempo, by threatening to win immediately on i5, forcing another blocking move from Xerxes.]
+
+16. i3-i5 d5-d3
+[Xerxes performs a good blocking manoeuvre. Any hopes of the king getting out on this side of the board look exceedingly remote now.|With d5-d3, Altti is signalling his desire to move the king to the other (left hand) side of the board as clearly as if he had waved a flag. It really is the only option at this point, thought the chances of success do not look great.]
+
+17. a4-b4 c4-c3
+[Making the most of his three warriors on the a-file, Xerxes moves a4 in to b4, beginning to close off all remaining exits. Look how the black warriors are arranged in orderly lines - the chaos of the battle over e3 is long forgotten; black seems to have reached a very superior position.|White hopes to outflank these three warriors, and preserve the attacked white warrior on c4, by moving it to c3. It is possibly intended to move it to a3 or b3 next, as part of an attack on b4.]
+
+18. d1-d2 Kf5-d5
+[Xerxes moves d1-d2, probably to guard against white moving c3-b3. Having d2 in place to deal with it is better than leaving it to e2, which, if it were to move away, would allow e6 to move down and disrupt the defensive line.|Another king move. It would seem more natural to place him on the c-file rather than the d-file, where he can't really do much, however, on the c-file he would be more vulnerable to attack as he could be captured by being surrounded on 2 sides; a daring move such as i5-d5 could force him to move into even greater danger.]
+
+19. h4-d4xd3 c3-d3xd4
+[With h4-d4x, Xerxes shows he now has the confidence to start picking off stragglers, which will make his job of encirclement much easier. The move does open a gap in his defensive line at h4, but even if white is able to exploit it, black is unlikely to have very much trouble.
+
+White can recapture of course, but then, so can black afterwards, so it is still worthwhile; black will capture 2 white pieces and only lose 1.| Altti recaptures with c3-d3. Even though this warrior will immediately be recaptured, it will at least open another potential gap in Xerxes' defence, and that can only be a good thing, from white's point of view.]
+
+20. b4-d4xd3 h6-h1
+[Black recaptures with b4-d4x. He knows he can do this with confidence, even though it leaves an open file; it is not safe for the king to move to the open b-file at b5, because it would immediately be captured by c8-c5x, and of course Altti knows it too.|White exploits the gap at h4 by moving right through it with h6-h1, hoping again to get another warrior "behind enemy lines" where it can do most damage. Possibly the next intended move is h1-e1, or h1-c1, though of course it very much depends on black's next move.]
+
+21. a5-c5 Kd5-f5
+[Xerxes is really on the warpath now; this move a5-c5 drastically cuts down Altti's space on the left, and threatens to win on the next move (thie king is captured on 3 sides when on the square next to the throne). Again, white has an undefended file to move to (the h-file), but can't move the king there because it would immediately be captured. However the king will have to move somewhere, to avoid instant capture. Moving e6-d6 would temporarily delay the capture, but there would not be any advantage in it - when playing as white, you don't want to block the king in with your own pieces.|The king retreats back to f5. This is a pure retreat, not a move to an advantageous square. Altti's forces are looking rather overwhelmed at this point; they were always outnumbered, but now they are pretty well surrounded as well.]
+
+22. g3-h3 h1-e1
+[Xerxes must still move carefully; the passed warrior on h1 could still be a threat, and it makes sense to close the h-file before attacking the king directly. In any case, such an attack cannot be far off.|The passed piece on h1 now goes into attack mode. If Altti can follow up with e6-e3x, that would knock a very useful hole in black's defences, though of course it is unlikely that Xerxes would allow that capture to take place. Still, a glimmer of hope...?]
+
+23. d2-d3 e1-b1
+[Xerxes defends with d2-d3, a retreat of a sort, even though the retreating warrior is also advancing towards the centre! That's what happens when enemies get behind you in battle. Altti cannot easily continue the attack, because e1-e2 would be captured by f3-f2x, and e76-e4 would be captured by f3-f4x. So Xerxes' defensive move is pretty good.|Realising that the game is not worth the candle, Altti wisely abandons that particular line of attack and moves e1 off to the open b-file. Pickings there look quite slim to be sure, but they don't look better anywhere else either.]
+
+24. a6-b6 b1-b3
+[A neat defensive move; Xerxes can confidently leave the a-file open now, as white has neither the resources nor the time to exploit that particular weakness, while moving a6-b6 closes the b-file and creates a strong diagonal from b6 to e3.|Hard to see what this move gains for Altti, he may even be playing for time and hoping Xerxes will make a mistake. Obviously moving the king back to d5 would be suicidal, so he can't be planning to attack c5 or d4. The passed warrior now on b3 is not a direct threat to black - at the moment - but it is certainly a complicating factor which is likely to delay black's final attack on the king.]
+
+25. i5-g5 e6-d6
+[Nevertheless, this move i5-g5 looks very much like the beginning of the final attack; a bold move that directly threatens the king; often in hnefatafl games, there comes a point where black can cease playing carefully, and switch over to all-out attack on the king; you can often spot this sudden change in black's tactics. Suddenly the king becomes magnetized, and enemy warriors fly across the board and stick to his sides. In some games, this can go horribly wrong; if the attack fails to nail down the king, black is likely to lose the game because his defences are now in disarray. However in this game, white's options are severely limited, and especially in tafl variants like this one where the king is weak (because he is captured on two sides like the ordinary warriors), escape will be very difficult.|Altti may be planning to move the king to d5, and this move makes it safe for him to do so. Once there, the king will threaten both c5 and d4 - now the reason behind Altti's b1-b3 move becomes clearer.]
+
+26. d4-d5 d6-g6
+[Xerxes moves d4-d5, to prevent the king's return to d5, and attack d6 at the same time. He is showing great skill in anticipating dangers before they arrive, a vital skill especially when playing as black.|Another attack thwarted, and white cannot afford to lose another piece. Possibly this move to g6 could pose a slight threat, more likely just a slight delay.
+
+Especially in on-line games, it's always worth playing on, even with a losing hand, as there is always the chance of winning on a time-out, if your opponent doesn't move in time; I have certainly won games that way, which by rights I should have lost, notably in a recent game against Duhawk93. However, in on-line tournaments as in real life ones - a win by time-out is still a win, and the chance of that may be Altti's best hope at his stage.]
+
+27. i6-h6 g6-f6
+[You can almost feel the vice being tightened - Xerxes gives it another turn of the screw with i6-h6, again leaving a file open, which he knows white is in no position to exploit. I might have been tempted by f3-f4, giving check on the king, as a more direct attack, but it's likely that move is coming soon enough, if the king doesn't move first.|Again, Altti does not want to lose another warrior, and placing it here on f6 does at least protect the king on one side. It's looking a bit like Custer's last stand though.]
+
+28. f3-f4 e7-a7
+[Here's that move I wanted to see, f3-f4 attacks the king and creates another strong diagonal, though we are probably well past the stage where such strategic formations are useful.|A surprise move, this, and probably more concerned with playing for time than with an actual tactical plan. Still, getting your warriors behind enemy lines is always a good idea, though in this case I think it's too late to make any difference - the king is well trapped in his bunker. If this were a real battle I would assume e7 was just fleeing the battlefield to save itself.]
+
+29. h6-g6
+[Another turn of the screw - now Xerxes attacks the king's one remaining bodyguard on f6. Once he is removed, the king will be defenceless. White resigns.|]

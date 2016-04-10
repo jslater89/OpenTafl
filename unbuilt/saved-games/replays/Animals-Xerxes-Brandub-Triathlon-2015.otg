@@ -1,0 +1,67 @@
+[date:2015.05.04]
+[event:Tafl Triathlon 2015]
+[round:Brandub]
+[site:aagenielsen.dk]
+[result:-1]
+[attackers:Xerxes]
+[defenders:Animals]
+[termination:Black resigns]
+[compiler:Jay Slater]
+[annotator:Tim Millar]
+[rules:dim:7 name:Brandub_Strong_Center_King surf:n atkf:y ks:c nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/]
+[start-comment:This commentary was originally posted on the World Tafl Federation's Facebook page by Tim Millar.
+
+Brandubh is corner tafl, played on a 7x7 board. White wins if the king reaches the corner, black wins if the king is captured. The King is captured by being surrounded on two sides, except in the following cases:
+
+If the king is on the central "throne" square, he must be surrounded on all 4 sides to be captured.
+
+If the king is on the square next to the throne, he must be surrounded on the other 3 sides to be captured.
+
+(ed. Note that OpenTafl's built-in brandub mode features a weak king. The rules from the rules tag in this replay's file may be added to the external-rules.conf file to add a brandub variant with a king who is strong near the throne.)
+
+If the king is on the square next to the corner, he can be captured by one enemy warrior moving in behind him, trapping him against the corner.
+
+All other pieces are captured by being surrounded on 2 sides by enemy pieces, or being trapped between a hostile square and an enemy.
+
+The corners are hostile to both sides (a warrior may be captured by being trapped between the corner and an enemy piece, and the throne is always hostile to black, and hostile to white when not occupied by the king.
+
+Only the king may occupy the throne square and the four corner squares, though any piece may pass freely over the central throne square.
+
+Don't be fooled by the small size and short games - it's an intense battle, and the lack of pieces means each one is usually doing more than one job, and each one is that much more valuable.]
+
+1. d2-e2 c4-c5
+[Fairly standard opening move for Brandubh - better than d2-f2, for example, which allows the response d3-f3. Moving d1 as an opening is quite rare, ideally d1 needs to stay exactly where it is.|A good opening move for white. Doubling up pieces on one rank like this creates a threat of attack - either c5-a5 or d5-g5, in each case, attacking the black warrior at the board edge, and in each case, the attacking white warrior is defended by the one behind it. This doubling move should be made on an open rank or file, not one that black has already occupied.]
+
+2. f4-f5 c5-a5
+[Xerxes moves f4-f5, to head off one of the attacking threats that Animals has set up. It also goes some way to creating a stable defensive position - if your first move as black was to move a piece to the right, as was the case here, then you should try to repeat that move all around the board to create a rotationally symmetrical pattern. I have heard this called the "windmill" effect. If Xerxes succeeds in moving d6-c6 and b4-b3, the pattern will be complete. It's not a foolproof defence, but it is stable, and white can only get through with heavy and risky sacrifices.|Animals takes the remaining attack option, moving c5-a5 to attack the black warrior on a4. This could well be foiled by b4-b3, a good move that defends a4 and also helps the windmill effect. But Xerxes has other plans...]
+
+3. d6-a6xa5 d5-a5xa6
+[Xerxes goes in for the kill with d6-a6x (the x denotes a capture). A risky move, since a6 can be immediately recaptured by d5-a5x, which incidentally renews the threat on a4.|Sure enough, Animals recaptures with d5-a5x, the risk he took in doubling his pieces on the 5th rank has paid off well. even though this is a straight exchange of one warrior for another warrior, white (Animals) is now in a significantly stronger position, having opened up one side of the board and claimed a strategic edge square at a5. The game is far from settled, but the balance of forces has tipped slightly towards a white victory.]
+
+4. f5-d5 d3-a3xa4
+[Xerxes places a warrior on d5 to prevent the king exiting the throne on that side. A good strategy, though the warrior on d5 may be attacked with e4-e5, for instance.
+
+The main problem is that it does nothing to prevent white moving d3-a3x, capturing the black warrior on a4. Remember, in this version, the king is relatively safe on the throne square. Some versions of Brandubh have the king vulnerable to capture on 2 sides even on the throne, so that move would be suicidal. Here, however, he is relatively safe as long as he is on the throne or on the square next to the throne - so it's vital to know exactly which version you are playing, and what the throne rules are.|Sure enough, Animals knows his king is safe for the moment, and so his warrior on d3 is free to move to a3 and capture, with d3-a3x. An excellent move, and since black cannot immediately recapture, white now has superiority of material as well as position. Black has lost 2 to white's 1. I do not much fancy black's chances from this point, though even now, the game is not quite settled - the king is very vulnerable once he leaves the safety of the throne square, and a sudden ambush could well catch him out in the open. Black still has more than enough warriors for that.]
+
+5. e2-c2 a5-b5
+[Black moves e2-c2 - seeing that the left hand side of the board is now dominated by white, black seeks to redress the situation. All hope of a windmill defence is long gone; Xerxes must try to anticipate where the king will move, and try to ambush him on his way to a corner. This move is not bad - it seems likely the king will try to reach the a-file, so the c-file could become vital - but it leaves the right hand side of the board very lightly defended - white might start to contemplate moving the king that way instead, despite his strong position on the left.|Another attack from Animals, this time attacking the black warrior on b4, hoping to force it to move, which would allow the king access to the a-file (from where he would almost certainly be able to reach either a1 or a7 and win). Attacking from this side is clever, since a3-b3 would be captured, and a5-a4 or 3-a4 could be blocked by c2-c4, and in any case, would block up the a4 square the king is trying to get to.]
+
+6. b4-c4 b5-b4xc4
+[There was not really a good move available to black here, since leaving b4 where it was would lead to its loss, as would moving it to a4, and moving it away to b3 would lead to the king moving to a4 - where he could not be stopped. At least losing the warrior here on c4 forces white to move in behind it, temporarily blocking the king's path with one of his own men. An ambush on the king might still be possible, but it's a fairly faint hope.|Understandably, Animals accepts the sacrifice with b5-b4x. Another black warrior down, and white looking stronger than ever. At this point you'd have to say, white would have to make a serious error to lose this game.]
+
+7. d1-d3 e4-e2
+[Black moves d1-d3. In some versions of the rules, such as Brandubh as it is played at www.dragonheelslair.com (ed. Or, as I said earlier, in OpenTafl!) this would be a winning move for black; but sadly (for Xerxes) not here. It is however half-way to surrounding the king, if only he can move c2-c4 and g4-e4.... However, Animals has several ways he can thwart that plan. b4-b5 might be good, as it forces black to interpose another warrior with c2-c4, which can immediately be killed.
+
+Note how the king's power depends on his position - on the throne, he has twice the defensive capability that he has away from it. Animals is using that extra power to great effect here.|Instead of b4-b5 (a rather merciless and unsubtle swipe) - Animals opts for the much more interesting e4-e2. Like most good tafl moves, this accomplishes two goals in one move: attacking the black warrior on d3 and simultaneously opening an exit for the king, to the lightly-defended right hand side of the board.
+
+Note how d3 must stay on the d-file, otherwise the king can get to the 1st rank which is open at both ends - a certain winning move.]
+
+8. d3-d2 Kd4-d3
+[Xerxes retreats d3 back to safety on d2. The warrior is saved, but black's position is dire. Animals has 3 possible exits for the king, all leading to potential winning positions. A white victory looks inevitable from here, though it's impossible to predict where on the board it might happen.|The first king move in the game is always a bit of a turning point. Here, Animals moves the king to d3, hoping to gain g3 on the next move, which would make the king unstoppable; the white warrior on e2 is blocking the two black ones on c2 and d2, and preventing them from interfering with the king's business.]
+
+9. g4-g3 Kd3-f3
+[Black moves g4-g3. Since g4 is the only piece who can stop the king moving to g3, this move is inevitable. However, the king will be able to stand safely on f3, since no other black warrior will be able to get to e3 to capture him. This seems like the quickest route to victory, though by no means the only one.|White moves the king to f3, taking advantage of the fact that the two black warriors on c2 and d2 are unable to move across and block him. Remember the king can't move to f7, because d7-e7 would capture him. The square next to the corner is a real danger to the king. But at the moment he could move to f1 quite safely. If black moves either c2-c1 or d2-d1, that would prevent the king moving to f1 for the same reason he can't move to f7 - the so-called "hostile corner" will get him.]
+
+10. d2-d1 Kf3-f2
+[Xerxes sensibly pulls d2 back to d1 - remember how I said d1 should stay where it is, if possible? Now he's back there, after his adventure to d3 and the to d2, neither of which really advanced black's cause. So, black has fended off temporarily the threat of the king moving to f1, though white could move e2-e1 to secure the corner (as c2-f2 would be met with e1-f1x), or alternatively the king might move to f2 threatening to move safely into the gap between the hostile corner and the black warrior on g3. This move would be countered either with g3-g2 (followed by a3-g3x - disastrous for black) - or g3-g4 (followed by a3-g3 - also probably fatal for black).|Animals chose the second of the two options I described. The king is worryingly close to the corner now - either f2-g2 or e2-e1 will lead to certain victory, and black cannot prevent both. Black resigns.]
+
