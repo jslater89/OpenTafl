@@ -105,6 +105,9 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.4.1b
+- Foteviken tablut: king is strong everywhere, not just near the center
+
 v0.2.4b
 - Implementation of 'rules' command in the UI
 - Scrolling message dialog fixes and improvements
