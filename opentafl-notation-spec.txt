@@ -122,7 +122,7 @@ are present only for organizational purposes.
 	[<"esc:"><escape-type>] [<"surf:"><yes-no>] [<"atkf:"><yes-no>] [<"tfr:"><threefold-rule>]
 
 	# These rules concern piece strengths and movement types.
-	[<"ka:"><yes-no>] [<"ks:"><yes-no>] [<"kj:"><jump-type>]
+	[<"ka:"><yes-no>] [<"ks:"><king-mode>] [<"kj:"><jump-type>]
 	[<"nj:"><jump-type>] [<"cj:"><jump-type>]
 
 	# These rules concern special spaces on the board.
@@ -158,6 +158,10 @@ are present only for organizational purposes.
 		yes-no:
 			"y": yes
 			"n": no
+	    king-mode:
+	        "s": strong
+	        "c": strong on or adjacent to center, weak elsewhere
+	        "w": weak everywheret
 		jump-type:
 			"n": no jumps
 			"r": restricted jumps: only to center, corners, or friendly fortresses
