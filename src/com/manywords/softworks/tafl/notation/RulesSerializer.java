@@ -78,6 +78,7 @@ public class RulesSerializer {
 
 
     public static String getRulesRecord(Rules rules) {
+        Coord.initialize(rules.boardSize);
         String otnrString = "";
 
         otnrString += "dim:";
