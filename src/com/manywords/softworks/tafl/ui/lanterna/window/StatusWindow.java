@@ -48,10 +48,7 @@ public class StatusWindow extends BasicWindow {
 
     public void addStatus(String text) {
         System.out.println("Got status line: " + text);
-        String[] lines = text.split("\n");
-        for(int i = 0; i < lines.length; i++) {
-            mTextDisplay.addLine(lines[i]);
-        }
+        mTextDisplay.addLine(text);
     }
 
     public void handleTimeUpdate(Side side, GameClock.TimeSpec attackerEntry, GameClock.TimeSpec defenderEntry) {

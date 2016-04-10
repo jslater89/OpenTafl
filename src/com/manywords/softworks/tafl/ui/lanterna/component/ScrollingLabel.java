@@ -93,7 +93,6 @@ public class ScrollingLabel extends Label {
 
         String[] lines = text.split("\n");
         for(String line : lines) {
-            // Preserve double-spacing
             if(line.equals("")) line = " ";
 
             mStringBuffer.add(0, line);
