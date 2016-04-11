@@ -171,7 +171,7 @@ public class HumanReadableRulesPrinter {
                 rules += "The throne is hostile to the following taflmen: " + hostile + ". ";
             }
 
-            if(!hostileEmpty.isEmpty() && !hostile.contains("no taflmen")) {
+            if(!hostileEmpty.isEmpty() && !hostileEmpty.contains("no taflmen")) {
                 rules += "Additionally, the throne is hostile to the following taflmen when empty: " + hostileEmpty + ". ";
             }
 
@@ -664,16 +664,16 @@ public class HumanReadableRulesPrinter {
         if(!taflmanSpecPattern.matcher(spec).matches()) throw new IllegalArgumentException("Bad taflman spec");
 
         String taflmenString = (attackingSide ? "attacking " : "defending ");
+
+        if(spec.equals("tcnkTCNK")) {
+            return "all " + (attackingSide ? "attacking" : "defending") + " taflmen";
+        }
+
         if(attackingSide) {
             spec = spec.replaceAll("[TCNK]", "");
         }
         else {
             spec = spec.replaceAll("[tcnk]", "");
-            spec = spec.toLowerCase();
-        }
-
-        if(spec.equals("tcnk")) {
-            return "all " + (attackingSide ? "attacking" : "defending") + " taflmen";
         }
 
         if(!r.getAttackers().hasKnights()) {
@@ -709,15 +709,19 @@ public class HumanReadableRulesPrinter {
             }
 
             switch(c) {
+                case 'T':
                 case 't':
                     taflmenString += "taflmen";
                     break;
+                case 'C':
                 case 'c':
                     taflmenString += "commanders";
                     break;
+                case 'N':
                 case 'n':
                     taflmenString += "knights";
                     break;
+                case 'K':
                 case 'k':
                     taflmenString += "kings";
             }
