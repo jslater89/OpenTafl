@@ -105,6 +105,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.4.3b (released 04/10/16):
+- Fix rules printing bugs relating to throne hostility when empty, and to king-
+only hostility
+
 v0.2.4.2b (released 04/10/16):
 - Tablut variants: kings are supposed to be armed
 - Add two more Tim Millar commentaries
