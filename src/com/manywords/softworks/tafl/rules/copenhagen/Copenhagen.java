@@ -8,6 +8,8 @@ import com.manywords.softworks.tafl.rules.copenhagen.eleven.test.*;
 import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Board;
 
 public class Copenhagen extends Rules {
+    private String mName = "Copenhagen";
+
     public static Copenhagen newCopenhagen11() {
         Copenhagen11Board board = new Copenhagen11Board();
         Copenhagen11Attackers attackers = new Copenhagen11Attackers(board);
@@ -24,6 +26,7 @@ public class Copenhagen extends Rules {
         Copenhagen11Defenders defenders = new Copenhagen11Defenders(board);
 
         Copenhagen rules = new Copenhagen(board, attackers, defenders);
+        rules.mName = "Copenhagen (relaxed shieldwall)";
         rules.mStrictShieldwallRule = false;
         return rules;
     }
@@ -79,7 +82,7 @@ public class Copenhagen extends Rules {
 
     @Override
     public String getName() {
-        return "Copenhagen";
+        return mName;
     }
 
     private Board mStartingBoard;
