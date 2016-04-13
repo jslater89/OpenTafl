@@ -178,12 +178,6 @@ public class ExternalEngineHost {
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
     }
 
-    public void start(Game game) {
-        mGame = game;
-        side(mPlayer.isAttackingSide());
-        mCommThread.sendCommand("start\n".getBytes(Charset.forName("US-ASCII")));
-    }
-
     public void position(GameState state) {
         String command = "position ";
         command += state.getOTNPositionString();

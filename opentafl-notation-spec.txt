@@ -158,10 +158,10 @@ are present only for organizational purposes.
 		yes-no:
 			"y": yes
 			"n": no
-	    king-mode:
-	        "s": strong
-	        "c": strong on or adjacent to center, weak elsewhere
-	        "w": weak everywheret
+		king-mode:
+			"s": strong
+			"c": strong on or adjacent to center, weak elsewhere
+			"w": weak everywheret
 		jump-type:
 			"n": no jumps
 			"r": restricted jumps: only to center, corners, or friendly fortresses
