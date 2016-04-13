@@ -105,9 +105,14 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.4.4b (released 04/13/16)
+- Fix Fetlar: king should be strong (oops)
+- Copenhagen: different variant names for standard and relaxed-shieldwall
+- Add a commentary of an amateur game
+
 v0.2.4.3b (released 04/10/16):
 - Fix rules printing bugs relating to throne hostility when empty, and to king-
-only hostility
+  only hostility
 
 v0.2.4.2b (released 04/10/16):
 - Tablut variants: kings are supposed to be armed
