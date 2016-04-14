@@ -72,6 +72,7 @@ public class LocalAi extends Player {
                 //System.out.println("Best path zobrist: " + bestMove.getZobrist());
 
                 onMoveDecided(bestMove.getRootMove());
+                workspace.printSearchStats();
             }
         });
         mWorker.start();

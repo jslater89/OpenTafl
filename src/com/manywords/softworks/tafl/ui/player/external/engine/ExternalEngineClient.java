@@ -105,6 +105,8 @@ public class ExternalEngineClient implements UiCallback {
                 GameTreeNode bestMove = workspace.getTreeRoot().getBestChild();
                 sendMoveCommand(bestMove.getEnteringMove());
                 mGame.getCurrentState().makeMove(bestMove.getEnteringMove());
+
+                workspace.printSearchStats();
             }
         });
         mAiThread.start();
@@ -202,6 +204,7 @@ public class ExternalEngineClient implements UiCallback {
                 }
 
                 sendAnalysisCommand(workspace, bestNodes);
+                workspace.printSearchStats();
             }
         });
         mAiThread.start();

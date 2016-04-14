@@ -33,6 +33,9 @@ public class AiWorkspace extends Game {
 
     private long mStartTime;
     private long mEndTime;
+
+    private int mLastDepth;
+    private int mLastExtensionDepth;
     /**
      * In milliseconds
      */
@@ -126,7 +129,7 @@ public class AiWorkspace extends Game {
 
             // If we still want to make moves in main time, and if main time would allow us to consider those moves
             // for longer than just spending one overtime plus leftover main time every time, figure that out.
-            if(movesLeft > 0 && (entry.mainTime > movesLeft * overtimeTime)) {
+            if(movesLeft > 0 && (mainTimeRemaining > movesLeft * overtimeTime)) {
                 long timePerMove = mainTimeRemaining / movesLeft;
                 if(mainTimeRemaining + overtimeTime > timePerMove) {
                     return timePerMove;
@@ -207,6 +210,8 @@ public class AiWorkspace extends Game {
 
         // Do the main search
         for (depth = 1; depth <= maxDepth;) {
+            mLastDepth = depth;
+
             if (canDoDeeperSearch(depth)) {
                 if (isTimeCritical() || mNoTime || mExtensionTime) {
                     break;
@@ -301,16 +306,19 @@ public class AiWorkspace extends Game {
             }
         }
 
+        mLastExtensionDepth = extensionDepth;
         mEndTime = System.currentTimeMillis();
+    }
 
-        int nodes = getGameTreeSize(depth);
-        int fullNodes = getGameTreeSize(depth + extensionLimit);
+    public void printSearchStats() {
+        int nodes = getGameTreeSize(mLastDepth);
+        int fullNodes = getGameTreeSize(mLastDepth + mLastExtensionDepth);
         int size = getTreeRoot().mBranches.size();
         double observedBranching = ((mGame.mAverageBranchingFactor * mGame.mAverageBranchingFactorCount) + size) / (++mGame.mAverageBranchingFactorCount);
         mGame.mAverageBranchingFactor = observedBranching;
 
         if(chatty && mUiCallback != null) {
-            mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / maxDepth)));
+            mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
             mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec, extended by " + (fullNodes - nodes) + " extra nodes");
         }
     }
