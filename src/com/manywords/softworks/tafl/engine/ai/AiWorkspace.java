@@ -165,6 +165,7 @@ public class AiWorkspace extends Game {
     }
 
     public void explore(int maxThinkTime) {
+        if(maxThinkTime == 0) maxThinkTime = Integer.MAX_VALUE;
         mMaxThinkTime = maxThinkTime * 1000;
 
         mStartTime = System.currentTimeMillis();
