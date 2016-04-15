@@ -105,6 +105,12 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.4.5b (released 04/15/16):
+- Provide external engines sufficient information to restart a game from replay
+  after finishing a regular game.
+- Fix AI sometimes accidentally running out of time.
+- Fix AI time use planning when think time is set to 0 (0 means 'AI's choice')
+
 v0.2.4.4b (released 04/13/16)
 - Fix Fetlar: king should be strong (oops)
 - Copenhagen: different variant names for standard and relaxed-shieldwall
