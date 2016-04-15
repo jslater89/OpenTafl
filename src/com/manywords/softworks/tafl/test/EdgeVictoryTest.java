@@ -19,6 +19,11 @@ class EdgeVictoryTest extends TaflTest implements UiCallback {
     }
 
     @Override
+    public void modeChanging(Mode mode, Object gameObject) {
+
+    }
+
+    @Override
     public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
@@ -35,6 +40,11 @@ class EdgeVictoryTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
+
+    }
+
+    @Override
+    public void modalStatus(String title, String text) {
 
     }
 

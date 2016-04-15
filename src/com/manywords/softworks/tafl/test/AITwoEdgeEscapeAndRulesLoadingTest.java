@@ -20,6 +20,11 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
     }
 
     @Override
+    public void modeChanging(Mode mode, Object gameObject) {
+
+    }
+
+    @Override
     public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
@@ -37,6 +42,11 @@ class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCallback 
     @Override
     public void statusText(String text) {
         System.out.println(text);
+    }
+
+    @Override
+    public void modalStatus(String title, String text) {
+
     }
 
     @Override

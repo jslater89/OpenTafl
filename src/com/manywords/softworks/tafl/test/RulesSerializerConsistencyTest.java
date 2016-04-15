@@ -14,6 +14,8 @@ class RulesSerializerConsistencyTest extends TaflTest {
         rules = RulesSerializer.loadRulesRecord(rules1);
         String rules2 = rules.getOTRString();
 
+        //System.out.println(rules1);
+        //System.out.println(rules2);
         assert RulesSerializer.rulesEqual(rules1, rules2);
     }
 

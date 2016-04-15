@@ -2,11 +2,9 @@ package com.manywords.softworks.tafl.test;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
-import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
@@ -26,8 +24,8 @@ class GameClockTest extends TaflTest implements UiCallback {
         Rules rules = Berserk.newCommanderCornerCaptureKingTest();
         mGame = new Game(rules, null, new GameClock.TimeSpec(500, 0, 0, 0));
 
-        Side defenders = mGame.getGameRules().getDefenders();
-        Side attackers = mGame.getGameRules().getAttackers();
+        Side defenders = mGame.getRules().getDefenders();
+        Side attackers = mGame.getRules().getAttackers();
 
         mGame.getClock().setCallback(mClockCallback);
 
@@ -185,6 +183,11 @@ class GameClockTest extends TaflTest implements UiCallback {
     }
 
     @Override
+    public void modeChanging(Mode mode, Object gameObject) {
+
+    }
+
+    @Override
     public void awaitingMove(Player player, boolean isAttackingSide) {
 
     }
@@ -201,6 +204,11 @@ class GameClockTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
+
+    }
+
+    @Override
+    public void modalStatus(String title, String text) {
 
     }
 

@@ -5,13 +5,31 @@ import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class Game {
+    public static class Tag {
+        public static final String EVENT = "event";
+        public static final String SITE = "site";
+        public static final String DATE = "date";
+        public static final String ROUND = "round";
+        public static final String ATTACKERS = "attackers";
+        public static final String DEFENDERS = "defenders";
+        public static final String RESULT = "result";
+        public static final String ANNOTATOR = "annotator";
+        public static final String COMPILER = "compiler";
+        public static final String TIME_CONTROL = "time-control";
+        public static final String TIME_REMAINING = "time-remaining";
+        public static final String TERMINATION = "termination";
+        public static final String VARIANT = "variant";
+        public static final String START_COMMENT = "start-comment";
+        public static final String RULES = "rules";
+        public static final String POSITION = "position";
+    }
     public Game(long[][] zobristTable, List<GameState> history) {
         if (!(this instanceof AiWorkspace)) {
             throw new IllegalArgumentException("Empty constructor is only for AiWorkspace!");
@@ -29,7 +47,7 @@ public class Game {
         mGameRules = rules;
 
         if(timeSpec != null) {
-            mClock = new GameClock(this, getGameRules().getAttackers(), getGameRules().getDefenders(), timeSpec);
+            mClock = new GameClock(this, getRules().getAttackers(), getRules().getDefenders(), timeSpec);
         }
 
         int boardSquares = rules.getBoard().getBoardDimension() * rules.getBoard().getBoardDimension();
@@ -49,6 +67,9 @@ public class Game {
 
         Taflman.initialize(this, mGameRules);
 
+        // Add the starting state to the history.
+        mHistory.add(mCurrentState);
+
         mCallback = callback;
     }
 
@@ -60,10 +81,11 @@ public class Game {
     private Rules mGameRules;
     private GameState mCurrentState;
     private List<GameState> mHistory;
+    private Map<String, String> mTagMap = new LinkedHashMap<String, String>();
 
     public void start() {
         if(mClock != null) {
-            mClock.start(getGameRules().getStartingSide());
+            mClock.start(getCurrentSide());
         }
     }
 
@@ -73,8 +95,39 @@ public class Game {
         }
     }
 
+    public void setTagMap(Map<String, String> tagMap) {
+        mTagMap = tagMap;
+    }
+
+    public Map<String, String> getTagMap() {
+        return mTagMap;
+    }
+
     public UiCallback getUiCallback() {
         return mCallback;
+    }
+
+    public void loadClock() {
+        if(mTagMap != null && mTagMap.containsKey("time-control")) {
+            String clockLengthString = mTagMap.get("time-control");
+            GameClock.TimeSpec clockLength = GameClock.getTimeSpecForGameNotationString(clockLengthString);
+
+            mClock = new GameClock(this, getCurrentState().getAttackers(), getCurrentState().getDefenders(), clockLength);
+
+            if(mTagMap.containsKey("time-remaining")) {
+                String remainingTimeString = mTagMap.get("time-remaining");
+                String[] remainingTimes = remainingTimeString.split(",");
+
+                GameClock.TimeSpec attackerTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
+                GameClock.TimeSpec defenderTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
+
+                GameClock.ClockEntry attackerClock = mClock.getClockEntry(true);
+                attackerClock.setTime(attackerTime);
+
+                GameClock.ClockEntry defenderClock = mClock.getClockEntry(false);
+                defenderClock.setTime(defenderTime);
+            }
+        }
     }
 
     public GameClock getClock() { return mClock; }
@@ -83,12 +136,16 @@ public class Game {
         this.mCallback = mCallback;
     }
 
-    public Rules getGameRules() {
+    public Rules getRules() {
         return mGameRules;
     }
 
     public void setGameRules(Rules mGameRules) {
         this.mGameRules = mGameRules;
+    }
+
+    public void setCurrentState(GameState state) {
+        mCurrentState = state;
     }
 
     public GameState getCurrentState() {
@@ -101,20 +158,69 @@ public class Game {
 
     public String getHistoryString() {
         String gameRecord = "";
-        int count = 1;
-        for(int i = 0; i < getHistory().size(); ) {
-            gameRecord += count++ + ". ";
-            if(i + 1 < getHistory().size()) {
-                gameRecord += getHistory().get(i++).getExitingMove() + " " + getHistory().get(i++).getExitingMove() + "\n";
+        gameRecord = Pattern.compile("\\[.*?\\]", Pattern.DOTALL).matcher(getCommentedHistoryString()).replaceAll("");
+        gameRecord = Pattern.compile("\n\n").matcher(gameRecord).replaceAll("\n");
+
+        return gameRecord;
+    }
+
+    public String getCommentedHistoryString() {
+        String gameRecord = "";
+        int turnCount = 1;
+
+        int i = 0;
+        List<GameState> thisTurn = new ArrayList<>();
+        boolean startingSideAttackers = getRules().getStartingSide().isAttackingSide();
+        boolean otherSideWent = false;
+        while(i < getHistory().size()) {
+            GameState s = getHistory().get(i++);
+            if(s.getExitingMove() == null) break;
+
+            if(!otherSideWent && s.getCurrentSide().isAttackingSide() == startingSideAttackers) {
+                thisTurn.add(s);
             }
-            else {
-                gameRecord += getHistory().get(i++).getExitingMove() + "\n";
+            else if(s.getCurrentSide().isAttackingSide() != startingSideAttackers) {
+                thisTurn.add(s);
+                otherSideWent = true;
+            }
+            else if(otherSideWent && s.getCurrentSide().isAttackingSide() == startingSideAttackers) {
+                gameRecord += getCommentedStringForMoves(turnCount, thisTurn);
+
+                thisTurn.clear();
+                thisTurn.add(s);
+                turnCount++;
+                otherSideWent = false;
             }
 
-            if(i == getHistory().size()) break;
+        }
+
+        if(thisTurn.size() > 0) {
+            gameRecord += getCommentedStringForMoves(turnCount, thisTurn);
         }
 
         return gameRecord;
+    }
+
+    private String getCommentedStringForMoves(int turnNumber, List<GameState> states) {
+
+
+        String commentedString = turnNumber + ". ";
+
+        for(GameState state : states) {
+            commentedString += ((DetailedMoveRecord) state.getExitingMove()) + " ";
+        }
+        commentedString += "\n";
+
+        commentedString += "[";
+        for(GameState state : states) {
+            DetailedMoveRecord m = (DetailedMoveRecord) state.getExitingMove();
+            String timeString = m.getTimeRemaining() != null ? m.getTimeRemaining().toString() + " " : "";
+            commentedString += "|" + timeString + m.getComment();
+        }
+        commentedString = commentedString.replaceFirst("\\|", "");
+        commentedString += "]\n";
+
+        return commentedString;
     }
 
     /**
@@ -137,12 +243,11 @@ public class Game {
                 nextState.getBoard(),
                 nextState.getAttackers(),
                 nextState.getDefenders(),
-                advanceTurn,
-                true,
+                true, // update zobrist
                 berserkingTaflman);
 
         mCurrentState = nextState;
-        mHistory.add(currentState);
+        mHistory.add(mCurrentState);
 
         if(mClock != null) {
             mClock.slap(advanceTurn);

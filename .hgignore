@@ -9,6 +9,9 @@ bin*
 profile*
 debug-positions*
 out*
+tournament-results*
+selfplay-results*
+engines/opentafl-debug-2.ini
 
 .idea/workspace.xml
 .idea/tasks.xml
@@ -16,8 +19,12 @@ out*
 .idea/dictionaries/**xml
 .idea/vcs.xml
 
-package/README.txt
-package/LICENSE.txt
+package/*
 
 **~
 **local.properties
+
+syntax: regexp
+
+^saved-games/.*
+^engines/.*

@@ -8,6 +8,8 @@ import com.manywords.softworks.tafl.rules.copenhagen.eleven.test.*;
 import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Board;
 
 public class Copenhagen extends Rules {
+    private String mName = "Copenhagen";
+
     public static Copenhagen newCopenhagen11() {
         Copenhagen11Board board = new Copenhagen11Board();
         Copenhagen11Attackers attackers = new Copenhagen11Attackers(board);
@@ -24,6 +26,7 @@ public class Copenhagen extends Rules {
         Copenhagen11Defenders defenders = new Copenhagen11Defenders(board);
 
         Copenhagen rules = new Copenhagen(board, attackers, defenders);
+        rules.mName = "Copenhagen (relaxed shieldwall)";
         rules.mStrictShieldwallRule = false;
         return rules;
     }
@@ -77,6 +80,11 @@ public class Copenhagen extends Rules {
         mStartingDefenders = defenders;
     }
 
+    @Override
+    public String getName() {
+        return mName;
+    }
+
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;
@@ -94,9 +102,9 @@ public class Copenhagen extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
+    public int getKingStrengthMode() {
         // King must be surrounded on four sides
-        return true;
+        return KING_STRONG;
     }
 
     @Override
@@ -106,12 +114,12 @@ public class Copenhagen extends Rules {
 
     @Override
     public int getKnightJumpMode() {
-        return Taflman.JUMP_NONE;
+        return Taflman.JUMP_CAPTURE;
     }
 
     @Override
     public int getCommanderJumpMode() {
-        return Taflman.JUMP_NONE;
+        return Taflman.JUMP_STANDARD;
     }
 
     @Override
@@ -202,7 +210,7 @@ public class Copenhagen extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         return true;
     }
 
@@ -219,7 +227,7 @@ public class Copenhagen extends Rules {
 
     @Override
     public int threefoldRepetitionResult() {
-        return Rules.DRAW;
+        return Rules.THIRD_REPETITION_WINS;
     }
 
     @Override
@@ -239,7 +247,7 @@ public class Copenhagen extends Rules {
 
     @Override
     public Side getStartingSide() {
-        return mStartingDefenders;
+        return mStartingAttackers;
     }
 
     @Override

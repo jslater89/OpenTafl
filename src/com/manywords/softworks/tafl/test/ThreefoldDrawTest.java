@@ -5,9 +5,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.command.CommandResult;
 import com.manywords.softworks.tafl.ui.player.Player;
@@ -16,6 +14,11 @@ class ThreefoldDrawTest extends TaflTest implements UiCallback {
 
     @Override
     public void gameStarting() {
+
+    }
+
+    @Override
+    public void modeChanging(Mode mode, Object gameObject) {
 
     }
 
@@ -36,6 +39,11 @@ class ThreefoldDrawTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
+
+    }
+
+    @Override
+    public void modalStatus(String title, String text) {
 
     }
 
@@ -71,6 +79,7 @@ class ThreefoldDrawTest extends TaflTest implements UiCallback {
         Rules rules = Fetlar.newFetlar11();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
+        state.setCurrentSide(state.getDefenders());
 
         // Target: start position
 

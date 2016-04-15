@@ -9,11 +9,11 @@ import com.manywords.softworks.tafl.ui.UiCallback;
 import java.util.List;
 
 public class LocalAi extends Player {
-    private MoveCallback mCallback;
+    private PlayerCallback mCallback;
     private UiWorkerThread mWorker;
 
     @Override
-    public void setCallback(MoveCallback c) {
+    public void setCallback(PlayerCallback c) {
         mCallback = c;
     }
 
@@ -22,16 +22,18 @@ public class LocalAi extends Player {
         ui.statusText("Waiting for computer move.");
 
         mWorker = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
+            AiWorkspace workspace = new AiWorkspace(ui, game, game.getCurrentState(), 50);
+
             private boolean mRunning = true;
 
             @Override
             public void cancel() {
+                workspace.crashStop();
                 mRunning = false;
             }
 
             @Override
             public void run() {
-                AiWorkspace workspace = new AiWorkspace(ui, game, game.getCurrentState(), 50);
                 workspace.chatty = true;
 
                 workspace.explore(thinkTime);
@@ -70,14 +72,30 @@ public class LocalAi extends Player {
                 //System.out.println("Best path zobrist: " + bestMove.getZobrist());
 
                 onMoveDecided(bestMove.getRootMove());
+                workspace.printSearchStats();
             }
         });
         mWorker.start();
     }
 
     @Override
+    public void moveResult(int moveResult) {
+
+    }
+
+    @Override
+    public void opponentMove(MoveRecord move) {
+
+    }
+
+    @Override
     public void stop() {
         if(mWorker != null) mWorker.cancel();
+    }
+
+    @Override
+    public void timeUpdate() {
+
     }
 
     @Override

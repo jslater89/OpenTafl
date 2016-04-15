@@ -20,9 +20,9 @@ Copyright 2015 Jay Slater
 
 package com.manywords.softworks.tafl.notation;
 
-import com.manywords.softworks.tafl.rules.Board;
-import com.manywords.softworks.tafl.rules.Coord;
-import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.rules.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,5 +121,43 @@ public class PositionSerializer {
         }
 
         return board;
+    }
+
+    public static GameState loadPositionRecord(Rules rules, String otnPosition, Game g) {
+        //char[][] board = loadPositionRecord(otnPosition);
+        Board b = new GenericBoard(rules);
+        List<List<Side.TaflmanHolder>> positionTaflmen = parseTaflmenFromPosition(otnPosition);
+        Side attackers = new GenericSide(b, true, positionTaflmen.get(0));
+        Side defenders = new GenericSide(b, false, positionTaflmen.get(1));
+        b.setupTaflmen(attackers, defenders);
+
+        return new GameState(g, g.getRules(), b, attackers, defenders);
+    }
+
+    public static List<List<Side.TaflmanHolder>> parseTaflmenFromPosition(String startPosition) {
+        List<Side.TaflmanHolder> attackers = new ArrayList<Side.TaflmanHolder>();
+        List<Side.TaflmanHolder> defenders = new ArrayList<Side.TaflmanHolder>();
+        List<List<Side.TaflmanHolder>> taflmen = new ArrayList<>();
+        taflmen.add(attackers);
+        taflmen.add(defenders);
+
+        char[][] boardArray = PositionSerializer.loadPositionRecord(startPosition);
+
+        for(int y = 0; y < boardArray.length; y++) {
+            for(int x = 0; x < boardArray.length; x++) {
+                char taflman = boardArray[y][x];
+                if(taflman != Taflman.EMPTY) {
+                    Side.TaflmanHolder holder = new Side.TaflmanHolder(taflman, Coord.get(x, y));
+                    if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
+                        attackers.add(holder);
+                    }
+                    else {
+                        defenders.add(holder);
+                    }
+                }
+            }
+        }
+
+        return taflmen;
     }
 }

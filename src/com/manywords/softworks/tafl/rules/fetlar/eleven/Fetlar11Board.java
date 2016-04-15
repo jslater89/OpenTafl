@@ -5,7 +5,7 @@ import com.manywords.softworks.tafl.rules.BoardImpl;
 
 public class Fetlar11Board extends BoardImpl {
     public Fetlar11Board() {
-        super();
+        super(11);
     }
 
     public Fetlar11Board(Board board) {

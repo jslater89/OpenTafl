@@ -122,7 +122,7 @@ are present only for organizational purposes.
 	[<"esc:"><escape-type>] [<"surf:"><yes-no>] [<"atkf:"><yes-no>] [<"tfr:"><threefold-rule>]
 
 	# These rules concern piece strengths and movement types.
-	[<"ka:"><yes-no>] [<"ks:"><yes-no>] [<"kj:"><jump-type>]
+	[<"ka:"><yes-no>] [<"ks:"><king-mode>] [<"kj:"><jump-type>]
 	[<"nj:"><jump-type>] [<"cj:"><jump-type>]
 
 	# These rules concern special spaces on the board.
@@ -158,6 +158,10 @@ are present only for organizational purposes.
 		yes-no:
 			"y": yes
 			"n": no
+		king-mode:
+			"s": strong
+			"c": strong on or adjacent to center, weak elsewhere
+			"w": weak everywheret
 		jump-type:
 			"n": no jumps
 			"r": restricted jumps: only to center, corners, or friendly fortresses
@@ -293,69 +297,91 @@ Sea Battle 9x9:
 9x9, escape to the edges, king unarmed, center and corners not hostile, all pieces may
 move through and stop on the center and corners.
 
-dim:9 esc:e ka:n cen: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
+dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4/4t4/3ttt3/
 
 4. Game Records
-	# These elements should be separated by newlines. Tags may be placed on individual
-	# lines, or 
-	# Rules strings should not
-	# contain any newlines.
 	[tags]
-	<rules-string>
-	[position-string]
+	<rules-tag>
 	
 	# This pattern should be separated from the header by newlines.
 	# This pattern repeats for the whole game. The final element may omit
-	# one move record, if the game ends. Commentary should be displayed
-	# alongside its turn.
-	<<turn-number><"."> <move-record> <move-record>>
-	[[first-half-commentary]|[second-half-commentary]]
+	# one move record, if the game ends. The host engine should display
+	# commentary, if provided, alongside a loaded game.
+	<<turn-number><"."> <move-record> <move-record> [move-record]...>
+	[<first-half-commentary>[<"|"><more-commentary>]]
 
 	tags: 
 		none, some, or all tags may be included, at the compiler's choice.
+		Tags may not contain newlines. Each tag should be placed on its own
+		line. The rules tag must always be the final tag.
 		[<"["><tag-type><":"><tag-value><"]">]
 		
 	tag-type:
 		"event": 
 			tournament or match event name
 		"site": 
-			location of game, in city, country format
+			location of game, in city, country format, or as a URL, for online
+			games
 		"date": 
 			date of game: YYYY.MM.DD
 		"round": 
 			round in tournament or match
 		"attackers": 
-			player of the attackers, in lastname, firstname format
+			player of the attackers, in customary format
 		"defenders": 
-			player of the defenders
+			player of the defenders, in customary format
 		"result": 
 			"1" (attackers win), "0" (draw), "-1" (defenders win), or "?" (other)
 		"annotator": 
-			person providing game notes, in lastname, firstname format
+			person providing game notes, in customary format
 		"compiler": 
-			person assembling this file, in lastname, firstname format
+			person assembling this file, in customary format
 		"time-control": 
-			<main-time-seconds> [<overtime-periods>:<overtime-length]
+			<main-time-seconds> [<overtime-periods><"/"><overtime-length] [<increment-length><"i">]
+			e.g. "3600 30/3 3i": 1 hour, 3 30-second overtimes, 3-second increment
+			the time allotted per player for this game.
+		"time-remaining":
+		    <<main-time-seconds> [<overtime-periods><"/"><overtime-length]><", ">"<<main-time-seconds> [<overtime-periods><"/"><overtime-length]>
+		    the time remaining at the end of this game record.
 		"termination": 
-			human-readable definition of how the game ended
+			human-readable statement on how the game ended, possibly containing
+			more information than the result tag; e.g. 'Black resigned'
 		"variant":
 			name of the tafl variant being played
+		"start-comment":
+		    a comment to be displayed at the start of the game, or whenever the player navigates
+		    back to the start of the game
 
-	rules-string:
-		an OTN rules string.
+	rules-tag:
+		<"[rules:"><rules-string><"]">
+
+		rules-string is an OTN rules string.
 	
-	position-string:
-		optionally, a starting position for the game, if not the starting position
-		in the rules string.
+	position-tag:
+		<"[position:"><position-string><"]">
+
+		optionally, a starting position for the game. If a position tag is provided,
+		the game starts at that position, instead of the starting position in the
+		rules string.
 
 	turn-number:
-		the number of times each player has moved, starting at 1.
+		the number of times both players have moved, starting at 1.
 	
 	move-record:
 		an OTN move record.
 
 	first-half-commentary:
-		comment on the first move of this turn.
+		comment on the first move of this turn. By convention, if the commentary
+		text begins with a clock specification string in the same syntax as used
+		for the time-control tag, OpenTafl will omit the clock specification from
+		the displayed commentary, and display the time given by the clock
+		specification in the clock display.
 
-	second-half-commentary:
-		comment on the second move of this turn.
+		Comments will be displayed after the move to which they correspond has
+		been played.
+
+	more-commentary:
+		comment on the second move of this turn (or on any additional moves this
+		turn, for variants including the berserk rule). The same clock display
+		convention applies.
+

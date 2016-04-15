@@ -7,12 +7,16 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
+        tests.add(new RestrictedFortReentryTest());
+        tests.add(new ExternalEngineHostTest());
         tests.add(new ThreefoldDrawTest());
         tests.add(new ThreefoldVictoryTest());
+        tests.add(new GameSerializerConsistencyTest());
         tests.add(new MoveSerializerConsistencyTest());
         tests.add(new PositionSerializerConsistencyTest());
         tests.add(new RulesSerializerConsistencyTest());
         tests.add(new TranspositionTableConsistencyTest());
+        tests.add(new TablutKingCaptureTest());
         tests.add(new StrongKingCaptureTest());
         tests.add(new DoubleCaptureTest());
         tests.add(new CaptureTest());
@@ -28,6 +32,7 @@ public class Test {
         tests.add(new CommanderCornerCaptureVictoryTest());
         tests.add(new JumpCaptureBerserkerTest());
         tests.add(new BerserkMoveDuplicationTest());
+        tests.add(new BerserkHistoryDuplicationTest());
         tests.add(new BadFetlarCaptureTest());
         tests.add(new BadCopenhagenCaptureTest());
         tests.add(new GameClockTest());

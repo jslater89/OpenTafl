@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.notation.TaflmanCodes;
 
+import java.util.List;
+
 /**
  * Created by jay on 2/6/16.
  */
@@ -36,17 +38,23 @@ public class GenericRules extends Rules {
         }
     }
 
+    @Override
+    public String getName() {
+        return (mName.equals("") ? "Unknown Tafl" : mName);
+    }
+
     /*
     ----------- THIS CODE IS FOR LOADING RULES -----------
      */
 
+    private String mName = "";
     private int mBoardSize;
     private int mEscapeType = CORNERS;
     private boolean mSurroundingFatal = true;
     private boolean mAttackersFirst = true;
     private int mThreefoldResult = DRAW;
     private boolean mKingArmed = true;
-    private boolean mKingStrong = true;
+    private int mKingMode = Rules.KING_STRONG;
     private int mKingJumpMode = Taflman.JUMP_NONE;
     private int mCommanderJumpMode = Taflman.JUMP_STANDARD;
     private int mKnightJumpMode = Taflman.JUMP_CAPTURE;
@@ -54,6 +62,8 @@ public class GenericRules extends Rules {
     private boolean mShieldwallFlankingRequired = true;
     private boolean mEdgeFortEscape = false;
     private int mBerserkMode = BERSERK_NONE;
+
+    public void setName(String name) { mName = name; }
 
     public void setEscapeType(int escapeType) {
         mEscapeType = escapeType;
@@ -73,8 +83,8 @@ public class GenericRules extends Rules {
         mKingArmed = kingArmed;
     }
 
-    public void setKingStrong(boolean kingStrong) {
-        mKingStrong = kingStrong;
+    public void setKingStrength(int kingStrong) {
+        mKingMode = kingStrong;
     }
 
     public void setKingJumpMode(int kingJumpMode) {
@@ -131,29 +141,33 @@ public class GenericRules extends Rules {
         mBerserkMode = berserkMode;
     }
 
-    public void setCenterParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] hostileEmpty) {
+    public void setCenterParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] hostileEmpty, boolean[] reenterable) {
         if(passable != null) centerPassableFor = passable;
         if(stoppable != null) centerStoppableFor = stoppable;
         if(hostile != null) centerHostileTo = hostile;
         if(hostileEmpty != null) emptyCenterHostileTo = hostileEmpty;
+        if(reenterable != null) centerReenterableFor = reenterable;
     }
 
-    public void setCornerParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile) {
+    public void setCornerParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] reenterable) {
         if(passable != null) cornerPassableFor = passable;
         if(stoppable != null) cornerStoppableFor = stoppable;
         if(hostile != null) cornerHostileTo = hostile;
+        if(reenterable != null) cornerReenterableFor = reenterable;
     }
 
-    public void setAttackerFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile) {
+    public void setAttackerFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] reenterable) {
         if(passable != null) attackerFortPassableFor = passable;
         if(stoppable != null) attackerFortStoppableFor = stoppable;
         if(hostile != null) attackerFortHostileTo = hostile;
+        if(reenterable != null) attackerFortReenterableFor = reenterable;
     }
 
-    public void setDefenderFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile) {
+    public void setDefenderFortParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] reenterable) {
         if(passable != null) defenderFortPassableFor = passable;
         if(stoppable != null) defenderFortStoppableFor = stoppable;
         if(hostile != null) defenderFortHostileTo = hostile;
+        if(reenterable != null) defenderFortReenterableFor = reenterable;
     }
 
     /*
@@ -184,8 +198,8 @@ public class GenericRules extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
-        return mKingStrong;
+    public int getKingStrengthMode() {
+        return mKingMode;
     }
 
     @Override
@@ -262,19 +276,33 @@ public class GenericRules extends Rules {
         boolean[] passabilityArray = new boolean[TAFLMAN_TYPE_COUNT];
         for(int i = 0; i < passabilityArray.length; i++) passabilityArray[i] = true;
 
+        boolean[] reentryArray = new boolean[TAFLMAN_TYPE_COUNT];
+        for(int i = 0; i < reentryArray.length; i++) reentryArray[i] = true;
+
         switch(type) {
             case CENTER:
                 passabilityArray = centerPassableFor;
+                reentryArray = centerReenterableFor;
                 break;
             case CORNER:
                 passabilityArray = cornerPassableFor;
+                reentryArray = cornerReenterableFor;
                 break;
             case ATTACKER_FORT:
                 passabilityArray = attackerFortPassableFor;
+                reentryArray = attackerFortReenterableFor;
                 break;
             case DEFENDER_FORT:
                 passabilityArray = defenderFortPassableFor;
+                reentryArray = defenderFortReenterableFor;
                 break;
+        }
+
+        // If we can't reenter the destination type, we can't move through
+        // it if we aren't on the same type.
+        if(!reentryArray[index]) {
+            SpaceType startType = board.getSpaceTypeFor(board.findTaflmanSpace(piece));
+            if(startType != type) return false;
         }
 
         return passabilityArray[index];
@@ -288,19 +316,33 @@ public class GenericRules extends Rules {
         boolean[] stoppabilityArray = new boolean[TAFLMAN_TYPE_COUNT];
         for(int i = 0; i < stoppabilityArray.length; i++) stoppabilityArray[i] = true;
 
+        boolean[] reentryArray = new boolean[TAFLMAN_TYPE_COUNT];
+        for(int i = 0; i < reentryArray.length; i++) reentryArray[i] = true;
+
         switch(type) {
             case CENTER:
                 stoppabilityArray = centerStoppableFor;
+                reentryArray = centerReenterableFor;
                 break;
             case CORNER:
                 stoppabilityArray = cornerStoppableFor;
+                reentryArray = cornerReenterableFor;
                 break;
             case ATTACKER_FORT:
                 stoppabilityArray = attackerFortStoppableFor;
+                reentryArray = attackerFortReenterableFor;
                 break;
             case DEFENDER_FORT:
                 stoppabilityArray = defenderFortStoppableFor;
+                reentryArray = defenderFortReenterableFor;
                 break;
+        }
+
+        // If there are any non-reenterable spaces, we need to see if we're starting on the same
+        // kind of space. If not, we can't make this move.
+        if(!reentryArray[index]) {
+            SpaceType startType = board.getSpaceTypeFor(board.findTaflmanSpace(piece));
+            if(startType != type) return false;
         }
 
         return stoppabilityArray[index];
@@ -345,7 +387,7 @@ public class GenericRules extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         return mEdgeFortEscape;
     }
 

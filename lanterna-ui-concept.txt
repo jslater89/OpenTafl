@@ -1,0 +1,18 @@
+The Lantera-based UI
+
+After discovering that storing a bunch of functionality in 
+AdvancedTerminalHelper was, in fact, a bad idea, I spent some time thinking
+about how OpenTafl ought to handle the Lanterna-based UI going forward—
+especially given that the Lanterna-based UI is likely to be the only UI for the
+remaining life of the project, unless someone else writes one.
+
+Anyway, AdvancedTerminal is now a container for a LogicalScreen, and the 
+LogicalScreen is the container for the 
+
+1. LogicalScreen
+A LogicalScreen is a collection of like-purposed windows
+
+They have TerminalCallback methods, and AdvancedTerminalHelper passes through to them.
+
+2. Windows
+Windows are the subunit of screens.

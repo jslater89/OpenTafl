@@ -1,17 +1,11 @@
 package com.manywords.softworks.tafl.rules.tawlbwrdd;
 
 import com.manywords.softworks.tafl.rules.*;
-import com.manywords.softworks.tafl.rules.fetlar.eleven.Fetlar11Attackers;
-import com.manywords.softworks.tafl.rules.fetlar.eleven.Fetlar11Board;
-import com.manywords.softworks.tafl.rules.fetlar.eleven.Fetlar11Defenders;
-import com.manywords.softworks.tafl.rules.fetlar.eleven.test.FetlarTestAttackers;
-import com.manywords.softworks.tafl.rules.fetlar.eleven.test.FetlarTestDefenders;
 import com.manywords.softworks.tafl.rules.tawlbwrdd.eleven.Tawlbwrdd11Attackers;
 import com.manywords.softworks.tafl.rules.tawlbwrdd.eleven.Tawlbwrdd11Board;
 import com.manywords.softworks.tafl.rules.tawlbwrdd.eleven.Tawlbwrdd11Defenders;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Tawlbwrdd extends Rules {
     public static Tawlbwrdd newTawlbwrdd11() {
@@ -29,6 +23,11 @@ public class Tawlbwrdd extends Rules {
         mStartingBoard.setRules(this);
         mStartingAttackers = attackers;
         mStartingDefenders = defenders;
+    }
+
+    @Override
+    public String getName() {
+        return "Tawlbwrdd";
     }
 
     private Board mStartingBoard;
@@ -50,9 +49,9 @@ public class Tawlbwrdd extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
+    public int getKingStrengthMode() {
         // King must be surrounded on four sides
-        return false;
+        return KING_WEAK;
     }
 
     @Override
@@ -116,7 +115,7 @@ public class Tawlbwrdd extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         return false;
     }
 

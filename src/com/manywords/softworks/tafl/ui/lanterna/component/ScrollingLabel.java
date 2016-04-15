@@ -11,12 +11,19 @@ import java.util.List;
  * Created by jay on 2/15/16.
  */
 public class ScrollingLabel extends Label {
+    public enum Direction {
+        BACKSCROLL, // Count up when scrolling up the screen
+        SCROLL // Count up when scrolling down the screen
+    }
+
     // Queue
     /*
      * mStringBuffer holds up to 512 strings, which are broken up for display
      * by the line buffer.
      */
 
+    private boolean mForceScrollCount;
+    private Direction mDirection = Direction.BACKSCROLL;
     private List<String> mStringBuffer;
     private List<String> mLineBuffer;
     private int mHeight;
@@ -30,7 +37,7 @@ public class ScrollingLabel extends Label {
     public ScrollingLabel(String text) {
         super(text);
         mStringBuffer = new ArrayList<String>(512);
-        mLineBuffer = new ArrayList<String>(512);
+        mLineBuffer = new ArrayList<String>(1024);
         clearAndAddLine(text);
     }
 
@@ -61,8 +68,6 @@ public class ScrollingLabel extends Label {
             for(String line : lines) {
                 mLineBuffer.add(0, line);
             }
-
-            if(mLineBuffer.size() > 512) break;
         }
 
         if(mStartPosition > (mLineBuffer.size() - mHeight)) {
@@ -88,7 +93,6 @@ public class ScrollingLabel extends Label {
 
         String[] lines = text.split("\n");
         for(String line : lines) {
-            // Preserve double-spacing
             if(line.equals("")) line = " ";
 
             mStringBuffer.add(0, line);
@@ -102,8 +106,14 @@ public class ScrollingLabel extends Label {
             mLineBuffer.add(0, s);
         }
 
-        while (mStringBuffer.size() >= 512) mStringBuffer.remove(511);
-        while (mLineBuffer.size() >= 512) mLineBuffer.remove(511);
+        while (mStringBuffer.size() > 512) {
+            String s = mStringBuffer.remove(512);
+            List<String> wrappedRemoved = TerminalTextUtils.getWordWrappedText(mWidth, s);
+
+            for(int i = 0; i < wrappedRemoved.size(); i++) {
+                mLineBuffer.remove(mLineBuffer.size() - 1);
+            }
+        }
 
         if(mStartPosition != 0) {
             mStartPosition = Math.min(mStartPosition + wrappedLine.size(), mLineBuffer.size() - mHeight);
@@ -125,6 +135,10 @@ public class ScrollingLabel extends Label {
             mStartPosition = Math.max(mStartPosition - distance, 0);
         }
 
+        handleScroll();
+    }
+
+    private void handleScroll() {
         String out = lineBufferToString(mStartPosition);
         setText(out);
     }
@@ -134,13 +148,20 @@ public class ScrollingLabel extends Label {
         int lines = getSize().getRows() + offset;
         int start = Math.min(lines, mLineBuffer.size()) - 1;
 
+        boolean singleScreen = mLineBuffer.size() < lines;
+
+        if(mForceScrollCount && !singleScreen) {
+            if(start < mLineBuffer.size() - 1) {
+                start -= 1;
+            }
+            else {
+                offset += 1;
+            }
+        }
+
         for(int i = start; i >= offset; i--) {
-            if(offset > 0 && i == offset) {
-                out.append("[Scrolled at ");
-                out.append(mStartPosition);
-                out.append("/");
-                out.append(mLineBuffer.size());
-                out.append("]\n");
+            if(offset > 0 && i == offset && !mForceScrollCount) {
+                out.append(getScrollCount());
             }
             else {
                 out.append(mLineBuffer.get(i));
@@ -148,6 +169,47 @@ public class ScrollingLabel extends Label {
             }
         }
 
+        if(mForceScrollCount && !singleScreen) {
+            out.append(getScrollCount());
+        }
+
         return out.toString();
+    }
+
+    private String getScrollCount() {
+        String scrollCount = "[Scrolled at ";
+
+        if(mDirection == Direction.BACKSCROLL) {
+            scrollCount += mStartPosition + "/" + mLineBuffer.size();
+        }
+        else {
+            scrollCount += ((mLineBuffer.size() - mStartPosition) - getSize().getRows()) + "/" + (mLineBuffer.size() - getSize().getRows());
+        }
+        scrollCount += "]\n";
+
+        return scrollCount;
+    }
+
+    public void scrollToStart() {
+        if(mHeight == 0) {
+            mStartPosition = 1024;
+        }
+        else {
+            mStartPosition = Math.max(mLineBuffer.size() - mHeight, 0);
+        }
+        handleScroll();
+    }
+
+    public void scrollToEnd() {
+        mStartPosition = 0;
+        handleScroll();
+    }
+
+    public void forceScrollCount(boolean force) {
+        mForceScrollCount = force;
+    }
+
+    public void setScrollCountDirection(Direction d) {
+        mDirection = d;
     }
 }

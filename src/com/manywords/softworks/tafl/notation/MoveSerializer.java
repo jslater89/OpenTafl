@@ -68,7 +68,7 @@ public class MoveSerializer {
         final int STATUS_CODE = 18;
         Pattern p = Pattern.compile(getMoveRegex());
         Matcher m = p.matcher(record);
-        if(!m.matches()) throw new IllegalArgumentException("Bad move record");
+        if(!m.matches()) throw new IllegalArgumentException("Bad move record: " + record);
 
         String[] groups = new String[19];
 
@@ -115,7 +115,7 @@ public class MoveSerializer {
 
     public static String getMoveRegex() {
         // This monstrosity is the fully-assembled version of the regex.
-        //String moveRegex = "([tcnkTCNK]?)([abcdefghijklmnopqrs]{1}[1234567890]{1,2})([\\^\\=\\-]{1,2})([abcdefghijklmnopqrs]{1}[1234567890]{1,2})((x([tcnkTCNK]?)([abcdefghijklmnopqrs]{1}[1234567890]{1,2})){1}(/([tcnkTCNK]?)([abcdefghijklmnopqrs]{1}[1234567890]{1,2}))?(/([tcnkTCNK]?)([abcdefghijklmnopqrs]{1}[1234567890]{1,2}))?(/([tcnkTCNK]?)([abcdefghijklmnopqrs]{1}[1234567890]{1,2}))?)?([\\+|\\-]{1,3})?";
+        //String moveRegex = "([tcnkTCNK]?)([a-s][0-9]{1,2})([\\^\\=\\-]{1,2})([a-s][0-9]{1,2})((x([tcnkTCNK]?)([a-s][0-9]{1,2}))(/([tcnkTCNK]?)([a-s][0-9]{1,2}))?(/([tcnkTCNK]?)([a-s][0-9]{1,2}))?(/([tcnkTCNK]?)(([a-s][0-9]{1,2}))?)?([\\+|\\-]{1,3})?";
 
         // Matches a taflman type character.
         final String taflmanTypePattern = "([tcnkTCNK]?)";

@@ -4,10 +4,11 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.Panel;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Coord;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalImagePanel;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
 import java.util.List;
 
@@ -16,9 +17,10 @@ import java.util.List;
  */
 public class BoardWindow extends BasicWindow {
     private Game mGame;
-    private AdvancedTerminalHelper.TerminalCallback mCallback;
+    private ReplayGame mReplayGame;
+    private LogicalScreen.TerminalCallback mCallback;
     private TerminalBoardImage mBoardImage;
-    public BoardWindow(String title, Game g, AdvancedTerminalHelper.TerminalCallback callback) {
+    public BoardWindow(String title, Game g, LogicalScreen.TerminalCallback callback) {
         super(title);
         mGame = g;
 
@@ -31,12 +33,26 @@ public class BoardWindow extends BasicWindow {
         rerenderBoard();
     }
 
+    public void enterReplay(ReplayGame rg) {
+        mReplayGame = rg;
+    }
+
+    public void setGame(Game g) {
+        mGame = g;
+    }
+
+    public void leaveReplay() {
+        mReplayGame = null;
+    }
+
     public void rerenderBoard() {
-        mBoardImage.renderBoard(mGame.getCurrentState(), null, null, null, null);
+        Game toRender = (mReplayGame != null ? mReplayGame.getGame() : mGame);
+        mBoardImage.renderBoard(toRender.getCurrentState(), null, null, null, null);
         invalidate();
     }
 
     public void rerenderBoard(Coord location, List<Coord> stops, List<Coord> moves, List<Coord> captures) {
-        mBoardImage.renderBoard(mGame.getCurrentState(), location, stops, moves, captures);
+        Game toRender = (mReplayGame != null ? mReplayGame.getGame() : mGame);
+        mBoardImage.renderBoard(toRender.getCurrentState(), location, stops, moves, captures);
     }
 }

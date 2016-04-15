@@ -3,13 +3,13 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
-import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
+import com.googlecode.lanterna.gui2.dialogs.*;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
+import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -17,14 +17,32 @@ import java.util.List;
  * Created by jay on 2/15/16.
  */
 public class OptionsMenuWindow extends BasicWindow {
-    private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
-    public OptionsMenuWindow(AdvancedTerminalHelper.TerminalCallback callback) {
-        mTerminalCallback = callback;
-
-        refreshSettings();
+    private enum EngineType {
+        ATTACKER,
+        DEFENDER,
+        ANALYSIS
     }
 
-    public void refreshSettings() {
+    private Label mVariantLabel;
+    private Label mClockLabel;
+    private Label mAttackerLabel;
+    private Label mAttackerConfigLabel;
+    private Label mDefenderLabel;
+    private Label mDefenderConfigLabel;
+    private Label mAnalysisLabel;
+    private Label mAnalysisConfigLabel;
+    private Label mThinkTimeLabel;
+
+    private Interactable mLastFocused;
+
+    private LogicalScreen.TerminalCallback mTerminalCallback;
+    public OptionsMenuWindow(LogicalScreen.TerminalCallback callback) {
+        mTerminalCallback = callback;
+
+        buildSettings();
+    }
+
+    private void buildSettings() {
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
 
@@ -46,43 +64,11 @@ public class OptionsMenuWindow extends BasicWindow {
                 showVariantSelectDialog();
             }
         });
-        Label variantName = new Label(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        mVariantLabel = new Label(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
         optionsPanel.addComponent(variantSelect);
         optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(variantName);
+        optionsPanel.addComponent(mVariantLabel);
 
-        Button attackerSelect = new Button("Attackers", new Runnable() {
-            @Override
-            public void run() {
-                showPlayerSelectDialog(true);
-            }
-        });
-        Label attackerType = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
-        optionsPanel.addComponent(attackerSelect);
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(attackerType);
-
-        Button defenderSelect = new Button("Defenders", new Runnable() {
-            @Override
-            public void run() {
-                showPlayerSelectDialog(false);
-            }
-        });
-        Label defenderType = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.defenders));
-        optionsPanel.addComponent(defenderSelect);
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(defenderType);
-
-        Button aiDepthSelect = new Button("AI think time", new Runnable() {
-            @Override
-            public void run() {
-                showAiDepthEntryDialog();
-            }
-        });
-        Label aiDepth = new Label("" + TerminalSettings.aiThinkTime);
-        optionsPanel.addComponent(aiDepthSelect);
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(aiDepth);
 
         Button clockSettingSelect = new Button("Clock setting", new Runnable() {
             @Override
@@ -90,14 +76,127 @@ public class OptionsMenuWindow extends BasicWindow {
                 showTimeSpecDialog();
             }
         });
-        Label clockSettingLabel = new Label(TerminalSettings.timeSpec.toString());
+        mClockLabel = new Label(TerminalSettings.timeSpec.toString());
         optionsPanel.addComponent(clockSettingSelect);
         optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(clockSettingLabel);
+        optionsPanel.addComponent(mClockLabel);
+
+        // Blank line
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+
+        Button attackerSelect = new Button("Attackers", new Runnable() {
+            @Override
+            public void run() {
+                showPlayerSelectDialog(true);
+            }
+        });
+        mAttackerLabel = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
+        optionsPanel.addComponent(attackerSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mAttackerLabel);
+
+        Button attackerFileSelect = new Button("Attacker config", () -> {
+           showFileSelectDialog(EngineType.ATTACKER);
+        });
+
+        if(TerminalSettings.attackerEngineFile == null) {
+            mAttackerConfigLabel = new Label("<none>");
+        }
+        else {
+            mAttackerConfigLabel = new Label(TerminalSettings.attackerEngineFile.getName());
+        }
+
+        optionsPanel.addComponent(attackerFileSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mAttackerConfigLabel);
+
+        // Blank line
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+
+        Button defenderSelect = new Button("Defenders", new Runnable() {
+            @Override
+            public void run() {
+                showPlayerSelectDialog(false);
+            }
+        });
+        mDefenderLabel = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.defenders));
+        optionsPanel.addComponent(defenderSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mDefenderLabel);
+
+        Button defenderFileSelect = new Button("Defender config", () -> {
+            showFileSelectDialog(EngineType.DEFENDER);
+        });
+
+        if(TerminalSettings.defenderEngineFile == null) {
+            mDefenderConfigLabel = new Label("<none>");
+        }
+        else {
+            mDefenderConfigLabel = new Label(TerminalSettings.defenderEngineFile.getName());
+        }
+
+        optionsPanel.addComponent(defenderFileSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mDefenderConfigLabel);
+
+        // Blank line
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+
+        Button analysisButton = new Button("Analysis engine", new Runnable() {
+            @Override
+            public void run() {
+                TerminalSettings.analysisEngine = !TerminalSettings.analysisEngine;
+                refreshSettings();
+            }
+        });
+        mAnalysisLabel = new Label(TerminalSettings.analysisEngine ? "On" : "Off");
+
+        optionsPanel.addComponent(analysisButton);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mAnalysisLabel);
+
+        Button analysisFileSelect = new Button("Analysis config", () -> {
+            showFileSelectDialog(EngineType.ANALYSIS);
+        });
+
+        if(TerminalSettings.analysisEngineFile == null) {
+            mAnalysisConfigLabel = new Label("<none>");
+        }
+        else {
+            mAnalysisConfigLabel = new Label(TerminalSettings.analysisEngineFile.getName());
+        }
+
+        optionsPanel.addComponent(analysisFileSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mAnalysisConfigLabel);
+
+
+        // Blank line
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+
+        Button aiDepthSelect = new Button("AI think time", new Runnable() {
+            @Override
+            public void run() {
+                showAiDepthEntryDialog();
+            }
+        });
+        mThinkTimeLabel = new Label("" + TerminalSettings.aiThinkTime);
+        optionsPanel.addComponent(aiDepthSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mThinkTimeLabel);
 
         Button backButton = new Button("Back", new Runnable() {
             @Override
             public void run() {
+                TerminalSettings.saveToFile();
                 mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
             }
         });
@@ -111,8 +210,72 @@ public class OptionsMenuWindow extends BasicWindow {
         this.setComponent(p);
     }
 
+    private void refreshSettings() {
+        mVariantLabel.setText(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        mClockLabel.setText(TerminalSettings.timeSpec.toString());
+        mAttackerLabel.setText(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
+
+        if(TerminalSettings.attackerEngineFile == null) {
+            mAttackerConfigLabel.setText("<none>");
+        }
+        else {
+            mAttackerConfigLabel.setText(TerminalSettings.attackerEngineFile.getName());
+        }
+
+        mDefenderLabel.setText(TerminalSettings.labelForPlayerType(TerminalSettings.defenders));
+
+        if(TerminalSettings.defenderEngineFile == null) {
+            mDefenderConfigLabel.setText("<none>");
+        }
+        else {
+            mDefenderConfigLabel.setText(TerminalSettings.defenderEngineFile.getName());
+        }
+
+        mAnalysisLabel.setText(TerminalSettings.analysisEngine ? "On" : "Off");
+
+        if(TerminalSettings.analysisEngineFile == null) {
+            mAnalysisConfigLabel.setText("<none>");
+        }
+        else {
+            mAnalysisConfigLabel.setText(TerminalSettings.analysisEngineFile.getName());
+        }
+
+        mThinkTimeLabel.setText("" + TerminalSettings.aiThinkTime);
+    }
+
     private EmptySpace newSpacer() {
-        return new EmptySpace(new TerminalSize(4, 0));
+        return new EmptySpace(new TerminalSize(4, 1));
+    }
+
+    private void showFileSelectDialog(EngineType type) {
+        FileDialogBuilder b = new FileDialogBuilder();
+        b.setActionLabel("Select");
+
+        File f = new File("engines");
+        if(f.exists()) b.setSelectedFile(f);
+
+        FileDialog d = b.build();
+        File configFile = d.showDialog(getTextGUI());
+
+        if(ExternalEngineHost.validateEngineFile(configFile)) {
+            switch(type) {
+
+                case ATTACKER:
+                    TerminalSettings.attackerEngineFile = configFile;
+                    break;
+                case DEFENDER:
+                    TerminalSettings.defenderEngineFile = configFile;
+                    break;
+                case ANALYSIS:
+                    TerminalSettings.analysisEngineFile = configFile;
+                    break;
+            }
+        }
+        else {
+            MessageDialog.showMessageDialog(getTextGUI(), "Invalid file", "File does not contain required engine elements.");
+        }
+
+        refreshSettings();
     }
 
     private void showTimeSpecDialog() {

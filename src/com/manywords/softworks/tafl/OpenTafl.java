@@ -2,52 +2,82 @@ package com.manywords.softworks.tafl;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.test.Test;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
+import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
+import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public class OpenTafl {
+    private static enum Mode {
+        WINDOW,
+        ADVANCED_TERMINAL,
+        DEBUG,
+        TEST,
+        EXTERNAL_ENGINE,
+        FALLBACK
+    }
+
+    public static boolean DEV_MODE = false;
+
     public static void main(String[] args) {
         Map<String, String> mapArgs = getArgs(args);
-        boolean window = false;
-        boolean advanced = true;
+        Mode runMode = Mode.ADVANCED_TERMINAL;
 
         for (String arg : args) {
-            if(arg.contains("--fallback")) {
-                window = false;
-                advanced = false;
+            if (arg.contains("--engine")) {
+                runMode = Mode.EXTERNAL_ENGINE;
+            }
+            else if (arg.contains("--test")) {
+                runMode = Mode.TEST;
             }
             else if (arg.contains("--debug")) {
-                Debug.run(mapArgs);
-                System.exit(0);
-            } else if (arg.contains("--test")) {
-                Test.run();
-                System.exit(0);
-            } else if (arg.contains("--window")) {
-                advanced = false;
-                window = true;
+                runMode = Mode.DEBUG;
+            }
+            else if (arg.contains("--window")) {
+                runMode = Mode.WINDOW;
+            }
+            else if(arg.contains("--fallback")) {
+                runMode = Mode.FALLBACK;
+            }
+            else if(arg.contains("--dev")) {
+                DEV_MODE = true;
             }
         }
 
-        if(advanced) {
-            DefaultTerminalFactory factory = new DefaultTerminalFactory();
-            Terminal t = null;
+        directoryCheck();
+        BuiltInVariants.loadExternalRules(new File("external-rules.conf"));
 
-            t = factory.createSwingTerminal();
+        switch(runMode) {
+            case WINDOW:
+                SwingWindow w = new SwingWindow();
+                break;
+            case ADVANCED_TERMINAL:
+                DefaultTerminalFactory factory = new DefaultTerminalFactory();
+                Terminal t = null;
 
-            AdvancedTerminalHelper<? extends Terminal> th = new AdvancedTerminalHelper<>(t);
-        }
-        else if (window) {
-            SwingWindow w = new SwingWindow();
-        }
-        else {
-            RawTerminal display = new RawTerminal();
-            display.runUi();
+                t = factory.createSwingTerminal();
+
+                AdvancedTerminal<? extends Terminal> th = new AdvancedTerminal<>(t);
+                break;
+            case DEBUG:
+                Debug.run(mapArgs);
+                break;
+            case TEST:
+                Test.run();
+                break;
+            case EXTERNAL_ENGINE:
+                ExternalEngineClient.run();
+                break;
+            case FALLBACK:
+                RawTerminal display = new RawTerminal();
+                display.runUi();
+                break;
         }
     }
 
@@ -75,5 +105,15 @@ public class OpenTafl {
         }
 
         return mapArgs;
+    }
+
+    private static void directoryCheck() {
+        if(!new File("saved-games").exists()) {
+            new File("saved-games/replays").mkdirs();
+        }
+
+        if(!new File("engines").exists()) {
+            new File("engines").mkdirs();
+        }
     }
 }

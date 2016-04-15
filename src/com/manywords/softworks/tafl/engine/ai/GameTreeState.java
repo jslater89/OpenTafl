@@ -360,7 +360,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             List<MoveRecord> successorMoves = new ArrayList<MoveRecord>();
 
-            boolean considerJumps = mGame.getGameRules().canSideJump(mState.getCurrentSide());
+            boolean considerJumps = mGame.getRules().canSideJump(mState.getCurrentSide());
 
             // Generate all successor moves.
             for (char taflman : taflmen) {
@@ -506,15 +506,29 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 }
             }
 
+            // If we have no legal moves, the other side wins
+            if(mBranches.size() == 0) {
+                if(getCurrentSide().isAttackingSide()) {
+                    mVictory = DEFENDER_WIN;
+                }
+                else {
+                    mVictory = ATTACKER_WIN;
+                }
+                mValue = evaluate();
+            }
+
             workspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
             mTaflmanMoveCache = null;
 
             // All moves explored; minify this state
             if(mDepth != 0) {
                 if(mValue == Evaluator.NO_VALUE) {
-                    System.out.println("Entering moves " + getEnteringMoveSequence());
-                    System.out.println("No value");
-                    System.exit(0);
+                    short evaluation = workspace.transpositionTable.getValue(mValue, mCurrentMaxDepth - mDepth, mGameLength);
+                    if(evaluation == Evaluator.NO_VALUE) {
+                        evaluation = workspace.evaluator.evaluate(GameTreeState.this);
+                    }
+                    setValue(evaluation);
+                    System.out.println("Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
                 }
                 MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
                 if (mParent != null) {

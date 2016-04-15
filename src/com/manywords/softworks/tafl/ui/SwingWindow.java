@@ -57,6 +57,11 @@ public class SwingWindow extends JFrame implements UiCallback {
     }
 
     @Override
+    public void modeChanging(Mode mode, Object gameObject) {
+
+    }
+
+    @Override
     public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
@@ -73,6 +78,11 @@ public class SwingWindow extends JFrame implements UiCallback {
 
     @Override
     public void statusText(String text) {
+
+    }
+
+    @Override
+    public void modalStatus(String title, String text) {
 
     }
 

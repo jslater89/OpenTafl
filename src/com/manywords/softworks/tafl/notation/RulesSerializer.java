@@ -31,12 +31,13 @@ public class RulesSerializer {
     public static final Map<String, String> defaults;
     static {
         HashMap<String, String> map = new HashMap<>();
+        map.put("name", "");
         map.put("esc", "c");
         map.put("surf", "y");
         map.put("atkf", "y");
         map.put("tfr", "d");
         map.put("ka", "y");
-        map.put("ks", "y");
+        map.put("ks", "s");
         map.put("kj", "n");
         map.put("nj", "c");
         map.put("cj", "j");
@@ -51,15 +52,21 @@ public class RulesSerializer {
         map.put("aforh", "TCNK");
         map.put("dforh", "tcnk");
 
+        // Most rulesets don't have impassable spaces.
         map.put("corp", "K");
         map.put("cenp", "tcnkTCNK");
         map.put("aforp", "tcnkTCNK");
-        map.put("dforp", "TCNK");
+        map.put("dforp", "tcnkTCNK");
 
         map.put("cors", "K");
-        map.put("cens", "tcnkTCNK");
+        map.put("cens", "K");
         map.put("afors", "tcnkTCNK");
         map.put("dfors", "TCNK");
+
+        map.put("corre", "tcnkTCNK");
+        map.put("cenre", "tcnkTCNK");
+        map.put("aforre", "tcnkTCNK");
+        map.put("dforre", "tcnkTCNK");
 
         map.put("sw", "n");
         map.put("swf", "y");
@@ -71,11 +78,14 @@ public class RulesSerializer {
 
 
     public static String getRulesRecord(Rules rules) {
+        Coord.initialize(rules.boardSize);
         String otnrString = "";
 
         otnrString += "dim:";
         otnrString += rules.boardSize;
         otnrString += " ";
+
+        otnrString += "name:" + rules.getName().replace(' ', '_') + " ";
 
         if(rules.getEscapeType() == Rules.EDGES) {
             otnrString += "esc:e ";
@@ -88,17 +98,20 @@ public class RulesSerializer {
         if(!rules.getStartingSide().isAttackingSide()) {
             otnrString += "atkf:n ";
         }
+        else {
+            otnrString += "atkf:y ";
+        }
 
         if(rules.threefoldRepetitionResult() != Rules.DRAW) {
-            otnrString += getStringForThreefoldResult(rules.threefoldRepetitionResult());
+            otnrString += "tfr:" + getStringForThreefoldResult(rules.threefoldRepetitionResult()) + " ";
         }
 
         if(!rules.isKingArmed()) {
             otnrString += "ka:n ";
         }
 
-        if(!rules.isKingStrong()) {
-            otnrString += "ks:n ";
+        if(rules.getKingStrengthMode() != Rules.KING_STRONG) {
+            otnrString += "ks:" + getStringForKingMode(rules.getKingStrengthMode()) + " ";
         }
 
         if(rules.getKingJumpMode() != Taflman.JUMP_NONE) {
@@ -175,7 +188,7 @@ public class RulesSerializer {
         if(!afors.equals(defaults.get("afors"))) otnrString += "afors:" + afors + " ";
 
         String dfors = getStringForTaflmanTypeList(rules.defenderFortStoppableFor);
-        if(!dfors.equals(defaults.get("dfors"))) otnrString += "dfors:" + afors + " ";
+        if(!dfors.equals(defaults.get("dfors"))) otnrString += "dfors:" + dfors + " ";
 
         String corh = getStringForTaflmanTypeList(rules.cornerHostileTo);
         if(!corh.equals(defaults.get("corh"))) otnrString += "corh:" + corh + " ";
@@ -192,6 +205,18 @@ public class RulesSerializer {
         String dforh = getStringForTaflmanTypeList(rules.defenderFortHostileTo);
         if(!dforh.equals(defaults.get("dforh"))) otnrString += "dforh:" + dforh + " ";
 
+        String corre = getStringForTaflmanTypeList(rules.cornerReenterableFor);
+        if(!corre.equals(defaults.get("corre"))) otnrString += "corre:" + corre + " ";
+
+        String cenre = getStringForTaflmanTypeList(rules.centerReenterableFor);
+        if(!cenre.equals(defaults.get("cenre"))) otnrString += "cenre:" + cenre + " ";
+
+        String aforre = getStringForTaflmanTypeList(rules.attackerFortReenterableFor);
+        if(!aforre.equals(defaults.get("aforre"))) otnrString += "aforre:" + aforre + " ";
+
+        String dforre = getStringForTaflmanTypeList(rules.defenderFortReenterableFor);
+        if(!dforre.equals(defaults.get("dforre"))) otnrString += "dforre:" + dforre + " ";
+
         if(rules.allowShieldWallCaptures() != Rules.NO_SHIELDWALL) {
             otnrString += "sw:" + getStringForShieldwallMode(rules.allowShieldWallCaptures()) + " ";
         }
@@ -200,7 +225,7 @@ public class RulesSerializer {
             otnrString += "swf:n ";
         }
 
-        if(rules.allowShieldFortEscapes()) {
+        if(rules.allowEdgeFortEscapes()) {
             otnrString += "efe:y ";
         }
 
@@ -214,18 +239,14 @@ public class RulesSerializer {
     }
 
     public static Rules loadRulesRecord(String otnrString) {
-        int boardSize = 0;
-        boolean attackerCommanders = false;
-        boolean defenderCommanders = false;
-        boolean attackerKnights = false;
-        boolean defenderKnights = false;
         List<List<Side.TaflmanHolder>> startingTaflmen;
 
         Map<String, String> config = getRulesMap(otnrString);
 
         int boardDimension = Integer.parseInt(config.get("dim"));
+        Coord.initialize(boardDimension);
         String startPosition = config.get("start");
-        startingTaflmen = parseTaflmenFromPosition(startPosition);
+        startingTaflmen = PositionSerializer.parseTaflmenFromPosition(startPosition);
 
         Board board = new GenericBoard(boardDimension);
         Side attackers = new GenericSide(board, true, startingTaflmen.get(0));
@@ -234,12 +255,13 @@ public class RulesSerializer {
         //System.out.println(defenders.getStartingTaflmen());
         GenericRules rules = new GenericRules(board, attackers, defenders);
 
+        if(config.containsKey("name")) rules.setName(config.get("name").replace('_', ' '));
         if(config.containsKey("esc")) rules.setEscapeType(getEscapeTypeForString(config.get("esc")));
         if(config.containsKey("surf")) rules.setSurroundingFatal(getBooleanForString(config.get("surf")));
         if(config.containsKey("atkf")) rules.setAttackersFirst(getBooleanForString(config.get("atkf")));
         if(config.containsKey("tfr")) rules.setThreefoldResult(getThreefoldResultForString(config.get("tfr")));
         if(config.containsKey("ka")) rules.setKingArmed(getBooleanForString(config.get("ka")));
-        if(config.containsKey("ks")) rules.setKingStrong(getBooleanForString(config.get("ks")));
+        if(config.containsKey("ks")) rules.setKingStrength(getKingModeForString(config.get("ks")));
         if(config.containsKey("kj")) rules.setKingJumpMode(getJumpModeForString(config.get("kj")));
         if(config.containsKey("nj")) rules.setKnightJumpMode(getJumpModeForString(config.get("nj")));
         if(config.containsKey("cj")) rules.setCommanderJumpMode(getJumpModeForString(config.get("cj")));
@@ -253,15 +275,16 @@ public class RulesSerializer {
         if(config.containsKey("afor")) rules.setAttackerForts(getCoordListForString(config.get("afor")));
         if(config.containsKey("dfor")) rules.setDefenderForts(getCoordListForString(config.get("dfor")));
 
-        boolean[] passable, stoppable, hostile, emptyHostile;
-        passable = stoppable = hostile = emptyHostile = null;
+        boolean[] passable, stoppable, hostile, emptyHostile, reenterable;
+        passable = stoppable = hostile = emptyHostile = reenterable = null;
 
         // Center
         if(config.containsKey("cenp")) passable = getTaflmanTypeListForString(config.get("cenp"));
         if(config.containsKey("cens")) stoppable = getTaflmanTypeListForString(config.get("cens"));
         if(config.containsKey("cenh")) hostile = getTaflmanTypeListForString(config.get("cenh"));
         if(config.containsKey("cenhe")) emptyHostile = getTaflmanTypeListForString(config.get("cenhe"));
-        rules.setCenterParameters(passable, stoppable, hostile, emptyHostile);
+        if(config.containsKey("cenre")) reenterable = getTaflmanTypeListForString(config.get("cenre"));
+        rules.setCenterParameters(passable, stoppable, hostile, emptyHostile, reenterable);
 
         passable = stoppable = hostile = emptyHostile = null;
 
@@ -269,7 +292,8 @@ public class RulesSerializer {
         if(config.containsKey("corp")) passable = getTaflmanTypeListForString(config.get("corp"));
         if(config.containsKey("cors")) stoppable = getTaflmanTypeListForString(config.get("cors"));
         if(config.containsKey("corh")) hostile = getTaflmanTypeListForString(config.get("corh"));
-        rules.setCornerParameters(passable, stoppable, hostile);
+        if(config.containsKey("cenre")) reenterable = getTaflmanTypeListForString(config.get("corre"));
+        rules.setCornerParameters(passable, stoppable, hostile, reenterable);
 
         passable = stoppable = hostile = emptyHostile = null;
 
@@ -277,7 +301,8 @@ public class RulesSerializer {
         if(config.containsKey("aforp")) passable = getTaflmanTypeListForString(config.get("aforp"));
         if(config.containsKey("afors")) stoppable = getTaflmanTypeListForString(config.get("afors"));
         if(config.containsKey("aforh")) hostile = getTaflmanTypeListForString(config.get("aforh"));
-        rules.setAttackerFortParameters(passable, stoppable, hostile);
+        if(config.containsKey("cenre")) reenterable = getTaflmanTypeListForString(config.get("aforre"));
+        rules.setAttackerFortParameters(passable, stoppable, hostile, reenterable);
 
         passable = stoppable = hostile = emptyHostile = null;
 
@@ -285,7 +310,8 @@ public class RulesSerializer {
         if(config.containsKey("dforp")) passable = getTaflmanTypeListForString(config.get("dforp"));
         if(config.containsKey("dfors")) stoppable = getTaflmanTypeListForString(config.get("dfors"));
         if(config.containsKey("dforh")) hostile = getTaflmanTypeListForString(config.get("dforh"));
-        rules.setDefenderFortParameters(passable, stoppable, hostile);
+        if(config.containsKey("cenre")) reenterable = getTaflmanTypeListForString(config.get("dforre"));
+        rules.setDefenderFortParameters(passable, stoppable, hostile, reenterable);
 
         return rules;
     }
@@ -304,33 +330,6 @@ public class RulesSerializer {
         }
 
         return config;
-    }
-
-    private static List<List<Side.TaflmanHolder>> parseTaflmenFromPosition(String startPosition) {
-        List<Side.TaflmanHolder> attackers = new ArrayList<Side.TaflmanHolder>();
-        List<Side.TaflmanHolder> defenders = new ArrayList<Side.TaflmanHolder>();
-        List<List<Side.TaflmanHolder>> taflmen = new ArrayList<>();
-        taflmen.add(attackers);
-        taflmen.add(defenders);
-
-        char[][] boardArray = PositionSerializer.loadPositionRecord(startPosition);
-
-        for(int y = 0; y < boardArray.length; y++) {
-            for(int x = 0; x < boardArray.length; x++) {
-                char taflman = boardArray[y][x];
-                if(taflman != Taflman.EMPTY) {
-                    Side.TaflmanHolder holder = new Side.TaflmanHolder(taflman, Coord.get(x, y));
-                    if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
-                        attackers.add(holder);
-                    }
-                    else {
-                        defenders.add(holder);
-                    }
-                }
-            }
-        }
-
-        return taflmen;
     }
 
     public static boolean isNumeric(String str) {
@@ -378,6 +377,23 @@ public class RulesSerializer {
         else return false;
     }
 
+    private static String getStringForKingMode(int kingMode) {
+        switch(kingMode) {
+            case Rules.KING_STRONG: return "s";
+            case Rules.KING_STRONG_CENTER: return "c";
+            case Rules.KING_WEAK: return "w";
+            default: return "s";
+        }
+    }
+
+    private static int getKingModeForString(String kingMode) {
+        if(kingMode.equals("s")) return Rules.KING_STRONG;
+        if(kingMode.equals("c")) return Rules.KING_STRONG_CENTER;
+        if(kingMode.equals("w")) return Rules.KING_WEAK;
+
+        return Rules.KING_STRONG;
+    }
+
     private static String getStringForJumpMode(int jumpMode) {
         switch(jumpMode) {
             case Taflman.JUMP_CAPTURE: return "c";
@@ -418,7 +434,7 @@ public class RulesSerializer {
         return defaultCenter;
     }
 
-    private static String getStringForTaflmanTypeList(boolean[] typeList) {
+    public static String getStringForTaflmanTypeList(boolean[] typeList) {
         String typeString = "";
         for(int i = 0; i < TaflmanCodes.count; i++) {
             if(typeList[i]) typeString += TaflmanCodes.inverse[i];
@@ -429,6 +445,8 @@ public class RulesSerializer {
 
     public static boolean[] getTaflmanTypeListForString(String typeString) {
         boolean[] typeList = new boolean[TaflmanCodes.count];
+        if(typeString == null) return typeList;
+
         for(int i = 0; i < typeString.length(); i++) {
             char c = typeString.charAt(i);
             int index = indexOf(TaflmanCodes.inverse, c);

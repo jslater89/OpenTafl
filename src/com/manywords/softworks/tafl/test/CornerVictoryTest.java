@@ -19,6 +19,11 @@ class CornerVictoryTest extends TaflTest implements UiCallback {
     }
 
     @Override
+    public void modeChanging(Mode mode, Object gameObject) {
+
+    }
+
+    @Override
     public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
@@ -35,6 +40,11 @@ class CornerVictoryTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
+
+    }
+
+    @Override
+    public void modalStatus(String title, String text) {
 
     }
 
@@ -70,6 +80,7 @@ class CornerVictoryTest extends TaflTest implements UiCallback {
         Rules rules = Fetlar.newFetlarTest();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
+        state.setCurrentSide(state.getDefenders());
 
         state.moveTaflman(state.getPieceAt(0, 2), state.getSpaceAt(0, 0));
         state = game.getCurrentState();

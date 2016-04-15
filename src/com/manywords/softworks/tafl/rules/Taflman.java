@@ -16,6 +16,7 @@ public class Taflman {
     public static final char ID_MASK = 255; // Eight low bits
     public static final char TYPE_MASK = 256 + 512 + 1024; // Three bits
     public static final char SIDE_MASK = 2048; // One bit
+    public static final char DEVELOPED_MASK = 4096; // One bit
 
     public static final int COUNT_TYPES = 4;
 
@@ -26,6 +27,9 @@ public class Taflman {
 
     public static final char SIDE_ATTACKERS = 2048;
     public static final char SIDE_DEFENDERS = 0;
+
+    public static final char DEVELOPED = 4096;
+    public static final char UNDEVELOPED = 0;
 
     private static Game game;
     private static Rules rules;
@@ -73,6 +77,8 @@ public class Taflman {
     public static char getPackedSide(char packed) {
         return (char) (packed & SIDE_MASK);
     }
+
+    public static boolean getDeveloped(char taflman) { return (taflman & DEVELOPED_MASK) == DEVELOPED; }
 
     public static Game getGame() {
         return game;
@@ -420,14 +426,13 @@ public class Taflman {
         List<Coord> captures = new ArrayList<Coord>(4);
         List<Character> capturedTaflmen = new ArrayList<Character>(4);
 
-        //if(mCachedAllowableDestinations == null) {
         List<Coord> allowableDestinations = getAllowableDestinations(state, taflman);
         List<Coord> capturingMoves = null;
         List<Coord> jumps = null;
         Coord start = getCurrentSpace(state, taflman);
-        //}
 
         if (allowableDestinations.contains(destination)) {
+            taflman |= DEVELOPED;
             capturingMoves = getCapturingMoves(state, taflman);
             jumps = getJumpsFor(state, taflman);
 
@@ -460,7 +465,11 @@ public class Taflman {
         }
 
         if(detailed) {
-            return new DetailedMoveRecord(start, destination, taflman, captures, capturedTaflmen, wasJump, wasBerserk);
+            DetailedMoveRecord m = new DetailedMoveRecord(start, destination, taflman, captures, capturedTaflmen, wasJump, wasBerserk);
+            if(state.mGame.getClock() != null && m.getTimeRemaining() == null) {
+                m.setTimeRemaining(state.mGame.getClock().getClockEntry(state.getCurrentSide()).toTimeSpec());
+            }
+            return m;
         }
         else {
             return new MoveRecord(start, destination, captures);
@@ -497,9 +506,20 @@ public class Taflman {
             return false;
         }
 
+        boolean isKingStrong = false;
+        if(Taflman.isKing(taflman)) {
+            if(getRules().getKingStrengthMode() == Rules.KING_STRONG) isKingStrong = true;
+            else if(getRules().getKingStrengthMode() == Rules.KING_STRONG_CENTER) {
+                Coord current = getCurrentSpace(state, taflman);
+                List<Coord> centerAndAdjacent = getBoard(state).getCenterAndAdjacentSpaces();
+
+                if(centerAndAdjacent.contains(current)) isKingStrong = true;
+            }
+        }
+
         // If this piece is a strong king, we need to check all four squares
-        // around us for hostility.
-        if (Taflman.isKing(taflman) && getRules().isKingStrong()) {
+        // around us for hostility
+        if (Taflman.isKing(taflman) && isKingStrong) {
             int hostileAdjacentSpaces = 0;
             List<Coord> adjacentSpaces = board.getAdjacentSpaces(Taflman.getCurrentSpace(state, taflman));
 
@@ -584,7 +604,8 @@ public class Taflman {
                 return false;
             }
 
-            if (Taflman.isKing(taflman) && getRules().isKingStrong()
+            if (Taflman.isKing(taflman)
+                    && (getRules().getKingStrengthMode() == Rules.KING_STRONG || getRules().getKingStrengthMode() == Rules.KING_STRONG_CENTER)
                     && (Taflman.getSide(capturer).hasCommanders() || Taflman.getSide(capturer).hasKnights())) {
                 // If the other side has commanders or knights and this is a strong
                 // king, we need to check for commander/knight sandwich.

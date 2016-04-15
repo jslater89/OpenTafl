@@ -22,6 +22,11 @@ class RestrictedSpaceTest extends TaflTest implements UiCallback {
     }
 
     @Override
+    public void modeChanging(Mode mode, Object gameObject) {
+
+    }
+
+    @Override
     public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
 
     }
@@ -38,6 +43,11 @@ class RestrictedSpaceTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
+
+    }
+
+    @Override
+    public void modalStatus(String title, String text) {
 
     }
 
@@ -73,6 +83,7 @@ class RestrictedSpaceTest extends TaflTest implements UiCallback {
         Rules rules = Fetlar.newFetlarTest();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
+        state.setCurrentSide(state.getDefenders());
 
         char ofInterest = state.getPieceAt(5, 6);
         List<Coord> allowableDestinations = Taflman.getAllowableDestinations(state, ofInterest);

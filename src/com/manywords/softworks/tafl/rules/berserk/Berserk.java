@@ -51,6 +51,11 @@ public class Berserk extends Rules {
         mStartingDefenders = defenders;
     }
 
+    @Override
+    public String getName() {
+        return "Berserk";
+    }
+
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;
@@ -67,9 +72,9 @@ public class Berserk extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
+    public int getKingStrengthMode() {
         // King must be surrounded on four sides
-        return true;
+        return KING_STRONG;
     }
 
     @Override
@@ -175,7 +180,7 @@ public class Berserk extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         return false;
     }
 

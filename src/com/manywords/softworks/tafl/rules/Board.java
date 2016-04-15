@@ -62,6 +62,8 @@ public abstract class Board {
      */
     public abstract boolean isEdgeSpace(Coord space);
 
+    public abstract List<Coord> getCenterAndAdjacentSpaces();
+
     /**
      * Get the up-to-four squares immediately adjacent
      * to this one.

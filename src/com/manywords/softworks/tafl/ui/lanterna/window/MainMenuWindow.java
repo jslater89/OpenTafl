@@ -2,19 +2,20 @@ package com.manywords.softworks.tafl.ui.lanterna.window;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
-import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
-import com.manywords.softworks.tafl.rules.BuiltInVariants;
-import com.manywords.softworks.tafl.ui.AdvancedTerminalHelper;
-import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
-import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
+import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
+import com.manywords.softworks.tafl.notation.GameSerializer;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
+import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
+
+import java.io.File;
 
 /**
  * Created by jay on 2/15/16.
  */
 public class MainMenuWindow extends BasicWindow {
-    private AdvancedTerminalHelper.TerminalCallback mTerminalCallback;
-    public MainMenuWindow(AdvancedTerminalHelper.TerminalCallback callback) {
+    private LogicalScreen.TerminalCallback mTerminalCallback;
+    public MainMenuWindow(LogicalScreen.TerminalCallback callback) {
         mTerminalCallback = callback;
 
         Panel p = new Panel();
@@ -33,43 +34,44 @@ public class MainMenuWindow extends BasicWindow {
         EmptySpace e1 = new EmptySpace(new TerminalSize(0, 1));
         p.addComponent(e1);
 
-        Button playButton = new Button("Play", new Runnable() {
-            @Override
-            public void run() {
-                GameClock.TimeSpec ts = TerminalSettings.timeSpec;
-                Game g;
-                if(ts.mainTime == 0 && (ts.overtimeTime == 0 ||ts.overtimeCount == 0)) {
-                    g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), mTerminalCallback.getUiCallback());
-                }
-                else {
-                    g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), mTerminalCallback.getUiCallback(), ts);
-                }
-
-                TerminalBoardImage.init(g.getGameRules().getBoard().getBoardDimension());
-
-                BoardWindow bw = new BoardWindow(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant), g, mTerminalCallback);
-                CommandWindow cw = new CommandWindow(g, mTerminalCallback);
-                StatusWindow sw = new StatusWindow(g, mTerminalCallback);
-
-                mTerminalCallback.onEnteringGame(g, bw, sw, cw);
-            }
-        });
+        Button playButton = new Button("Play", () -> TerminalUtils.startGame(getTextGUI(), mTerminalCallback));
         p.addComponent(playButton);
 
-        Button optionsButton = new Button("Options", new Runnable() {
-            @Override
-            public void run() {
-                mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback));
-            }
-        });
+        Button optionsButton = new Button("Options", () -> mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback)));
         p.addComponent(optionsButton);
 
-        Button quitButton = new Button("Quit", new Runnable() {
-            @Override
-            public void run() {
-                mTerminalCallback.onMenuNavigation(null);
+        Button loadGameButton = new Button("Load game", () -> {
+            File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved game", "Open", new File("saved-games"));
+            if(gameFile == null) {
+                return;
             }
+
+            GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
+            ReplayGame rg = new ReplayGame(g.game, g.moves);
+            TerminalUtils.startSavedGame(rg, getTextGUI(), mTerminalCallback);
+
         });
+        p.addComponent(loadGameButton);
+
+        Button viewReplayButton = new Button("View replay", () -> {
+            File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved replay", "Open", new File("saved-games/replays"));
+            if(gameFile == null) {
+                return;
+            }
+
+            GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
+            ReplayGame rg = new ReplayGame(g.game, g.moves);
+            TerminalUtils.startReplay(rg, getTextGUI(), mTerminalCallback);
+
+        });
+        p.addComponent(viewReplayButton);
+
+        if(OpenTafl.DEV_MODE) {
+            Button tourneyButton = new Button("AI selfplay", () -> mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback)));
+            p.addComponent(tourneyButton);
+        }
+
+        Button quitButton = new Button("Quit", () -> mTerminalCallback.onMenuNavigation(null));
         p.addComponent(quitButton);
 
         /*

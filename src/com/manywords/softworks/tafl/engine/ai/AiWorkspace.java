@@ -21,6 +21,8 @@ public class AiWorkspace extends Game {
     public static final Evaluator evaluator = new FishyEvaluator();
 
     private Game mGame;
+    private GameClock.TimeSpec mClockLength;
+    private GameClock.TimeSpec mTimeRemaining;
     private GameTreeState mStartingState;
 
     public long[] mAlphaCutoffs;
@@ -31,6 +33,9 @@ public class AiWorkspace extends Game {
 
     private long mStartTime;
     private long mEndTime;
+
+    private int mLastDepth;
+    private int mLastExtensionDepth;
     /**
      * In milliseconds
      */
@@ -51,7 +56,7 @@ public class AiWorkspace extends Game {
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory());
         mLastTimeToDepth = new long[20];
-        setGameRules(startingGame.getGameRules());
+        setGameRules(startingGame.getRules());
         setUiCallback(null);
         mOriginalStartingState = startingState;
         mGame = startingGame;
@@ -67,14 +72,21 @@ public class AiWorkspace extends Game {
         transpositionTable = new TranspositionTable((transpositionTable != null? transpositionTable.size() : 5));
     }
 
-    private long planTimeUsage(Game g) {
-        // We Math.min the return from this with the requested think time
-        if(g.getClock() == null) return Long.MAX_VALUE;
+    public void setTimeRemaining(GameClock.TimeSpec length, GameClock.TimeSpec entry) {
+        mClockLength = length;
+        mTimeRemaining = entry;
+    }
 
-        int boardDimension = g.getGameRules().boardSize;
+    public void crashStop() {
+        mNoTime = true;
+    }
 
+    private long planTimeUsage(Game g, GameClock.TimeSpec entry) {
+        // Math.minned against
+        if(entry == null) return Long.MAX_VALUE;
         // Aim to make a certain number of moves in main time, using overtimes
         // for the rest.
+        int boardDimension = g.getRules().getBoard().getBoardDimension();
         int mainTimeMoves;
         if(boardDimension == 7) {
             mainTimeMoves = 6;
@@ -84,15 +96,13 @@ public class AiWorkspace extends Game {
         }
         else mainTimeMoves = 20;
 
+        // Moves the current side has made
         int movesMade = g.getHistory().size() / 2;
         int movesLeft = mainTimeMoves - movesMade;
-        long mainTime = g.getClock().getMainTime();
-        long overtimeTime = g.getClock().getOvertimeTime();
-        long overtimeCount = g.getClock().getOvertimeCount();
-        long incrementTime = g.getClock().getIncrementTime();
-
-
-        GameClock.ClockEntry entry = g.getClock().getClockEntry(g.getCurrentState().getCurrentSide());
+        long mainTime = mClockLength.mainTime;
+        long overtimeTime = mClockLength.overtimeTime;
+        long overtimeCount = mClockLength.overtimeCount;
+        long incrementTime = (mClockLength.incrementTime > 0 ? mClockLength.incrementTime : 3000);
 
         if(overtimeCount == 0 || overtimeTime == 0) {
             if(movesMade < mainTimeMoves / 2) {
@@ -100,7 +110,7 @@ public class AiWorkspace extends Game {
                 long openingTime = (long) (mainTime * 0.05);
                 return openingTime / (mainTimeMoves / 2) + (long)(incrementTime * 0.9);
             }
-            else if (entry.getMainTime() > mainTime * 0.2) {
+            else if (entry.mainTime > mainTime * 0.2) {
                 // Midgame: expect to make about mainTimeMoves for the next 75% of the time.
                 long midgameTime = (long) (mainTime * 0.75);
                 return midgameTime / (mainTimeMoves) + (long)(incrementTime * 0.9);
@@ -108,15 +118,18 @@ public class AiWorkspace extends Game {
             else {
                 // Endgame: use a constant portion of the main time, until that turns out to be three seconds,
                 // then just use three seconds and hope we're close enough to a win to make that work.
-                long remainingTime = entry.getMainTime() / mainTimeMoves;
+                long remainingTime = entry.mainTime / mainTimeMoves;
                 return Math.max(remainingTime, 3);
             }
         }
         else {
             // If we do have overtime, work out the time we have left per main time move and return that. Otherwise
             // return the overtime time.
-            long mainTimeRemaining = entry.getMainTime();
-            if(movesLeft > 0) {
+            long mainTimeRemaining = entry.mainTime;
+
+            // If we still want to make moves in main time, and if main time would allow us to consider those moves
+            // for longer than just spending one overtime plus leftover main time every time, figure that out.
+            if(movesLeft > 0 && (mainTimeRemaining > movesLeft * overtimeTime)) {
                 long timePerMove = mainTimeRemaining / movesLeft;
                 if(mainTimeRemaining + overtimeTime > timePerMove) {
                     return timePerMove;
@@ -126,8 +139,14 @@ public class AiWorkspace extends Game {
                 }
             }
             else {
-                //TODO: use multiple overtimes to think about harder positions
-                return mainTimeRemaining + overtimeTime;
+                if(movesLeft > 0) {
+                    long timePerMove = mainTimeRemaining / movesLeft;
+                    return entry.overtimeTime + timePerMove;
+                }
+                else {
+                    // TODO: use multiple overtimes if things get dicey
+                    return mainTimeRemaining + entry.overtimeTime;
+                }
             }
         }
     }
@@ -146,13 +165,19 @@ public class AiWorkspace extends Game {
     }
 
     public void explore(int maxThinkTime) {
+        if(maxThinkTime == 0) maxThinkTime = Integer.MAX_VALUE;
         mMaxThinkTime = maxThinkTime * 1000;
 
         mStartTime = System.currentTimeMillis();
         int maxDepth = 10;
 
-        mThinkTime = Math.min(planTimeUsage(mGame), mMaxThinkTime);
-        if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec");
+        if(mTimeRemaining == null && mGame.getClock() != null) {
+            mClockLength = mGame.getClock().toTimeSpec();
+            mTimeRemaining = mGame.getClock().getClockEntry(mGame.getCurrentSide()).toTimeSpec();
+        }
+        long desiredTime = planTimeUsage(mGame, mTimeRemaining);
+        mThinkTime = Math.min(desiredTime, mMaxThinkTime);
+        if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec, desired " + desiredTime);
 
         //mThreadPool.start();
         Timer t = new Timer();
@@ -186,6 +211,8 @@ public class AiWorkspace extends Game {
 
         // Do the main search
         for (depth = 1; depth <= maxDepth;) {
+            mLastDepth = depth;
+
             if (canDoDeeperSearch(depth)) {
                 if (isTimeCritical() || mNoTime || mExtensionTime) {
                     break;
@@ -280,16 +307,19 @@ public class AiWorkspace extends Game {
             }
         }
 
+        mLastExtensionDepth = extensionDepth;
         mEndTime = System.currentTimeMillis();
+    }
 
-        int nodes = getGameTreeSize(depth);
-        int fullNodes = getGameTreeSize(depth + extensionLimit);
+    public void printSearchStats() {
+        int nodes = getGameTreeSize(mLastDepth);
+        int fullNodes = getGameTreeSize(mLastDepth + mLastExtensionDepth);
         int size = getTreeRoot().mBranches.size();
         double observedBranching = ((mGame.mAverageBranchingFactor * mGame.mAverageBranchingFactorCount) + size) / (++mGame.mAverageBranchingFactorCount);
         mGame.mAverageBranchingFactor = observedBranching;
 
         if(chatty && mUiCallback != null) {
-            mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / maxDepth)));
+            mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
             mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec, extended by " + (fullNodes - nodes) + " extra nodes");
         }
     }
@@ -322,8 +352,7 @@ public class AiWorkspace extends Game {
                 nextState.getBoard(),
                 nextState.getAttackers(),
                 nextState.getDefenders(),
-                true,
-                true,
+                true, // update Zobrist
                 berserkingTaflman);
 
         nextState.checkVictory();

@@ -14,6 +14,7 @@ class ShieldwallTest extends TaflTest {
         Rules rules = Copenhagen.newShieldwallTest();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
+        state.setCurrentSide(state.getDefenders());
 
         //RawTerminal.renderGameState(state);
         //println "Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers())

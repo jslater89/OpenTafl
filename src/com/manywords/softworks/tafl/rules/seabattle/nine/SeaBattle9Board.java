@@ -5,7 +5,7 @@ import com.manywords.softworks.tafl.rules.BoardImpl;
 
 public class SeaBattle9Board extends BoardImpl {
     public SeaBattle9Board() {
-        super();
+        super(9);
     }
 
     public SeaBattle9Board(Board board) {

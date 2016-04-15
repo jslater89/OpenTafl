@@ -22,18 +22,22 @@ public abstract class Rules {
     public boolean[] centerStoppableFor = new boolean[TAFLMAN_TYPE_COUNT];
     public boolean[] centerHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
     public boolean[] emptyCenterHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] centerReenterableFor = new boolean[TAFLMAN_TYPE_COUNT];
 
     public boolean[] cornerPassableFor = new boolean[TAFLMAN_TYPE_COUNT];
     public boolean[] cornerStoppableFor = new boolean[TAFLMAN_TYPE_COUNT];
     public boolean[] cornerHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] cornerReenterableFor = new boolean[TAFLMAN_TYPE_COUNT];
 
     public boolean[] attackerFortPassableFor = new boolean[TAFLMAN_TYPE_COUNT];
     public boolean[] attackerFortStoppableFor = new boolean[TAFLMAN_TYPE_COUNT];
     public boolean[] attackerFortHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] attackerFortReenterableFor = new boolean[TAFLMAN_TYPE_COUNT];
 
     public boolean[] defenderFortPassableFor = new boolean[TAFLMAN_TYPE_COUNT];
     public boolean[] defenderFortStoppableFor = new boolean[TAFLMAN_TYPE_COUNT];
     public boolean[] defenderFortHostileTo = new boolean[TAFLMAN_TYPE_COUNT];
+    public boolean[] defenderFortReenterableFor = new boolean[TAFLMAN_TYPE_COUNT];
 
     public Rules (Board board, Side attackers, Side defenders) {
         board.setRules(this);
@@ -70,18 +74,22 @@ public abstract class Rules {
         centerStoppableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cens"));
         centerHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cenh"));
         emptyCenterHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cenhe"));
+        centerReenterableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cenre"));
 
         cornerPassableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("corp"));
         cornerStoppableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("cors"));
         cornerHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("corh"));
+        cornerReenterableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("corre"));
 
         attackerFortPassableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("aforp"));
         attackerFortStoppableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("afors"));
         attackerFortHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("aforh"));
+        attackerFortReenterableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("aforre"));
 
         defenderFortPassableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("dforp"));
         defenderFortStoppableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("dfors"));
         defenderFortHostileTo = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("dforh"));
+        defenderFortReenterableFor = RulesSerializer.getTaflmanTypeListForString(RulesSerializer.defaults.get("dforre"));
     }
 
     /**
@@ -172,6 +180,8 @@ public abstract class Rules {
         return mDefenderForts;
     }
 
+    public abstract String getName();
+
     /**
      * Set up the centers, corners, and
      */
@@ -185,12 +195,28 @@ public abstract class Rules {
     public abstract boolean isKingArmed();
 
     /**
+     * The king is strong, requiring four men to capture at all times.
+     */
+    public static final int KING_STRONG = 0;
+
+    /**
+     * The king is strong when on or adjacent to the throne, and weak
+     * elsewhere.
+     */
+    public static final int KING_STRONG_CENTER = 1;
+
+    /**
+     * The king is weak, requiring only two men to capture.
+     */
+    public static final int KING_WEAK = 2;
+
+    /**
      * Does the king take two or four men to
      * capture?
      *
      * @return
      */
-    public abstract boolean isKingStrong();
+    public abstract int getKingStrengthMode();
 
     /**
      * Does the king jump? If so, how?
@@ -268,7 +294,7 @@ public abstract class Rules {
      *
      * @return
      */
-    public abstract boolean allowShieldFortEscapes();
+    public abstract boolean allowEdgeFortEscapes();
 
     public static final int CORNERS = 1;
     public static final int EDGES = 0;
@@ -343,9 +369,5 @@ public abstract class Rules {
 
     public String getOTRString() {
         return RulesSerializer.getRulesRecord(this);
-    }
-
-    public String getHumanReadableRules() {
-        return "";
     }
 }

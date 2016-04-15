@@ -18,6 +18,11 @@ public class Coord {
         this((byte) x, (byte) y);
     }
 
+    private static final int EAST = 0;
+    private static final int WEST = 1;
+    private static final int NORTH = 2;
+    private static final int SOUTH = 3;
+
     private static Coord[][] mCoords;
     private static int mDimension;
     private static Map<Coord, List<Coord>> mAdjacentCoords;
@@ -30,6 +35,10 @@ public class Coord {
     private static List<Coord> mAllEdges;
 
     public static void initialize(int dimension) {
+        if(dimension == 0) {
+            throw new IllegalStateException("Cannot initialize Coord to dimension 0");
+        }
+
         if(mDimension == dimension) {
             return;
         }
@@ -185,7 +194,7 @@ public class Coord {
         return c.y * mDimension + c.x;
     }
 
-    public static List<Coord> getAdjacentSpace(Coord c) {
+    public static List<Coord> getAdjacentSpaces(Coord c) {
         return mAdjacentCoords.get(c);
     }
     public static List<Coord> getDiagonalSpaces(Coord c) {
@@ -214,6 +223,51 @@ public class Coord {
 
     public static List<Coord> getEdgesFlat() {
         return mAllEdges;
+    }
+
+    public static List<Coord> getInterveningSpaces(Coord start, Coord finish) {
+        List<Coord> interveningSpaces = new ArrayList<>(mDimension);
+
+        int xDiff = Math.abs(start.x - finish.x);
+        int yDiff = Math.abs(start.y - finish.y);
+
+        if(xDiff == yDiff && xDiff == 0) {
+            return interveningSpaces;
+        }
+        if(yDiff == 0) {
+            List<List<Coord>> rankAndFileCoords = getRankAndFileCoords(start);
+
+            if(finish.x > start.x) {
+                for(Coord c : rankAndFileCoords.get(EAST)) {
+                    if(!c.equals(finish)) interveningSpaces.add(c);
+                    else break;
+                }
+            }
+            else {
+                for(Coord c : rankAndFileCoords.get(WEST)) {
+                    if(!c.equals(finish)) interveningSpaces.add(c);
+                    else break;
+                }
+            }
+        }
+        else if(xDiff == 0) {
+            List<List<Coord>> rankAndFileCoords = getRankAndFileCoords(start);
+
+            if(finish.y > start.y) {
+                for(Coord c : rankAndFileCoords.get(SOUTH)) {
+                    if(!c.equals(finish)) interveningSpaces.add(c);
+                    else break;
+                }
+            }
+            else {
+                for(Coord c : rankAndFileCoords.get(NORTH)) {
+                    if(!c.equals(finish)) interveningSpaces.add(c);
+                    else break;
+                }
+            }
+        }
+
+        return interveningSpaces;
     }
 
     public String toString() {

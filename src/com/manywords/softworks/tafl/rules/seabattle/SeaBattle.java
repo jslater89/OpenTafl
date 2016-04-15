@@ -7,7 +7,6 @@ import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Defenders;
 import com.manywords.softworks.tafl.rules.seabattle.nine.test.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class SeaBattle extends Rules {
@@ -55,6 +54,11 @@ public class SeaBattle extends Rules {
         mStartingDefenders = defenders;
     }
 
+    @Override
+    public String getName() {
+        return "Sea Battle";
+    }
+
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;
@@ -73,9 +77,9 @@ public class SeaBattle extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
+    public int getKingStrengthMode() {
         // King must be surrounded to capture
-        return true;
+        return KING_STRONG;
     }
 
     @Override
@@ -148,7 +152,7 @@ public class SeaBattle extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         // Sea Battles is an edge-escape ruleset
         return false;
     }

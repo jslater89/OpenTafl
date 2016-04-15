@@ -5,7 +5,7 @@ import com.manywords.softworks.tafl.rules.BoardImpl;
 
 public class Copenhagen11Board extends BoardImpl {
     public Copenhagen11Board() {
-        super();
+        super(11);
     }
 
     public Copenhagen11Board(Board board) {

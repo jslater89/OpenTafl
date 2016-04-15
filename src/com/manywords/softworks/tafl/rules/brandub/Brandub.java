@@ -52,6 +52,11 @@ public class Brandub extends Rules {
         mStartingDefenders = defenders;
     }
 
+    @Override
+    public String getName() {
+        return "Brandub";
+    }
+
     private Board mStartingBoard;
     private Side mStartingAttackers;
     private Side mStartingDefenders;
@@ -71,9 +76,9 @@ public class Brandub extends Rules {
     }
 
     @Override
-    public boolean isKingStrong() {
+    public int getKingStrengthMode() {
         // King is captured as a regular piece.
-        return false;
+        return KING_WEAK;
     }
 
     @Override
@@ -160,7 +165,7 @@ public class Brandub extends Rules {
     }
 
     @Override
-    public boolean allowShieldFortEscapes() {
+    public boolean allowEdgeFortEscapes() {
         // No edge escape captures.
         return false;
     }
