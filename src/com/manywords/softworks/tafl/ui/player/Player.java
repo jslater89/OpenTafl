@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.ui.player;
 
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
@@ -40,12 +41,24 @@ public abstract class Player {
         mAttackingSide = isAttackingSide;
     }
 
+    /**
+     * Called when the game state changes outside of the usual progression, i.e. in a replay.
+     * @param state
+     */
+    public void positionChanged(GameState state) {
+
+    }
+
     public void statusText(String text) {
         mGame.getUiCallback().statusText(text);
     }
 
     public void modalStatus(String title, String message) {
         mGame.getUiCallback().modalStatus(title, message);
+    }
+
+    public void quit() {
+
     }
 
     public abstract void getNextMove(UiCallback ui, Game game, int thinkTime);

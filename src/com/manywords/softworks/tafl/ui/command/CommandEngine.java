@@ -140,18 +140,27 @@ public class CommandEngine {
         mInGame = false;
         mGame.finish();
 
-        shutdown();
+        stopPlayers();
 
         if(!quiet) {
             callbackGameFinished();
         }
     }
 
-    public void shutdown() {
+    public void stopPlayers() {
         mAttacker.stop();
         mDefender.stop();
         if(mAnalysisEngine != null) {
             mDummyAnalysisPlayer.stop();
+        }
+    }
+
+    public void shutdown() {
+        mAttacker.quit();
+        mDefender.quit();
+
+        if(mAnalysisEngine != null) {
+            mDummyAnalysisPlayer.quit();
         }
     }
 
@@ -387,6 +396,10 @@ public class CommandEngine {
         // 15. REPLAY NEXT COMMAND
         else if(command instanceof HumanCommandParser.ReplayNext) {
             GameState state = mReplay.nextState();
+
+            mAttacker.positionChanged(state);
+            mDefender.positionChanged(state);
+
             if(state != null) return new CommandResult(CommandResult.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", null);
             else return new CommandResult(CommandResult.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
         }

@@ -151,6 +151,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         mStatusWindow = null;
         mCommandWindow = null;
 
+        mCommandEngine.stopPlayers();
         mCommandEngine.shutdown();
         mCommandEngineThread.cancel();
 

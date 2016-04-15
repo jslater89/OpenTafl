@@ -69,6 +69,12 @@ public class ExternalEnginePlayer extends Player {
         }
     }
 
+    @Override
+    public void positionChanged(GameState state) {
+        mHost.position(state);
+        mHost.side(state.getCurrentSide().isAttackingSide());
+    }
+
     private int connectAttempts = 0;
     @Override
     public void getNextMove(UiCallback ui, Game game, int thinkTime) {
@@ -127,7 +133,12 @@ public class ExternalEnginePlayer extends Player {
 
     @Override
     public void stop() {
-        mHost.stopEngine();
+        mHost.stopEnginePlay();
+    }
+
+    @Override
+    public void quit() {
+        mHost.terminateEngine();
     }
 
     @Override
