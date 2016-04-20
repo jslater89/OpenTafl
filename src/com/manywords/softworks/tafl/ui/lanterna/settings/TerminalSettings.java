@@ -97,6 +97,7 @@ public class TerminalSettings {
         File f = new File(SETTINGS_PATH);
         try {
             if(!f.exists()) {
+                System.out.println("No settings file exists");
                 return;
             }
             Wini ini = new Wini(f);
@@ -121,7 +122,7 @@ public class TerminalSettings {
             if(v != 0) variant = v - 1;
 
             int time = ini.get("config", "thinktime", int.class);
-            if(time != 0) aiThinkTime = time;
+            aiThinkTime = time;
 
             long mainTime = ini.get("clock", "maintime", long.class);
             long overtimeTime = ini.get("clock", "overtime", long.class);

@@ -144,7 +144,6 @@ public class RawTerminal implements UiCallback {
     public void startGame(Game game) {
         mGame = game;
         mCommandEngine = new CommandEngine(mGame, this, mPlayers[0], mPlayers[1]);
-        mCommandEngine.setSearchDepth(mSearchDepth);
 
         mCommandEngine.startGame();
     }

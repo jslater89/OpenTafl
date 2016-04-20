@@ -92,10 +92,6 @@ public class CommandEngine {
         mUiCallbacks.remove(callback);
     }
 
-    public void setSearchDepth(int depth) {
-        mThinkTime = depth;
-    }
-
     public void startGame() {
         if(mInGame) {
             // Don't restart a started game
