@@ -139,13 +139,21 @@ public class AiWorkspace extends Game {
                 }
             }
             else {
+                // Be very careful with time if we only have one overtime and no main time!
+                if(entry.overtimeCount == 1 && mainTimeRemaining == 0) {
+                    return entry.overtimeTime - 1000;
+                }
                 if(movesLeft > 0) {
                     long timePerMove = mainTimeRemaining / movesLeft;
-                    return entry.overtimeTime + timePerMove;
+
+                    // Save half a second, just to avoid using extra overtimes
+                    return entry.overtimeTime + timePerMove - 500;
                 }
                 else {
                     // TODO: use multiple overtimes if things get dicey
-                    return mainTimeRemaining + entry.overtimeTime;
+
+                    // Save half a second, just to avoid using extra overtimes
+                    return mainTimeRemaining + entry.overtimeTime - 500;
                 }
             }
         }
