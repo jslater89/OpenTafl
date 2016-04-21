@@ -105,6 +105,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.4.7b (released 04/21/16):
+- Actually fix AI time use planning when down to overtime times, by reserving
+  an extra half-second or second
+
 v0.2.4.6b (released 04/20/16):
 - Actually fix AI time use planning when think time is set to 0, since the
   previous fix was still broken
