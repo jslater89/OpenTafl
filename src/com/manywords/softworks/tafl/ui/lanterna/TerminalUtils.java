@@ -12,7 +12,7 @@ import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
-import java.io.File;
+import java.io.*;
 
 /**
  * Created by jay on 3/22/16.
@@ -86,5 +86,16 @@ public class TerminalUtils {
         builder.setTitle(title);
         builder.setActionLabel(actionLabel);
         return builder.build().showDialog(gui);
+    }
+
+    public static PrintStream newDummyPrintStream() {
+        PrintStream ps = new PrintStream(new BufferedOutputStream(new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+
+            }
+        }));
+
+        return ps;
     }
 }

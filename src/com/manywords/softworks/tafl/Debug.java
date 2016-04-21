@@ -3,8 +3,11 @@ package com.manywords.softworks.tafl;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Map;
 
 public class Debug {
@@ -28,23 +31,25 @@ public class Debug {
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
             Terminal t = null;
 
-            t = factory.createSwingTerminal();
-            /*
-            else {
+            if(args.containsKey("--text-terminal")) {
                 factory.setForceTextTerminal(true);
                 try {
                     t = factory.createTerminal();
+                    System.setOut(TerminalUtils.newDummyPrintStream());
+                    System.setErr(TerminalUtils.newDummyPrintStream());
                 } catch (IOException e) {
                     System.out.println("Unable to start.");
                 }
             }
-            */
+            else {
+                t = factory.createSwingTerminal();
+            }
 
             if (t != null) {
                 AdvancedTerminal<? extends Terminal> th = new AdvancedTerminal<>(t);
             }
             else {
-                System.out.println("Exiting");
+                System.out.println("Exiting: no terminal built");
             }
         }
     }
