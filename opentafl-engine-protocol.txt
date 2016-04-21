@@ -15,7 +15,7 @@ To avoid complicated bookkeeping, commands are unacknowledged.
 OpenTafl requires that external engines provide an .ini file containing basic
 configuration information. The file must contain a section with the [engine]
 heading, and entries with the names 'directory', 'filename', and 'command'. It
-may optionally contain an entry named 'arguments'.
+may optionally contain an entry named 'arguments' and an entry named 'name'.
 
 'directory' must contain the path to the directory in which your engine is
 installed, relative to <opentafl-dir>/engines. It is recommended to install
@@ -32,7 +32,11 @@ directory.
 'arguments' need not be present. If it is, its contents will be treated as
 command-line arguments to your engine.
 
+'name' need not be present. If it is, its contents will be displayed as your
+AI's human-readable name.
+
 See the opentafl.ini file in any distribution of OpenTafl for an example.
+
 
 2. Simple Algebraic Tafl Notation
 Since both OpenTafl and the external engines maintain game state, detailed
@@ -40,10 +44,11 @@ notation is unnecessary. Therefore, OpenTafl by default uses a very simple move
 notation: the starting space, a dash, and the finishing space: 'a4-a1'. 
 OpenTafl can be configured to use full OpenTafl move notation, if desired.
 
+
 3. Analysis vs. play
 If a player is playing against an external AI engine, and has configured that
 same AI engine to provide game analysis, by convention, OpenTafl will run two
-instances of your engine. One will be solely dedicated to gameplay, and the
+instances of that engine. One will be solely dedicated to gameplay, and the
 other will be solely dedicated to analysis. If your engine receives a 'play'
 command, you may assume that it will not be used for analysis.
 
@@ -51,6 +56,13 @@ If your engine receives an 'analysis' command, it will not be used for play.
 Engines used for analysis may receive multiple 'rules' commands, and, when a
 player requests a position analysis, will receive a 'position' command and a
 'side' command to set up the correct game state.
+
+If a player has configured an external AI engine as an opponent, or for
+analysis, and is viewing a replay, OpenTafl will initialize the AI engine at
+the start of the replay, and send 'position' and 'side' commands as the player
+moves through the replay, so that attached AI engines are always aware of the
+current game state.
+
 
 4. hello
 Direction: Engine <-> OpenTafl
@@ -61,6 +73,7 @@ started. If your engine has not sent a 'hello' command after five seconds,
 OpenTafl will assume that your engine failed to start, and will stop any game
 in progress and alert the user.
 
+
 5. simple-moves
 Direction: Engine -> OpenTafl
 Command: 'simple-moves <on|off>'
@@ -68,6 +81,7 @@ Default: on
 
 When set to on, OpenTafl provides the external engine with simple move records.
 When set to off, OpenTafl provides full OpenTafl Algebraic Tafl Notation.
+
 
 6. rules
 Direction: OpenTafl <-> Engine
@@ -80,7 +94,9 @@ defaults and other required implementation details.
 When receiving a 'rules' command, the engine should initialize to the starting
 board position. If the engine sends a 'rules' command, OpenTafl will reply with
 a 'rules' command; in this case, initialize to the starting board position only
-if the game has not yet begun.
+if the game has not yet begun. (You may assume that the game has begun if your
+engine has received a 'play' command or an 'opponent-move' command.)
+
 
 7. position
 Direction: OpenTafl <-> Engine
@@ -89,20 +105,22 @@ Command: 'position [position-record]'
 OpenTafl provides the engine with an OpenTafl Notation Position string, as
 defined in the OpenTafl Notation specification, representing the current game
 state. OpenTafl will not send unsolicited position commands unless the engine
-is being used for game analysis. Engines playing the game must send a position
-command to receive a position command.
+is being used for game analysis, or during replay viewing. Engines playing as
+opponents must send a 'position' command to receive a 'position' command.
+
 
 8. side
 Direction: OpenTafl <-> Engine
 Command: 'side [attackers|defenders]'
 
 OpenTafl informs the engine which side it is to play for. OpenTafl will send
-side commands to engines in analysis mode only. Engines being used for gameplay
-will be given the side to play in the 'play' command.
+side commands to engines in analysis mode and during replays only. Engines 
+being used for gameplay will be given the side to play in the 'play' command.
+
 
 9. clock
 Direction: OpenTafl <-> Engine
-Command: 'clock [attacker-millis][*] [defender-millis][*] [overtime-seconds] [attacker-overtimes] [defender-overtimes]'
+Command: 'clock [<attacker-millis>[*] <defender-millis>[*] <overtime-seconds> <attacker-overtimes> <defender-overtimes>]'
 
 OpenTafl provides the engine with the time left for both players in 
 milliseconds. If overtime timing is enabled, also provides the length of each
@@ -121,6 +139,7 @@ OpenTafl will send clock commands at four times:
 	4. Immediately before asking an engine used for analysis to analyze a
 	   position.
 
+
 10. analyze
 Direction: OpenTafl -> Engine
 Command: 'analyze <number> <seconds>'
@@ -130,6 +149,7 @@ given number of possible moves with evaluations (see 'analysis') and taking up
 to the given amount of time. Engines are not required to return exactly
 [number] moves, provided they return at least one move. At their discretion,
 engines may use less than the given limiting time.
+
 
 11. analysis
 Direction: Engine -> OpenTafl
@@ -146,6 +166,7 @@ Engines are not required to return a full move list, and may elect to simply
 provide the first move in the list (the move which exits the current game
 state).
 
+
 12. play
 Direction: OpenTafl -> Engine
 Command: 'play <attackers|defenders>'
@@ -153,6 +174,7 @@ Command: 'play <attackers|defenders>'
 OpenTafl instructs the engine to play for the given side from the current
 board state. The game clock runs from the moment the OpenTafl sends the 'play'
 command to the moment that OpenTafl receives the 'move' command.
+
 
 13. move
 Direction: Engine -> OpenTafl
@@ -162,12 +184,14 @@ The engine submits the given move to OpenTafl. If the move is made
 successfully, OpenTafl returns a 'move' command. If the move is not successful,
 OpenTafl returns an 'error' command. See 'error' and 'opponent-move' below.
 
+
 14. move
 Direction: OpenTafl -> Engine
 Command: 'move <position-record>'
 
 The move the engine last submitted to OpenTafl completed successfully. The
 position record provided is the board state following your move.
+
 
 15. error
 Direction: OpenTafl <-> Engine
@@ -192,6 +216,7 @@ OpenTafl -> Engine:
 	3: berserk mode wrong side (side from last turn moves again: berserk mode)
 	4: berserk mode illegal move (attempted to move a non-berserking taflman)
 
+
 16. opponent-move
 Direction: OpenTafl -> Engine
 Command: 'opponent-move <move-list> <position-record>'
@@ -211,6 +236,7 @@ command. Note that, in case of an erroneous move, OpenTafl will send three
 commands: 'error', 'opponent-move' (containing the prior move, and the correct
 board position), and 'play'.
 
+
 17. finish
 Direction: OpenTafl -> Engine
 Command: 'finish <finish-code>'
@@ -221,11 +247,13 @@ OpenTafl informs the engine that the game has ended. Result codes:
 	2: attackers win
 	3: defenders win
 
+
 18. goodbye
 Direction: OpenTafl -> Engine
 Command: 'goodbye'
 
 OpenTafl informs the engine that it may safely shut down.
+
 
 19. status
 Direction: Engine -> OpenTafl
