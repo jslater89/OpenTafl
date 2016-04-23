@@ -379,6 +379,11 @@ public class CommandEngine {
                 g.getClock().getClockEntry(true).setTime(attackerClock);
                 g.getClock().getClockEntry(false).setTime(defenderClock);
             }
+            else if(TerminalSettings.timeSpec.mainTime != 0 || TerminalSettings.timeSpec.overtimeTime != 0) {
+                GameClock clock = new GameClock(g, g.getCurrentState().getAttackers(), g.getCurrentState().getDefenders(), TerminalSettings.timeSpec);
+
+                g.setClock(clock);
+            }
 
             enterGame(g);
             return new CommandResult(CommandResult.Type.REPLAY_PLAY_HERE, CommandResult.SUCCESS, "", null);
@@ -402,6 +407,10 @@ public class CommandEngine {
         // 16. REPLAY PREV COMMAND
         else if(command instanceof HumanCommandParser.ReplayPrevious) {
             GameState state = mReplay.previousState();
+
+            mAttacker.positionChanged(state);
+            mDefender.positionChanged(state);
+
             if(state != null) return new CommandResult(CommandResult.Type.REPLAY_PREVIOUS, CommandResult.SUCCESS, "", null);
             else return new CommandResult(CommandResult.Type.REPLAY_PREVIOUS, CommandResult.FAIL, "At the start of the game history.", null);
         }
@@ -409,6 +418,10 @@ public class CommandEngine {
         else if(command instanceof HumanCommandParser.ReplayJump) {
             HumanCommandParser.ReplayJump j = (HumanCommandParser.ReplayJump) command;
             GameState state = mReplay.setTurnIndex(j.turnIndex);
+
+            mAttacker.positionChanged(state);
+            mDefender.positionChanged(state);
+
             if(state != null) return new CommandResult(CommandResult.Type.REPLAY_JUMP, CommandResult.SUCCESS, "", null);
             else return new CommandResult(CommandResult.Type.REPLAY_JUMP, CommandResult.FAIL, "Turn index " + j + " out of bounds.", null);
         }
