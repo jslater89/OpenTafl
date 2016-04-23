@@ -165,7 +165,7 @@ public class ReplayGame {
     }
 
     public void prepareForGameStart(int index) {
-        stateAtIndex(index);
+        setPosition(index);
         List<GameState> toRemove = new ArrayList<>(historySize() - index);
         for(int i = index + 1; i < historySize(); i++) {
             toRemove.add(mGame.getHistory().get(i));
@@ -215,36 +215,52 @@ public class ReplayGame {
 
         // The last state doesn't have an exiting move
         System.out.println(historySize());
-        for(int i = 0; i < historySize() - 1; i++) {
+        for(int i = 1; i < historySize() - 1; i++) {
             GameState current = mGame.getHistory().get(i);
 
             if(current.getCurrentSide().isAttackingSide()) {
                 // The other side's clock doesn't count down.
-                mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(i));
+                if(mDefenderTimeSpecByIndex.size() > 0) {
+                    mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(mDefenderTimeSpecByIndex.size() - 1));
+                }
+                else {
+                    mDefenderTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
+                }
 
                 // If we have a record, save it; otherwise, get the previous one as a best guess.
                 DetailedMoveRecord dm = mMoveHistory.get(i);
                 if(dm.getTimeRemaining() != null) {
                     mAttackerTimeSpecByIndex.add(dm.getTimeRemaining());
                 }
+                else if (mAttackerTimeSpecByIndex.size() > 0){
+                    mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(mAttackerTimeSpecByIndex.size() - 1));
+                }
                 else {
-                    mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(i));
+                    mAttackerTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
                 }
             }
             else {
-                mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(i));
+                if(mAttackerTimeSpecByIndex.size() > 0) {
+                    mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(mAttackerTimeSpecByIndex.size() - 1));
+                }
+                else {
+                    mAttackerTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
+                }
 
                 DetailedMoveRecord dm = mMoveHistory.get(i);
                 if(dm.getTimeRemaining() != null) {
                     mDefenderTimeSpecByIndex.add(dm.getTimeRemaining());
                 }
+                else if (mDefenderTimeSpecByIndex.size() > 0){
+                    mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(mDefenderTimeSpecByIndex.size() - 1));
+                }
                 else {
-                    mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(i));
+                    mDefenderTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
                 }
             }
         }
 
-        String remainingTimeString = mGame.getTagMap().get("remaining-time");
+        String remainingTimeString = mGame.getTagMap().get("time-remaining");
         if(remainingTimeString != null) {
             String[] remainingTimes = remainingTimeString.split(",");
             mAttackerTimeLeft = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
@@ -256,7 +272,6 @@ public class ReplayGame {
     }
 
     public GameClock.TimeSpec getTimeGuess(boolean isAttackingSide) {
-        int index = mStatePosition;
         if(isAttackingSide && mAttackerTimeSpecByIndex.size() > mStatePosition) {
             return mAttackerTimeSpecByIndex.get(mStatePosition);
         }
