@@ -63,17 +63,7 @@ public class TerminalUtils {
         rg.prepareForGameStart();
         Game g = rg.getGame();
 
-        if(rg.getTimeGuess(true) != null && rg.getTimeGuess(false) != null) {
-            GameClock.TimeSpec attackerClock = rg.getTimeGuess(true);
-            GameClock.TimeSpec defenderClock = rg.getTimeGuess(false);
-
-            if(g.getClock() == null) {
-                g.setClock(new GameClock(g, g.getCurrentState().getAttackers(), g.getCurrentState().getDefenders(), attackerClock));
-            }
-            g.getClock().getClockEntry(true).setTime(attackerClock);
-            g.getClock().getClockEntry(false).setTime(defenderClock);
-        }
-        else if(TerminalSettings.timeSpec.mainTime != 0 || TerminalSettings.timeSpec.overtimeTime != 0) {
+        if(g.getClock() == null && (TerminalSettings.timeSpec.mainTime != 0 || TerminalSettings.timeSpec.overtimeTime != 0)) {
             GameClock clock = new GameClock(g, g.getCurrentState().getAttackers(), g.getCurrentState().getDefenders(), TerminalSettings.timeSpec);
 
             g.setClock(clock);
