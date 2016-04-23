@@ -63,6 +63,12 @@ public class TerminalUtils {
         rg.prepareForGameStart();
         Game g = rg.getGame();
 
+        if(g.getClock() == null && (TerminalSettings.timeSpec.mainTime != 0 || TerminalSettings.timeSpec.overtimeTime != 0)) {
+            GameClock clock = new GameClock(g, g.getCurrentState().getAttackers(), g.getCurrentState().getDefenders(), TerminalSettings.timeSpec);
+
+            g.setClock(clock);
+        }
+
         if(g.getCurrentState().checkVictory() > 0) {
             MessageDialog.showMessageDialog(gui, "Game already ended", "This game record has already finished.\n\nTry loading it as a replay and using the 'play-here'\ncommand where you would like to take control.");
             return null;

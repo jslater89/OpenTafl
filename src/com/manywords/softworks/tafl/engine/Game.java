@@ -132,6 +132,8 @@ public class Game {
 
     public GameClock getClock() { return mClock; }
 
+    public void setClock(GameClock clock) { mClock = clock; }
+
     public void setUiCallback(UiCallback mCallback) {
         this.mCallback = mCallback;
     }
