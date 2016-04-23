@@ -88,7 +88,7 @@ public class GameSerializer {
 
                 String timeRemainingString =
                         g.getClock().getClockEntry(g.getCurrentState().getAttackers()).toTimeSpec().toGameNotationString() + ", " +
-                                g.getClock().getClockEntry(g.getCurrentState().getAttackers()).toTimeSpec().toGameNotationString();
+                                g.getClock().getClockEntry(g.getCurrentState().getDefenders()).toTimeSpec().toGameNotationString();
                 tagString += "[time-remaining:" + timeRemainingString + "]\n";
             }
 
