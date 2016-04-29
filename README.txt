@@ -105,6 +105,12 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.4.8b (released 04/23/16):
+- Fix saved-game bug: time-remaining tag would incorrectly show attacker time
+  twice
+- Fix saved-game loading bug: would incorrectly prefer starting time setting
+  instead of most recent recorded time setting
+
 v0.2.4.7b (released 04/21/16):
 - Actually fix AI time use planning when down to overtime times, by reserving
   an extra half-second or second
