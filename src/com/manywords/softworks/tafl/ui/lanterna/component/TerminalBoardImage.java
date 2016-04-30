@@ -14,31 +14,44 @@ import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by jay on 2/15/16.
  */
 public class TerminalBoardImage extends BasicTextImage {
     private static int boardDimension;
-    private static int rowHeight = 3;
-    private static int colWidth = 5;
-    private static int spaceHeight = rowHeight - 1;
-    private static int spaceWidth = colWidth - 1;
+    private int mRowHeight = 3;
+    private int mColWidth = 5;
+    private int mSpaceHeight = mRowHeight - 1;
+    private int mSpaceWidth = mColWidth - 1;
     public static void init(int dimension) {
         boardDimension = dimension;
     }
 
     public TerminalBoardImage() {
-        this(null);
+        this(null, 3, 5);
+    }
+
+    public TerminalBoardImage(int rowHeight, int colWidth) {
+        this(null, rowHeight, colWidth);
     }
 
     public TerminalBoardImage(GameState state) {
+        this(state, 3, 5);
+    }
+
+    public TerminalBoardImage(GameState state, int rowHeight, int colWidth) {
         // +--- per row, + extra
         // |
         // |
         //  per column, + extra
+
         super(boardDimension * colWidth + 1, boardDimension * rowHeight + 1);
+
+        mRowHeight = rowHeight;
+        mColWidth = colWidth;
+        mSpaceHeight = mRowHeight - 1;
+        mSpaceWidth = mColWidth - 1;
 
         renderBoardBackground();
         if(state != null) {
@@ -66,23 +79,23 @@ public class TerminalBoardImage extends BasicTextImage {
         TextCharacter space = new TextCharacter(' ', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
 
         for (int row = 0; row < boardDimension; row++) {
-            int yTop = row * rowHeight;
-            int yBottom = row * rowHeight + rowHeight;
+            int yTop = row * mRowHeight;
+            int yBottom = row * mRowHeight + mRowHeight;
             int rowLabelIdx = ((yTop + yBottom) / 2);
 
             for (int col = 0; col < boardDimension; col++) {
-                int xLeft = col * colWidth;
-                int xRight = col * colWidth + colWidth;
+                int xLeft = col * mColWidth;
+                int xRight = col * mColWidth + mColWidth;
                 int colLabelIdx = ((xLeft + xRight) / 2);
 
                 for (int y = yTop; y < yBottom + 1; y++) {
                     for (int x = xLeft; x < xRight + 1; x++) {
                         // Draw the top or bottom of a space
-                        if (y % rowHeight == 0) {
+                        if (y % mRowHeight == 0) {
                             if (y == 0 && x == colLabelIdx) {
                                 setCharacterAt(x, y, new TextCharacter((char) ('a' + col)));
                             }
-                            else if (x % colWidth == 0) setCharacterAt(x, y, plus);
+                            else if (x % mColWidth == 0) setCharacterAt(x, y, plus);
                             else setCharacterAt(x, y, dash);
                         }
                         // Draw the middle of a space
@@ -99,7 +112,7 @@ public class TerminalBoardImage extends BasicTextImage {
                             else if (x == 0 && y == rowLabelIdx + 1 && rowLabel.length() > 1) {
                                 setCharacterAt(x, y, new TextCharacter(rowLabel.charAt(1)));
                             }
-                            else if (x % colWidth == 0) setCharacterAt(x, y, pipe);
+                            else if (x % mColWidth == 0) setCharacterAt(x, y, pipe);
                             else setCharacterAt(x, y, space);
                         }
                     }
@@ -147,8 +160,8 @@ public class TerminalBoardImage extends BasicTextImage {
         TerminalPosition spaceLoc = getSpaceTopLeftForCoord(coord);
         int yStart = spaceLoc.getRow();
         int xStart = spaceLoc.getColumn();
-        for(int y = yStart; y < yStart + spaceHeight; y++) {
-            for(int x = xStart; x < xStart + spaceWidth; x++) {
+        for(int y = yStart; y < yStart + mSpaceHeight; y++) {
+            for(int x = xStart; x < xStart + mSpaceWidth; x++) {
                 setCharacterAt(x, y, character);
             }
         }
@@ -175,11 +188,17 @@ public class TerminalBoardImage extends BasicTextImage {
             TextColor bg = TerminalThemeConstants.DKGRAY;
 
             TerminalPosition spaceLoc = getSpaceTopLeftForCoord(c);
-            int yStart = spaceLoc.getRow() + 1;
+            int yStart;
+            if(mRowHeight <= 2) {
+                yStart = spaceLoc.getRow();
+            }
+            else {
+                yStart = spaceLoc.getRow() + 1;
+            }
             int xStart = spaceLoc.getColumn();
 
-            String symbol = Taflman.getStringSymbol(taflman, spaceWidth);
-            for(int i = xStart; i < xStart + spaceWidth; i++) {
+            String symbol = Taflman.getStringSymbol(taflman, mSpaceWidth);
+            for(int i = xStart; i < xStart + mSpaceWidth; i++) {
                 if(i - xStart >= symbol.length()) break;
                 setCharacterAt(i, yStart, new TextCharacter(symbol.charAt(i - xStart), color, bg, TerminalThemeConstants.NO_SGRS));
             }
@@ -187,8 +206,9 @@ public class TerminalBoardImage extends BasicTextImage {
     }
 
     private TerminalPosition getSpaceTopLeftForCoord(Coord c) {
-        int yStart = c.y * rowHeight + 1;
-        int xStart = c.x * colWidth + 1;
+
+        int yStart = c.y * mRowHeight + 1;
+        int xStart = c.x * mColWidth + 1;
         return new TerminalPosition(xStart, yStart);
     }
 }

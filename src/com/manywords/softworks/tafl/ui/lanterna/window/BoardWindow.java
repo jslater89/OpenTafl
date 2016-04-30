@@ -25,7 +25,16 @@ public class BoardWindow extends BasicWindow {
         mGame = g;
 
         Panel p = new Panel();
-        mBoardImage = new TerminalBoardImage();
+        if(mGame.getRules().getBoard().getBoardDimension() >= 15) {
+            mBoardImage = new TerminalBoardImage(2, 3);
+        }
+        else if(mGame.getRules().getBoard().getBoardDimension() >= 13){
+            mBoardImage = new TerminalBoardImage(3, 4);
+        }
+        else {
+            mBoardImage = new TerminalBoardImage();
+        }
+
         TerminalImagePanel boardImagePanel = new TerminalImagePanel(mBoardImage, new TerminalSize(40, 25));
         p.addComponent(boardImagePanel);
 
