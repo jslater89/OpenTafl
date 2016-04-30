@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
@@ -425,7 +426,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             else if (r.type == CommandResult.Type.HELP) {
                 String helpString = HumanCommandParser.getHelpString(getCurrentCommands());
 
-                ScrollingMessageDialog dialog = new ScrollingMessageDialog("OpenTafl Help", helpString, MessageDialogButton.Close);
+                ScrollingMessageDialog dialog = new ScrollingMessageDialog("OpenTafl " + OpenTafl.CURRENT_VERSION + " Help", helpString, MessageDialogButton.Close);
                 dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
                 dialog.showDialog(mGui);
             }

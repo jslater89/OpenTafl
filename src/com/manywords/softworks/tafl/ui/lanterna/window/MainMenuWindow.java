@@ -22,7 +22,7 @@ public class MainMenuWindow extends BasicWindow {
         p.setLayoutManager(new LinearLayout());
         p.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-        Label l1 = new Label("OpenTafl");
+        Label l1 = new Label("OpenTafl " + OpenTafl.CURRENT_VERSION);
         p.addComponent(l1);
 
         Label l2 = new Label("The old Norse board game,");
