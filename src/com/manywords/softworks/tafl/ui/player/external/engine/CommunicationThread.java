@@ -16,6 +16,10 @@ public class CommunicationThread extends Thread {
     private boolean running = true;
     private CommunicationThreadCallback callback;
 
+    private boolean log = false;
+    private File logFile;
+    private FileWriter logFileWriter;
+
     public CommunicationThread(Process process, OutputStream output, InputStream input, CommunicationThreadCallback callback) {
         this.process = process;
         this.output = output;
@@ -23,11 +27,36 @@ public class CommunicationThread extends Thread {
         this.callback = callback;
     }
 
+    public void setLog(boolean l) {
+        log = l;
+
+        if(log) {
+            logFile = new File("engine-output.log");
+            try {
+                logFileWriter = new FileWriter(logFile);
+            } catch (IOException e) {
+                System.out.println("Failed to open engine output log for writing");
+                log = false;
+            }
+        }
+        else {
+            try {
+                logFileWriter.flush();
+                logFileWriter.close();
+            } catch (IOException e) {
+                System.out.println("Failed to close engine log");
+            }
+        }
+    }
+
     public void cancel() {
         running = false;
+        setLog(false);
     }
 
     public synchronized void sendCommand(byte[] command) {
+        logBytes(true, command);
+
         try {
             output.write(command);
             output.flush();
@@ -45,6 +74,7 @@ public class CommunicationThread extends Thread {
                 if(i > 0) {
                     byte[] command = new byte[i];
                     System.arraycopy(buffer, 0, command, 0, i);
+                    logBytes(false, command);
                     callback.onCommandReceived(command);
                 }
                 else {
@@ -73,6 +103,17 @@ public class CommunicationThread extends Thread {
             output.close();
         } catch (IOException e) {
             //best effort
+        }
+    }
+
+    private void logBytes(boolean sender, byte[] command) {
+        if(log) {
+            try {
+                logFileWriter.write((sender ? "Sent: " : "Received: ") + new String(command));
+                logFileWriter.flush();
+            } catch (IOException e) {
+                System.out.println("Failed to write to engine log");
+            }
         }
     }
 }
