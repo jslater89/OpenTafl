@@ -736,7 +736,7 @@ public class Taflman {
         else if(size == 2) return edge1 + symbol;
         else if(size == 3) return edge1 + symbol + edge2;
         else if(size == 4) return edge1 + symbol + symbol + edge2;
-        else if(size == 5) return edge1 + "-" + symbol + "-" + edge2;
+        else if(size == 5) return edge1 + symbol + symbol + symbol + edge2;
         else return edge1 + symbol + edge2;
     }
 
