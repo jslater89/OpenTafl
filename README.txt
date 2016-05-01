@@ -105,6 +105,15 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.5b (released 05/01/16):
+- Add 15x15 Tablut variant, layout courtesy of the forum at aagenielsen.dk
+- Add option to render large boards (15x15 and up) using an alternate, smaller
+  representation
+- Internal improvements to handling of external engine configuration files
+- Prefer to display names from external engine configuration files over
+  filenames
+- Correctly shut down engines when AI self-play games finish
+
 v0.2.4.8b (released 04/23/16):
 - Fix saved-game bug: time-remaining tag would incorrectly show attacker time
   twice
