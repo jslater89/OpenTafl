@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
+import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
 import java.io.File;
@@ -27,8 +28,8 @@ public class ExternalEnginePlayer extends Player {
     private int mAttackerOvertimes = -1;
     private int mDefenderOvertimes = -1;
 
-    public void setupEngine(File iniFile) {
-        mHost = new ExternalEngineHost(this, iniFile);
+    public void setupEngine(EngineSpec spec) {
+        mHost = new ExternalEngineHost(this, spec);
         mMyLastMove = null;
         if(getGame() == null) throw new IllegalStateException("ExternalEnginePlayer game is null when setting up engine!");
         mHost.setGame(getGame());
@@ -49,14 +50,14 @@ public class ExternalEnginePlayer extends Player {
         super.setupPlayer();
         mAttackerOvertimes = -1;
         mDefenderOvertimes = -1;
-        setupEngine(this.isAttackingSide() ? TerminalSettings.attackerEngineFile : TerminalSettings.defenderEngineFile);
+        setupEngine(this.isAttackingSide() ? TerminalSettings.attackerEngineSpec : TerminalSettings.defenderEngineSpec);
     }
 
     public ExternalEngineHost setupAnalysisEngine() {
         super.setupPlayer();
         mAttackerOvertimes = -1;
         mDefenderOvertimes = -1;
-        setupEngine(TerminalSettings.analysisEngineFile);
+        setupEngine(TerminalSettings.analysisEngineSpec);
 
         return mHost;
     }

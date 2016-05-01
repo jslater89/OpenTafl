@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.ui.selfplay;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
 
 import java.io.File;
 
@@ -11,18 +12,18 @@ import java.io.File;
 public class MatchResult {
     private Game[] games = new Game[2];
 
-    private File[] engines = new File[2];
+    private EngineSpec[] engines = new EngineSpec[2];
 
-    private File[] winners = new File[2];
+    private EngineSpec[] winners = new EngineSpec[2];
 
     private int[] gameLengths = new int[2];
 
-    public void setEngines(File engine1, File engine2) {
+    public void setEngines(EngineSpec engine1, EngineSpec engine2) {
         engines[0] = engine1;
         engines[1] = engine2;
     }
 
-    public void setWinner(int index, File engine) {
+    public void setWinner(int index, EngineSpec engine) {
         winners[index] = engine;
     }
 
@@ -35,11 +36,11 @@ public class MatchResult {
         return games[index];
     }
 
-    public File getEngine(int index) {
+    public EngineSpec getEngine(int index) {
         return engines[index];
     }
 
-    public File getWinner(int index) {
+    public EngineSpec getWinner(int index) {
         return winners[index];
     }
 
@@ -47,7 +48,7 @@ public class MatchResult {
         return gameLengths[index];
     }
 
-    public File getMatchWinner() {
+    public EngineSpec getMatchWinner() {
         if(games[0] == null || games[1] == null) throw new IllegalStateException();
         if(engines[0] == null || engines[1] == null) throw new IllegalStateException();
 

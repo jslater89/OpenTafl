@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.ui.lanterna.settings;
 
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.ui.player.Player;
+import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
 import org.ini4j.Wini;
 
 import java.io.File;
@@ -21,11 +22,11 @@ public class TerminalSettings {
     public static int attackers = AI;
     public static int defenders = HUMAN;
 
-    public static File attackerEngineFile = null;
-    public static File defenderEngineFile = null;
+    public static EngineSpec attackerEngineSpec = null;
+    public static EngineSpec defenderEngineSpec = null;
 
     public static boolean analysisEngine = false;
-    public static File analysisEngineFile = null;
+    public static EngineSpec analysisEngineSpec = null;
 
     public static int aiThinkTime = 10;
 
@@ -69,6 +70,10 @@ public class TerminalSettings {
                 f.createNewFile();
             }
             Wini ini = new Wini(f);
+
+            File attackerEngineFile = attackerEngineSpec.specFile;
+            File defenderEngineFile = defenderEngineSpec.specFile;
+            File analysisEngineFile = analysisEngineSpec.specFile;
             ini.put("config", "attacker", attackers + 1);
             ini.put("config", "attackerfile", (attackerEngineFile != null ? attackerEngineFile.getCanonicalPath() : ""));
             ini.put("config", "defender", defenders + 1);
@@ -105,16 +110,16 @@ public class TerminalSettings {
             if(attacker != 0) attackers = attacker - 1;
 
             String attackerFile = ini.get("config", "attackerfile", String.class);
-            if(attackerFile != null && !attackerFile.equals("")) attackerEngineFile = new File(attackerFile);
+            if(attackerFile != null && !attackerFile.equals("")) attackerEngineSpec = new EngineSpec(new File(attackerFile));
 
             int defender = ini.get("config", "defender", int.class);
             if(defender != 0) defenders = defender - 1;
 
             String defenderFile = ini.get("config", "defenderfile", String.class);
-            if(defenderFile != null && !defenderFile.equals("")) defenderEngineFile = new File(defenderFile);
+            if(defenderFile != null && !defenderFile.equals("")) defenderEngineSpec = new EngineSpec(new File(defenderFile));
 
             String analysisFile = ini.get("config", "analysisfile", String.class);
-            if(analysisFile != null && !analysisFile.equals("")) analysisEngineFile = new File(analysisFile);
+            if(analysisFile != null && !analysisFile.equals("")) analysisEngineSpec = new EngineSpec(new File(analysisFile));
 
             analysisEngine = ini.get("config", "analysis", boolean.class);
 

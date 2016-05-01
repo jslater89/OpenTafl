@@ -10,7 +10,7 @@ import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.lanterna.screen.GameScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
+import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
 
 import java.io.*;
 
@@ -19,11 +19,11 @@ import java.io.*;
  */
 public class TerminalUtils {
     public static Game startGame(WindowBasedTextGUI gui, LogicalScreen.TerminalCallback callback) {
-        if(TerminalSettings.attackers == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.attackerEngineFile)) {
+        if(TerminalSettings.attackers == TerminalSettings.ENGINE && TerminalSettings.attackerEngineSpec == null) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Attacker engine missing configuration file!");
             return null;
         }
-        if(TerminalSettings.defenders == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.defenderEngineFile)) {
+        if(TerminalSettings.defenders == TerminalSettings.ENGINE && TerminalSettings.defenderEngineSpec == null) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Defender engine missing configuration file!");
             return null;
         }
@@ -51,11 +51,11 @@ public class TerminalUtils {
      * @param callback
      */
     public static Game startSavedGame(ReplayGame rg, WindowBasedTextGUI gui, LogicalScreen.TerminalCallback callback) {
-        if(TerminalSettings.attackers == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.attackerEngineFile)) {
+        if(TerminalSettings.attackers == TerminalSettings.ENGINE && TerminalSettings.attackerEngineSpec == null) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Attacker engine missing configuration file!");
             return null;
         }
-        if(TerminalSettings.defenders == TerminalSettings.ENGINE && !ExternalEngineHost.validateEngineFile(TerminalSettings.defenderEngineFile)) {
+        if(TerminalSettings.defenders == TerminalSettings.ENGINE && TerminalSettings.defenderEngineSpec == null) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Defender engine missing configuration file!");
             return null;
         }

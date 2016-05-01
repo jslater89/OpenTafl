@@ -13,6 +13,7 @@ import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.player.ExternalEnginePlayer;
 import com.manywords.softworks.tafl.ui.player.Player;
+import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
 import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class CommandEngine {
         mDefender.setGame(g);
         mDefender.setupPlayer();
 
-        if(TerminalSettings.analysisEngine && ExternalEngineHost.validateEngineFile(TerminalSettings.analysisEngineFile)) {
+        if(TerminalSettings.analysisEngine && TerminalSettings.analysisEngineSpec != null) {
             mDummyAnalysisPlayer = new ExternalEnginePlayer();
             mDummyAnalysisPlayer.setGame(g);
             mDummyAnalysisPlayer.setCallback(mPlayerCallback);

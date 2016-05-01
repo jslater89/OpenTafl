@@ -6,9 +6,9 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.lanterna.window.MainMenuWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.SelfplayResultWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.SelfplayWindow;
+import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -22,8 +22,8 @@ import java.util.List;
  * Created by jay on 3/22/16.
  */
 public class SelfplayRunner {
-    private File mFirstEngineFile;
-    private File mSecondEngineFile;
+    private EngineSpec mFirstEngineSpec;
+    private EngineSpec mSecondEngineSpec;
     private int mMatchCount;
     private GameClock.TimeSpec mGameTimeSpec;
     private List<MatchResult> mMatchResults;
@@ -38,8 +38,8 @@ public class SelfplayRunner {
         mHost = host;
         mMatchCount = matchCount;
 
-        mFirstEngineFile = TerminalSettings.attackerEngineFile;
-        mSecondEngineFile = TerminalSettings.defenderEngineFile;
+        mFirstEngineSpec = TerminalSettings.attackerEngineSpec;
+        mSecondEngineSpec = TerminalSettings.defenderEngineSpec;
         mGameTimeSpec = TerminalSettings.timeSpec;
         mMatchResults = new ArrayList<>(mMatchCount);
     }
@@ -71,8 +71,8 @@ public class SelfplayRunner {
             StringBuilder builder = new StringBuilder();
 
             builder.append("Tournament results\n");
-            builder.append("Engine 1: ").append(mMatchResults.get(0).getEngine(0).getName()).append("\n");
-            builder.append("Engine 2: ").append(mMatchResults.get(0).getEngine(1).getName()).append("\n");
+            builder.append("Engine 1: ").append(mMatchResults.get(0).getEngine(0).toString()).append("\n");
+            builder.append("Engine 2: ").append(mMatchResults.get(0).getEngine(1).toString()).append("\n");
             builder.append("\n");
 
             int i = 1;
@@ -95,8 +95,8 @@ public class SelfplayRunner {
                 builder.append("\n");
             }
 
-            builder.append(mMatchResults.get(0).getEngine(0).getName()).append(" won: ").append(matchResultsByEngine[0]).append(" matches\n");
-            builder.append(mMatchResults.get(0).getEngine(1).getName()).append(" won: ").append(matchResultsByEngine[1]).append(" matches\n");
+            builder.append(mMatchResults.get(0).getEngine(0).toString()).append(" won: ").append(matchResultsByEngine[0]).append(" matches\n");
+            builder.append(mMatchResults.get(0).getEngine(1).toString()).append(" won: ").append(matchResultsByEngine[1]).append(" matches\n");
 
             String tourneySummary = builder.toString();
 
@@ -147,17 +147,17 @@ public class SelfplayRunner {
         mHost.getTerminalCallback().onMenuNavigation(new SelfplayResultWindow(mHost.getTerminalCallback(), this));
     }
 
-    public static String drawOrName(File f) {
-        return (f == null? "Draw" : f.getName());
+    public static String drawOrName(EngineSpec f) {
+        return (f == null? "Draw" : f.toString());
     }
 
     private void runTournamentMatch() {
         mCurrentMatch = new MatchResult();
 
-        mCurrentMatch.setEngines(mFirstEngineFile, mSecondEngineFile);
-        System.out.println("Running match " + (mMatchResults.size() + 1) + "/" + mMatchCount + " between " + mFirstEngineFile.getName() + " and " + mSecondEngineFile.getName());
-        TerminalSettings.attackerEngineFile = mFirstEngineFile;
-        TerminalSettings.defenderEngineFile = mSecondEngineFile;
+        mCurrentMatch.setEngines(mFirstEngineSpec, mSecondEngineSpec);
+        System.out.println("Running match " + (mMatchResults.size() + 1) + "/" + mMatchCount + " between " + mFirstEngineSpec.toString() + " and " + mSecondEngineSpec.toString());
+        TerminalSettings.attackerEngineSpec = mFirstEngineSpec;
+        TerminalSettings.defenderEngineSpec = mSecondEngineSpec;
 
 
         // This is a blocking call (sets this as the UI thread), so when it returns, the game
@@ -176,16 +176,16 @@ public class SelfplayRunner {
         mCurrentMatch.setGame(0, mLastGame);
         mLastGame = null;
         if(mCurrentMatch.getGame(0).getCurrentState().checkVictory() == GameState.ATTACKER_WIN) {
-            System.out.println(mFirstEngineFile.getName() + " wins game 1");
-            mCurrentMatch.setWinner(0, mFirstEngineFile);
+            System.out.println(mFirstEngineSpec.toString() + " wins game 1");
+            mCurrentMatch.setWinner(0, mFirstEngineSpec);
         }
         else if(mCurrentMatch.getGame(0).getCurrentState().checkVictory() == GameState.DEFENDER_WIN) {
-            System.out.println(mSecondEngineFile.getName() + " wins game 1");
-            mCurrentMatch.setWinner(0, mSecondEngineFile);
+            System.out.println(mSecondEngineSpec.toString() + " wins game 1");
+            mCurrentMatch.setWinner(0, mSecondEngineSpec);
         }
 
-        TerminalSettings.attackerEngineFile = mSecondEngineFile;
-        TerminalSettings.defenderEngineFile = mFirstEngineFile;
+        TerminalSettings.attackerEngineSpec = mSecondEngineSpec;
+        TerminalSettings.defenderEngineSpec = mFirstEngineSpec;
 
         // Same blocking call.
         System.out.println("Running game 2");
@@ -202,17 +202,17 @@ public class SelfplayRunner {
         mCurrentMatch.setGame(1, mLastGame);
         mLastGame = null;
         if(mCurrentMatch.getGame(1).getCurrentState().checkVictory() == GameState.ATTACKER_WIN) {
-            System.out.println(mSecondEngineFile.getName() + " wins game 2");
-            mCurrentMatch.setWinner(1, mSecondEngineFile);
+            System.out.println(mSecondEngineSpec.toString() + " wins game 2");
+            mCurrentMatch.setWinner(1, mSecondEngineSpec);
         }
         else if(mCurrentMatch.getGame(1).getCurrentState().checkVictory() == GameState.DEFENDER_WIN) {
-            System.out.println(mFirstEngineFile.getName() + " wins game 2");
-            mCurrentMatch.setWinner(1, mFirstEngineFile);
+            System.out.println(mFirstEngineSpec.toString() + " wins game 2");
+            mCurrentMatch.setWinner(1, mFirstEngineSpec);
         }
 
         // Restore previous settings
-        TerminalSettings.attackerEngineFile = mFirstEngineFile;
-        TerminalSettings.defenderEngineFile = mSecondEngineFile;
+        TerminalSettings.attackerEngineSpec = mFirstEngineSpec;
+        TerminalSettings.defenderEngineSpec = mSecondEngineSpec;
 
         mMatchResults.add(mCurrentMatch);
         if(mMatchResults.size() >= mMatchCount) {

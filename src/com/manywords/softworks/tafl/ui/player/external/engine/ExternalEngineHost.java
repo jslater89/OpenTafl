@@ -31,34 +31,6 @@ public class ExternalEngineHost {
     private ExternalEnginePlayer mPlayer;
     private boolean mSimpleNotation = true;
 
-    public static boolean validateEngineFile(File iniFile) {
-        try {
-            Wini ini = new Wini(iniFile);
-            String dir = ini.get("engine", "directory", String.class);
-            String filename = ini.get("engine", "filename", String.class);
-            String command = ini.get("engine", "command", String.class);
-            String args = ini.get("engine", "arguments", String.class);
-
-            if(dir == null || dir.equals("") || command == null || command.equals("") || filename == null || filename.equals("")) {
-                System.out.println("Missing elements");
-                return false;
-            }
-
-            File engineFileDir = new File("engines");
-            File engineDir = new File(engineFileDir, dir);
-            File engineFile = new File(engineDir, filename);
-            if(!engineFile.exists()) {
-                System.out.println("File does not exist: " + engineFile);
-                System.out.println(engineFile.getAbsolutePath());
-                return false;
-            }
-
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
     public ExternalEngineHost(ExternalEnginePlayer player, TaflTest host, PipedInputStream connectToOutput, PipedOutputStream connectToInput) {
         mPlayer = player;
         try {
@@ -75,36 +47,15 @@ public class ExternalEngineHost {
         mCommThread.start();
     }
 
-    public ExternalEngineHost(ExternalEnginePlayer player, File iniFile) {
+    public ExternalEngineHost(ExternalEnginePlayer player, EngineSpec spec) {
         mPlayer = player;
 
-        String dirName;
-        String fileName;
-        String command;
-        String args;
-        try {
-            if(!validateEngineFile(iniFile)) {
-                throw new IllegalStateException("Missing engine file for " + (player.isAttackingSide() ? "attacker" : "defender") + ": " + iniFile);
-            }
-            Wini ini = new Wini(iniFile);
-            dirName = ini.get("engine", "directory", String.class);
-            fileName = ini.get("engine", "filename", String.class);
-            command = ini.get("engine", "command", String.class);
-            args = ini.get("engine", "arguments", String.class);
-            if(args == null) args = "";
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-            throw new IllegalStateException("Missing engine file for " + (player.isAttackingSide() ? "attacker" : "defender"));
-        }
-
-        File engineFileDir = new File("engines");
-        File directory = new File(engineFileDir, dirName);
+        File directory = spec.directory;
         File absoluteDirectory = directory.getAbsoluteFile();
 
-        String[] argArray = args.split(" ");
-        String[] commandLine = new String[argArray.length + 1];
-        commandLine[0] = command;
-        System.arraycopy(argArray, 0, commandLine, 1, argArray.length);
+        String[] commandLine = new String[spec.arguments.length + 1];
+        commandLine[0] = spec.command;
+        System.arraycopy(spec.arguments, 0, commandLine, 1, spec.arguments.length);
 
         ProcessBuilder b = new ProcessBuilder();
         b.directory(absoluteDirectory);

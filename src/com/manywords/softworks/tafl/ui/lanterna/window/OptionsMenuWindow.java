@@ -7,7 +7,7 @@ import com.googlecode.lanterna.gui2.dialogs.*;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
+import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -101,11 +101,11 @@ public class OptionsMenuWindow extends BasicWindow {
            showFileSelectDialog(EngineType.ATTACKER);
         });
 
-        if(TerminalSettings.attackerEngineFile == null) {
+        if(TerminalSettings.attackerEngineSpec == null) {
             mAttackerConfigLabel = new Label("<none>");
         }
         else {
-            mAttackerConfigLabel = new Label(TerminalSettings.attackerEngineFile.getName());
+            mAttackerConfigLabel = new Label(TerminalSettings.attackerEngineSpec.toString());
         }
 
         optionsPanel.addComponent(attackerFileSelect);
@@ -132,11 +132,11 @@ public class OptionsMenuWindow extends BasicWindow {
             showFileSelectDialog(EngineType.DEFENDER);
         });
 
-        if(TerminalSettings.defenderEngineFile == null) {
+        if(TerminalSettings.defenderEngineSpec == null) {
             mDefenderConfigLabel = new Label("<none>");
         }
         else {
-            mDefenderConfigLabel = new Label(TerminalSettings.defenderEngineFile.getName());
+            mDefenderConfigLabel = new Label(TerminalSettings.defenderEngineSpec.toString());
         }
 
         optionsPanel.addComponent(defenderFileSelect);
@@ -165,11 +165,11 @@ public class OptionsMenuWindow extends BasicWindow {
             showFileSelectDialog(EngineType.ANALYSIS);
         });
 
-        if(TerminalSettings.analysisEngineFile == null) {
+        if(TerminalSettings.analysisEngineSpec == null) {
             mAnalysisConfigLabel = new Label("<none>");
         }
         else {
-            mAnalysisConfigLabel = new Label(TerminalSettings.analysisEngineFile.getName());
+            mAnalysisConfigLabel = new Label(TerminalSettings.analysisEngineSpec.toString());
         }
 
         optionsPanel.addComponent(analysisFileSelect);
@@ -215,29 +215,29 @@ public class OptionsMenuWindow extends BasicWindow {
         mClockLabel.setText(TerminalSettings.timeSpec.toString());
         mAttackerLabel.setText(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
 
-        if(TerminalSettings.attackerEngineFile == null) {
+        if(TerminalSettings.attackerEngineSpec == null) {
             mAttackerConfigLabel.setText("<none>");
         }
         else {
-            mAttackerConfigLabel.setText(TerminalSettings.attackerEngineFile.getName());
+            mAttackerConfigLabel.setText(TerminalSettings.attackerEngineSpec.toString());
         }
 
         mDefenderLabel.setText(TerminalSettings.labelForPlayerType(TerminalSettings.defenders));
 
-        if(TerminalSettings.defenderEngineFile == null) {
+        if(TerminalSettings.defenderEngineSpec == null) {
             mDefenderConfigLabel.setText("<none>");
         }
         else {
-            mDefenderConfigLabel.setText(TerminalSettings.defenderEngineFile.getName());
+            mDefenderConfigLabel.setText(TerminalSettings.defenderEngineSpec.toString());
         }
 
         mAnalysisLabel.setText(TerminalSettings.analysisEngine ? "On" : "Off");
 
-        if(TerminalSettings.analysisEngineFile == null) {
+        if(TerminalSettings.analysisEngineSpec == null) {
             mAnalysisConfigLabel.setText("<none>");
         }
         else {
-            mAnalysisConfigLabel.setText(TerminalSettings.analysisEngineFile.getName());
+            mAnalysisConfigLabel.setText(TerminalSettings.analysisEngineSpec.toString());
         }
 
         mThinkTimeLabel.setText("" + TerminalSettings.aiThinkTime);
@@ -257,17 +257,18 @@ public class OptionsMenuWindow extends BasicWindow {
         FileDialog d = b.build();
         File configFile = d.showDialog(getTextGUI());
 
-        if(ExternalEngineHost.validateEngineFile(configFile)) {
+        if(EngineSpec.validateEngineFile(configFile)) {
+            EngineSpec spec = new EngineSpec(configFile);
             switch(type) {
 
                 case ATTACKER:
-                    TerminalSettings.attackerEngineFile = configFile;
+                    TerminalSettings.attackerEngineSpec = spec;
                     break;
                 case DEFENDER:
-                    TerminalSettings.defenderEngineFile = configFile;
+                    TerminalSettings.defenderEngineSpec = spec;
                     break;
                 case ANALYSIS:
-                    TerminalSettings.analysisEngineFile = configFile;
+                    TerminalSettings.analysisEngineSpec = spec;
                     break;
             }
         }
