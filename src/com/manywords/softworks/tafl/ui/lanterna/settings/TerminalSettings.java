@@ -19,6 +19,8 @@ public class TerminalSettings {
     public static final int NETWORK = 2;
     public static final int ENGINE = 3;
 
+    public static boolean shrinkLargeBoards = true;
+
     public static int attackers = AI;
     public static int defenders = HUMAN;
 
@@ -74,6 +76,7 @@ public class TerminalSettings {
             File attackerEngineFile = attackerEngineSpec.specFile;
             File defenderEngineFile = defenderEngineSpec.specFile;
             File analysisEngineFile = analysisEngineSpec.specFile;
+            ini.put("display", "shrinklarge", shrinkLargeBoards);
             ini.put("config", "attacker", attackers + 1);
             ini.put("config", "attackerfile", (attackerEngineFile != null ? attackerEngineFile.getCanonicalPath() : ""));
             ini.put("config", "defender", defenders + 1);
@@ -133,6 +136,8 @@ public class TerminalSettings {
             long overtimeTime = ini.get("clock", "overtime", long.class);
             int overtimeCount = ini.get("clock", "otcount", int.class);
             long incrementTime = ini.get("clock", "increment", long.class);
+
+            shrinkLargeBoards = ini.get("display", "shrinklarge", boolean.class);
 
             GameClock.TimeSpec ts = new GameClock.TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
             timeSpec = ts;

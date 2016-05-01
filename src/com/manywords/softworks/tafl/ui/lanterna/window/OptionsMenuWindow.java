@@ -32,6 +32,7 @@ public class OptionsMenuWindow extends BasicWindow {
     private Label mAnalysisLabel;
     private Label mAnalysisConfigLabel;
     private Label mThinkTimeLabel;
+    private Label mShrinkLabel;
 
     private Interactable mLastFocused;
 
@@ -80,6 +81,17 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(clockSettingSelect);
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(mClockLabel);
+
+        Button aiDepthSelect = new Button("AI think time", new Runnable() {
+            @Override
+            public void run() {
+                showAiDepthEntryDialog();
+            }
+        });
+        mThinkTimeLabel = new Label("" + TerminalSettings.aiThinkTime);
+        optionsPanel.addComponent(aiDepthSelect);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mThinkTimeLabel);
 
         // Blank line
         optionsPanel.addComponent(newSpacer());
@@ -176,22 +188,23 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(mAnalysisConfigLabel);
 
-
         // Blank line
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(newSpacer());
 
-        Button aiDepthSelect = new Button("AI think time", new Runnable() {
+        Button shrinkLargeBoardsButton = new Button("Shrink large boards", new Runnable() {
             @Override
             public void run() {
-                showAiDepthEntryDialog();
+                TerminalSettings.shrinkLargeBoards = !TerminalSettings.shrinkLargeBoards;
+                refreshSettings();
             }
         });
-        mThinkTimeLabel = new Label("" + TerminalSettings.aiThinkTime);
-        optionsPanel.addComponent(aiDepthSelect);
+        mShrinkLabel = new Label(TerminalSettings.shrinkLargeBoards ? "On" : "Off");
+
+        optionsPanel.addComponent(shrinkLargeBoardsButton);
         optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(mThinkTimeLabel);
+        optionsPanel.addComponent(mShrinkLabel);
 
         Button backButton = new Button("Back", new Runnable() {
             @Override
@@ -241,6 +254,8 @@ public class OptionsMenuWindow extends BasicWindow {
         }
 
         mThinkTimeLabel.setText("" + TerminalSettings.aiThinkTime);
+
+        mShrinkLabel.setText(TerminalSettings.shrinkLargeBoards ? "On" : "Off");
     }
 
     private EmptySpace newSpacer() {

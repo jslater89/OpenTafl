@@ -9,6 +9,7 @@ import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalImagePanel;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
+import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.util.List;
 
@@ -24,15 +25,20 @@ public class BoardWindow extends BasicWindow {
         super(title);
         mGame = g;
 
+        int rowHeight = 3;
+        int colWidth = 5;
+
         Panel p = new Panel();
         if(mGame.getRules().getBoard().getBoardDimension() >= 15) {
-            mBoardImage = new TerminalBoardImage(2, 3);
+            rowHeight = 2;
+            colWidth = 3;
         }
-        else if(mGame.getRules().getBoard().getBoardDimension() >= 13){
-            mBoardImage = new TerminalBoardImage(3, 4);
+
+        if(TerminalSettings.shrinkLargeBoards) {
+            mBoardImage = new TerminalBoardImage(rowHeight, colWidth);
         }
         else {
-            mBoardImage = new TerminalBoardImage();
+            mBoardImage = new TerminalBoardImage(3, 5);
         }
 
         TerminalImagePanel boardImagePanel = new TerminalImagePanel(mBoardImage, new TerminalSize(40, 25));
