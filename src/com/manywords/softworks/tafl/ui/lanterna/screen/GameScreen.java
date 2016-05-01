@@ -249,6 +249,9 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 System.out.println("Leaving game, entering selfplay window");
                 mSelfplayWindow.notifyGameFinished(mGame);
 
+                // Shut down the players so they don't clutter us
+                mCommandEngine.shutdown();
+
                 System.out.println("Removing windows");
                 mBoardWindow.close();
                 System.out.println("Removed board");
