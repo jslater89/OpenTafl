@@ -105,6 +105,9 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.5.1b (released 05/02/16):
+- Add missing 15x15 variant (lost in the build)
+
 v0.2.5b (released 05/01/16):
 - Add 15x15 Tablut variant, layout courtesy of the forum at aagenielsen.dk
 - Add option to render large boards (15x15 and up) using an alternate, smaller
