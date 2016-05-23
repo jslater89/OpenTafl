@@ -4,8 +4,8 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
-import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
-import com.manywords.softworks.tafl.ui.player.external.network.server.NetworkServer;
+import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
+import com.manywords.softworks.tafl.command.player.external.network.server.NetworkServer;
 import jline.console.ConsoleReader;
 
 import java.io.*;

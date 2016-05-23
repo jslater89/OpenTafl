@@ -8,10 +8,10 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.ui.UiCallback;
-import com.manywords.softworks.tafl.ui.command.CommandResult;
-import com.manywords.softworks.tafl.ui.player.ExternalEnginePlayer;
-import com.manywords.softworks.tafl.ui.player.Player;
-import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineHost;
+import com.manywords.softworks.tafl.command.CommandResult;
+import com.manywords.softworks.tafl.command.player.ExternalEnginePlayer;
+import com.manywords.softworks.tafl.command.player.Player;
+import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineHost;
 
 import java.io.*;
 import java.util.ArrayList;

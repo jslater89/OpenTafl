@@ -10,8 +10,8 @@ import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
-import com.manywords.softworks.tafl.ui.command.CommandResult;
-import com.manywords.softworks.tafl.ui.player.Player;
+import com.manywords.softworks.tafl.command.CommandResult;
+import com.manywords.softworks.tafl.command.player.Player;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.manywords.softworks.tafl.ui.lanterna.settings;
 
 import com.manywords.softworks.tafl.engine.GameClock;
-import com.manywords.softworks.tafl.ui.player.Player;
-import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
+import com.manywords.softworks.tafl.command.player.Player;
+import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
 import org.ini4j.Wini;
 
 import java.io.File;

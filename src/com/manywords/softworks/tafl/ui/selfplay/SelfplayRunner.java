@@ -6,9 +6,9 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.lanterna.window.SelfplayResultWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.SelfplayWindow;
-import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
+import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayResultWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
+import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
 
 import java.io.File;
 import java.io.FileWriter;

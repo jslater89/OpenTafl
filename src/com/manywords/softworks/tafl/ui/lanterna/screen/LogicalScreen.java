@@ -9,7 +9,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
-import com.manywords.softworks.tafl.ui.lanterna.window.SelfplayWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 /**
  * Created by jay on 4/2/16.

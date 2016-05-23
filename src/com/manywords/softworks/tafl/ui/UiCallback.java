@@ -2,8 +2,8 @@ package com.manywords.softworks.tafl.ui;
 
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.ui.command.CommandResult;
-import com.manywords.softworks.tafl.ui.player.Player;
+import com.manywords.softworks.tafl.command.CommandResult;
+import com.manywords.softworks.tafl.command.player.Player;
 
 public interface UiCallback {
     public enum Mode {

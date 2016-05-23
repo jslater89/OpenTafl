@@ -15,7 +15,7 @@ import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowDecorationRenderer;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowPostRenderer;
-import com.manywords.softworks.tafl.ui.lanterna.window.*;
+import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 import javax.swing.*;
 import java.io.IOException;
