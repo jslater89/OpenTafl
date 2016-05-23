@@ -1,7 +1,7 @@
-package com.manywords.softworks.tafl.command.player.external.network.server;
+package com.manywords.softworks.tafl.network.server;
 
-import com.manywords.softworks.tafl.command.player.external.network.server.thread.PriorityTaskQueue;
-import com.manywords.softworks.tafl.command.player.external.network.server.thread.ServerThread;
+import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
+import com.manywords.softworks.tafl.network.server.thread.ServerThread;
 
 import java.io.IOException;
 import java.net.ServerSocket;

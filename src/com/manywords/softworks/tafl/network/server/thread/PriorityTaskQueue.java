@@ -1,6 +1,6 @@
-package com.manywords.softworks.tafl.command.player.external.network.server.thread;
+package com.manywords.softworks.tafl.network.server.thread;
 
-import com.manywords.softworks.tafl.command.player.external.network.server.NetworkServer;
+import com.manywords.softworks.tafl.network.server.NetworkServer;
 
 import java.util.ArrayList;
 import java.util.List;

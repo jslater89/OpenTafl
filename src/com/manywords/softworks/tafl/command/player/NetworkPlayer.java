@@ -1,10 +1,9 @@
-package com.manywords.softworks.tafl.command.player.external.network;
+package com.manywords.softworks.tafl.command.player;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.ui.UiCallback;
-import com.manywords.softworks.tafl.command.player.Player;
-import com.manywords.softworks.tafl.command.player.external.network.server.NetworkServer;
+import com.manywords.softworks.tafl.network.server.NetworkServer;
 
 /**
  * Created by jay on 5/22/16.

@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.command.player.external.network.server.task;
+package com.manywords.softworks.tafl.network.server.task;
 
 /**
  * Created by jay on 5/23/16.

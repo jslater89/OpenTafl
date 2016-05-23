@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.command.player.external.network.server.thread;
+package com.manywords.softworks.tafl.network.server.thread;
 
 /**
  * Created by jay on 5/22/16.
