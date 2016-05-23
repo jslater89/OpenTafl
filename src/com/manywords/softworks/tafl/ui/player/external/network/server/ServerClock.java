@@ -1,7 +1,7 @@
 package com.manywords.softworks.tafl.ui.player.external.network.server;
 
 /**
- * Created by jay on 5/22/16.
+ * Created by jay on 5/23/16.
  */
-public class NetworkServerClient {
+public class ServerClock {
 }

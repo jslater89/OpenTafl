@@ -3,10 +3,15 @@ package com.manywords.softworks.tafl.ui.player.external.network.server.threads;
 /**
  * Created by jay on 5/22/16.
  */
-public class NetworkServerThread extends Thread {
+public class ServerThread extends Thread {
     private boolean mWaiting;
     private boolean mRunning = true;
-    private NetworkPriorityTaskQueue mQueue;
+    private PriorityTaskQueue mQueue;
+
+    public ServerThread(PriorityTaskQueue queue) {
+        super();
+        mQueue = queue;
+    }
 
     @Override
     public void run() {
@@ -26,18 +31,19 @@ public class NetworkServerThread extends Thread {
     }
 
     private void waitForTask() {
-        try {
-            this.wait();
-            mWaiting = true;
-        } catch (InterruptedException e) {
-
+        mWaiting = true;
+        while(mWaiting) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+            }
         }
     }
 
-    public void notifyThisThread() {
-        this.notify();
-
+    // Must be synchronized to own this object's monitor
+    public synchronized void notifyThisThread() {
         mWaiting = false;
+        this.notify();
     }
 
     public boolean isWaiting() {

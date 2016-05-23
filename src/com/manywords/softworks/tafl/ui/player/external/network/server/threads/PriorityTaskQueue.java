@@ -8,14 +8,15 @@ import java.util.List;
 /**
  * Created by jay on 5/22/16.
  */
-public class NetworkPriorityTaskQueue {
+public class PriorityTaskQueue {
     private NetworkServer mServer;
 
     private final List<Runnable> mHighPriorityQueue;
     private final List<Runnable> mStandardPriorityQueue;
     private final List<Runnable> mLowPriorityTaskQueue;
 
-    public NetworkPriorityTaskQueue() {
+    public PriorityTaskQueue(NetworkServer server) {
+        mServer = server;
         mHighPriorityQueue = new ArrayList<>(16);
         mStandardPriorityQueue = new ArrayList<>(32);
         mLowPriorityTaskQueue = new ArrayList<>(16);
