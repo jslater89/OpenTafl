@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.ui.player.external.network.server.tasks;
+package com.manywords.softworks.tafl.ui.player.external.network.server.task;
 
 /**
  * Created by jay on 5/23/16.
@@ -12,6 +12,6 @@ public class HandleClientCommunicationTask implements Runnable {
 
     @Override
     public void run() {
-
+        System.out.println("Server received: " + mData);
     }
 }

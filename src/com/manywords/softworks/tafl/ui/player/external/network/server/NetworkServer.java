@@ -1,7 +1,7 @@
 package com.manywords.softworks.tafl.ui.player.external.network.server;
 
-import com.manywords.softworks.tafl.ui.player.external.network.server.threads.PriorityTaskQueue;
-import com.manywords.softworks.tafl.ui.player.external.network.server.threads.ServerThread;
+import com.manywords.softworks.tafl.ui.player.external.network.server.thread.PriorityTaskQueue;
+import com.manywords.softworks.tafl.ui.player.external.network.server.thread.ServerThread;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -30,7 +30,7 @@ public class NetworkServer {
 
     private final List<ServerClient> mClients;
 
-    private boolean mRunning;
+    private boolean mRunning = true;
 
     public NetworkServer(int threadCount) {
         mTaskQueue = new PriorityTaskQueue(this);
@@ -58,9 +58,13 @@ public class NetworkServer {
     }
 
     private void startServer() {
+        for(ServerThread thread : mThreadPool) {
+            thread.start();
+        }
+
         try (
-                ServerSocket socket = new ServerSocket(11541);
-                ) {
+            ServerSocket socket = new ServerSocket(11541);
+        ) {
             while(mRunning) {
                 Socket clientSocket = socket.accept();
                 addClient(new ServerClient(this, clientSocket));
@@ -68,6 +72,14 @@ public class NetworkServer {
         } catch (IOException e) {
             System.out.println("Failed to start server socket");
             System.exit(-1);
+        }
+
+        System.out.println("Server stopping.");
+    }
+
+    public void onDisconnect(ServerClient c) {
+        synchronized (mClients) {
+            mClients.remove(c);
         }
     }
 

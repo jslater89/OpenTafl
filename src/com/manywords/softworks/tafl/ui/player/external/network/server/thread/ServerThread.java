@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.ui.player.external.network.server.threads;
+package com.manywords.softworks.tafl.ui.player.external.network.server.thread;
 
 /**
  * Created by jay on 5/22/16.
@@ -30,7 +30,7 @@ public class ServerThread extends Thread {
         }
     }
 
-    private void waitForTask() {
+    private synchronized void waitForTask() {
         mWaiting = true;
         while(mWaiting) {
             try {

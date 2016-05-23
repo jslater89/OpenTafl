@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.ui.player.external.network.server.threads;
+package com.manywords.softworks.tafl.ui.player.external.network.server.thread;
 
 import com.manywords.softworks.tafl.ui.player.external.network.server.NetworkServer;
 
