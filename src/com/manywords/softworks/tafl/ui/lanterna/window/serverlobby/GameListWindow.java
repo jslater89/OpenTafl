@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 
 import com.googlecode.lanterna.gui2.BasicWindow;
+import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.table.Table;
 
 /**
@@ -9,5 +10,9 @@ import com.googlecode.lanterna.gui2.table.Table;
 public class GameListWindow extends BasicWindow {
     public GameListWindow() {
         super("Game List");
+
+        Panel p = new Panel();
+
+        setComponent(p);
     }
 }

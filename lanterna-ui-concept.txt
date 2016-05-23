@@ -10,9 +10,15 @@ Anyway, AdvancedTerminal is now a container for a LogicalScreen, and the
 LogicalScreen is the container for the 
 
 1. LogicalScreen
-A LogicalScreen is a collection of like-purposed windows
+A LogicalScreen is a collection of like-purposed windows. They have
+TerminalCallback methods, and AdvancedTerminalHelper passes through to them.
 
-They have TerminalCallback methods, and AdvancedTerminalHelper passes through to them.
+A LogicalScreen should extend LogicalScreen.setActive and
+LogicalScreen.setInactive. On setActive, a LogicalScreen should create its
+windows, lay them out (if necessary), add them to the provided Lanterna GUI,
+and wait for one of them to close. On setInactive, the screen is closing, and
+should remove its windows and do any necessary teardown.
 
 2. Windows
-Windows are the subunit of screens.
+Windows are the subunit of screens, and are straight Lanterna windows. See the
+Lanterna documentation for more information on them.

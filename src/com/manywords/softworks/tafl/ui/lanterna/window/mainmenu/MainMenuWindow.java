@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.ServerLobbyScreen;
 import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 import java.io.File;
@@ -37,6 +38,9 @@ public class MainMenuWindow extends BasicWindow {
 
         Button playButton = new Button("Play", () -> TerminalUtils.startGame(getTextGUI(), mTerminalCallback));
         p.addComponent(playButton);
+
+        Button networkButton = new Button("Join server", () -> mTerminalCallback.changeActiveScreen(new ServerLobbyScreen("localhost", 11541)));
+        p.addComponent(networkButton);
 
         Button optionsButton = new Button("Options", () -> mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback)));
         p.addComponent(optionsButton);

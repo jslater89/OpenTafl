@@ -105,8 +105,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) return;
 
         mBoardWindow.setHints(TerminalThemeConstants.BOARD_WINDOW);
-        mStatusWindow.setHints(TerminalThemeConstants.STATUS_WINDOW);
-        mCommandWindow.setHints(TerminalThemeConstants.COMMAND_WINDOW);
+        mStatusWindow.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
+        mCommandWindow.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
 
         TerminalSize screenSize = size;
         TerminalSize boardWindowSize = mBoardWindow.getPreferredSize();
