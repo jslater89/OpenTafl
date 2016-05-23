@@ -49,21 +49,27 @@ public class PriorityTaskQueue {
     public Runnable getTask() {
         // Take a task from the highest priority queue with tasks, unless a lower priority's queue is 4^depth times larger
         // than the queue in question.
-        if(mHighPriorityQueue.size() > 0
-                && !((mStandardPriorityQueue.size() > mHighPriorityQueue.size() * 4) || (mLowPriorityTaskQueue.size() > mHighPriorityQueue.size() * 16))) {
-            synchronized (mHighPriorityQueue) {
-                return mHighPriorityQueue.remove(0);
+
+        try {
+            if (mHighPriorityQueue.size() > 0
+                    && !((mStandardPriorityQueue.size() > mHighPriorityQueue.size() * 4) || (mLowPriorityTaskQueue.size() > mHighPriorityQueue.size() * 16))) {
+                synchronized (mHighPriorityQueue) {
+                    return mHighPriorityQueue.remove(0);
+                }
+            }
+            else if (mStandardPriorityQueue.size() > 0 && !(mLowPriorityTaskQueue.size() > mStandardPriorityQueue.size() * 4)) {
+                synchronized (mStandardPriorityQueue) {
+                    return mStandardPriorityQueue.remove(0);
+                }
+            }
+            else if (mLowPriorityTaskQueue.size() > 0) {
+                synchronized (mLowPriorityTaskQueue) {
+                    return mLowPriorityTaskQueue.remove(0);
+                }
             }
         }
-        else if(mStandardPriorityQueue.size() > 0 && !(mLowPriorityTaskQueue.size() > mStandardPriorityQueue.size() * 4)) {
-            synchronized (mStandardPriorityQueue) {
-                return mStandardPriorityQueue.remove(0);
-            }
-        }
-        else if(mLowPriorityTaskQueue.size() > 0){
-            synchronized (mLowPriorityTaskQueue) {
-                return mLowPriorityTaskQueue.remove(0);
-            }
+        catch(ArrayIndexOutOfBoundsException e) {
+            // Race condition possible here, but I don't want to synchronize the whole block for speed reasons.
         }
 
         return null;

@@ -21,6 +21,8 @@ public class TerminalSettings {
 
     public static boolean shrinkLargeBoards = true;
 
+    public static String onlinePlayerName = "Fishbreath";
+
     public static int attackers = AI;
     public static int defenders = HUMAN;
 

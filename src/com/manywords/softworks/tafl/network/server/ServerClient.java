@@ -1,10 +1,9 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.network.server.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.HandleClientCommunicationTask;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -15,6 +14,7 @@ public class ServerClient {
     private Socket mClientSocket;
 
     private SocketListener mSocketListener;
+    private PrintWriter mClientWriter;
 
     public ServerClient(NetworkServer server, Socket clientSocket) {
         mServer = server;
@@ -22,6 +22,17 @@ public class ServerClient {
 
         mSocketListener = new SocketListener();
         mSocketListener.start();
+
+        try {
+            mClientWriter = new PrintWriter(new OutputStreamWriter(mClientSocket.getOutputStream()), true);
+        } catch (IOException e) {
+            System.err.println("Failed to connect to client!");
+            mServer.onDisconnect(this);
+        }
+    }
+
+    public void writePacket(NetworkPacket packet) {
+        mClientWriter.println(packet.toString());
     }
 
     private class SocketListener extends Thread {
@@ -32,7 +43,7 @@ public class ServerClient {
                 BufferedReader in = new BufferedReader(new InputStreamReader(mClientSocket.getInputStream()));
             ) {
                 while((inputData = in.readLine()) != null) {
-                    mServer.getTaskQueue().pushStandardPriorityTask(new HandleClientCommunicationTask(inputData));
+                    mServer.getTaskQueue().pushStandardPriorityTask(new HandleClientCommunicationTask(mServer, inputData));
                 }
             }
             catch(IOException e) {

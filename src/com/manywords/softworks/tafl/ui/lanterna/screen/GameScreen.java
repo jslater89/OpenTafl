@@ -618,10 +618,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         }
 
         @Override
-        public void handleKeyStroke(KeyStroke key) {
+        public boolean handleKeyStroke(KeyStroke key) {
             if(key.getKeyType() == KeyType.PageUp || key.getKeyType() == KeyType.PageDown) {
                 mStatusWindow.handleInput(key);
+                return true;
             }
+            else return false;
         }
 
         @Override

@@ -17,20 +17,14 @@ import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 public abstract class LogicalScreen {
     public interface TerminalCallback {
         public void onMenuNavigation(Window destination);
-
         public void changeActiveScreen(LogicalScreen screen);
-
         public void onEnteringGameScreen(Game g, String title);
         public void onEnteringGameScreen(ReplayGame rg, String title);
-
         public void onEnteringReplay(ReplayGame rg);
         public void onEnteringGame(Game g);
-
         public void handleInGameCommand(String command);
-        public void handleKeyStroke(KeyStroke key);
-
+        public boolean handleKeyStroke(KeyStroke key);
         public UiCallback getUiCallback();
-
         public void setSelfplayWindow(Window tournamentWindow);
     }
 
@@ -102,8 +96,8 @@ public abstract class LogicalScreen {
         }
 
         @Override
-        public void handleKeyStroke(KeyStroke key) {
-
+        public boolean handleKeyStroke(KeyStroke key) {
+            return false;
         }
 
         @Override

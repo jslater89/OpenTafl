@@ -8,7 +8,7 @@ import com.googlecode.lanterna.input.KeyType;
 /**
  * Created by jay on 2/15/16.
  */
-public class TerminalEnterTerminatedTextBox extends TextBox {
+public class EnterTerminatedTextBox extends TextBox {
     public interface TextBoxCallback {
         public void onEnterPressed(String input);
         public void onPageKeyPressed(KeyStroke key);
@@ -16,7 +16,7 @@ public class TerminalEnterTerminatedTextBox extends TextBox {
 
     private TextBoxCallback mCallback;
 
-    public TerminalEnterTerminatedTextBox(TextBoxCallback c) {
+    public EnterTerminatedTextBox(TextBoxCallback c) {
         mCallback = c;
     }
 

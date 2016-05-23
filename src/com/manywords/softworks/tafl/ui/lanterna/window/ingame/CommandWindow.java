@@ -4,7 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.manywords.softworks.tafl.ui.lanterna.component.TerminalEnterTerminatedTextBox;
+import com.manywords.softworks.tafl.ui.lanterna.component.EnterTerminatedTextBox;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class CommandWindow extends BasicWindow {
     private LogicalScreen.TerminalCallback mCallback;
-    private TerminalEnterTerminatedTextBox mTextBox;
+    private EnterTerminatedTextBox mTextBox;
 
     private int mCommandBufferSize = 25;
     private int mCommandBufferPosition = 0;
@@ -29,7 +29,7 @@ public class CommandWindow extends BasicWindow {
         p.setLayoutManager(new LinearLayout());
 
         Label l = new Label("Enter command (enter 'help' for list):");
-        mTextBox = new TerminalEnterTerminatedTextBox(new TerminalEnterTerminatedTextBox.TextBoxCallback() {
+        mTextBox = new EnterTerminatedTextBox(new EnterTerminatedTextBox.TextBoxCallback() {
             @Override
             public void onEnterPressed(String input) {
                 addToBuffer(input);
