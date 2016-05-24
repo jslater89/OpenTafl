@@ -78,8 +78,6 @@ public class ChatWindow extends BasicWindow {
     public void setSize(TerminalSize size) {
         super.setSize(size);
 
-        System.out.println(size);
-
         mChatText.setPreferredSize(new TerminalSize(size.getColumns(), size.getRows() - 5));
         mChatBox.setPreferredSize(new TerminalSize(size.getColumns(), 1));
         mButtonPanel.setPreferredSize(new TerminalSize(size.getColumns(), 3));

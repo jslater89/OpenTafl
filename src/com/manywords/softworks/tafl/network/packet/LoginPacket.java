@@ -4,7 +4,7 @@ package com.manywords.softworks.tafl.network.packet;
  * Created by jay on 5/23/16.
  */
 public class LoginPacket {
-    private final String username;
+    public final String username;
     private final String salt;
     private final String hashedPassword;
 

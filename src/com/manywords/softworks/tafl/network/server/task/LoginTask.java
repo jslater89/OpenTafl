@@ -23,6 +23,7 @@ public class LoginTask implements Runnable {
     @Override
     public void run() {
         // if login good
+        client.onRegistered(packet.username);
         server.sendPacketToClient(client, new SuccessPacket(), PriorityTaskQueue.Priority.STANDARD);
         // else
         //mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.LOGIN_FAILED), PriorityTaskQueue.Priority.STANDARD);
