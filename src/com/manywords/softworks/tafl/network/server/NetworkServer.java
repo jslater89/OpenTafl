@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
-import com.manywords.softworks.tafl.network.server.packet.NetworkPacket;
+import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.SendPacketTask;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 import com.manywords.softworks.tafl.network.server.thread.ServerThread;
@@ -51,10 +51,14 @@ public class NetworkServer {
     }
     public List<ServerClient> getClients() { return mClients; }
 
-    public void sendPacketToAllClients(NetworkPacket packet) {
+    public void sendPacketToAllClients(NetworkPacket packet, PriorityTaskQueue.Priority priority) {
         for(ServerClient client : mClients) {
-            mTaskQueue.pushLowPriorityTask(new SendPacketTask(packet, client));
+            mTaskQueue.pushTask(new SendPacketTask(packet, client), priority);
         }
+    }
+
+    public void sendPacketToClient(ServerClient client, NetworkPacket packet, PriorityTaskQueue.Priority priority) {
+        mTaskQueue.pushTask(new SendPacketTask(packet, client), priority);
     }
 
     public void notifyThreadIfNecessary() {

@@ -4,16 +4,22 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
+import com.manywords.softworks.tafl.network.packet.ErrorPacket;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ChatWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameDetailWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameListWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ServerLoginDialog;
 
 /**
  * Created by jay on 5/23/16.
@@ -34,7 +40,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
 
     public ServerLobbyScreen(String hostname, int port) {
-        mConnection = new ClientServerConnection(hostname, port, new ClientServerCallback());
+        mConnection = new ClientServerConnection(TerminalSettings.onlineServerHost, TerminalSettings.onlineServerPort, new ClientServerCallback());
     }
 
     @Override
@@ -43,9 +49,16 @@ public class ServerLobbyScreen extends LogicalScreen {
     }
 
     private void enterUi() {
-        if(!mConnection.connect()) {
-            // TODO: error message, return to main menu
+        ServerLoginDialog dialog = new ServerLoginDialog("Login to server " + TerminalSettings.onlineServerHost + ":" + TerminalSettings.onlineServerPort);
+        dialog.setHints(TerminalThemeConstants.CENTERED_MODAL);
+        dialog.showDialog(mGui);
+
+        if(dialog.canceled || dialog.username.equals("") || dialog.hashedPassword.equals("")) {
+            mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+        }
+        else if(!mConnection.connect(dialog.username, dialog.salt, dialog.hashedPassword)) {
             System.out.println("Connection failed!");
+            mTerminalCallback.changeActiveScreen(new MainMenuScreen());
         }
         else {
             createWindows();
@@ -187,6 +200,32 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void onChatMessageReceived(String sender, String message) {
             mChatWindow.onChatMessageReceived(sender, message);
+        }
+
+        @Override
+        public void onSuccessReceived() {
+
+        }
+
+        @Override
+        public void onErrorReceived(String message) {
+            System.out.println(message);
+            System.out.println(ErrorPacket.LOGIN_FAILED);
+            System.out.println(message.equals(ErrorPacket.LOGIN_FAILED));
+            if(message.equals(ErrorPacket.LOGIN_FAILED)) {
+                MessageDialogBuilder b = new MessageDialogBuilder();
+                b.setTitle("Login failed");
+                b.setText("Login/registration credentials invalid.");
+                b.addButton(MessageDialogButton.OK);
+                MessageDialog d = b.build();
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+
+                // Ordinarily comes from a non-UI thread
+                TerminalUtils.runOnUiThread(mGui, () -> {
+                    d.showDialog(mGui);
+                    mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+                });
+            }
         }
     }
 }

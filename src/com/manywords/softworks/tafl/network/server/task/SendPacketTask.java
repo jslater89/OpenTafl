@@ -1,9 +1,7 @@
 package com.manywords.softworks.tafl.network.server.task;
 
 import com.manywords.softworks.tafl.network.server.ServerClient;
-import com.manywords.softworks.tafl.network.server.packet.NetworkPacket;
-
-import java.net.Socket;
+import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 
 /**
  * Created by jay on 5/23/16.

@@ -1,7 +1,5 @@
 package com.manywords.softworks.tafl.network.client;
 
-import com.manywords.softworks.tafl.network.server.packet.LobbyChatPacket;
-
 import java.io.*;
 import java.net.Socket;
 
@@ -11,7 +9,16 @@ import java.net.Socket;
 public class ClientServerConnection {
     public interface ClientServerCallback {
         public void onChatMessageReceived(String sender, String message);
+        public void onSuccessReceived();
+        public void onErrorReceived(String message);
     }
+
+    public enum State {
+        DISCONNECTED,
+        LOGGED_IN,
+    }
+
+    private State mCurrentState = State.DISCONNECTED;
 
     private final String hostname;
     private final int port;
@@ -20,15 +27,16 @@ public class ClientServerConnection {
     private PrintWriter mServerWriter;
     private Thread mReadThread;
 
-    private ClientServerCallback mCallback;
+    private ClientServerCallback mExternalCallback;
+    private ClientServerCallback mInternalCallback = new InternalCallback();
 
     public ClientServerConnection(String hostname, int port, ClientServerCallback callback) {
         this.hostname = hostname;
         this.port = port;
-        mCallback = callback;
+        mExternalCallback = callback;
     }
 
-    public boolean connect() {
+    public boolean connect(String username, String salt, String hashedPassword) {
         try {
             mServer = new Socket(hostname, port);
             mServerWriter = new PrintWriter(new OutputStreamWriter(mServer.getOutputStream()), true);
@@ -36,6 +44,7 @@ public class ClientServerConnection {
             mReadThread = new ReadThread();
             mReadThread.start();
 
+            sendRegistrationMessage(username, salt, hashedPassword);
             return true;
         } catch (IOException e) {
             return false;
@@ -44,10 +53,16 @@ public class ClientServerConnection {
 
     public void disconnect() {
         try {
-            mServer.close();
+            if(mServer != null) mServer.close();
+
+            mServer = null;
         } catch (IOException e) {
             // Best effort
         }
+    }
+
+    public void sendRegistrationMessage(String username, String salt, String hashedPassword) {
+        mServerWriter.println("login \"" + username + "\" " + salt + " " + hashedPassword);
     }
 
     public void sendChatMessage(String sender, String message) {
@@ -64,12 +79,30 @@ public class ClientServerConnection {
             ) {
                 while((inputData = in.readLine()) != null) {
                     System.out.println("Client received: " + inputData);
-                    ServerCommandParser.handlePacket(mCallback, inputData);
+                    ClientCommandParser.handlePacket(mInternalCallback, inputData);
                 }
             }
             catch(IOException e) {
                 System.out.println("Server connection error: " + e);
             }
+        }
+    }
+
+    private class InternalCallback implements ClientServerCallback {
+
+        @Override
+        public void onChatMessageReceived(String sender, String message) {
+            mExternalCallback.onChatMessageReceived(sender, message);
+        }
+
+        @Override
+        public void onSuccessReceived() {
+            if(mCurrentState == State.DISCONNECTED) mCurrentState = State.LOGGED_IN;
+        }
+
+        @Override
+        public void onErrorReceived(String message) {
+            if(mCurrentState == State.DISCONNECTED) mExternalCallback.onErrorReceived(message);
         }
     }
 }

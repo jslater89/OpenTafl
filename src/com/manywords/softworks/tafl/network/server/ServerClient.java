@@ -1,7 +1,8 @@
 package com.manywords.softworks.tafl.network.server;
 
-import com.manywords.softworks.tafl.network.server.packet.NetworkPacket;
+import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.HandleClientCommunicationTask;
+import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 
 import java.io.*;
 import java.net.Socket;
@@ -43,7 +44,7 @@ public class ServerClient {
                 BufferedReader in = new BufferedReader(new InputStreamReader(mClientSocket.getInputStream()));
             ) {
                 while((inputData = in.readLine()) != null) {
-                    mServer.getTaskQueue().pushStandardPriorityTask(new HandleClientCommunicationTask(mServer, inputData));
+                    mServer.getTaskQueue().pushTask(new HandleClientCommunicationTask(mServer, ServerClient.this, inputData), PriorityTaskQueue.Priority.STANDARD);
                 }
             }
             catch(IOException e) {

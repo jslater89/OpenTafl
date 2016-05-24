@@ -9,6 +9,12 @@ import java.util.List;
  * Created by jay on 5/22/16.
  */
 public class PriorityTaskQueue {
+    public enum Priority {
+        HIGH,
+        STANDARD,
+        LOW
+    }
+
     private NetworkServer mServer;
 
     private final List<Runnable> mHighPriorityQueue;
@@ -22,7 +28,22 @@ public class PriorityTaskQueue {
         mLowPriorityTaskQueue = new ArrayList<>(16);
     }
 
-    public void pushHighPriorityTask(Runnable task) {
+    public void pushTask(Runnable task, Priority priority) {
+        switch(priority) {
+
+            case HIGH:
+                pushHighPriorityTask(task);
+                break;
+            case STANDARD:
+                pushStandardPriorityTask(task);
+                break;
+            case LOW:
+                pushLowPriorityTask(task);
+                break;
+        }
+    }
+
+    private void pushHighPriorityTask(Runnable task) {
         synchronized (mHighPriorityQueue) {
             mHighPriorityQueue.add(task);
         }
@@ -30,7 +51,7 @@ public class PriorityTaskQueue {
         mServer.notifyThreadIfNecessary();
     }
 
-    public void pushStandardPriorityTask(Runnable task) {
+    private void pushStandardPriorityTask(Runnable task) {
         synchronized (mStandardPriorityQueue) {
             mStandardPriorityQueue.add(task);
         }
@@ -38,7 +59,7 @@ public class PriorityTaskQueue {
         mServer.notifyThreadIfNecessary();
     }
 
-    public void pushLowPriorityTask(Runnable task) {
+    private void pushLowPriorityTask(Runnable task) {
         synchronized (mLowPriorityTaskQueue) {
             mLowPriorityTaskQueue.add(task);
         }

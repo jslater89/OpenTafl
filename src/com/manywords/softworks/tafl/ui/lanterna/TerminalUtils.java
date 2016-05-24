@@ -17,6 +17,15 @@ import java.io.*;
  * Created by jay on 3/22/16.
  */
 public class TerminalUtils {
+    public static void runOnUiThread(WindowBasedTextGUI gui, Runnable task) {
+        if(Thread.currentThread().equals(gui.getGUIThread().getThread())) {
+            task.run();
+        }
+        else {
+            gui.getGUIThread().invokeLater(task);
+        }
+    }
+
     public static Game startGame(WindowBasedTextGUI gui, LogicalScreen.TerminalCallback callback) {
         if(TerminalSettings.attackers == TerminalSettings.ENGINE && TerminalSettings.attackerEngineSpec == null) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Attacker engine missing configuration file!");
