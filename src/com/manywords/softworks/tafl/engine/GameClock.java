@@ -23,6 +23,7 @@ public class GameClock {
     private UpdateThread mUpdateThread;
     private boolean mOutOfTime = false;
     private boolean mRunning = false;
+    private boolean mServerMode = false;
 
     private static final int ATTACKERS = 0;
     private static final int DEFENDERS = 1;
@@ -50,6 +51,10 @@ public class GameClock {
         return new TimeSpec(mMainTimeMillis, mOvertimeMillis, mOvertimeCount, mIncrementMillis);
     }
 
+    public void setServerMode(boolean on) {
+        mServerMode = on;
+    }
+
     public void setCallback(GameClockCallback callback) {
         mCallback = callback;
     }
@@ -72,8 +77,10 @@ public class GameClock {
             mClocks[mCurrentPlayer].mMainTimeMillis += mIncrementMillis;
         }
 
-        mUpdateThread = new UpdateThread();
-        mUpdateThread.start();
+        if(!mServerMode) {
+            mUpdateThread = new UpdateThread();
+            mUpdateThread.start();
+        }
 
         return mClocks[mCurrentPlayer];
     }
@@ -135,7 +142,7 @@ public class GameClock {
         else return mClocks[DEFENDERS];
     }
 
-    private void updateClocks() {
+    public void updateClocks() {
         if(mOutOfTime) return;
 
         synchronized (mClocks) {

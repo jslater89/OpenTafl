@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.engine;
 
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
+import com.manywords.softworks.tafl.network.server.ServerClock;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
@@ -44,10 +45,17 @@ public class Game {
     }
 
     public Game(Rules rules, UiCallback callback, GameClock.TimeSpec timeSpec) {
+        this(rules, callback, timeSpec, false);
+    }
+
+    public Game(Rules rules, UiCallback callback, GameClock.TimeSpec timeSpec, boolean serverGame) {
         mGameRules = rules;
 
         if(timeSpec != null) {
             mClock = new GameClock(this, getRules().getAttackers(), getRules().getDefenders(), timeSpec);
+            if(serverGame) {
+                mClock.setServerMode(true);
+            }
         }
 
         int boardSquares = rules.getBoard().getBoardDimension() * rules.getBoard().getBoardDimension();
