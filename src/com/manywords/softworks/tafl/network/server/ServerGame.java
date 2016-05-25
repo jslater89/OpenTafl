@@ -1,7 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.network.DummyServerClient;
 
 import java.util.ArrayList;
 import java.util.List;

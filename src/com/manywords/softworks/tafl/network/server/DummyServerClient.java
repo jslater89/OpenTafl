@@ -1,8 +1,6 @@
-package com.manywords.softworks.tafl.network;
+package com.manywords.softworks.tafl.network.server;
 
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
-import com.manywords.softworks.tafl.network.server.NetworkServer;
-import com.manywords.softworks.tafl.network.server.ServerClient;
 
 import java.net.Socket;
 
