@@ -12,7 +12,7 @@ public class LoginPacket {
         String[] firstSplit = data.split("\"");
         String username = firstSplit[1];
 
-        String[] secondSplit = firstSplit[2].split(" ");
+        String[] secondSplit = firstSplit[2].trim().split(" ");
         String salt = secondSplit[0];
         String hashedPassword = secondSplit[1];
 
@@ -23,5 +23,10 @@ public class LoginPacket {
         this.username = username;
         this.salt = salt;
         this.hashedPassword = hashedPassword;
+    }
+
+    @Override
+    public String toString() {
+        return "login \"" + username +"\" " + salt + " " + hashedPassword;
     }
 }

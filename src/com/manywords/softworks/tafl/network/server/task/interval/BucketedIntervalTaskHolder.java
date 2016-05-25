@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Holds N tasks in M buckets. Runs N/M tasks per interval.
@@ -15,22 +16,26 @@ import java.util.List;
 public class BucketedIntervalTaskHolder extends IntervalTaskHolder {
     private List<IntervalTask>[] mBuckets;
     private int mLastBucketRun = 0;
+    private final Random r;
 
-    public BucketedIntervalTaskHolder(NetworkServer server, int interval, int bucketCount) {
-        this(server, interval, bucketCount, PriorityTaskQueue.Priority.STANDARD);
+    public BucketedIntervalTaskHolder(PriorityTaskQueue queue, int interval, int bucketCount) {
+        this(queue, interval, bucketCount, PriorityTaskQueue.Priority.STANDARD);
     }
 
-    public BucketedIntervalTaskHolder(NetworkServer server, int interval, int bucketCount, PriorityTaskQueue.Priority priority) {
-        super(server, interval, null, priority);
+    public BucketedIntervalTaskHolder(PriorityTaskQueue queue, int interval, int bucketCount, PriorityTaskQueue.Priority priority) {
+        super(queue, interval, null, priority);
         if(bucketCount == 0) throw new IllegalArgumentException();
         mBuckets = new List[bucketCount];
         for(int i = 0; i < bucketCount; i++) {
             mBuckets[i] = new ArrayList<>();
         }
+
+        mLastRun = System.currentTimeMillis();
+        r = new XorshiftRandom();
     }
 
     public void addBucketTask(IntervalTask task) {
-        int bucket = new XorshiftRandom().nextInt(mBuckets.length);
+        int bucket = r.nextInt(mBuckets.length);
         mBuckets[bucket].add(task);
     }
 
@@ -41,10 +46,9 @@ public class BucketedIntervalTaskHolder extends IntervalTaskHolder {
     }
 
     @Override
-    public void ping() {
-        if(mLastRun == -1) mLastRun = System.currentTimeMillis();
-
-        if(System.currentTimeMillis() - mLastRun > interval) {
+    public void ping(long time) {
+        if(time - mLastRun > interval) {
+            mLastRun = time;
             pushBucketTasks();
         }
     }
@@ -53,7 +57,7 @@ public class BucketedIntervalTaskHolder extends IntervalTaskHolder {
         List<IntervalTask> taskList = mBuckets[mLastBucketRun];
         for(IntervalTask task : taskList) {
             task.reset();
-            server.getTaskQueue().pushTask(task, priority);
+            queue.pushTask(task, priority);
         }
 
         mLastBucketRun = (mLastBucketRun + 1) % mBuckets.length;

@@ -36,7 +36,6 @@ import java.util.List;
  */
 public class NetworkServer {
     private PriorityTaskQueue mTaskQueue;
-    private List<ServerThread> mThreadPool;
     private ServerTickThread mTickThread;
 
     private BucketedIntervalTaskHolder mGameClockTasks;
@@ -49,20 +48,15 @@ public class NetworkServer {
     private boolean mRunning = true;
 
     public NetworkServer(int threadCount) {
-        mTaskQueue = new PriorityTaskQueue(this);
-        mThreadPool = new ArrayList<>(threadCount);
+        mTaskQueue = new PriorityTaskQueue(threadCount);
         mClients = new ArrayList<>(64);
         mLobbyClients = new ArrayList<>(64);
         mGames = new ArrayList<>(32);
 
-        for(int i = 0; i < threadCount; i++) {
-            mThreadPool.add(new ServerThread("ServerThread" + i, mTaskQueue));
-        }
-
         mTickThread = new ServerTickThread();
 
-        mGameListUpdateTasks = new BucketedIntervalTaskHolder(this, 1000, 30, PriorityTaskQueue.Priority.LOW);
-        mGameClockTasks = new BucketedIntervalTaskHolder(this, 1000, 5, PriorityTaskQueue.Priority.HIGH);
+        mGameListUpdateTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 30, PriorityTaskQueue.Priority.LOW);
+        mGameClockTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 5, PriorityTaskQueue.Priority.HIGH);
 
         mTickThread.addTaskHolder(mGameListUpdateTasks);
         mTickThread.addTaskHolder(mGameClockTasks);
@@ -85,20 +79,8 @@ public class NetworkServer {
         mTaskQueue.pushTask(new SendPacketTask(packet, client), priority);
     }
 
-    public void notifyThreadIfNecessary() {
-        for(ServerThread thread : mThreadPool) {
-            if(thread.isWaiting()) {
-                thread.notifyThisThread();
-                return;
-            }
-        }
-    }
-
     private void startServer() {
-        for(ServerThread thread : mThreadPool) {
-            thread.start();
-        }
-
+        mTaskQueue.start();
         mTickThread.start();
 
         try (

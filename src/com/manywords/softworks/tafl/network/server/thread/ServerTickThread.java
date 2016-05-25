@@ -34,8 +34,9 @@ public class ServerTickThread extends Thread {
                 // Don't care
             }
 
+            long time = System.currentTimeMillis();
             for (IntervalTaskHolder task : mIntervalTaskHolders) {
-                task.ping();
+                task.ping(time);
             }
         }
     }

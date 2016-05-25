@@ -15,17 +15,37 @@ public class PriorityTaskQueue {
         LOW
     }
 
-    private NetworkServer mServer;
+    private List<ServerThread> mThreadPool;
 
     private final List<Runnable> mHighPriorityQueue;
     private final List<Runnable> mStandardPriorityQueue;
     private final List<Runnable> mLowPriorityTaskQueue;
 
-    public PriorityTaskQueue(NetworkServer server) {
-        mServer = server;
+    public PriorityTaskQueue(int threadCount) {
+        mThreadPool = new ArrayList<>(threadCount);
         mHighPriorityQueue = new ArrayList<>(16);
         mStandardPriorityQueue = new ArrayList<>(32);
         mLowPriorityTaskQueue = new ArrayList<>(16);
+
+        for(int i = 0; i < threadCount; i++) {
+            mThreadPool.add(new ServerThread("ServerThread" + i, this));
+        }
+    }
+
+    public void start() {
+        for(ServerThread thread : mThreadPool) {
+            thread.start();
+        }
+    }
+
+
+    private void notifyThreadIfNecessary() {
+        for(ServerThread thread : mThreadPool) {
+            if(thread.isWaiting()) {
+                thread.notifyThisThread();
+                return;
+            }
+        }
     }
 
     public void pushTask(Runnable task, Priority priority) {
@@ -48,7 +68,7 @@ public class PriorityTaskQueue {
             mHighPriorityQueue.add(task);
         }
 
-        mServer.notifyThreadIfNecessary();
+        notifyThreadIfNecessary();
     }
 
     private void pushStandardPriorityTask(Runnable task) {
@@ -56,7 +76,7 @@ public class PriorityTaskQueue {
             mStandardPriorityQueue.add(task);
         }
 
-        mServer.notifyThreadIfNecessary();
+        notifyThreadIfNecessary();
     }
 
     private void pushLowPriorityTask(Runnable task) {
@@ -64,7 +84,7 @@ public class PriorityTaskQueue {
             mLowPriorityTaskQueue.add(task);
         }
 
-        mServer.notifyThreadIfNecessary();
+        notifyThreadIfNecessary();
     }
 
     public Runnable getTask() {
