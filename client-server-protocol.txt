@@ -2,5 +2,7 @@ login "player name" salt password-hash
     error invalid-login
     success
 
-
 lobby-chat "player name" message
+
+get-game-list
+    game-list <guid> "rules name" "attacker name" "defender name" password:<true|false> spectators:<num>|...

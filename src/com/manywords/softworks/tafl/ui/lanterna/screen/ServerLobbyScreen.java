@@ -16,6 +16,7 @@ import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
+import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ChatWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameDetailWindow;
@@ -55,10 +56,18 @@ public class ServerLobbyScreen extends LogicalScreen {
         dialog.showDialog(mGui);
 
         if(dialog.canceled || dialog.username.equals("") || dialog.hashedPassword.equals("")) {
+            MessageDialogBuilder b = new MessageDialogBuilder();
+            MessageDialog d = b.setTitle("Login failed").setText("No credentials entered.").addButton(MessageDialogButton.OK).build();
+            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+            d.showDialog(mGui);
             mTerminalCallback.changeActiveScreen(new MainMenuScreen());
         }
         else if(!mConnection.connect(dialog.username, dialog.salt, dialog.hashedPassword)) {
-            System.out.println("Connection failed!");
+            MessageDialogBuilder b = new MessageDialogBuilder();
+            MessageDialog d = b.setTitle("Connection failed").setText("Server connection failed.").addButton(MessageDialogButton.OK).build();
+            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+            d.showDialog(mGui);
+
             mTerminalCallback.changeActiveScreen(new MainMenuScreen());
         }
         else {
