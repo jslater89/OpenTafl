@@ -6,3 +6,4 @@ lobby-chat "player name" message
 
 get-game-list
     game-list <guid> "rules name" "attacker name" "defender name" password:<true|false> spectators:<num>|...
+                 0         1     2        3      4        5                            6

@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.network.client;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 /**
  * Created by jay on 5/23/16.
@@ -11,6 +12,7 @@ public class ClientServerConnection {
         public void onChatMessageReceived(String sender, String message);
         public void onSuccessReceived();
         public void onErrorReceived(String message);
+        public void onGameListReceived(List<ClientGameInformation> games);
     }
 
     public enum State {
@@ -69,6 +71,10 @@ public class ClientServerConnection {
         mServerWriter.println("lobby-chat \"" + sender + "\" " + message);
     }
 
+    public void requestGameUpdate() {
+        mServerWriter.println("game-list");
+    }
+
     private class ReadThread extends Thread {
         @Override
         public void run() {
@@ -103,6 +109,11 @@ public class ClientServerConnection {
         @Override
         public void onErrorReceived(String message) {
             if(mCurrentState == State.DISCONNECTED) mExternalCallback.onErrorReceived(message);
+        }
+
+        @Override
+        public void onGameListReceived(List<ClientGameInformation> games) {
+            mExternalCallback.onGameListReceived(games);
         }
     }
 }

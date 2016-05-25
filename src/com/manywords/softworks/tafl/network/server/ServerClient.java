@@ -39,6 +39,10 @@ public class ServerClient {
         }
     }
 
+    public String getUsername() {
+        return mUsername;
+    }
+
     public void writePacket(NetworkPacket packet) {
         mClientWriter.println(packet.toString());
     }

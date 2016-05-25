@@ -1,9 +1,15 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.network.DummyServerClient;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.SendPacketTask;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 import com.manywords.softworks.tafl.network.server.thread.ServerThread;
+import com.manywords.softworks.tafl.rules.brandub.Brandub;
+import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
+import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
+import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -31,6 +37,7 @@ public class NetworkServer {
     private List<ServerThread> mThreadPool;
 
     private final List<ServerClient> mClients;
+    private final List<ServerGame> mGames;
 
     private boolean mRunning = true;
 
@@ -38,6 +45,7 @@ public class NetworkServer {
         mTaskQueue = new PriorityTaskQueue(this);
         mThreadPool = new ArrayList<>(threadCount);
         mClients = new ArrayList<>(64);
+        mGames = new ArrayList<>(32);
 
         for(int i = 0; i < threadCount; i++) {
             mThreadPool.add(new ServerThread(mTaskQueue));
@@ -88,6 +96,27 @@ public class NetworkServer {
         }
 
         System.out.println("Server stopping.");
+    }
+
+    /**
+     * Returns a copy of the games list.
+     * @return
+     */
+    public List<ServerGame> getGames() {
+        synchronized (mGames) {
+            return new ArrayList<>(mGames);
+        }
+    }
+
+    public List<ServerGame> getDummyGames() {
+        ArrayList<ServerGame> games = new ArrayList<>();
+
+        games.add(ServerGame.getDummyGame(this, "Fishbreath", "Shenmage", new Game(Brandub.newBrandub7(), null)));
+        games.add(ServerGame.getDummyGame(this, "Nasa", "Shenmage", new Game(Fetlar.newFetlar11(), null)));
+        games.add(ServerGame.getDummyGame(this, "Fishbreath", "parvusimperator", new Game(Copenhagen.newCopenhagen11(), null)));
+        games.add(ServerGame.getDummyGame(this, "Nasa", "Shenmage", new Game(SeaBattle.newSeaBattle9(), null)));
+
+        return games;
     }
 
     public void onDisconnect(ServerClient c) {

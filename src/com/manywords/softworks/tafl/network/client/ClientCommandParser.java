@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.network.client;
 
 import com.manywords.softworks.tafl.network.packet.ErrorPacket;
+import com.manywords.softworks.tafl.network.packet.GameListPacket;
 import com.manywords.softworks.tafl.network.packet.LobbyChatPacket;
 
 /**
@@ -18,6 +19,10 @@ public class ClientCommandParser {
         }
         else if(data.startsWith("success")) {
             callback.onSuccessReceived();
+        }
+        else if(data.startsWith("game-list")) {
+            GameListPacket packet = GameListPacket.parse(data);
+            callback.onGameListReceived(packet.games);
         }
     }
 }

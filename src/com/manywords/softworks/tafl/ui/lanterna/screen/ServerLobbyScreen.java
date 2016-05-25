@@ -10,6 +10,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.network.client.ClientGameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.ErrorPacket;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
@@ -22,6 +23,8 @@ import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ChatWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameDetailWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameListWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ServerLoginDialog;
+
+import java.util.List;
 
 /**
  * Created by jay on 5/23/16.
@@ -203,6 +206,11 @@ public class ServerLobbyScreen extends LogicalScreen {
         public void sendChatMessage(String message) {
             mConnection.sendChatMessage(TerminalSettings.onlinePlayerName, message);
         }
+
+        @Override
+        public void requestGameUpdate() {
+            mConnection.requestGameUpdate();
+        }
     }
 
     private class ClientServerCallback implements ClientServerConnection.ClientServerCallback {
@@ -236,6 +244,11 @@ public class ServerLobbyScreen extends LogicalScreen {
                     mTerminalCallback.changeActiveScreen(new MainMenuScreen());
                 });
             }
+        }
+
+        @Override
+        public void onGameListReceived(List<ClientGameInformation> games) {
+            mGameList.updateGameList(games);
         }
     }
 }

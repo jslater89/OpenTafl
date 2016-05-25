@@ -40,7 +40,6 @@ public class ServerThread extends Thread {
         }
     }
 
-    // Must be synchronized to own this object's monitor
     public synchronized void notifyThisThread() {
         mWaiting = false;
         this.notify();

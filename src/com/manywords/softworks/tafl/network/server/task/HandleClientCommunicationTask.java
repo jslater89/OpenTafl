@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server.task;
 
+import com.manywords.softworks.tafl.network.packet.GameListPacket;
 import com.manywords.softworks.tafl.network.packet.LoginPacket;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.packet.LobbyChatPacket;
@@ -23,8 +24,12 @@ public class HandleClientCommunicationTask implements Runnable {
             LobbyChatPacket packet = LobbyChatPacket.parse(data);
             mServer.sendPacketToAllClients(packet, PriorityTaskQueue.Priority.LOW);
         }
-        if(data.startsWith("login")) {
+        else if(data.startsWith("login")) {
             mServer.getTaskQueue().pushTask(new LoginTask(mServer, mClient, LoginPacket.parse(data)), PriorityTaskQueue.Priority.STANDARD);
+        }
+        else if(data.startsWith("game-list")) {
+            //mServer.getTaskQueue().pushTask(new SendPacketTask(GameListPacket.parse(mServer.getGames()), mClient), PriorityTaskQueue.Priority.LOW);
+            mServer.getTaskQueue().pushTask(new SendPacketTask(GameListPacket.parse(mServer.getDummyGames()), mClient), PriorityTaskQueue.Priority.LOW);
         }
     }
 

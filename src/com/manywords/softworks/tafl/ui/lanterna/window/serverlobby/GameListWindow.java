@@ -12,17 +12,21 @@ import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created by jay on 5/23/16.
  */
 public class GameListWindow extends BasicWindow {
     public interface GameListWindowHost {
+        public void requestGameUpdate();
     }
     private LogicalScreen.TerminalCallback mTerminalCallback;
     private GameListWindowHost mHost;
     private Table<String> mGameTable;
     private List<ClientGameInformation> mGameList;
+
+    private static final String[] COLUMNS = {"Rules", "Attackers", "Defenders", "Password", "Spectators"};
 
     public GameListWindow(LogicalScreen.TerminalCallback terminalCallback, GameListWindowHost host) {
         super("Game List");
@@ -31,16 +35,18 @@ public class GameListWindow extends BasicWindow {
         mHost = host;
 
         Panel p = new Panel();
-        mGameTable = new Table<>("Rules", "Attackers", "Defenders", "Password", "Spectators");
+        mGameTable = new Table<>(COLUMNS);
         mGameList = new ArrayList<>();
 
-        generateDebugGames();
+        //generateDebugGames();
 
         updateTable();
 
         p.addComponent(mGameTable);
 
         setComponent(p);
+
+        mHost.requestGameUpdate();
     }
 
     public void notifyFocus(boolean focused) {
@@ -52,11 +58,13 @@ public class GameListWindow extends BasicWindow {
         }
     }
 
+    public void updateGameList(List<ClientGameInformation> games) {
+        mGameList = games;
+        updateTable();
+    }
+
     private void updateTable() {
-        TableModel<String> model = mGameTable.getTableModel();
-        for(int i = 0; i < model.getRowCount(); i++) {
-            model.removeRow(i);
-        }
+        TableModel<String> model = new TableModel<>(COLUMNS);
         for(ClientGameInformation g : mGameList) {
             model.addRow(g.rulesName, g.attackerUsername, g.defenderUsername, g.password ? "Y" : "N", "" + g.spectators);
         }
@@ -94,13 +102,13 @@ public class GameListWindow extends BasicWindow {
         for(int i = 0; i < 50; i++) {
             switch(new Random().nextInt(3)) {
                 case 0:
-                    mGameList.add(new ClientGameInformation("Brandub 7x7", "Fishbreath", "otherguy", true, 0));
+                    mGameList.add(new ClientGameInformation(UUID.randomUUID().toString(), "Brandub 7x7", "Fishbreath", "otherguy", true, 0));
                     break;
                 case 1:
-                    mGameList.add(new ClientGameInformation("Tablut 15x15", "Shenmage", "parvusimperator", false, 2));
+                    mGameList.add(new ClientGameInformation(UUID.randomUUID().toString(), "Tablut 15x15", "Shenmage", "parvusimperator", false, 2));
                     break;
                 case 2:
-                    mGameList.add(new ClientGameInformation("Foteviken Tablut 9x9", "Nasa", "OpenTafl AI", false, 28));
+                    mGameList.add(new ClientGameInformation(UUID.randomUUID().toString(), "Foteviken Tablut 9x9", "Nasa", "OpenTafl AI", false, 28));
                     break;
             }
         }
