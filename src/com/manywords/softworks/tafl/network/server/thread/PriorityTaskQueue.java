@@ -89,7 +89,7 @@ public class PriorityTaskQueue {
                 }
             }
         }
-        catch(ArrayIndexOutOfBoundsException e) {
+        catch(IndexOutOfBoundsException e) {
             // Race condition possible here, but I don't want to synchronize the whole block for speed reasons.
         }
 

@@ -23,12 +23,12 @@ public class ServerLoginDialog extends DialogWindow {
 
         final Label usernameLabel = new Label("Username");
         final TextBox usernameInput = new TextBox();
-        usernameInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.])+"));
+        usernameInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
 
         final Label passwordLabel = new Label("Password");
         final TextBox passwordInput = new TextBox();
         passwordInput.setMask('*');
-        passwordInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.])+"));
+        passwordInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
 
         final Button finishButton = new Button("Login", () -> {
             username = usernameInput.getText();

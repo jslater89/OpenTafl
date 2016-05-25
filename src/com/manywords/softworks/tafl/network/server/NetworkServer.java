@@ -107,17 +107,6 @@ public class NetworkServer {
         }
     }
 
-    public List<ServerGame> getDummyGames() {
-        ArrayList<ServerGame> games = new ArrayList<>();
-
-        games.add(ServerGame.getDummyGame(this, "Fishbreath", "Shenmage", new Game(Brandub.newBrandub7(), null)));
-        games.add(ServerGame.getDummyGame(this, "Nasa", "Shenmage", new Game(Fetlar.newFetlar11(), null)));
-        games.add(ServerGame.getDummyGame(this, "Fishbreath", "parvusimperator", new Game(Copenhagen.newCopenhagen11(), null)));
-        games.add(ServerGame.getDummyGame(this, "Nasa", "Shenmage", new Game(SeaBattle.newSeaBattle9(), null)));
-
-        return games;
-    }
-
     public void onDisconnect(ServerClient c) {
         synchronized (mClients) {
             mClients.remove(c);

@@ -7,6 +7,7 @@ import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.gui2.table.TableModel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.network.client.ClientGameInformation;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class GameListWindow extends BasicWindow {
     private List<ClientGameInformation> mGameList;
 
     private static final String[] COLUMNS = {"Rules", "Attackers", "Defenders", "Password", "Spectators"};
+    private static final String[] EMPTY_ROW = {"", "", "", "", ""};
 
     public GameListWindow(LogicalScreen.TerminalCallback terminalCallback, GameListWindowHost host) {
         super("Game List");
@@ -39,14 +41,19 @@ public class GameListWindow extends BasicWindow {
         mGameList = new ArrayList<>();
 
         //generateDebugGames();
-
-        updateTable();
-
         p.addComponent(mGameTable);
 
         setComponent(p);
 
-        mHost.requestGameUpdate();
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // Don't care
+            }
+            mHost.requestGameUpdate();
+        }).start();
+
     }
 
     public void notifyFocus(boolean focused) {
@@ -69,9 +76,6 @@ public class GameListWindow extends BasicWindow {
             model.addRow(g.rulesName, g.attackerUsername, g.defenderUsername, g.password ? "Y" : "N", "" + g.spectators);
         }
 
-        if(model.getRowCount() == 0) {
-            model.addRow("", "", "", "", "");
-        }
         mGameTable.setTableModel(model);
 
         System.out.println("Rows: " + model.getRowCount());
@@ -87,9 +91,9 @@ public class GameListWindow extends BasicWindow {
 
         mGameTable.setVisibleRows(size.getRows() - 2);
 
-        TerminalSize preferredSize = mGameTable.getPreferredSize();
-        TerminalSize newSize = new TerminalSize(size.getColumns() - 2, preferredSize.getRows());
-        mGameTable.setPreferredSize(newSize);
+        //TerminalSize preferredSize = mGameTable.getPreferredSize();
+        //TerminalSize newSize = new TerminalSize(size.getColumns() - 2, size.getRows() - 2);
+        //mGameTable.setPreferredSize(newSize);
     }
 
     @Override
@@ -98,19 +102,5 @@ public class GameListWindow extends BasicWindow {
         return handledByScreen || super.handleInput(key);
     }
 
-    private void generateDebugGames() {
-        for(int i = 0; i < 50; i++) {
-            switch(new Random().nextInt(3)) {
-                case 0:
-                    mGameList.add(new ClientGameInformation(UUID.randomUUID().toString(), "Brandub 7x7", "Fishbreath", "otherguy", true, 0));
-                    break;
-                case 1:
-                    mGameList.add(new ClientGameInformation(UUID.randomUUID().toString(), "Tablut 15x15", "Shenmage", "parvusimperator", false, 2));
-                    break;
-                case 2:
-                    mGameList.add(new ClientGameInformation(UUID.randomUUID().toString(), "Foteviken Tablut 9x9", "Nasa", "OpenTafl AI", false, 28));
-                    break;
-            }
-        }
-    }
+
 }

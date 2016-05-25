@@ -59,10 +59,12 @@ public class ServerLobbyScreen extends LogicalScreen {
         dialog.showDialog(mGui);
 
         if(dialog.canceled || dialog.username.equals("") || dialog.hashedPassword.equals("")) {
-            MessageDialogBuilder b = new MessageDialogBuilder();
-            MessageDialog d = b.setTitle("Login failed").setText("No credentials entered.").addButton(MessageDialogButton.OK).build();
-            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
-            d.showDialog(mGui);
+            if(!dialog.canceled) {
+                MessageDialogBuilder b = new MessageDialogBuilder();
+                MessageDialog d = b.setTitle("Login failed").setText("No credentials entered.").addButton(MessageDialogButton.OK).build();
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+                d.showDialog(mGui);
+            }
             mTerminalCallback.changeActiveScreen(new MainMenuScreen());
         }
         else if(!mConnection.connect(dialog.username, dialog.salt, dialog.hashedPassword)) {

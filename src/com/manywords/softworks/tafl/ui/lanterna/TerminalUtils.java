@@ -18,7 +18,7 @@ import java.io.*;
  */
 public class TerminalUtils {
     public static void runOnUiThread(WindowBasedTextGUI gui, Runnable task) {
-        if(Thread.currentThread().equals(gui.getGUIThread().getThread())) {
+        if(gui == null || Thread.currentThread().equals(gui.getGUIThread().getThread())) {
             task.run();
         }
         else {
