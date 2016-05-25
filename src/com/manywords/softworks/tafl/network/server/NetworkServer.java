@@ -3,8 +3,11 @@ package com.manywords.softworks.tafl.network.server;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.SendPacketTask;
+import com.manywords.softworks.tafl.network.server.task.interval.BucketedIntervalTaskHolder;
+import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 import com.manywords.softworks.tafl.network.server.thread.ServerThread;
+import com.manywords.softworks.tafl.network.server.thread.ServerTickThread;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
@@ -34,8 +37,13 @@ import java.util.List;
 public class NetworkServer {
     private PriorityTaskQueue mTaskQueue;
     private List<ServerThread> mThreadPool;
+    private ServerTickThread mTickThread;
+
+    private BucketedIntervalTaskHolder mGameClockTasks;
+    private BucketedIntervalTaskHolder mGameListUpdateTasks;
 
     private final List<ServerClient> mClients;
+    private final List<ServerClient> mLobbyClients;
     private final List<ServerGame> mGames;
 
     private boolean mRunning = true;
@@ -44,11 +52,20 @@ public class NetworkServer {
         mTaskQueue = new PriorityTaskQueue(this);
         mThreadPool = new ArrayList<>(threadCount);
         mClients = new ArrayList<>(64);
+        mLobbyClients = new ArrayList<>(64);
         mGames = new ArrayList<>(32);
 
         for(int i = 0; i < threadCount; i++) {
             mThreadPool.add(new ServerThread(mTaskQueue));
         }
+
+        mTickThread = new ServerTickThread();
+
+        mGameListUpdateTasks = new BucketedIntervalTaskHolder(this, 1000, 30, PriorityTaskQueue.Priority.LOW);
+        mGameClockTasks = new BucketedIntervalTaskHolder(this, 1000, 5, PriorityTaskQueue.Priority.HIGH);
+
+        mTickThread.addTaskHolder(mGameListUpdateTasks);
+        mTickThread.addTaskHolder(mGameClockTasks);
 
         startServer();
     }
@@ -82,6 +99,8 @@ public class NetworkServer {
             thread.start();
         }
 
+        mTickThread.start();
+
         try (
             ServerSocket socket = new ServerSocket(11541);
         ) {
@@ -110,12 +129,30 @@ public class NetworkServer {
     public void onDisconnect(ServerClient c) {
         synchronized (mClients) {
             mClients.remove(c);
+            clientExitingLobby(c);
+        }
+    }
+
+    private void clientEnteringLobby(ServerClient c) {
+        mLobbyClients.add(c);
+
+        for(IntervalTask t : c.getLobbyTasks()) {
+            mGameListUpdateTasks.addBucketTask(t);
+        }
+    }
+
+    private void clientExitingLobby(ServerClient c) {
+        mLobbyClients.remove(c);
+
+        for(IntervalTask t : c.getLobbyTasks()) {
+            mGameListUpdateTasks.removeBucketTask(t);
         }
     }
 
     private void addClient(ServerClient c) {
         synchronized (mClients) {
             mClients.add(c);
+            clientEnteringLobby(c);
         }
     }
 }

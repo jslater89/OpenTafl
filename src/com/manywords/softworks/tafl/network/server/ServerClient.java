@@ -2,10 +2,14 @@ package com.manywords.softworks.tafl.network.server;
 
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.HandleClientCommunicationTask;
+import com.manywords.softworks.tafl.network.server.task.interval.GameListUpdateTask;
+import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jay on 5/22/16.
@@ -13,6 +17,9 @@ import java.net.Socket;
 public class ServerClient {
     private NetworkServer mServer;
     private Socket mClientSocket;
+
+    private List<IntervalTask> mLobbyTasks;
+    private List<IntervalTask> mInGameTasks;
 
     protected String mUsername;
 
@@ -27,6 +34,11 @@ public class ServerClient {
         mServer = server;
         mClientSocket = clientSocket;
 
+        mLobbyTasks = new ArrayList<>(1);
+        mInGameTasks = new ArrayList<>(1);
+
+        mLobbyTasks.add(new GameListUpdateTask(mServer, this));
+
         mSocketListener = new SocketListener();
         mSocketListener.start();
 
@@ -40,6 +52,10 @@ public class ServerClient {
 
     public String getUsername() {
         return mUsername;
+    }
+
+    public List<IntervalTask> getLobbyTasks() {
+        return mLobbyTasks;
     }
 
     public void writePacket(NetworkPacket packet) {

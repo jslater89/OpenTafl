@@ -7,6 +7,10 @@ import java.util.Random;
  */
 public class XorshiftRandom extends Random {
     private long seed;
+
+    public XorshiftRandom() {
+        this.seed = System.currentTimeMillis();
+    }
     public XorshiftRandom(long seed) {
         this.seed = seed;
     }
