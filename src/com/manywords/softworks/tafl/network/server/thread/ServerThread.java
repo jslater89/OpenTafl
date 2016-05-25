@@ -8,8 +8,8 @@ public class ServerThread extends Thread {
     private boolean mRunning = true;
     private PriorityTaskQueue mQueue;
 
-    public ServerThread(PriorityTaskQueue queue) {
-        super();
+    public ServerThread(String name, PriorityTaskQueue queue) {
+        super(name);
         mQueue = queue;
     }
 

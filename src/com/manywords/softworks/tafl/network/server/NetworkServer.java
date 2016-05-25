@@ -56,7 +56,7 @@ public class NetworkServer {
         mGames = new ArrayList<>(32);
 
         for(int i = 0; i < threadCount; i++) {
-            mThreadPool.add(new ServerThread(mTaskQueue));
+            mThreadPool.add(new ServerThread("ServerThread" + i, mTaskQueue));
         }
 
         mTickThread = new ServerTickThread();

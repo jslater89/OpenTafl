@@ -13,6 +13,10 @@ public class ServerTickThread extends Thread {
     private static final int TICK_TIME = 1000; //ms
     private boolean mRunning = true;
 
+    public ServerTickThread() {
+        super("ServerTickThread");
+    }
+
     public void addTaskHolder(IntervalTaskHolder taskHolder) {
         mIntervalTaskHolders.add(taskHolder);
     }
