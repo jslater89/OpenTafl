@@ -44,16 +44,6 @@ public class GameListWindow extends BasicWindow {
         p.addComponent(mGameTable);
 
         setComponent(p);
-
-        new Thread(() -> {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Don't care
-            }
-            mHost.requestGameUpdate();
-        }).start();
-
     }
 
     public void notifyFocus(boolean focused) {

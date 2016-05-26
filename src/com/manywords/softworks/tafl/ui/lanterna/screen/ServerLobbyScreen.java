@@ -58,6 +58,9 @@ public class ServerLobbyScreen extends LogicalScreen {
     }
 
     private void enterUi() {
+        createWindows();
+        layoutWindows(mGui.getScreen().getTerminalSize());
+
         ServerLoginDialog dialog = new ServerLoginDialog("Login to server " + TerminalSettings.onlineServerHost + ":" + TerminalSettings.onlineServerPort);
         dialog.setHints(TerminalThemeConstants.CENTERED_MODAL);
         dialog.showDialog(mGui);
@@ -80,8 +83,6 @@ public class ServerLobbyScreen extends LogicalScreen {
             mTerminalCallback.changeActiveScreen(new MainMenuScreen());
         }
         else {
-            createWindows();
-            layoutWindows(mGui.getScreen().getTerminalSize());
             addWindows();
         }
     }
@@ -267,6 +268,24 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void onGameListReceived(List<ClientGameInformation> games) {
             mGameList.updateGameList(games);
+        }
+
+        @Override
+        public void onDisconnect(boolean planned) {
+            if(!planned) {
+                MessageDialogBuilder b = new MessageDialogBuilder();
+                b.setTitle("Server connection failed");
+                b.setText("Server terminated the connection.");
+                b.addButton(MessageDialogButton.OK);
+                MessageDialog d = b.build();
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+
+                // Ordinarily comes from a non-UI thread
+                TerminalUtils.runOnUiThread(mGui, () -> {
+                    d.showDialog(mGui);
+                    mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+                });
+            }
         }
     }
 }

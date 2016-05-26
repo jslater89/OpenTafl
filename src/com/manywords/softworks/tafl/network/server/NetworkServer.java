@@ -51,7 +51,7 @@ public class NetworkServer {
 
         mTickThread = new ServerTickThread();
 
-        mGameListUpdateTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 2, PriorityTaskQueue.Priority.LOW);
+        mGameListUpdateTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 20, PriorityTaskQueue.Priority.LOW);
         mGameClockTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 5, PriorityTaskQueue.Priority.HIGH);
 
         mTickThread.addTaskHolder(mGameListUpdateTasks);

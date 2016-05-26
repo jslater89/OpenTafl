@@ -1,9 +1,6 @@
 package com.manywords.softworks.tafl.network.client;
 
-import com.manywords.softworks.tafl.network.packet.CancelGamePacket;
-import com.manywords.softworks.tafl.network.packet.CreateGamePacket;
-import com.manywords.softworks.tafl.network.packet.LobbyChatPacket;
-import com.manywords.softworks.tafl.network.packet.LoginPacket;
+import com.manywords.softworks.tafl.network.packet.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -20,6 +17,7 @@ public class ClientServerConnection {
         public void onSuccessReceived();
         public void onErrorReceived(String message);
         public void onGameListReceived(List<ClientGameInformation> games);
+        public void onDisconnect(boolean planned);
     }
 
     public enum State {
@@ -38,6 +36,8 @@ public class ClientServerConnection {
     private PrintWriter mServerWriter;
     private Thread mReadThread;
 
+    private boolean mPlannedDisconnect = false;
+
     private ClientServerCallback mExternalCallback;
     private ClientServerCallback mInternalCallback = new InternalCallback();
 
@@ -49,6 +49,7 @@ public class ClientServerConnection {
 
     public boolean connect(String username, String hashedPassword) {
         try {
+            mPlannedDisconnect = false;
             mServer = new Socket(hostname, port);
             mServerWriter = new PrintWriter(new OutputStreamWriter(mServer.getOutputStream()), true);
 
@@ -64,6 +65,7 @@ public class ClientServerConnection {
 
     public void disconnect() {
         try {
+            mPlannedDisconnect = true;
             if(mServer != null) mServer.close();
 
             mServer = null;
@@ -78,8 +80,8 @@ public class ClientServerConnection {
     }
 
     public void sendCancelGameMessage(UUID uuid) {
-        setState(State.LOGGED_IN);
         mServerWriter.println(new CancelGamePacket(uuid));
+        setState(State.LOGGED_IN);
     }
 
     public void sendRegistrationMessage(String username, String hashedPassword) {
@@ -110,6 +112,9 @@ public class ClientServerConnection {
             catch(IOException e) {
                 System.out.println("Server connection error: " + e);
             }
+
+            System.out.println("Disconnected from server");
+            mExternalCallback.onDisconnect(mPlannedDisconnect);
         }
     }
 
@@ -122,6 +127,12 @@ public class ClientServerConnection {
 
         @Override
         public void onStateChanged(State newState) {
+            switch(newState) {
+                case LOGGED_IN:
+                case HOSTING:
+                    requestGameUpdate();
+                    break;
+            }
             mExternalCallback.onStateChanged(newState);
         }
 
@@ -149,6 +160,10 @@ public class ClientServerConnection {
 
         @Override
         public void onErrorReceived(String message) {
+            /*if(message.equals(ErrorPacket.GAME_CANCELED)) {
+                requestGameUpdate();
+            }*/
+
             switch(mCurrentState) {
 
                 case DISCONNECTED:
@@ -168,6 +183,11 @@ public class ClientServerConnection {
         @Override
         public void onGameListReceived(List<ClientGameInformation> games) {
             mExternalCallback.onGameListReceived(games);
+        }
+
+        @Override
+        public void onDisconnect(boolean planned) {
+
         }
     }
 }
