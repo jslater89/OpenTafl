@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 public class ServerLoginDialog extends DialogWindow {
     public boolean canceled = false;
     public String username = "";
-    public String salt = "testsalt";
     public String hashedPassword = "";
 
     public ServerLoginDialog(String title) {

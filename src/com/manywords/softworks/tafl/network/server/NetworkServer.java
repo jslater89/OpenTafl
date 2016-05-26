@@ -68,6 +68,15 @@ public class NetworkServer {
         return mTaskQueue;
     }
     public List<ServerClient> getClients() { return mClients; }
+    public boolean hasClientNamed(String username) {
+        synchronized (mClients) {
+            for (ServerClient c : mClients) {
+                if (username.equals(c.getUsername())) return true;
+            }
+        }
+
+        return false;
+    }
 
     public void sendPacketToAllClients(NetworkPacket packet, PriorityTaskQueue.Priority priority) {
         for(ServerClient client : mClients) {

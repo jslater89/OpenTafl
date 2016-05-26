@@ -19,6 +19,8 @@ public class GameListPacket extends NetworkPacket {
 
         List<ClientGameInformation> games = new ArrayList<>();
 
+        if(data.trim().isEmpty()) return new GameListPacket(games);
+
         for(String record : records) {
             String[] elements = record.split("\"");
             String uuid = elements[0].trim();

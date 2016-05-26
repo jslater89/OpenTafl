@@ -1,9 +1,53 @@
-login "player name" salt password-hash
+login "player name" playername-password-hash
     error invalid-login
     success
 
 lobby-chat "player name" message
 
+    Includes player name so that clients and servers use the same packet.
+
 get-game-list
     game-list <guid> "rules name" "attacker name" "defender name" password:<true|false> spectators:<num>|...
-                 0         1     2        3      4        5                            6
+
+create-game [attackers|defenders] [OTN rules string]
+
+join-game guid [password-hash]
+    error game-full
+    error waiting-for-other-game
+    error invalid-password
+    success
+
+    On success, NetworkServer has a Game, ServerClient has a Game, and the client sees himself hosting.
+
+cancel-game guid
+    error not-in-game
+    success
+
+    Cancel Game should be a button in the server lobby interface.
+
+ready-for-game
+    error waiting-for-opponent
+    success
+
+    When both ServerClients are ready, the game begins. The first player to ready up gets the error. The second
+    player gets the success.
+
+start-game
+
+    Server sends to clients to notify game start. Clients open a game interface with one LocalHuman and one
+    NetworkPlayer.
+
+kibbitz-game guid
+    error invalid-password
+    error game-not-started
+    success
+
+    On success, opens a game interface with two NetworkPlayers.
+
+game-chat "player name" message
+
+    Game chat is visible to all players and spectators in a game. Players send game chat messages.
+
+kibbitz-chat "player name" message
+
+    Kibbitz chat is only visible to spectators. Spectators send kibbitz chat messages.

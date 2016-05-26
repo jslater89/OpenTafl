@@ -28,7 +28,7 @@ public class NetworkPacketConsistencyTests extends TaflTest {
 
         assert first.equals(second);
 
-        LoginPacket lp = new LoginPacket("Fish Breath", "saltytest", "hashypassword");
+        LoginPacket lp = new LoginPacket("Fish Breath", "hashypassword");
         first = lp.toString();
 
         lp = LoginPacket.parse(first);

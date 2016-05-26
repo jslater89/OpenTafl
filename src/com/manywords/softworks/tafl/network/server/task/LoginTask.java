@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server.task;
 
+import com.manywords.softworks.tafl.network.packet.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.LoginPacket;
 import com.manywords.softworks.tafl.network.packet.SuccessPacket;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
@@ -23,9 +24,12 @@ public class LoginTask implements Runnable {
     @Override
     public void run() {
         // if login good
-        client.onRegistered(packet.username);
-        server.sendPacketToClient(client, new SuccessPacket(), PriorityTaskQueue.Priority.STANDARD);
-        // else
-        //mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.LOGIN_FAILED), PriorityTaskQueue.Priority.STANDARD);
+        if(!server.hasClientNamed(packet.username)) {
+            client.onRegistered(packet.username);
+            server.sendPacketToClient(client, new SuccessPacket(), PriorityTaskQueue.Priority.LOW);
+        }
+        else {
+            server.sendPacketToClient(client, new ErrorPacket(ErrorPacket.LOGIN_FAILED), PriorityTaskQueue.Priority.LOW);
+        }
     }
 }

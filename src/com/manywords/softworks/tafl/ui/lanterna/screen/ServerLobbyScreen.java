@@ -67,7 +67,7 @@ public class ServerLobbyScreen extends LogicalScreen {
             }
             mTerminalCallback.changeActiveScreen(new MainMenuScreen());
         }
-        else if(!mConnection.connect(dialog.username, dialog.salt, dialog.hashedPassword)) {
+        else if(!mConnection.connect(dialog.username, dialog.hashedPassword)) {
             MessageDialogBuilder b = new MessageDialogBuilder();
             MessageDialog d = b.setTitle("Connection failed").setText("Server connection failed.").addButton(MessageDialogButton.OK).build();
             d.setHints(TerminalThemeConstants.CENTERED_MODAL);

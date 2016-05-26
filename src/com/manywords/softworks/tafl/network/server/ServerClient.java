@@ -15,16 +15,25 @@ import java.util.List;
  * Created by jay on 5/22/16.
  */
 public class ServerClient {
+    public enum GameRole {
+        ATTACKER,
+        DEFENDER,
+        KIBBITZER,
+        OUT_OF_GAME,
+    }
     private NetworkServer mServer;
     private Socket mClientSocket;
-
-    private List<IntervalTask> mLobbyTasks;
-    private List<IntervalTask> mInGameTasks;
 
     protected String mUsername;
 
     private SocketListener mSocketListener;
     private PrintWriter mClientWriter;
+
+    private List<IntervalTask> mLobbyTasks;
+    private List<IntervalTask> mInGameTasks;
+
+    private ServerGame mGame;
+    private GameRole mGameRole = GameRole.OUT_OF_GAME;
 
     protected ServerClient() {
         if(!(this instanceof DummyServerClient)) throw new IllegalStateException("No-arg constructor is for dummy client only!");

@@ -1,5 +1,8 @@
 package com.manywords.softworks.tafl.network.client;
 
+import com.manywords.softworks.tafl.network.packet.LobbyChatPacket;
+import com.manywords.softworks.tafl.network.packet.LoginPacket;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
@@ -38,7 +41,7 @@ public class ClientServerConnection {
         mExternalCallback = callback;
     }
 
-    public boolean connect(String username, String salt, String hashedPassword) {
+    public boolean connect(String username, String hashedPassword) {
         try {
             mServer = new Socket(hostname, port);
             mServerWriter = new PrintWriter(new OutputStreamWriter(mServer.getOutputStream()), true);
@@ -46,7 +49,7 @@ public class ClientServerConnection {
             mReadThread = new ReadThread();
             mReadThread.start();
 
-            sendRegistrationMessage(username, salt, hashedPassword);
+            sendRegistrationMessage(username, hashedPassword);
             return true;
         } catch (IOException e) {
             return false;
@@ -63,12 +66,12 @@ public class ClientServerConnection {
         }
     }
 
-    public void sendRegistrationMessage(String username, String salt, String hashedPassword) {
-        mServerWriter.println("login \"" + username + "\" " + salt + " " + hashedPassword);
+    public void sendRegistrationMessage(String username, String hashedPassword) {
+        mServerWriter.println(new LoginPacket(username, hashedPassword));
     }
 
     public void sendChatMessage(String sender, String message) {
-        mServerWriter.println("lobby-chat \"" + sender + "\" " + message);
+        mServerWriter.println(new LobbyChatPacket(sender, message));
     }
 
     public void requestGameUpdate() {
