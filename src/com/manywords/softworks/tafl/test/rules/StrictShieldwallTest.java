@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.test.TaflTest;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 
 public class StrictShieldwallTest extends TaflTest {
 

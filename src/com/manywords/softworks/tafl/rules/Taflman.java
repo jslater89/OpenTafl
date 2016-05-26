@@ -31,14 +31,6 @@ public class Taflman {
     public static final char DEVELOPED = 4096;
     public static final char UNDEVELOPED = 0;
 
-    private static Game game;
-    private static Rules rules;
-
-    public static void initialize(Game g, Rules r) {
-        game = g;
-        rules = r;
-    }
-
     public static char encode(TaflmanImpl taflman) {
         char packedTaflman = 0;
         packedTaflman = (char) (packedTaflman | (char) taflman.getImplId());
@@ -80,21 +72,10 @@ public class Taflman {
 
     public static boolean getDeveloped(char taflman) { return (taflman & DEVELOPED_MASK) == DEVELOPED; }
 
-    public static Game getGame() {
-        return game;
-    }
-
-    public static GameState getCurrentState() {
-        return game.getCurrentState();
-    }
-
     public static Board getBoard(GameState state) {
         return state.getBoard();
     }
 
-    public static Rules getRules() {
-        return rules;
-    }
 
     /**
      * Return an 8-bit identifier for this piece, unique on its side.
@@ -127,11 +108,11 @@ public class Taflman {
      *
      * @return
      */
-    public static Side getSide(char taflman) {
+    public static Side getSide(GameState state, char taflman) {
         if (getPackedSide(taflman) == SIDE_ATTACKERS) {
-            return game.getCurrentState().getAttackers();
+            return state.getAttackers();
         } else {
-            return game.getCurrentState().getDefenders();
+            return state.getDefenders();
         }
     }
 
@@ -140,6 +121,7 @@ public class Taflman {
     }
 
     public static List<Coord> getAllowableMoves(GameState state, char taflman) {
+        Rules rules = getBoard(state).getRules();
 
         List<Coord> cachedMoves = state.getCachedAllowableMovesForTaflman(taflman);
         if (cachedMoves != null) return cachedMoves;
@@ -154,16 +136,17 @@ public class Taflman {
     }
 
     public static List<Coord> getAllowableMovesFrom(GameState state, char taflman, Coord space, boolean withJump) {
+        Rules rules = getBoard(state).getRules();
         List<Coord> allowableMoves = new ArrayList<Coord>(getBoard(state).getBoardDimension() * 2);
 
         // Moves on the same rank (row)
-        int x = space.x;
-        int y = space.y;
-        int boardSize = getBoard(state).getBoardDimension();
+//        int x = space.x;
+//        int y = space.y;
+//        int boardSize = getBoard(state).getBoardDimension();
 
         for(List<Coord> direction : Coord.getRankAndFileCoords(space)) {
             for(Coord potentialMove : direction) {
-                boolean canPass = getRules().canTaflmanMoveThrough(getBoard(state), taflman, potentialMove);
+                boolean canPass = rules.canTaflmanMoveThrough(getBoard(state), taflman, potentialMove);
                 if (getBoard(state).getOccupier(potentialMove) != EMPTY || !canPass) {
                     break;
                 } else {
@@ -191,11 +174,12 @@ public class Taflman {
     }
 
     public static List<Coord> getCapturingMovesFromDestinations(GameState state, char taflman, Coord start, List<Coord> moves) {
+        Rules rules = getBoard(state).getRules();
         // Seems very unlikely we'll need to worry about more than
         // five captures all that often.
         List<Coord> capturingMoves = new ArrayList<Coord>(5);
 
-        if (getJumpMode(taflman) == Taflman.JUMP_CAPTURE) {
+        if (getJumpMode(rules, taflman) == Taflman.JUMP_CAPTURE) {
             for (Coord jump : getJumpsFrom(state, taflman, start)) {
                 capturingMoves.add(jump);
             }
@@ -230,11 +214,13 @@ public class Taflman {
     }
 
     public static List<Coord> getAllowableDestinationsFrom(GameState state, char taflman, Coord space, boolean withJumps) {
+        Rules rules = getBoard(state).getRules();
+
         List<Coord> allowableMoves = getAllowableMovesFrom(state, taflman, space, withJumps);
         List<Coord> allowableDestinations = new ArrayList<Coord>(allowableMoves.size());
 
         for (Coord move : allowableMoves) {
-            if (getRules().canTaflmanStopOn(getBoard(state), taflman, move)) {
+            if (rules.canTaflmanStopOn(getBoard(state), taflman, move)) {
                 allowableDestinations.add(move);
             }
         }
@@ -256,11 +242,13 @@ public class Taflman {
     }
 
     public static List<Coord> getJumpsFrom(GameState state, char taflman, Coord space) {
+        Rules rules = getBoard(state).getRules();
+
         List<Coord> jumps = new ArrayList<Coord>(4);
         boolean isStartSpecial = false;
         boolean canJump = false;
 
-        if (getJumpMode(taflman) == Taflman.JUMP_RESTRICTED) {
+        if (getJumpMode(rules, taflman) == Taflman.JUMP_RESTRICTED) {
             if (getBoard(state).getSpaceTypeFor(space) != SpaceType.NONE) {
                 isStartSpecial = true;
             } else {
@@ -268,7 +256,7 @@ public class Taflman {
             }
         }
 
-        if (getJumpMode(taflman) > 0) {
+        if (getJumpMode(rules, taflman) > 0) {
             canJump = true;
         } else {
             canJump = false;
@@ -332,16 +320,16 @@ public class Taflman {
     }
 
     private static Coord checkJumpDestination(GameState state, char taflman, Coord destination, boolean isStartSpecial) {
-
+        Rules rules = getBoard(state).getRules();
         SpaceType group = getBoard(state).getSpaceTypeFor(destination);
 
         if (getBoard(state).getOccupier(destination) != EMPTY) {
             // Can't jump to an occupied space.
-        } else if (group == SpaceType.NONE && !isStartSpecial && getJumpMode(taflman) == Taflman.JUMP_RESTRICTED) {
+        } else if (group == SpaceType.NONE && !isStartSpecial && getJumpMode(rules, taflman) == Taflman.JUMP_RESTRICTED) {
             // If group is null and start is special and this is a restricted-jump taflman,
             // then we can't jump. If we are able to jump, fall through to standard
             // case.
-        } else if (!getRules().canTaflmanStopOn(getBoard(state), taflman, destination)) {
+        } else if (!rules.canTaflmanStopOn(getBoard(state), taflman, destination)) {
             // If the destination is a special space on which this taflman can't stop,
             // then no jump is possible.
         } else {
@@ -421,6 +409,8 @@ public class Taflman {
 
     // Returns null, or a list of spaces captured
     public static MoveRecord moveTo(GameState state, char taflman, Coord destination, boolean detailed) {
+        Rules rules = getBoard(state).getRules();
+
         boolean wasJump = false;
         boolean wasBerserk = state.getBerserkingTaflman() == taflman;
         List<Coord> captures = new ArrayList<Coord>(4);
@@ -440,7 +430,7 @@ public class Taflman {
             getBoard(state).setOccupier(destination, taflman);
 
             if (capturingMoves.contains(destination)) {
-                if (getJumpMode(taflman) != Taflman.JUMP_NONE && jumps.contains(destination)) {
+                if (getJumpMode(rules, taflman) != Taflman.JUMP_NONE && jumps.contains(destination)) {
                     wasJump = true;
                     int jumpedX = (start.x + destination.x) / 2;
                     int jumpedY = (start.y + destination.y) / 2;
@@ -484,6 +474,8 @@ public class Taflman {
      * @return
      */
     public static boolean isCapturedBy(GameState state, char taflman, char capturer, Coord move, boolean byJump) {
+        Rules rules = getBoard(state).getRules();
+
         // If we're on the same side, don't even worry about it...
         if (Taflman.getPackedSide(capturer) == Taflman.getPackedSide(taflman)) return false;
 
@@ -496,20 +488,20 @@ public class Taflman {
             } else {
                 // Otherwise, we're captured if and only if the capturer
                 // can capture by jumping.
-                return Taflman.getJumpMode(capturer) == Taflman.JUMP_CAPTURE;
+                return Taflman.getJumpMode(rules, capturer) == Taflman.JUMP_CAPTURE;
             }
         }
 
         // If the capturing piece is an unarmed king, don't check anything
         // else.
-        if (Taflman.isKing(capturer) && !getRules().isKingArmed()) {
+        if (Taflman.isKing(capturer) && !rules.isKingArmed()) {
             return false;
         }
 
         boolean isKingStrong = false;
         if(Taflman.isKing(taflman)) {
-            if(getRules().getKingStrengthMode() == Rules.KING_STRONG) isKingStrong = true;
-            else if(getRules().getKingStrengthMode() == Rules.KING_STRONG_CENTER) {
+            if(rules.getKingStrengthMode() == Rules.KING_STRONG) isKingStrong = true;
+            else if(rules.getKingStrengthMode() == Rules.KING_STRONG_CENTER) {
                 Coord current = getCurrentSpace(state, taflman);
                 List<Coord> centerAndAdjacent = getBoard(state).getCenterAndAdjacentSpaces();
 
@@ -538,7 +530,7 @@ public class Taflman {
                 }
             }
 
-            if (Taflman.getSide(capturer).hasCommanders() || Taflman.getSide(capturer).hasKnights()) {
+            if (Taflman.getSide(state, capturer).hasCommanders() || Taflman.getSide(state, capturer).hasKnights()) {
                 // Strong kings can be captured by commander sandwich, or by commander
                 // sandwich against the corners, but not against the throne. If the
                 // other side has commanders or knights, we can't shortcut here.
@@ -585,6 +577,8 @@ public class Taflman {
     }
 
     private static boolean checkSandwichCapture(GameState state, char taflman, char capturer, Coord move, Coord adjacentOne, Coord adjacentTwo) {
+        Rules rules = getBoard(state).getRules();
+
         if ((getBoard(state).isSpaceHostileTo(adjacentOne, taflman) || adjacentOne == move)
                 && (getBoard(state).isSpaceHostileTo(adjacentTwo, taflman) || adjacentTwo == move)) {
 
@@ -605,8 +599,8 @@ public class Taflman {
             }
 
             if (Taflman.isKing(taflman)
-                    && (getRules().getKingStrengthMode() == Rules.KING_STRONG || getRules().getKingStrengthMode() == Rules.KING_STRONG_CENTER)
-                    && (Taflman.getSide(capturer).hasCommanders() || Taflman.getSide(capturer).hasKnights())) {
+                    && (rules.getKingStrengthMode() == Rules.KING_STRONG || rules.getKingStrengthMode() == Rules.KING_STRONG_CENTER)
+                    && (Taflman.getSide(state, capturer).hasCommanders() || Taflman.getSide(state, capturer).hasKnights())) {
                 // If the other side has commanders or knights and this is a strong
                 // king, we need to check for commander/knight sandwich.
                 if (getBoard(state).getSpaceTypeFor(adjacentOne) == SpaceType.CENTER || getBoard(state).getSpaceTypeFor(adjacentTwo) == SpaceType.CENTER) {
@@ -700,10 +694,6 @@ public class Taflman {
      * friendly citadels.
      */
     public static final int JUMP_RESTRICTED = 3;
-
-    public static int getJumpMode(char taflman) {
-        return getJumpMode(getRules(), taflman);
-    }
 
     public static int getJumpMode(Rules r, char taflman) {
         if (isKing(taflman)) return r.getKingJumpMode();

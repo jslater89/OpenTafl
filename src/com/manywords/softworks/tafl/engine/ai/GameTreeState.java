@@ -370,7 +370,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 List<Character> startAdjacent = getBoard().getAdjacentNeighbors(start);
                 boolean taflmanJumpCaptures = false;
                 if (considerJumps) {
-                    if (Taflman.getJumpMode(taflman) == Taflman.JUMP_CAPTURE) {
+                    if (Taflman.getJumpMode(mGame.getRules(), taflman) == Taflman.JUMP_CAPTURE) {
                         taflmanJumpCaptures = true;
                     }
                 }

@@ -73,8 +73,6 @@ public class Game {
         // Create a new state off of the game rules.
         mCurrentState = new GameState(this, mGameRules);
 
-        Taflman.initialize(this, mGameRules);
-
         // Add the starting state to the history.
         mHistory.add(mCurrentState);
 

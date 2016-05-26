@@ -646,7 +646,7 @@ public class RawTerminal implements UiCallback {
                 if (special.contains(space)) {
                     if (highlight != null
                             && highlight.x == i && highlight.y == rank) {
-                        String color = (Taflman.getSide(occupier).isAttackingSide() ? ANSI_RED : ANSI_WHITE);
+                        String color = (Taflman.getSide(board.getState(), occupier).isAttackingSide() ? ANSI_RED : ANSI_WHITE);
                         rowString += "*" + color + "*" + ANSI_BLUE + "*|";
                     } else {
                         rowString += ANSI_BLUE + "***|";
@@ -654,7 +654,7 @@ public class RawTerminal implements UiCallback {
                 } else {
                     if (highlight != null
                             && highlight.x == i && highlight.y == rank) {
-                        String color = (Taflman.getSide(occupier).isAttackingSide() ? ANSI_RED : ANSI_WHITE);
+                        String color = (Taflman.getSide(board.getState(), occupier).isAttackingSide() ? ANSI_RED : ANSI_WHITE);
                         rowString += color + " * " + ANSI_BLUE + "|";
                     } else {
                         rowString += ANSI_BLUE + "   |";
