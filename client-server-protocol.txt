@@ -9,7 +9,8 @@ lobby-chat "player name" message
 get-game-list
     game-list <guid> "rules name" "attacker name" "defender name" password:<true|false> spectators:<num>|...
 
-create-game [attackers|defenders] [OTN rules string]
+create-game <attackers|defenders> <password-hash|open> [OTN rules string]
+
 
 join-game guid [password-hash]
     error game-full

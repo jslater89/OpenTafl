@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.ui.lanterna.component.EnterTerminatedTextBox
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
+import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
 /**
  * Created by jay on 5/23/16.
@@ -35,6 +36,9 @@ public class ChatWindow extends BasicWindow {
         mChatText = new ScrollingLabel();
         p.addComponent(mChatText);
 
+        Label enterTextLabel = new Label("Enter message:");
+        p.addComponent(enterTextLabel);
+
         mChatBox = new EnterTerminatedTextBox(new EnterTerminatedTextBox.TextBoxCallback() {
             @Override
             public void onEnterPressed(String input) {
@@ -47,16 +51,6 @@ public class ChatWindow extends BasicWindow {
             }
         });
         p.addComponent(mChatBox);
-
-        mButtonPanel = new Panel();
-        mButtonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-
-        Button exitButton = new Button("Leave server", () -> {
-            mCallback.changeActiveScreen(new MainMenuScreen());
-        });
-        mButtonPanel.addComponent(exitButton);
-
-        p.addComponent(mButtonPanel);
 
         setComponent(p);
     }
@@ -78,9 +72,8 @@ public class ChatWindow extends BasicWindow {
     public void setSize(TerminalSize size) {
         super.setSize(size);
 
-        mChatText.setPreferredSize(new TerminalSize(size.getColumns(), size.getRows() - 5));
+        mChatText.setPreferredSize(new TerminalSize(size.getColumns(), size.getRows() - 3));
         mChatBox.setPreferredSize(new TerminalSize(size.getColumns(), 1));
-        mButtonPanel.setPreferredSize(new TerminalSize(size.getColumns(), 3));
     }
 
     @Override
