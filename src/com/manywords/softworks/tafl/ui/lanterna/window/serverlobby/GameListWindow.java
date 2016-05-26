@@ -67,10 +67,6 @@ public class GameListWindow extends BasicWindow {
         }
 
         mGameTable.setTableModel(model);
-
-        System.out.println("Rows: " + model.getRowCount());
-        System.out.println("Columns: " + model.getColumnCount());
-        System.out.println("Column labels: " + model.getColumnLabels());
     }
 
     @Override
