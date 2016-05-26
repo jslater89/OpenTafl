@@ -67,14 +67,10 @@ public class FileBackedPlayerDatabase extends PlayerDatabase {
     }
 
     private synchronized void flushDatabaseInternal() {
-        try {
-            PrintWriter pw = new PrintWriter(mDatabase);
-
+        try (PrintWriter pw = new PrintWriter(mDatabase)) {
             for(FilePlayerRecord pr : mPlayerRecords) {
                 pw.println(pr.toString());
             }
-
-            pw.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Failed to write to database file");
         }
@@ -89,9 +85,7 @@ public class FileBackedPlayerDatabase extends PlayerDatabase {
     public synchronized void updateDatabase() {
         mPlayerRecords.clear();
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(mDatabase));
-
+        try (BufferedReader reader = new BufferedReader(new FileReader(mDatabase))) {
             String in;
             while((in = reader.readLine()) != null) {
                 FilePlayerRecord r = new FilePlayerRecord(in);
