@@ -4,6 +4,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialog;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
+import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -55,7 +56,11 @@ public class CreateGameDialog extends DialogWindow {
 
         final Button finishButton = new Button("Create", () -> {
             if(sideChooser.getCheckedItem().equals("Attackers")) attackingSide = true;
-            hashedPassword = String.valueOf(passwordInput.getText().hashCode()); //TODO: implement this
+            hashedPassword = passwordInput.getText();
+            hashedPassword = (hashedPassword.isEmpty() ? "none" : hashedPassword);
+            if(!hashedPassword.equals("none")) {
+                hashedPassword = PasswordHasher.hashPassword("", hashedPassword);
+            }
             canceled = false;
 
             CreateGameDialog.this.close();

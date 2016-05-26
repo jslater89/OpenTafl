@@ -1,17 +1,21 @@
 package com.manywords.softworks.tafl.network.client;
 
+import com.manywords.softworks.tafl.network.packet.CancelGamePacket;
+import com.manywords.softworks.tafl.network.packet.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.LobbyChatPacket;
 import com.manywords.softworks.tafl.network.packet.LoginPacket;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by jay on 5/23/16.
  */
 public class ClientServerConnection {
     public interface ClientServerCallback {
+        public void onStateChanged(State newState);
         public void onChatMessageReceived(String sender, String message);
         public void onSuccessReceived();
         public void onErrorReceived(String message);
@@ -21,6 +25,8 @@ public class ClientServerConnection {
     public enum State {
         DISCONNECTED,
         LOGGED_IN,
+        CREATING_GAME,
+        HOSTING,
     }
 
     private State mCurrentState = State.DISCONNECTED;
@@ -66,6 +72,16 @@ public class ClientServerConnection {
         }
     }
 
+    public void sendCreateGameMessage(CreateGamePacket packet) {
+        setState(State.CREATING_GAME);
+        mServerWriter.println(packet);
+    }
+
+    public void sendCancelGameMessage(UUID uuid) {
+        setState(State.LOGGED_IN);
+        mServerWriter.println(new CancelGamePacket(uuid));
+    }
+
     public void sendRegistrationMessage(String username, String hashedPassword) {
         mServerWriter.println(new LoginPacket(username, hashedPassword));
     }
@@ -97,7 +113,17 @@ public class ClientServerConnection {
         }
     }
 
+    private void setState(State newState) {
+        mCurrentState = newState;
+        mInternalCallback.onStateChanged(newState);
+    }
+
     private class InternalCallback implements ClientServerCallback {
+
+        @Override
+        public void onStateChanged(State newState) {
+            mExternalCallback.onStateChanged(newState);
+        }
 
         @Override
         public void onChatMessageReceived(String sender, String message) {
@@ -106,12 +132,37 @@ public class ClientServerConnection {
 
         @Override
         public void onSuccessReceived() {
-            if(mCurrentState == State.DISCONNECTED) mCurrentState = State.LOGGED_IN;
+            switch(mCurrentState) {
+
+                case DISCONNECTED:
+                    setState(State.LOGGED_IN);
+                    break;
+                case LOGGED_IN:
+                    break;
+                case CREATING_GAME:
+                    setState(State.HOSTING);
+                    break;
+                case HOSTING:
+                    break;
+            }
         }
 
         @Override
         public void onErrorReceived(String message) {
-            if(mCurrentState == State.DISCONNECTED) mExternalCallback.onErrorReceived(message);
+            switch(mCurrentState) {
+
+                case DISCONNECTED:
+                    mExternalCallback.onErrorReceived(message);
+                    break;
+                case LOGGED_IN:
+                    break;
+                case CREATING_GAME:
+                    setState(State.LOGGED_IN);
+                    mExternalCallback.onErrorReceived(message);
+                    break;
+                case HOSTING:
+                    break;
+            }
         }
 
         @Override

@@ -48,6 +48,10 @@ public class PriorityTaskQueue {
         }
     }
 
+    public void pushTask(Runnable task) {
+        pushTask(task, Priority.STANDARD);
+    }
+
     public void pushTask(Runnable task, Priority priority) {
         switch(priority) {
 

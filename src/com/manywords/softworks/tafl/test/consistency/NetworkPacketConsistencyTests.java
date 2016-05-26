@@ -1,10 +1,11 @@
 package com.manywords.softworks.tafl.test.consistency;
 
 import com.manywords.softworks.tafl.network.NetworkDummyDataGenerator;
-import com.manywords.softworks.tafl.network.packet.GameListPacket;
-import com.manywords.softworks.tafl.network.packet.LobbyChatPacket;
-import com.manywords.softworks.tafl.network.packet.LoginPacket;
+import com.manywords.softworks.tafl.network.packet.*;
+import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.test.TaflTest;
+
+import java.util.UUID;
 
 /**
  * Created by jay on 5/25/16.
@@ -33,6 +34,22 @@ public class NetworkPacketConsistencyTests extends TaflTest {
 
         lp = LoginPacket.parse(first);
         second = lp.toString();
+
+        assert first.equals(second);
+
+        CreateGamePacket cgp = new CreateGamePacket(UUID.randomUUID(), true, "hashypasswordy", Brandub.newBrandub7().getOTRString());
+        first = cgp.toString();
+
+        cgp = CreateGamePacket.parse(first);
+        second = cgp.toString();
+
+        assert first.equals(second);
+
+        CancelGamePacket canp = new CancelGamePacket(UUID.randomUUID());
+        first = canp.toString();
+
+        canp = CancelGamePacket.parse(first);
+        second = canp.toString();
 
         assert first.equals(second);
     }

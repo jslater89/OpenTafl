@@ -9,22 +9,29 @@ lobby-chat "player name" message
 get-game-list
     game-list <guid> "rules name" "attacker name" "defender name" password:<true|false> spectators:<num>|...
 
-create-game <attackers|defenders> <password-hash|open> [OTN rules string]
+##### GAMES AND GAME LIFECYCLE #####
+A game is created with create-game, and is in the first stage of its lifecycle: present on the server, but not running.
 
+Once both clients send the 'ready' command to the server, the server will begin the game and start the clock. The game
+is now running, as indicated by the server sending start-game.
+
+Once the game ends by win, defeat, or draw, the server will send an end-game message. The game is now in the post-game
+state, where history can be viewed, and the game can be saved.
+
+When a client who is an active participant in the game leaves at any time, for any reason, the client shold send
+the cancel-game message.. If a second client remains, the server also ends the game. When all clients who are active
+participants have sent cancel-game, the server removes the game.
+
+create-game <guid> <attackers|defenders> <password-hash|open> <OTN rules string>
+    error already-hosting
 
 join-game guid [password-hash]
     error game-full
-    error waiting-for-other-game
+    error already-hosting
     error invalid-password
     success
 
     On success, NetworkServer has a Game, ServerClient has a Game, and the client sees himself hosting.
-
-cancel-game guid
-    error not-in-game
-    success
-
-    Cancel Game should be a button in the server lobby interface.
 
 ready-for-game
     error waiting-for-opponent
@@ -37,6 +44,17 @@ start-game
 
     Server sends to clients to notify game start. Clients open a game interface with one LocalHuman and one
     NetworkPlayer.
+
+end-game
+
+cancel-game guid
+    error not-in-game
+    success
+
+    Cancel Game should be a button in the server lobby interface.
+
+
+
 
 kibbitz-game guid
     error invalid-password
@@ -52,3 +70,7 @@ game-chat "player name" message
 kibbitz-chat "player name" message
 
     Kibbitz chat is only visible to spectators. Spectators send kibbitz chat messages.
+
+error
+    error game-canceled
+        The current game has been terminated by the server: one party has disconnected.

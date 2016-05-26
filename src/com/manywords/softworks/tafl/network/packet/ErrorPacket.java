@@ -5,6 +5,8 @@ package com.manywords.softworks.tafl.network.packet;
  */
 public class ErrorPacket extends NetworkPacket {
     public static final String LOGIN_FAILED = "invalid-login";
+    public static final String ALREADY_HOSTING = "already-hosting";
+    public static final String GAME_CANCELED = "game-canceled";
 
     public final String error;
 

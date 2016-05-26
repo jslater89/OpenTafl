@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.network.packet.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.HandleClientCommunicationTask;
 import com.manywords.softworks.tafl.network.server.task.interval.GameListUpdateTask;
@@ -57,6 +58,23 @@ public class ServerClient {
             System.err.println("Failed to connect to client!");
             mServer.onDisconnect(this);
         }
+    }
+
+    public ServerGame getGame() {
+        return mGame;
+    }
+
+    public void setGame(ServerGame game, GameRole role) {
+        mGame = game;
+        mGameRole = role;
+
+        if(mGame == null) {
+            writePacket(new ErrorPacket(ErrorPacket.GAME_CANCELED));
+        }
+    }
+
+    public GameRole getGameRole() {
+        return mGameRole;
     }
 
     public String getUsername() {

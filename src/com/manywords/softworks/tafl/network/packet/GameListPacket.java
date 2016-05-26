@@ -42,9 +42,9 @@ public class GameListPacket extends NetworkPacket {
 
         for(ServerGame g : serverGames) {
             String uuidString = g.uuid.toString();
-            String rulesName = g.getGame().getRules().getName();
-            String attackerUsername = g.getAttackerClient().getUsername();
-            String defenderUsername = g.getDefenderClient().getUsername();
+            String rulesName = g.getGame().getRules().getName() + " " + g.getGame().getRules().getBoard().getBoardDimension() + "x" + g.getGame().getRules().getBoard().getBoardDimension();
+            String attackerUsername = g.getAttackerClient() == null ? "<none>" :g.getAttackerClient().getUsername();
+            String defenderUsername = g.getDefenderClient() == null ? "<none>" :g.getDefenderClient().getUsername();
             boolean password = g.isPassworded();
             int spectators = g.getSpectators().size();
 

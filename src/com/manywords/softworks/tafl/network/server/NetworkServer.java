@@ -1,23 +1,19 @@
 package com.manywords.softworks.tafl.network.server;
 
-import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.SendPacketTask;
 import com.manywords.softworks.tafl.network.server.task.interval.BucketedIntervalTaskHolder;
 import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
-import com.manywords.softworks.tafl.network.server.thread.ServerThread;
 import com.manywords.softworks.tafl.network.server.thread.ServerTickThread;
-import com.manywords.softworks.tafl.rules.brandub.Brandub;
-import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
-import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
-import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
+import com.manywords.softworks.tafl.rules.Rules;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The main class for the OpenTafl server. Handles starting up things and initial reception of network packets.
@@ -55,7 +51,7 @@ public class NetworkServer {
 
         mTickThread = new ServerTickThread();
 
-        mGameListUpdateTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 30, PriorityTaskQueue.Priority.LOW);
+        mGameListUpdateTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 2, PriorityTaskQueue.Priority.LOW);
         mGameClockTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 5, PriorityTaskQueue.Priority.HIGH);
 
         mTickThread.addTaskHolder(mGameListUpdateTasks);
@@ -117,15 +113,74 @@ public class NetworkServer {
         }
     }
 
+    public ServerGame getGame(UUID gameUUID) {
+        ServerGame g = null;
+
+        synchronized (mGames) {
+            for(ServerGame game : mGames) {
+                if(game.uuid.equals(gameUUID)) {
+                    g = game;
+                    break;
+                }
+            }
+        }
+
+        return g;
+    }
+
+    public boolean createGame(ServerClient client, UUID gameUUID, String passwordHash, Rules rules, boolean attackingSide) {
+        if(client.getGame() != null) {
+            return false;
+        }
+
+        ServerGame g = new ServerGame(this, gameUUID);
+        g.setRules(rules);
+        if(!passwordHash.equals("none")) {
+            g.setPassword(passwordHash);
+        }
+
+        if(attackingSide) {
+            g.setAttackerClient(client);
+        }
+        else {
+            g.setDefenderClient(client);
+        }
+
+        synchronized (mGames) {
+            mGames.add(g);
+        }
+
+        return true;
+    }
+
+    /**
+     * Called not when the actual game is done, but when both clients have exited the game.
+     * @return
+     */
+    public void removeGame(ServerGame g) {
+        synchronized (mGames) {
+            mGames.remove(g);
+        }
+
+        g.shutdown();
+    }
+
     public void onDisconnect(ServerClient c) {
         synchronized (mClients) {
             mClients.remove(c);
-            clientExitingLobby(c);
         }
+
+        // If a party to the game leaves the server, stop the game.
+        if(c.getGame() != null && (c.getGameRole() == ServerClient.GameRole.ATTACKER || c.getGameRole() == ServerClient.GameRole.DEFENDER)) {
+            removeGame(c.getGame());
+        }
+        clientExitingLobby(c);
     }
 
     private void clientEnteringLobby(ServerClient c) {
-        mLobbyClients.add(c);
+        synchronized (mLobbyClients) {
+            mLobbyClients.add(c);
+        }
 
         for(IntervalTask t : c.getLobbyTasks()) {
             mGameListUpdateTasks.addBucketTask(t);
@@ -133,7 +188,9 @@ public class NetworkServer {
     }
 
     private void clientExitingLobby(ServerClient c) {
-        mLobbyClients.remove(c);
+        synchronized (mLobbyClients) {
+            mLobbyClients.remove(c);
+        }
 
         for(IntervalTask t : c.getLobbyTasks()) {
             mGameListUpdateTasks.removeBucketTask(t);
@@ -143,7 +200,8 @@ public class NetworkServer {
     private void addClient(ServerClient c) {
         synchronized (mClients) {
             mClients.add(c);
-            clientEnteringLobby(c);
         }
+
+        clientEnteringLobby(c);
     }
 }

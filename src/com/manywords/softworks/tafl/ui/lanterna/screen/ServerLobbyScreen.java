@@ -12,6 +12,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.network.client.ClientGameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
+import com.manywords.softworks.tafl.network.packet.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.ErrorPacket;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
@@ -25,6 +26,7 @@ import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameListWindo
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ServerLoginDialog;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by jay on 5/23/16.
@@ -35,6 +37,8 @@ public class ServerLobbyScreen extends LogicalScreen {
     private GameListWindow mGameList;
     private GameDetailWindow mGameDetail;
     private ChatWindow mChatWindow;
+
+    protected ServerLobbyTerminalCallback mTerminalCallback;
 
     private int mFocusedWindow = 0;
     private static final int FOCUS_LIST = 0;
@@ -83,9 +87,9 @@ public class ServerLobbyScreen extends LogicalScreen {
     }
 
     private void createWindows() {
-        mGameList = new GameListWindow(mTerminalCallback, (ServerLobbyTerminalCallback) mTerminalCallback);
-        mGameDetail = new GameDetailWindow(mTerminalCallback);
-        mChatWindow = new ChatWindow(mTerminalCallback, (ServerLobbyTerminalCallback) mTerminalCallback);
+        mGameList = new GameListWindow(mTerminalCallback, mTerminalCallback);
+        mGameDetail = new GameDetailWindow(mTerminalCallback, mTerminalCallback);
+        mChatWindow = new ChatWindow(mTerminalCallback, mTerminalCallback);
     }
 
     private void addWindows() {
@@ -185,7 +189,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         leaveUi();
     }
 
-    private class ServerLobbyTerminalCallback extends DefaultTerminalCallback implements ChatWindow.ChatWindowHost, GameListWindow.GameListWindowHost {
+    private class ServerLobbyTerminalCallback extends DefaultTerminalCallback implements ChatWindow.ChatWindowHost, GameListWindow.GameListWindowHost, GameDetailWindow.GameDetailHost {
         @Override
         public boolean handleKeyStroke(KeyStroke key) {
             if(key.getKeyType() == KeyType.Tab) {
@@ -213,9 +217,24 @@ public class ServerLobbyScreen extends LogicalScreen {
         public void requestGameUpdate() {
             mConnection.requestGameUpdate();
         }
+
+        @Override
+        public void createGame(CreateGamePacket packet) {
+            mConnection.sendCreateGameMessage(packet);
+        }
+
+        @Override
+        public void cancelGame(UUID uuid) {
+            mConnection.sendCancelGameMessage(uuid);
+        }
     }
 
     private class ClientServerCallback implements ClientServerConnection.ClientServerCallback {
+
+        @Override
+        public void onStateChanged(ClientServerConnection.State newState) {
+            if(mGameDetail != null) mGameDetail.onConnectionStateChanged(newState);
+        }
 
         @Override
         public void onChatMessageReceived(String sender, String message) {
@@ -229,9 +248,6 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void onErrorReceived(String message) {
-            System.out.println(message);
-            System.out.println(ErrorPacket.LOGIN_FAILED);
-            System.out.println(message.equals(ErrorPacket.LOGIN_FAILED));
             if(message.equals(ErrorPacket.LOGIN_FAILED)) {
                 MessageDialogBuilder b = new MessageDialogBuilder();
                 b.setTitle("Login failed");

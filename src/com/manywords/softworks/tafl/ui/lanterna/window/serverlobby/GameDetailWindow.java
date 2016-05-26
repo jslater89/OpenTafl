@@ -3,56 +3,121 @@ package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.manywords.softworks.tafl.network.client.ClientServerConnection;
+import com.manywords.softworks.tafl.network.packet.CreateGamePacket;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
+
+import java.util.UUID;
 
 /**
  * Created by jay on 5/23/16.
  */
 public class GameDetailWindow extends BasicWindow {
+    public interface GameDetailHost {
+        public void createGame(CreateGamePacket packet);
+        public void cancelGame(UUID uuid);
+    }
     LogicalScreen.TerminalCallback mCallback;
-    private Panel mButtonPanel;
+    private GameDetailHost mHost;
 
-    public GameDetailWindow(LogicalScreen.TerminalCallback terminalCallback) {
+    private Panel mButtonPanel;
+    private GameCreateButton mGameCreationButton;
+    private GameCreateButtonAction mGameCreationButtonAction;
+
+    private CreateGamePacket mCreatePacket;
+
+    public GameDetailWindow(LogicalScreen.TerminalCallback terminalCallback, GameDetailHost host) {
         super("Game Details");
 
         mCallback = terminalCallback;
+        mHost = host;
 
         Panel p = new Panel();
 
         mButtonPanel = new Panel();
         mButtonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
-        Button gameCreationButton = new Button("Create game", () -> {
-            CreateGameDialog d = new CreateGameDialog("Create game");
-            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
-            d.showDialog(getTextGUI());
-
-            if(!d.canceled) {
-                System.out.println(d.rules.getName());
-                System.out.println(d.rules.getOTRString());
-
-                System.out.println(d.attackingSide);
-                System.out.println(d.hashedPassword);
-            }
-            else {
-                System.out.println("Canceled");
-            }
-
-            getTextGUI().setActiveWindow(this);
-        });
+        mGameCreationButtonAction = new GameCreateButtonAction();
+        mGameCreationButton = new GameCreateButton("Create game", mGameCreationButtonAction);
+        mGameCreationButtonAction.setButton(mGameCreationButton);
 
         Button exitButton = new Button("Leave server", () -> {
             mCallback.changeActiveScreen(new MainMenuScreen());
         });
-        mButtonPanel.addComponent(gameCreationButton);
+        mButtonPanel.addComponent(mGameCreationButton);
         mButtonPanel.addComponent(exitButton);
 
         p.addComponent(mButtonPanel);
 
-
         setComponent(p);
+    }
+
+    private class GameCreateButton extends Button {
+        private boolean creating = true;
+
+        public boolean isCreating() { return creating; }
+        public boolean isCanceling() { return !creating; }
+
+        public void setMode(boolean creating) {
+            this.creating = creating;
+
+            if(creating) {
+                setLabel("Create game");
+            }
+            else {
+                setLabel("Cancel game");
+            }
+        }
+
+        public GameCreateButton(String label, Runnable action) {
+            super(label, action);
+        }
+    }
+
+    private class GameCreateButtonAction implements Runnable {
+        private GameCreateButton mButton;
+
+        public void setButton(GameCreateButton button) {
+            mButton = button;
+        }
+
+        @Override
+        public void run() {
+            if(mButton.isCreating()) {
+                CreateGameDialog d = new CreateGameDialog("Create game");
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+                d.showDialog(getTextGUI());
+
+                if (!d.canceled) {
+                    if(d.hashedPassword.equals("")) d.hashedPassword = "none";
+                    mCreatePacket = new CreateGamePacket(UUID.randomUUID(), d.attackingSide, d.hashedPassword, d.rules.getOTRString());
+                    mHost.createGame(mCreatePacket);
+                }
+                else {
+                    System.out.println("Canceled");
+                }
+            }
+            else if(mButton.isCanceling()) {
+                if(mCreatePacket != null) {
+                    mHost.cancelGame(mCreatePacket.uuid);
+                }
+            }
+
+            getTextGUI().setActiveWindow(GameDetailWindow.this);
+
+        }
+    }
+
+    public void onConnectionStateChanged(ClientServerConnection.State state) {
+        if(state == ClientServerConnection.State.HOSTING || state == ClientServerConnection.State.CREATING_GAME) {
+            mGameCreationButton.setMode(false);
+        }
+        else {
+            mGameCreationButton.setMode(true);
+            mCreatePacket = null;
+        }
     }
 
     public void notifyFocus(boolean focused) {
