@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.util.regex.Pattern;
@@ -31,7 +32,7 @@ public class ServerLoginDialog extends DialogWindow {
 
         final Button finishButton = new Button("Login", () -> {
             username = usernameInput.getText();
-            hashedPassword = String.valueOf(passwordInput.getText().hashCode()); //TODO: implement this
+            hashedPassword = PasswordHasher.hashPassword(username, passwordInput.getText());
 
             TerminalSettings.onlinePlayerName = username;
 

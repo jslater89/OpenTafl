@@ -5,7 +5,7 @@ package com.manywords.softworks.tafl.network.packet;
  */
 public class LoginPacket {
     public final String username;
-    private final String hashedPassword;
+    public final String password;
 
     public static LoginPacket parse(String data) {
         String[] firstSplit = data.split("\"");
@@ -16,13 +16,13 @@ public class LoginPacket {
         return new LoginPacket(username, hashedPassword);
     }
 
-    public LoginPacket(String username, String hashedPassword) {
+    public LoginPacket(String username, String password) {
         this.username = username;
-        this.hashedPassword = hashedPassword;
+        this.password = password;
     }
 
     @Override
     public String toString() {
-        return "login \"" + username +"\" " + hashedPassword;
+        return "login \"" + username +"\" " + password;
     }
 }

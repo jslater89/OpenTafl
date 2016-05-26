@@ -6,7 +6,7 @@ import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 /**
  * Created by jay on 5/25/16.
  */
-public abstract class IntervalTaskHolder {
+public class IntervalTaskHolder {
     protected final PriorityTaskQueue queue;
     protected final int interval;
     protected final PriorityTaskQueue.Priority priority;

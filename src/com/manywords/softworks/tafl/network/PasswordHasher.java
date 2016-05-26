@@ -5,13 +5,16 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  * Created by jay on 5/25/16.
  */
 public class PasswordHasher {
     public static String generateSalt() {
-        return "";
+        byte[] salt = new byte[8];
+        new SecureRandom().nextBytes(salt);
+        return Base64.encode(salt);
     }
 
     public static String hashPassword(String salt, String password) {

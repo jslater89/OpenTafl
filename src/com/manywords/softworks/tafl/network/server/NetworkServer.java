@@ -1,6 +1,8 @@
 package com.manywords.softworks.tafl.network.server;
 
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
+import com.manywords.softworks.tafl.network.server.database.PlayerDatabase;
+import com.manywords.softworks.tafl.network.server.database.file.FileBackedPlayerDatabase;
 import com.manywords.softworks.tafl.network.server.task.SendPacketTask;
 import com.manywords.softworks.tafl.network.server.task.interval.BucketedIntervalTaskHolder;
 import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
@@ -8,6 +10,7 @@ import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 import com.manywords.softworks.tafl.network.server.thread.ServerTickThread;
 import com.manywords.softworks.tafl.rules.Rules;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -41,6 +44,8 @@ public class NetworkServer {
     private final List<ServerClient> mLobbyClients;
     private final List<ServerGame> mGames;
 
+    private PlayerDatabase mPlayerDatabase;
+
     private boolean mRunning = true;
 
     public NetworkServer(int threadCount) {
@@ -48,6 +53,9 @@ public class NetworkServer {
         mClients = new ArrayList<>(64);
         mLobbyClients = new ArrayList<>(64);
         mGames = new ArrayList<>(32);
+
+        mPlayerDatabase = new FileBackedPlayerDatabase(this, new File("server", "player.db"));
+        mPlayerDatabase.updateDatabase();
 
         mTickThread = new ServerTickThread();
 
@@ -57,13 +65,15 @@ public class NetworkServer {
         mTickThread.addTaskHolder(mGameListUpdateTasks);
         mTickThread.addTaskHolder(mGameClockTasks);
 
+        mPlayerDatabase.addUpdateTasks(mTickThread, mTaskQueue);
+
         startServer();
     }
 
     public PriorityTaskQueue getTaskQueue() {
         return mTaskQueue;
     }
-    public List<ServerClient> getClients() { return mClients; }
+
     public boolean hasClientNamed(String username) {
         synchronized (mClients) {
             for (ServerClient c : mClients) {
@@ -72,6 +82,10 @@ public class NetworkServer {
         }
 
         return false;
+    }
+
+    public PlayerDatabase getPlayerDatabase() {
+        return mPlayerDatabase;
     }
 
     public void sendPacketToAllClients(NetworkPacket packet, PriorityTaskQueue.Priority priority) {
