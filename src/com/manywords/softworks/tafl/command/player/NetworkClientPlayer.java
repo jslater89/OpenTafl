@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.command.player;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
+import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 
@@ -12,6 +13,17 @@ import com.manywords.softworks.tafl.network.server.NetworkServer;
 public class NetworkClientPlayer extends Player {
     private ClientServerConnection mConnection;
     private PlayerCallback mCallback;
+
+    private GameRole mGameRole;
+
+    public NetworkClientPlayer(ClientServerConnection c) {
+        mConnection = c;
+        mGameRole = c.getGameRole();
+    }
+
+    public GameRole getGameRole() {
+        return mGameRole;
+    }
 
     @Override
     public void getNextMove(UiCallback ui, Game game, int thinkTime) {

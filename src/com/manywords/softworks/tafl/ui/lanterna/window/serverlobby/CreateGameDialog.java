@@ -28,16 +28,16 @@ public class CreateGameDialog extends DialogWindow {
         p.setLayoutManager(new LinearLayout());
 
         final Label rulesLabel = new Label(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
-        final Button rulesButton = new Button("Rules", new Runnable() {
-            @Override
-            public void run() {
-                String[] rulesTextArray = new String[BuiltInVariants.rulesDescriptions.size()];
+        final Button rulesButton = new Button("Rules", () -> {
+            String[] rulesTextArray = new String[BuiltInVariants.rulesDescriptions.size()];
 
-                for(int i = 0; i < rulesTextArray.length; i++) {
-                    rulesTextArray[i] = BuiltInVariants.rulesDescriptions.get(i);
-                }
+            for(int i = 0; i < rulesTextArray.length; i++) {
+                rulesTextArray[i] = BuiltInVariants.rulesDescriptions.get(i);
+            }
 
-                rules = BuiltInVariants.rulesForDescription(ListSelectDialog.showDialog(getTextGUI(), "Rules", "Select a rules variant", rulesTextArray));
+            String rulesDescription = ListSelectDialog.showDialog(getTextGUI(), "Rules", "Select a rules variant", rulesTextArray);
+            if(rulesDescription != null) {
+                rules = BuiltInVariants.rulesForDescription(rulesDescription);
                 rulesLabel.setText(rules.toString());
             }
         });

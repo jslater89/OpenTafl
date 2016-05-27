@@ -19,6 +19,7 @@ public class GameDetailWindow extends BasicWindow {
         public void requestGameUpdate();
         public void createGame(CreateGamePacket packet);
         public void leaveGame();
+        public void disconnect();
     }
     LogicalScreen.TerminalCallback mCallback;
     private GameDetailHost mHost;
@@ -47,6 +48,7 @@ public class GameDetailWindow extends BasicWindow {
         Button refreshButton = new Button("Refresh list", () -> mHost.requestGameUpdate());
 
         Button exitButton = new Button("Leave server", () -> {
+            mHost.disconnect();
             mCallback.changeActiveScreen(new MainMenuScreen());
         });
         mButtonPanel.addComponent(mGameCreationButton);

@@ -16,12 +16,6 @@ import java.util.List;
  * Created by jay on 5/22/16.
  */
 public class ServerClient {
-    public enum GameRole {
-        ATTACKER,
-        DEFENDER,
-        KIBBITZER,
-        OUT_OF_GAME,
-    }
     private NetworkServer mServer;
     private Socket mClientSocket;
 

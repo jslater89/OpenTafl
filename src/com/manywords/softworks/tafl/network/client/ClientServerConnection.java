@@ -1,9 +1,14 @@
 package com.manywords.softworks.tafl.network.client;
 
+import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
+import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
+import com.manywords.softworks.tafl.network.server.GameRole;
+import com.manywords.softworks.tafl.rules.Rules;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -17,10 +22,11 @@ public class ClientServerConnection {
     public interface ClientServerCallback {
         public void onStateChanged(State newState);
         public void onChatMessageReceived(String sender, String message);
-        public void onSuccessReceived();
+        public void onSuccessReceived(String message);
         public void onErrorReceived(String message);
         public void onGameListReceived(List<ClientGameInformation> games);
         public void onDisconnect(boolean planned);
+        public void onStartGame(Rules r);
     }
 
     public enum State {
@@ -43,6 +49,7 @@ public class ClientServerConnection {
     private Thread mReadThread;
 
     private UUID mServerGameUUID;
+    private GameRole mGameRole = GameRole.OUT_OF_GAME;
 
     private boolean mPlannedDisconnect = false;
 
@@ -52,6 +59,10 @@ public class ClientServerConnection {
     public ClientServerConnection(String hostname, int port, ClientServerCallback callback) {
         this.hostname = hostname;
         this.port = port;
+        mExternalCallback = callback;
+    }
+
+    public void setCallback(ClientServerCallback callback) {
         mExternalCallback = callback;
     }
 
@@ -82,6 +93,18 @@ public class ClientServerConnection {
         }
     }
 
+    public NetworkClientPlayer getNetworkPlayer() {
+        return new NetworkClientPlayer(this);
+    }
+
+    public State getCurrentState() {
+        return mCurrentState;
+    }
+
+    public GameRole getGameRole() {
+        return mGameRole;
+    }
+
     public void sendCreateGameMessage(CreateGamePacket packet) {
         setState(State.CREATING_GAME);
         mServerGameUUID = packet.uuid;
@@ -92,7 +115,7 @@ public class ClientServerConnection {
         if(mServerGameUUID != null) {
             mServerWriter.println(new LeaveGamePacket(mServerGameUUID));
         }
-        if(mCurrentState != State.LOGGED_IN) {
+        if(mCurrentState != State.DISCONNECTED && mCurrentState != State.LOGGED_IN) {
             setState(State.LOGGED_IN);
         }
     }
@@ -133,8 +156,14 @@ public class ClientServerConnection {
                     BufferedReader in = new BufferedReader(new InputStreamReader(mServer.getInputStream()));
             ) {
                 while((inputData = in.readLine()) != null) {
-                    System.out.println("Client received: " + inputData);
-                    ClientCommandParser.handlePacket(mInternalCallback, inputData);
+                    try {
+                        System.out.println("Client received: " + inputData);
+                        ClientCommandParser.handlePacket(mInternalCallback, inputData);
+                    }
+                    catch(Exception e) {
+                        System.out.println("Encountered exception reading from server: ");
+                        e.printStackTrace(System.out);
+                    }
                 }
             }
             catch(IOException e) {
@@ -171,7 +200,7 @@ public class ClientServerConnection {
         }
 
         @Override
-        public void onSuccessReceived() {
+        public void onSuccessReceived(String message) {
             switch(mCurrentState) {
 
                 case DISCONNECTED:
@@ -181,6 +210,12 @@ public class ClientServerConnection {
                     break;
                 case JOINING_GAME:
                 case CREATING_GAME:
+                    if(message.equals(SuccessPacket.JOINED_ATTACKERS)) {
+                        mGameRole = GameRole.ATTACKER;
+                    }
+                    else if(message.equals(SuccessPacket.JOINED_DEFENDERS)) {
+                        mGameRole = GameRole.DEFENDER;
+                    }
                     setState(State.IN_PREGAME);
                     break;
                 case IN_PREGAME:
@@ -219,6 +254,12 @@ public class ClientServerConnection {
         @Override
         public void onDisconnect(boolean planned) {
 
+        }
+
+        @Override
+        public void onStartGame(Rules r) {
+            setState(State.IN_GAME);
+            mExternalCallback.onStartGame(r);
         }
     }
 }

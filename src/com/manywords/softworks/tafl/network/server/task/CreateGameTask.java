@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.network.server.task;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
+import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
@@ -27,7 +28,10 @@ public class CreateGameTask implements Runnable {
         boolean result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide);
 
         if(result) {
-            mServer.sendPacketToClient(mClient, new SuccessPacket(), PriorityTaskQueue.Priority.STANDARD);
+            mServer.sendPacketToClient(
+                    mClient,
+                    new SuccessPacket(mClient.getGameRole() == GameRole.ATTACKER ? SuccessPacket.JOINED_ATTACKERS : SuccessPacket.JOINED_DEFENDERS),
+                    PriorityTaskQueue.Priority.STANDARD);
         }
         else {
             mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.ALREADY_HOSTING), PriorityTaskQueue.Priority.LOW);

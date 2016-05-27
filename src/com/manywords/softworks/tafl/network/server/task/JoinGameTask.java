@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.network.server.task;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
+import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.network.server.ServerGame;
@@ -40,7 +41,10 @@ public class JoinGameTask implements Runnable {
                 mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.GAME_FULL), PriorityTaskQueue.Priority.LOW);
             }
             else {
-                mServer.sendPacketToClient(mClient, new SuccessPacket(), PriorityTaskQueue.Priority.LOW);
+                mServer.sendPacketToClient(
+                        mClient,
+                        new SuccessPacket(mClient.getGameRole() == GameRole.ATTACKER ? SuccessPacket.JOINED_ATTACKERS : SuccessPacket.JOINED_DEFENDERS),
+                        PriorityTaskQueue.Priority.STANDARD);
             }
         }
         else {

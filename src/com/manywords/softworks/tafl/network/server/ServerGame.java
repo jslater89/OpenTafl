@@ -120,10 +120,10 @@ public class ServerGame {
 
     private synchronized void setAttackerClient(ServerClient attackerClient) {
         if(attackerClient == null) {
-            mAttackerClient.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
+            mAttackerClient.setGame(null, GameRole.OUT_OF_GAME);
         }
         else {
-            attackerClient.setGame(this, ServerClient.GameRole.ATTACKER);
+            attackerClient.setGame(this, GameRole.ATTACKER);
             mAttackerPlayer.setClient(attackerClient);
         }
 
@@ -132,10 +132,10 @@ public class ServerGame {
 
     private synchronized void setDefenderClient(ServerClient defenderClient) {
         if(defenderClient == null) {
-            mDefenderClient.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
+            mDefenderClient.setGame(null, GameRole.OUT_OF_GAME);
         }
         else {
-            defenderClient.setGame(this, ServerClient.GameRole.DEFENDER);
+            defenderClient.setGame(this, GameRole.DEFENDER);
             mDefenderPlayer.setClient(defenderClient);
         }
 
@@ -146,14 +146,14 @@ public class ServerGame {
         synchronized (mSpectators) {
             mSpectators.add(client);
         }
-        client.setGame(this, ServerClient.GameRole.KIBBITZER);
+        client.setGame(this, GameRole.KIBBITZER);
     }
 
     public void removeSpectator(ServerClient client) {
         synchronized (mSpectators) {
             mSpectators.remove(client);
         }
-        client.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
+        client.setGame(null, GameRole.OUT_OF_GAME);
     }
 
     public void removeClient(ServerClient client) {
@@ -173,11 +173,11 @@ public class ServerGame {
     }
 
     public void shutdown() {
-        if(mAttackerClient != null) mAttackerClient.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
-        if(mDefenderClient != null) mDefenderClient.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
+        if(mAttackerClient != null) mAttackerClient.setGame(null, GameRole.OUT_OF_GAME);
+        if(mDefenderClient != null) mDefenderClient.setGame(null, GameRole.OUT_OF_GAME);
 
         for(ServerClient c : mSpectators) {
-            c.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
+            c.setGame(null, GameRole.OUT_OF_GAME);
         }
     }
 

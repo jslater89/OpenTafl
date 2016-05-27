@@ -1,8 +1,10 @@
 package com.manywords.softworks.tafl.network.client;
 
+import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.GameListPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.LobbyChatPacket;
+import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
 
 /**
  * Created by jay on 5/23/16.
@@ -18,11 +20,16 @@ public class ClientCommandParser {
             callback.onErrorReceived(packet.error);
         }
         else if(data.startsWith("success")) {
-            callback.onSuccessReceived();
+            SuccessPacket packet = SuccessPacket.parse(data);
+            callback.onSuccessReceived(packet.message);
         }
         else if(data.startsWith("game-list")) {
             GameListPacket packet = GameListPacket.parse(data);
             callback.onGameListReceived(packet.games);
+        }
+        else if(data.startsWith("start-game")) {
+            StartGamePacket packet = StartGamePacket.parse(data);
+            callback.onStartGame(packet.rules);
         }
     }
 }

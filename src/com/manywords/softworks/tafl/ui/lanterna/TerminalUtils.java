@@ -3,10 +3,13 @@ package com.manywords.softworks.tafl.ui.lanterna;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
+import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.lanterna.screen.GameScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -47,6 +50,28 @@ public class TerminalUtils {
 
         // Blocks here
         GameScreen gameScreen = new GameScreen(g, BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        callback.changeActiveScreen(gameScreen);
+        return g;
+    }
+
+    public static Game startNetworkGame(
+            WindowBasedTextGUI gui,
+            LogicalScreen.TerminalCallback callback,
+            ClientServerConnection connection,
+            Rules rules,
+            GameClock.TimeSpec timeSpec) {
+        // Terminal settings: local network player. For now, though...
+
+        Game g;
+        if(timeSpec == null || timeSpec.mainTime == 0 && (timeSpec.overtimeTime == 0 || timeSpec.overtimeCount == 0)) {
+            g = new Game(rules, callback.getUiCallback());
+        }
+        else {
+            g = new Game(rules, callback.getUiCallback(), timeSpec);
+        }
+
+        GameScreen gameScreen = new GameScreen(g, rules.toString());
+        gameScreen.setServerConnection(connection);
         callback.changeActiveScreen(gameScreen);
         return g;
     }

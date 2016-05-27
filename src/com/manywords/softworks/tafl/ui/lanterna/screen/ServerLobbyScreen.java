@@ -14,6 +14,7 @@ import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
+import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -24,7 +25,6 @@ import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameListWindo
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ServerLoginDialog;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by jay on 5/23/16.
@@ -46,8 +46,13 @@ public class ServerLobbyScreen extends LogicalScreen {
     private static final int FOCUS_BACKWARD = 4;
 
 
-    public ServerLobbyScreen(String hostname, int port) {
+    public ServerLobbyScreen() {
         mConnection = new ClientServerConnection(TerminalSettings.onlineServerHost, TerminalSettings.onlineServerPort, new ClientServerCallback());
+    }
+
+    public ServerLobbyScreen(ClientServerConnection connection) {
+        mConnection = connection;
+        mConnection.setCallback(new ClientServerCallback());
     }
 
     @Override
@@ -59,26 +64,32 @@ public class ServerLobbyScreen extends LogicalScreen {
         createWindows();
         layoutWindows(mGui.getScreen().getTerminalSize());
 
-        ServerLoginDialog dialog = new ServerLoginDialog("Login to server " + TerminalSettings.onlineServerHost + ":" + TerminalSettings.onlineServerPort);
-        dialog.setHints(TerminalThemeConstants.CENTERED_MODAL);
-        dialog.showDialog(mGui);
 
-        if(dialog.canceled || dialog.username.equals("") || dialog.hashedPassword.equals("")) {
-            if(!dialog.canceled) {
+        if(mConnection.getCurrentState() == ClientServerConnection.State.DISCONNECTED) {
+            ServerLoginDialog dialog = new ServerLoginDialog("Login to server " + TerminalSettings.onlineServerHost + ":" + TerminalSettings.onlineServerPort);
+            dialog.setHints(TerminalThemeConstants.CENTERED_MODAL);
+            dialog.showDialog(mGui);
+
+            if (dialog.canceled || dialog.username.equals("") || dialog.hashedPassword.equals("")) {
+                if (!dialog.canceled) {
+                    MessageDialogBuilder b = new MessageDialogBuilder();
+                    MessageDialog d = b.setTitle("Login failed").setText("No credentials entered.").addButton(MessageDialogButton.OK).build();
+                    d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+                    d.showDialog(mGui);
+                }
+                mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+            }
+            else if (!mConnection.connect(dialog.username, dialog.hashedPassword)) {
                 MessageDialogBuilder b = new MessageDialogBuilder();
-                MessageDialog d = b.setTitle("Login failed").setText("No credentials entered.").addButton(MessageDialogButton.OK).build();
+                MessageDialog d = b.setTitle("Connection failed").setText("Server connection failed.").addButton(MessageDialogButton.OK).build();
                 d.setHints(TerminalThemeConstants.CENTERED_MODAL);
                 d.showDialog(mGui);
-            }
-            mTerminalCallback.changeActiveScreen(new MainMenuScreen());
-        }
-        else if(!mConnection.connect(dialog.username, dialog.hashedPassword)) {
-            MessageDialogBuilder b = new MessageDialogBuilder();
-            MessageDialog d = b.setTitle("Connection failed").setText("Server connection failed.").addButton(MessageDialogButton.OK).build();
-            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
-            d.showDialog(mGui);
 
-            mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+                mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+            }
+            else {
+                addWindows();
+            }
         }
         else {
             addWindows();
@@ -133,7 +144,6 @@ public class ServerLobbyScreen extends LogicalScreen {
     }
 
     private void leaveUi() {
-        mConnection.disconnect();
         removeWindows();
     }
 
@@ -230,6 +240,11 @@ public class ServerLobbyScreen extends LogicalScreen {
         public void leaveGame() {
             mConnection.sendLeaveGameMessage();
         }
+
+        @Override
+        public void disconnect() {
+            mConnection.disconnect();
+        }
     }
 
     private class ClientServerCallback implements ClientServerConnection.ClientServerCallback {
@@ -245,7 +260,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         }
 
         @Override
-        public void onSuccessReceived() {
+        public void onSuccessReceived(String message) {
 
         }
 
@@ -283,7 +298,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void onGameListReceived(List<ClientGameInformation> games) {
-            mGameList.updateGameList(games);
+            if(mGameList != null) mGameList.updateGameList(games);
         }
 
         @Override
@@ -302,6 +317,11 @@ public class ServerLobbyScreen extends LogicalScreen {
                     mTerminalCallback.changeActiveScreen(new MainMenuScreen());
                 });
             }
+        }
+
+        @Override
+        public void onStartGame(Rules r) {
+            TerminalUtils.runOnUiThread(mGui, () -> TerminalUtils.startNetworkGame(mGui, mTerminalCallback, mConnection, r, null));
         }
     }
 }

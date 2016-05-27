@@ -10,7 +10,7 @@ import com.manywords.softworks.tafl.rules.Rules;
 public class StartGamePacket extends NetworkPacket {
     public final Rules rules;
 
-    public StartGamePacket parse(String data) {
+    public static StartGamePacket parse(String data) {
         Rules r = RulesSerializer.loadRulesRecord(data.replaceFirst("start-game", "").trim());
 
         return new StartGamePacket(r);

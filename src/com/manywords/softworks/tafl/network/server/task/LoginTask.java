@@ -26,7 +26,7 @@ public class LoginTask implements Runnable {
         // if login good
         if (server.getPlayerDatabase().allowLoginFor(packet.username, packet.password)) {
             client.onRegistered(packet.username);
-            server.sendPacketToClient(client, new SuccessPacket(), PriorityTaskQueue.Priority.LOW);
+            server.sendPacketToClient(client, new SuccessPacket(SuccessPacket.LOGGED_IN), PriorityTaskQueue.Priority.LOW);
         }
         else {
             server.sendPacketToClient(client, new ErrorPacket(ErrorPacket.LOGIN_FAILED), PriorityTaskQueue.Priority.LOW);

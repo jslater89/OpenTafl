@@ -23,7 +23,13 @@ public class ServerThread extends Thread {
         // us to do.
         while(mRunning) {
             while ((task = mQueue.getTask()) != null) {
-                task.run();
+                try {
+                    task.run();
+                }
+                catch(Exception e) {
+                    System.out.println("Encountered exception reading from client: ");
+                    e.printStackTrace(System.out);
+                }
             }
 
             waitForTask();

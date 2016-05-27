@@ -42,7 +42,9 @@ public class ChatWindow extends BasicWindow {
         mChatBox = new EnterTerminatedTextBox(new EnterTerminatedTextBox.TextBoxCallback() {
             @Override
             public void onEnterPressed(String input) {
-                mHost.sendChatMessage(input);
+                if(!input.trim().isEmpty()) {
+                    mHost.sendChatMessage(input);
+                }
             }
 
             @Override
@@ -65,7 +67,9 @@ public class ChatWindow extends BasicWindow {
     }
 
     public void onChatMessageReceived(String sender, String message) {
-        mChatText.addLine(sender + ": " + message);
+        if(!message.trim().isEmpty()) {
+            mChatText.addLine(sender + ": " + message);
+        }
     }
 
     @Override
