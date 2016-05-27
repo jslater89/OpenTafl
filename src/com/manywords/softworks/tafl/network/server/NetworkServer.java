@@ -142,22 +142,22 @@ public class NetworkServer {
         return g;
     }
 
-    public boolean createGame(ServerClient client, UUID gameUUID, String passwordHash, Rules rules, boolean attackingSide) {
+    public boolean createGame(ServerClient client, UUID gameUUID, String password, Rules rules, boolean attackingSide) {
         if(client.getGame() != null) {
             return false;
         }
 
         ServerGame g = new ServerGame(this, gameUUID);
         g.setRules(rules);
-        if(!passwordHash.equals("none")) {
-            g.setPassword(passwordHash);
+        if(!password.equals("none")) {
+            g.setPassword(password);
         }
 
         if(attackingSide) {
-            g.setAttackerClient(client);
+            g.tryJoinGame(client, password, true, false);
         }
         else {
-            g.setDefenderClient(client);
+            g.tryJoinGame(client, password, false, true);
         }
 
         synchronized (mGames) {
@@ -165,6 +165,14 @@ public class NetworkServer {
         }
 
         return true;
+    }
+
+    public void startGame(ServerGame game) {
+        game.startGame();
+        IntervalTask clockUpdateTask = game.getClockUpdateTask();
+        if(clockUpdateTask != null) {
+            mGameClockTasks.addBucketTask(clockUpdateTask);
+        }
     }
 
     /**

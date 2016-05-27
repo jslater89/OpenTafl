@@ -7,6 +7,9 @@ import com.manywords.softworks.tafl.command.player.NetworkServerPlayer;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.network.PasswordHasher;
+import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
+import com.manywords.softworks.tafl.network.server.task.StartGameTask;
+import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.UiCallback;
@@ -35,6 +38,7 @@ public class ServerGame {
     private Game mGame;
     private CommandEngine mCommandEngine;
     private ServerUiCallback mUiCallback = new ServerUiCallback();
+    private ClockUpdateTask mClockUpdateTask = new ClockUpdateTask();
 
     private ServerClient mAttackerClient;
     private NetworkServerPlayer mAttackerPlayer;
@@ -55,13 +59,19 @@ public class ServerGame {
 
     public void setRules(Rules r) {
         mGame = new Game(r, mUiCallback);
+
+        // The game clock will be updated by our interval task.
+        if(mGame.getClock() != null) {
+            mGame.getClock().setServerMode(true);
+        }
+
         mAttackerPlayer = new NetworkServerPlayer();
         mDefenderPlayer = new NetworkServerPlayer();
         mCommandEngine = new CommandEngine(mGame, mUiCallback, mAttackerPlayer, mDefenderPlayer);
     }
 
-    public void onGameStart() {
-
+    public void startGame() {
+        mCommandEngine.startGame();
     }
 
     public void setPassword(String password) {
@@ -77,20 +87,38 @@ public class ServerGame {
     }
 
     public synchronized boolean tryJoinGame(ServerClient c, String password) {
-        if(mAttackerClient == null) {
-            setAttackerClient(c);
-            return true;
-        }
-        else if(mDefenderClient == null) {
-            setDefenderClient(c);
-            return true;
-        }
-        else {
-            return false;
-        }
+        return tryJoinGame(c, password, true, true);
     }
 
-    public synchronized void setAttackerClient(ServerClient attackerClient) {
+    public synchronized boolean tryJoinGame(ServerClient c, String password, boolean attackers, boolean defenders) {
+        boolean retval;
+        if(!tryPassword(password)) {
+            retval = false;
+        }
+        else if(attackers && mAttackerClient == null) {
+            setAttackerClient(c);
+            retval = true;
+        }
+        else if(defenders && mDefenderClient == null) {
+            setDefenderClient(c);
+            retval = true;
+        }
+        else {
+            retval = false;
+        }
+
+        if(mAttackerClient != null && mDefenderClient != null) {
+            List<ServerClient> clients = new ArrayList<>();
+            clients.add(mAttackerClient);
+            clients.add(mDefenderClient);
+            clients.addAll(mSpectators);
+            mServer.getTaskQueue().pushTask(new StartGameTask(mServer, this, clients, new StartGamePacket(mGame.getRules())));
+        }
+
+        return retval;
+    }
+
+    private synchronized void setAttackerClient(ServerClient attackerClient) {
         if(attackerClient == null) {
             mAttackerClient.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
         }
@@ -102,7 +130,7 @@ public class ServerGame {
         mAttackerClient = attackerClient;
     }
 
-    public synchronized void setDefenderClient(ServerClient defenderClient) {
+    private synchronized void setDefenderClient(ServerClient defenderClient) {
         if(defenderClient == null) {
             mDefenderClient.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
         }
@@ -171,6 +199,24 @@ public class ServerGame {
 
     public Game getGame() {
         return mGame;
+    }
+
+    public IntervalTask getClockUpdateTask() {
+        return mClockUpdateTask;
+    }
+
+    private class ClockUpdateTask extends IntervalTask {
+        @Override
+        public void reset() {
+
+        }
+
+        @Override
+        public void run() {
+            if(mGame != null && mGame.getClock() != null) {
+                mGame.getClock().updateClocks();
+            }
+        }
     }
 
     private class ServerUiCallback implements UiCallback {
