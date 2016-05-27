@@ -55,13 +55,11 @@ public class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements Ui
 
     @Override
     public void gameStateAdvanced() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void victoryForSide(Side side) {
-        // TODO Auto-generated method stub
 
     }
 

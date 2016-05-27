@@ -18,8 +18,6 @@ public abstract class BoardImpl extends Board {
         }
     }
 
-    // [y][x]
-    //TODO: privatize
     private TaflmanCoordMap mCachedTaflmanLocations = null;
     private Rules mRules;
     private GameState mState;

@@ -88,13 +88,11 @@ public class SwingWindow extends JFrame implements UiCallback {
 
     @Override
     public void gameStateAdvanced() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void victoryForSide(Side side) {
-        // TODO Auto-generated method stub
 
     }
 

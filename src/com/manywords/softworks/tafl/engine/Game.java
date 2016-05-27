@@ -242,8 +242,6 @@ public class Game {
         return mCurrentState.getCurrentSide();
     }
 
-    // TODO: pass StateEvent object to notify UI of happenings
-    // in callback
     public GameState advanceState(GameState currentState, GameState nextState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
         nextState.updateGameState(
                 this,

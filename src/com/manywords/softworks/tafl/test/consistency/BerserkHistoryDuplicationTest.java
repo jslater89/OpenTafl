@@ -51,13 +51,11 @@ public class BerserkHistoryDuplicationTest extends TaflTest implements UiCallbac
 
     @Override
     public void gameStateAdvanced() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void victoryForSide(Side side) {
-        // TODO Auto-generated method stub
 
     }
 

@@ -373,7 +373,7 @@ public class Taflman {
                 // 2. Has zero or one (neighbors + impassable squares) adjacent
                 //
                 // Then the two taflmen share the same span of reachable spaces.
-                // TODO: check if neighbor can jump, and if so, this is only safe if we also jump.
+                // TODO: reimplement this? check if neighbor can jump, and if so, this is only safe if we also jump.
                 /*
                 for(char neighborPiece : getBoard().getAdjacentNeighbors(space)) {
                     Coord neighbor = Taflman.getCurrentSpace(neighborPiece);

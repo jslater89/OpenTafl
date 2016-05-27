@@ -55,13 +55,11 @@ public class RestrictedFortReentryTest extends TaflTest implements UiCallback {
 
     @Override
     public void gameStateAdvanced() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void victoryForSide(Side side) {
-        // TODO Auto-generated method stub
 
     }
 

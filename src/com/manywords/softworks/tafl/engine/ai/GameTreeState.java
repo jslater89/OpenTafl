@@ -25,7 +25,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public short mValue = Evaluator.NO_VALUE;
     public List<GameTreeNode> mBranches = new ArrayList<GameTreeNode>();
 
-    // TODO: comment debug code here.
     private String debugOutputString = null;
 
     public GameTreeState(AiWorkspace workspace, GameState copyState) {
