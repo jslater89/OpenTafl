@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
-import com.manywords.softworks.tafl.network.packet.ErrorPacket;
+import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.HandleClientCommunicationTask;
 import com.manywords.softworks.tafl.network.server.task.interval.GameListUpdateTask;

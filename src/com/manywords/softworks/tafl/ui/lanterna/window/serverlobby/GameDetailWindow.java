@@ -4,7 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
-import com.manywords.softworks.tafl.network.packet.CreateGamePacket;
+import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
@@ -16,6 +16,7 @@ import java.util.UUID;
  */
 public class GameDetailWindow extends BasicWindow {
     public interface GameDetailHost {
+        public void requestGameUpdate();
         public void createGame(CreateGamePacket packet);
         public void cancelGame(UUID uuid);
     }
@@ -43,10 +44,13 @@ public class GameDetailWindow extends BasicWindow {
         mGameCreationButton = new GameCreateButton("Create game", mGameCreationButtonAction);
         mGameCreationButtonAction.setButton(mGameCreationButton);
 
+        Button refreshButton = new Button("Refresh list", () -> mHost.requestGameUpdate());
+
         Button exitButton = new Button("Leave server", () -> {
             mCallback.changeActiveScreen(new MainMenuScreen());
         });
         mButtonPanel.addComponent(mGameCreationButton);
+        mButtonPanel.addComponent(refreshButton);
         mButtonPanel.addComponent(exitButton);
 
         p.addComponent(mButtonPanel);

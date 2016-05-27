@@ -1,12 +1,9 @@
 package com.manywords.softworks.tafl.network.server.task;
 
-import com.manywords.softworks.tafl.network.NetworkDummyDataGenerator;
-import com.manywords.softworks.tafl.network.packet.*;
+import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
-
-import java.util.Random;
 
 
 public class HandleClientCommunicationTask implements Runnable {

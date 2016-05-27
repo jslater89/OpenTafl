@@ -1,7 +1,9 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.command.CommandEngine;
 import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.Player;
+import com.manywords.softworks.tafl.command.player.NetworkServerPlayer;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.network.PasswordHasher;
@@ -31,10 +33,13 @@ public class ServerGame {
     private NetworkServer mServer;
 
     private Game mGame;
+    private CommandEngine mCommandEngine;
     private ServerUiCallback mUiCallback = new ServerUiCallback();
 
     private ServerClient mAttackerClient;
+    private NetworkServerPlayer mAttackerPlayer;
     private ServerClient mDefenderClient;
+    private NetworkServerPlayer mDefenderPlayer;
     private List<ServerClient> mSpectators = new ArrayList<>();
 
     private String mBase64HashedPassword = "";
@@ -50,6 +55,13 @@ public class ServerGame {
 
     public void setRules(Rules r) {
         mGame = new Game(r, mUiCallback);
+        mAttackerPlayer = new NetworkServerPlayer();
+        mDefenderPlayer = new NetworkServerPlayer();
+        mCommandEngine = new CommandEngine(mGame, mUiCallback, mAttackerPlayer, mDefenderPlayer);
+    }
+
+    public void onGameStart() {
+
     }
 
     public void setPassword(String password) {
@@ -62,6 +74,7 @@ public class ServerGame {
         }
         else {
             attackerClient.setGame(this, ServerClient.GameRole.ATTACKER);
+            mAttackerPlayer.setClient(attackerClient);
         }
 
         mAttackerClient = attackerClient;
@@ -73,6 +86,7 @@ public class ServerGame {
         }
         else {
             defenderClient.setGame(this, ServerClient.GameRole.DEFENDER);
+            mDefenderPlayer.setClient(defenderClient);
         }
 
         mDefenderClient = defenderClient;

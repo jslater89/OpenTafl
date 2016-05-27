@@ -1,11 +1,11 @@
-package com.manywords.softworks.tafl.network.packet;
+package com.manywords.softworks.tafl.network.packet.pregame;
 
 import com.manywords.softworks.tafl.network.client.ClientGameInformation;
+import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.ServerGame;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by jay on 5/24/16.

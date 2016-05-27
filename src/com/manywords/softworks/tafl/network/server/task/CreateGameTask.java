@@ -1,8 +1,8 @@
 package com.manywords.softworks.tafl.network.server.task;
 
-import com.manywords.softworks.tafl.network.packet.CreateGamePacket;
-import com.manywords.softworks.tafl.network.packet.ErrorPacket;
-import com.manywords.softworks.tafl.network.packet.SuccessPacket;
+import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
+import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
+import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;

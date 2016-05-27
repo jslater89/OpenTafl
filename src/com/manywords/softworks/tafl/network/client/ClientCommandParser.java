@@ -1,8 +1,8 @@
 package com.manywords.softworks.tafl.network.client;
 
-import com.manywords.softworks.tafl.network.packet.ErrorPacket;
-import com.manywords.softworks.tafl.network.packet.GameListPacket;
-import com.manywords.softworks.tafl.network.packet.LobbyChatPacket;
+import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
+import com.manywords.softworks.tafl.network.packet.pregame.GameListPacket;
+import com.manywords.softworks.tafl.network.packet.pregame.LobbyChatPacket;
 
 /**
  * Created by jay on 5/23/16.

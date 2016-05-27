@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.manywords.softworks.tafl.network.PasswordHasher;
@@ -15,6 +16,8 @@ public class ServerLoginDialog extends DialogWindow {
     public String username = "";
     public String hashedPassword = "";
 
+    public TextBox usernameInput, passwordInput;
+
     public ServerLoginDialog(String title) {
         super(title);
 
@@ -22,11 +25,11 @@ public class ServerLoginDialog extends DialogWindow {
         p.setLayoutManager(new LinearLayout());
 
         final Label usernameLabel = new Label("Username");
-        final TextBox usernameInput = new TextBox();
+        usernameInput = new TextBox();
         usernameInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
 
         final Label passwordLabel = new Label("Password");
-        final TextBox passwordInput = new TextBox();
+        passwordInput = new TextBox();
         passwordInput.setMask('*');
         passwordInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
 
@@ -59,4 +62,15 @@ public class ServerLoginDialog extends DialogWindow {
 
         setComponent(p);
     }
+
+    @Override
+    public void setSize(TerminalSize size) {
+        super.setSize(size);
+
+        TerminalSize thisSize = getSize();
+        TerminalSize inputSize = new TerminalSize(thisSize.getColumns() - 2, 1);
+
+        usernameInput.setPreferredSize(inputSize);
+        passwordInput.setPreferredSize(inputSize);
+    }        
 }

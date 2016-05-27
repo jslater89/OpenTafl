@@ -105,7 +105,7 @@ public class FileBackedPlayerDatabase extends PlayerDatabase {
             throw new RuntimeException("Failed to read database file");
         }
 
-        // Flush the database to clear out any unused players.
+        // Flush the database to clear out any expired players.
         flushDatabaseInternal();
     }
 

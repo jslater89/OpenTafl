@@ -2,7 +2,6 @@ package com.manywords.softworks.tafl.ui.lanterna.screen;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
@@ -12,13 +11,12 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.network.client.ClientGameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
-import com.manywords.softworks.tafl.network.packet.CreateGamePacket;
-import com.manywords.softworks.tafl.network.packet.ErrorPacket;
-import com.manywords.softworks.tafl.network.server.NetworkServer;
+import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
+import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
+import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ChatWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameDetailWindow;
@@ -217,6 +215,11 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void requestGameUpdate() {
             mConnection.requestGameUpdate();
+        }
+
+        @Override
+        public void joinGame(JoinGamePacket packet) {
+            mConnection.sendJoinGameMessage(packet);
         }
 
         @Override

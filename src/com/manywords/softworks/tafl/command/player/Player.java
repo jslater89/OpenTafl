@@ -6,12 +6,13 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 public abstract class Player {
-    private Game mGame;
-    private boolean mAttackingSide;
+    protected Game mGame;
+    protected boolean mAttackingSide;
 
     public enum Type {
         HUMAN,
-        NETWORK,
+        NETWORK_CLIENT,
+        NETWORK_SERVER,
         AI,
         ENGINE
     }
@@ -75,7 +76,7 @@ public abstract class Player {
         switch(type) {
             case HUMAN:
                 return new LocalHuman();
-            case NETWORK:
+            case NETWORK_CLIENT:
                 return new LocalHuman();
             case AI:
                 return new LocalAi();

@@ -1,6 +1,8 @@
 package com.manywords.softworks.tafl.network.client;
 
-import com.manywords.softworks.tafl.network.packet.*;
+import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
+import com.manywords.softworks.tafl.network.packet.pregame.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -90,6 +92,14 @@ public class ClientServerConnection {
 
     public void sendChatMessage(String sender, String message) {
         mServerWriter.println(new LobbyChatPacket(sender, message));
+    }
+
+    public void sendJoinGameMessage(JoinGamePacket packet) {
+        mServerWriter.println(packet);
+    }
+
+    public void sendMoveDecidedMessage(MoveRecord move) {
+        mServerWriter.println(new MovePacket(move));
     }
 
     public void requestGameUpdate() {

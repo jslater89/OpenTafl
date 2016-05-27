@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.server.task;
 
-import com.manywords.softworks.tafl.network.packet.CancelGamePacket;
+import com.manywords.softworks.tafl.network.packet.pregame.CancelGamePacket;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.network.server.ServerGame;

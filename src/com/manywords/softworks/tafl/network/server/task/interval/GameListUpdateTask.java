@@ -1,11 +1,8 @@
 package com.manywords.softworks.tafl.network.server.task.interval;
 
-import com.manywords.softworks.tafl.network.NetworkDummyDataGenerator;
-import com.manywords.softworks.tafl.network.packet.GameListPacket;
+import com.manywords.softworks.tafl.network.packet.pregame.GameListPacket;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
-
-import java.util.Random;
 
 /**
  * Created by jay on 5/25/16.

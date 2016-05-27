@@ -1,4 +1,6 @@
-package com.manywords.softworks.tafl.network.packet;
+package com.manywords.softworks.tafl.network.packet.pregame;
+
+import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 
 import java.util.UUID;
 

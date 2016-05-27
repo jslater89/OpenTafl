@@ -40,10 +40,13 @@ ready-for-game
     When both ServerClients are ready, the game begins. The first player to ready up gets the error. The second
     player gets the success.
 
-start-game
+start-game <OTN rules string>
 
     Server sends to clients to notify game start. Clients open a game interface with one LocalHuman and one
     NetworkPlayer.
+
+clock-update <maintime/overtimetime/overtimelength/overtimecount> <maintime/overtimetime/overtimelength/overtimecount>
+    Attacker clock first. All times in milliseconds.
 
 end-game
 

@@ -20,6 +20,14 @@ public class ClientGameInformation {
         this.spectators = spectators;
     }
 
+    public boolean hasFreeSide() {
+        return attackerUsername.equals("<none>") || defenderUsername.equals("<none>");
+    }
+
+    public boolean freeSideAttackers() {
+        return attackerUsername.equals("<none>");
+    }
+
     public String toString() {
         return uuid + " \"" + rulesName + "\" " + " \"" + attackerUsername + "\" " + " \"" + defenderUsername + "\" " + "password:" + password + " spectators:" + spectators;
     }

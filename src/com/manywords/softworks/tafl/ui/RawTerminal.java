@@ -286,7 +286,8 @@ public class RawTerminal implements UiCallback {
                 return "Local human player";
             case AI:
                 return "AI player";
-            case NETWORK:
+            case NETWORK_SERVER:
+            case NETWORK_CLIENT:
                 return "Network player";
             default:
                 return "How did you get here?";

@@ -1,4 +1,6 @@
-package com.manywords.softworks.tafl.network.packet;
+package com.manywords.softworks.tafl.network.packet.pregame;
+
+import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 
 /**
  * Created by jay on 5/23/16.

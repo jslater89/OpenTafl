@@ -1,7 +1,7 @@
 package com.manywords.softworks.tafl.test.consistency;
 
 import com.manywords.softworks.tafl.network.NetworkDummyDataGenerator;
-import com.manywords.softworks.tafl.network.packet.*;
+import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.test.TaflTest;
 

@@ -7,13 +7,12 @@ import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.gui2.table.TableModel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.network.client.ClientGameInformation;
-import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
+import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
+import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 /**
  * Created by jay on 5/23/16.
@@ -21,6 +20,7 @@ import java.util.UUID;
 public class GameListWindow extends BasicWindow {
     public interface GameListWindowHost {
         public void requestGameUpdate();
+        public void joinGame(JoinGamePacket packet);
     }
     private LogicalScreen.TerminalCallback mTerminalCallback;
     private GameListWindowHost mHost;
@@ -39,6 +39,21 @@ public class GameListWindow extends BasicWindow {
         Panel p = new Panel();
         mGameTable = new Table<>(COLUMNS);
         mGameList = new ArrayList<>();
+
+        mGameTable.setSelectAction(() -> {
+            if(mGameTable.getTableModel().getRowCount() == 0) return;
+
+            ClientGameInformation gameInformation = mGameList.get(mGameTable.getSelectedRow());
+            JoinGameDialog d = new JoinGameDialog("Join game", gameInformation);
+            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+            
+            d.showDialog(getTextGUI());
+            if(!d.canceled) {
+                mHost.joinGame(d.packet);
+            }
+
+            getTextGUI().setActiveWindow(GameListWindow.this);
+        });
 
         //generateDebugGames();
         p.addComponent(mGameTable);
