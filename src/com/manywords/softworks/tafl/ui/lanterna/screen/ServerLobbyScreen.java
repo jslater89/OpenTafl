@@ -265,6 +265,20 @@ public class ServerLobbyScreen extends LogicalScreen {
                     mTerminalCallback.changeActiveScreen(new MainMenuScreen());
                 });
             }
+            else {
+                MessageDialogBuilder b = new MessageDialogBuilder();
+                b.setTitle("Unhandled error");
+                b.setText("Error packet message:\n" + message);
+                b.addButton(MessageDialogButton.OK);
+                MessageDialog d = b.build();
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+
+                // Ordinarily comes from a non-UI thread
+                TerminalUtils.runOnUiThread(mGui, () -> {
+                    d.showDialog(mGui);
+                    mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+                });
+            }
         }
 
         @Override
