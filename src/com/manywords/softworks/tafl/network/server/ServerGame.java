@@ -40,7 +40,7 @@ public class ServerGame {
     private NetworkServerPlayer mAttackerPlayer;
     private ServerClient mDefenderClient;
     private NetworkServerPlayer mDefenderPlayer;
-    private List<ServerClient> mSpectators = new ArrayList<>();
+    private final List<ServerClient> mSpectators = new ArrayList<>();
 
     private String mBase64HashedPassword = "";
 
@@ -68,7 +68,29 @@ public class ServerGame {
         mBase64HashedPassword = PasswordHasher.hashPassword("", password);
     }
 
-    public void setAttackerClient(ServerClient attackerClient) {
+    public boolean tryPassword(String password) {
+        if(!isPassworded()) return true;
+
+        String hashedPassword = PasswordHasher.hashPassword("", password);
+        if(mBase64HashedPassword.equals(hashedPassword)) return true;
+        else return false;
+    }
+
+    public synchronized boolean tryJoinGame(ServerClient c, String password) {
+        if(mAttackerClient == null) {
+            setAttackerClient(c);
+            return true;
+        }
+        else if(mDefenderClient == null) {
+            setDefenderClient(c);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public synchronized void setAttackerClient(ServerClient attackerClient) {
         if(attackerClient == null) {
             mAttackerClient.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
         }
@@ -80,7 +102,7 @@ public class ServerGame {
         mAttackerClient = attackerClient;
     }
 
-    public void setDefenderClient(ServerClient defenderClient) {
+    public synchronized void setDefenderClient(ServerClient defenderClient) {
         if(defenderClient == null) {
             mDefenderClient.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
         }
@@ -93,16 +115,20 @@ public class ServerGame {
     }
 
     public void addSpectator(ServerClient client) {
-        mSpectators.add(client);
+        synchronized (mSpectators) {
+            mSpectators.add(client);
+        }
         client.setGame(this, ServerClient.GameRole.KIBBITZER);
     }
 
     public void removeSpectator(ServerClient client) {
-        mSpectators.remove(client);
+        synchronized (mSpectators) {
+            mSpectators.remove(client);
+        }
         client.setGame(null, ServerClient.GameRole.OUT_OF_GAME);
     }
 
-    private void removePlayer(ServerClient client) {
+    public void removeClient(ServerClient client) {
         if(client.equals(mAttackerClient)) {
             setAttackerClient(null);
         }
@@ -116,10 +142,6 @@ public class ServerGame {
         if(mAttackerClient == null && mDefenderClient == null) {
             mServer.removeGame(this);
         }
-    }
-
-    public void cancel(ServerClient c) {
-        removePlayer(c);
     }
 
     public void shutdown() {

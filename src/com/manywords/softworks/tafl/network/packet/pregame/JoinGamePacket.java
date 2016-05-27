@@ -13,10 +13,10 @@ public class JoinGamePacket extends NetworkPacket {
     public final String hashedPassword;
 
     public static JoinGamePacket parse(String data) {
-        data = data.replaceFirst("join-game", "");
+        data = data.replaceFirst("join-game", "").trim();
         String[] split = data.split(" ");
 
-        return new JoinGamePacket(UUID.fromString(split[0]), Boolean.parseBoolean(split[1]), split[3]);
+        return new JoinGamePacket(UUID.fromString(split[0]), Boolean.parseBoolean(split[1]), split[2]);
     }
 
     public JoinGamePacket(UUID uuid, boolean spectate, String hashedPassword) {

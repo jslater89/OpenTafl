@@ -18,7 +18,7 @@ public class GameDetailWindow extends BasicWindow {
     public interface GameDetailHost {
         public void requestGameUpdate();
         public void createGame(CreateGamePacket packet);
-        public void cancelGame(UUID uuid);
+        public void leaveGame();
     }
     LogicalScreen.TerminalCallback mCallback;
     private GameDetailHost mHost;
@@ -71,7 +71,7 @@ public class GameDetailWindow extends BasicWindow {
                 setLabel("Create game");
             }
             else {
-                setLabel("Cancel game");
+                setLabel("Leave game");
             }
         }
 
@@ -104,9 +104,7 @@ public class GameDetailWindow extends BasicWindow {
                 }
             }
             else if(mButton.isCanceling()) {
-                if(mCreatePacket != null) {
-                    mHost.cancelGame(mCreatePacket.uuid);
-                }
+                mHost.leaveGame();
             }
 
             getTextGUI().setActiveWindow(GameDetailWindow.this);
@@ -115,7 +113,7 @@ public class GameDetailWindow extends BasicWindow {
     }
 
     public void onConnectionStateChanged(ClientServerConnection.State state) {
-        if(state == ClientServerConnection.State.HOSTING || state == ClientServerConnection.State.CREATING_GAME) {
+        if(state == ClientServerConnection.State.IN_PREGAME || state == ClientServerConnection.State.CREATING_GAME || state == ClientServerConnection.State.JOINING_GAME) {
             mGameCreationButton.setMode(false);
         }
         else {

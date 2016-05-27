@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.network.client;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
+import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 
 import java.io.*;
 import java.net.Socket;
@@ -26,7 +27,10 @@ public class ClientServerConnection {
         DISCONNECTED,
         LOGGED_IN,
         CREATING_GAME,
-        HOSTING,
+        JOINING_GAME,
+        IN_PREGAME,
+        IN_GAME,
+        IN_POSTGAME,
     }
 
     private State mCurrentState = State.DISCONNECTED;
@@ -37,6 +41,8 @@ public class ClientServerConnection {
     private Socket mServer;
     private PrintWriter mServerWriter;
     private Thread mReadThread;
+
+    private UUID mServerGameUUID;
 
     private boolean mPlannedDisconnect = false;
 
@@ -78,12 +84,17 @@ public class ClientServerConnection {
 
     public void sendCreateGameMessage(CreateGamePacket packet) {
         setState(State.CREATING_GAME);
+        mServerGameUUID = packet.uuid;
         mServerWriter.println(packet);
     }
 
-    public void sendCancelGameMessage(UUID uuid) {
-        mServerWriter.println(new CancelGamePacket(uuid));
-        setState(State.LOGGED_IN);
+    public void sendLeaveGameMessage() {
+        if(mServerGameUUID != null) {
+            mServerWriter.println(new LeaveGamePacket(mServerGameUUID));
+        }
+        if(mCurrentState != State.LOGGED_IN) {
+            setState(State.LOGGED_IN);
+        }
     }
 
     public void sendRegistrationMessage(String username, String hashedPassword) {
@@ -95,7 +106,14 @@ public class ClientServerConnection {
     }
 
     public void sendJoinGameMessage(JoinGamePacket packet) {
-        mServerWriter.println(packet);
+        if(mCurrentState == State.LOGGED_IN) {
+            setState(State.JOINING_GAME);
+            mServerGameUUID = packet.uuid;
+            mServerWriter.println(packet);
+        }
+        else {
+            mInternalCallback.onErrorReceived(ErrorPacket.ALREADY_HOSTING);
+        }
     }
 
     public void sendMoveDecidedMessage(MoveRecord move) {
@@ -129,6 +147,7 @@ public class ClientServerConnection {
     }
 
     private void setState(State newState) {
+        System.out.println("State change: " + mCurrentState + " to " + newState);
         mCurrentState = newState;
         mInternalCallback.onStateChanged(newState);
     }
@@ -139,7 +158,7 @@ public class ClientServerConnection {
         public void onStateChanged(State newState) {
             switch(newState) {
                 case LOGGED_IN:
-                case HOSTING:
+                case IN_PREGAME:
                     requestGameUpdate();
                     break;
             }
@@ -160,10 +179,11 @@ public class ClientServerConnection {
                     break;
                 case LOGGED_IN:
                     break;
+                case JOINING_GAME:
                 case CREATING_GAME:
-                    setState(State.HOSTING);
+                    setState(State.IN_PREGAME);
                     break;
-                case HOSTING:
+                case IN_PREGAME:
                     break;
             }
         }
@@ -181,11 +201,12 @@ public class ClientServerConnection {
                     break;
                 case LOGGED_IN:
                     break;
+                case JOINING_GAME:
                 case CREATING_GAME:
                     setState(State.LOGGED_IN);
                     mExternalCallback.onErrorReceived(message);
                     break;
-                case HOSTING:
+                case IN_PREGAME:
                     break;
             }
         }

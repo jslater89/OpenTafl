@@ -227,9 +227,8 @@ public class ServerLobbyScreen extends LogicalScreen {
             mConnection.sendCreateGameMessage(packet);
         }
 
-        @Override
-        public void cancelGame(UUID uuid) {
-            mConnection.sendCancelGameMessage(uuid);
+        public void leaveGame() {
+            mConnection.sendLeaveGameMessage();
         }
     }
 

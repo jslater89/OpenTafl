@@ -16,7 +16,8 @@ public class ServerLoginDialog extends DialogWindow {
     public String username = "";
     public String hashedPassword = "";
 
-    public TextBox usernameInput, passwordInput;
+    public TextBox mUsernameInput, mPasswordInput;
+    Panel mMainPanel;
 
     public ServerLoginDialog(String title) {
         super(title);
@@ -25,17 +26,17 @@ public class ServerLoginDialog extends DialogWindow {
         p.setLayoutManager(new LinearLayout());
 
         final Label usernameLabel = new Label("Username");
-        usernameInput = new TextBox();
-        usernameInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
+        mUsernameInput = new TextBox();
+        mUsernameInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
 
         final Label passwordLabel = new Label("Password");
-        passwordInput = new TextBox();
-        passwordInput.setMask('*');
-        passwordInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
+        mPasswordInput = new TextBox();
+        mPasswordInput.setMask('*');
+        mPasswordInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
 
         final Button finishButton = new Button("Login", () -> {
-            username = usernameInput.getText();
-            hashedPassword = PasswordHasher.hashPassword(username, passwordInput.getText());
+            username = mUsernameInput.getText();
+            hashedPassword = PasswordHasher.hashPassword(username, mPasswordInput.getText());
 
             TerminalSettings.onlinePlayerName = username;
 
@@ -48,10 +49,10 @@ public class ServerLoginDialog extends DialogWindow {
         });
 
         p.addComponent(usernameLabel);
-        p.addComponent(usernameInput);
+        p.addComponent(mUsernameInput);
 
         p.addComponent(passwordLabel);
-        p.addComponent(passwordInput);
+        p.addComponent(mPasswordInput);
 
         Panel buttonPanel = new Panel();
         buttonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
@@ -60,6 +61,7 @@ public class ServerLoginDialog extends DialogWindow {
 
         p.addComponent(buttonPanel);
 
+
         setComponent(p);
     }
 
@@ -67,10 +69,11 @@ public class ServerLoginDialog extends DialogWindow {
     public void setSize(TerminalSize size) {
         super.setSize(size);
 
+        mMainPanel.setPreferredSize(size);
         TerminalSize thisSize = getSize();
         TerminalSize inputSize = new TerminalSize(thisSize.getColumns() - 2, 1);
 
-        usernameInput.setPreferredSize(inputSize);
-        passwordInput.setPreferredSize(inputSize);
-    }        
+        mUsernameInput.setPreferredSize(inputSize);
+        mPasswordInput.setPreferredSize(inputSize);
+    }
 }

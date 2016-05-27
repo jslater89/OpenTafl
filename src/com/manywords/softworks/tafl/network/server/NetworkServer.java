@@ -59,7 +59,7 @@ public class NetworkServer {
 
         mTickThread = new ServerTickThread();
 
-        mGameListUpdateTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 20, PriorityTaskQueue.Priority.LOW);
+        mGameListUpdateTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 5, PriorityTaskQueue.Priority.LOW);
         mGameClockTasks = new BucketedIntervalTaskHolder(mTaskQueue, 1000, 5, PriorityTaskQueue.Priority.HIGH);
 
         mTickThread.addTaskHolder(mGameListUpdateTasks);
@@ -185,8 +185,8 @@ public class NetworkServer {
         }
 
         // If a party to the game leaves the server, stop the game.
-        if(c.getGame() != null && (c.getGameRole() == ServerClient.GameRole.ATTACKER || c.getGameRole() == ServerClient.GameRole.DEFENDER)) {
-            removeGame(c.getGame());
+        if(c.getGame() != null) {
+            c.getGame().removeClient(c);
         }
         clientExitingLobby(c);
     }

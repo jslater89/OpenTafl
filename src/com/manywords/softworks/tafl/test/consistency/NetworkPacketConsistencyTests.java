@@ -45,12 +45,21 @@ public class NetworkPacketConsistencyTests extends TaflTest {
 
         assert first.equals(second);
 
-        CancelGamePacket canp = new CancelGamePacket(UUID.randomUUID());
+        LeaveGamePacket canp = new LeaveGamePacket(UUID.randomUUID());
         first = canp.toString();
 
-        canp = CancelGamePacket.parse(first);
+        canp = LeaveGamePacket.parse(first);
         second = canp.toString();
 
         assert first.equals(second);
+
+        JoinGamePacket joinp = new JoinGamePacket(UUID.randomUUID(), true, "hashypassword");
+        first = joinp.toString();
+
+        joinp = JoinGamePacket.parse(first);
+        second = joinp.toString();
+
+        assert first.equals(second);
+
     }
 }

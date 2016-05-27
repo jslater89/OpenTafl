@@ -12,15 +12,15 @@ get-game-list
 ##### GAMES AND GAME LIFECYCLE #####
 A game is created with create-game, and is in the first stage of its lifecycle: present on the server, but not running.
 
-Once both clients send the 'ready' command to the server, the server will begin the game and start the clock. The game
-is now running, as indicated by the server sending start-game.
+Once an opponent has joined, the server starts the game and kicks off the clock, if necessary. The clients enter the
+game interface.
 
 Once the game ends by win, defeat, or draw, the server will send an end-game message. The game is now in the post-game
 state, where history can be viewed, and the game can be saved.
 
 When a client who is an active participant in the game leaves at any time, for any reason, the client shold send
-the cancel-game message.. If a second client remains, the server also ends the game. When all clients who are active
-participants have sent cancel-game, the server removes the game.
+the leave-game message. If a second client remains, the server also ends the game. When all clients who are active
+participants have sent leave-game, the server removes the game.
 
 create-game <guid> <attackers|defenders> <password-hash|open> <OTN rules string>
     error already-hosting
@@ -50,27 +50,25 @@ clock-update <maintime/overtimetime/overtimelength/overtimecount> <maintime/over
 
 end-game
 
-cancel-game guid
+leave-game guid
     error not-in-game
     success
 
     Cancel Game should be a button in the server lobby interface.
 
 
-
-
-kibbitz-game guid
+spectate-game guid
     error invalid-password
     error game-not-started
     success
 
-    On success, opens a game interface with two NetworkPlayers.
+    On success, opens a game interface which gets its updates from the server.
 
 game-chat "player name" message
 
     Game chat is visible to all players and spectators in a game. Players send game chat messages.
 
-kibbitz-chat "player name" message
+spectator-chat "player name" message
 
     Kibbitz chat is only visible to spectators. Spectators send kibbitz chat messages.
 

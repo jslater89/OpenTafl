@@ -32,8 +32,11 @@ public class HandleClientCommunicationTask implements Runnable {
         else if(data.startsWith("create-game")) {
             mServer.getTaskQueue().pushTask(new CreateGameTask(mServer, mClient, CreateGamePacket.parse(data)));
         }
-        else if(data.startsWith("cancel-game")) {
-            mServer.getTaskQueue().pushTask(new CancelGameTask(mServer, mClient, CancelGamePacket.parse(data)));
+        else if(data.startsWith("leave-game")) {
+            mServer.getTaskQueue().pushTask(new LeaveGameTask(mServer, mClient, LeaveGamePacket.parse(data)));
+        }
+        else if(data.startsWith("join-game")) {
+            mServer.getTaskQueue().pushTask(new JoinGameTask(mServer, mClient, JoinGamePacket.parse(data)));
         }
     }
 
