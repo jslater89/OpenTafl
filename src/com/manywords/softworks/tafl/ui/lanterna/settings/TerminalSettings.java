@@ -73,9 +73,9 @@ public class TerminalSettings {
             }
             Wini ini = new Wini(f);
 
-            File attackerEngineFile = attackerEngineSpec.specFile;
-            File defenderEngineFile = defenderEngineSpec.specFile;
-            File analysisEngineFile = analysisEngineSpec.specFile;
+            File attackerEngineFile = (attackerEngineSpec == null ? null : attackerEngineSpec.specFile);
+            File defenderEngineFile = (defenderEngineSpec == null ? null : defenderEngineSpec.specFile);
+            File analysisEngineFile = (analysisEngineSpec == null ? null : analysisEngineSpec.specFile);
             ini.put("display", "shrinklarge", shrinkLargeBoards);
             ini.put("config", "attacker", attackers + 1);
             ini.put("config", "attackerfile", (attackerEngineFile != null ? attackerEngineFile.getCanonicalPath() : ""));

@@ -105,6 +105,9 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.5.2b (released 05/27/16):
+- Fix crash on close when no external engines are configured
+
 v0.2.5.1b (released 05/02/16):
 - Add missing 15x15 variant (lost in the build)
 
