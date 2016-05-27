@@ -18,7 +18,8 @@ public class NetworkClientPlayer extends Player {
 
     public NetworkClientPlayer(ClientServerConnection c) {
         mConnection = c;
-        mGameRole = c.getGameRole();
+        // The role of the player over the network is 'out of game', if we're out of game somehow, or the role we are not.
+        mGameRole = (c.getGameRole() == GameRole.OUT_OF_GAME ? GameRole.OUT_OF_GAME : (c.getGameRole() == GameRole.ATTACKER ? GameRole.DEFENDER : GameRole.ATTACKER));
     }
 
     public GameRole getGameRole() {
@@ -37,6 +38,7 @@ public class NetworkClientPlayer extends Player {
 
     @Override
     public void opponentMove(MoveRecord move) {
+        // i.e., the local player has decided on a move.
         mConnection.sendMoveDecidedMessage(move);
     }
 
@@ -52,7 +54,7 @@ public class NetworkClientPlayer extends Player {
 
     @Override
     public void onMoveDecided(MoveRecord record) {
-        // Called by ClientServerConnection
+        // i.e., the network player has decided upon a move. ClientServerConnection calls here.
         mCallback.onMoveDecided(this, record);
     }
 

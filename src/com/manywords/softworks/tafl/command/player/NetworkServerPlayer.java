@@ -4,8 +4,10 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.network.packet.ingame.MoveResultPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
-import com.manywords.softworks.tafl.network.packet.ingame.RequestMovePacket;
+import com.manywords.softworks.tafl.network.packet.ingame.AwaitMovePacket;
+import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
+import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 /**
@@ -14,9 +16,10 @@ import com.manywords.softworks.tafl.ui.UiCallback;
 public class NetworkServerPlayer extends Player {
     private ServerClient mClient;
     private PlayerCallback mPlayerCallback;
+    private NetworkServer mServer;
 
-    public NetworkServerPlayer() {
-
+    public NetworkServerPlayer(NetworkServer server) {
+        this.mServer = server;
     }
 
     public void setClient(ServerClient client) {
@@ -25,17 +28,17 @@ public class NetworkServerPlayer extends Player {
 
     @Override
     public void getNextMove(UiCallback ui, Game game, int thinkTime) {
-        mClient.writePacket(new RequestMovePacket(isAttackingSide()));
+        mServer.sendPacketToClient(mClient, new AwaitMovePacket(isAttackingSide()), PriorityTaskQueue.Priority.HIGH);
     }
 
     @Override
     public void moveResult(int moveResult) {
-        mClient.writePacket(new MoveResultPacket(moveResult));
+        mServer.sendPacketToClient(mClient, new MoveResultPacket(moveResult), PriorityTaskQueue.Priority.HIGH);
     }
 
     @Override
     public void opponentMove(MoveRecord move) {
-        mClient.writePacket(new MovePacket(move));
+        mServer.sendPacketToClient(mClient, new MovePacket(move), PriorityTaskQueue.Priority.HIGH);
     }
 
     @Override
@@ -51,7 +54,9 @@ public class NetworkServerPlayer extends Player {
     @Override
     public void onMoveDecided(MoveRecord record) {
         // Client calls into here
-        mPlayerCallback.onMoveDecided(this, record);
+        synchronized(mClient.getGame()) {
+            mPlayerCallback.onMoveDecided(this, record);
+        }
     }
 
     @Override

@@ -65,8 +65,8 @@ public class ServerGame {
             mGame.getClock().setServerMode(true);
         }
 
-        mAttackerPlayer = new NetworkServerPlayer();
-        mDefenderPlayer = new NetworkServerPlayer();
+        mAttackerPlayer = new NetworkServerPlayer(mServer);
+        mDefenderPlayer = new NetworkServerPlayer(mServer);
         mCommandEngine = new CommandEngine(mGame, mUiCallback, mAttackerPlayer, mDefenderPlayer);
     }
 
@@ -181,13 +181,23 @@ public class ServerGame {
         }
     }
 
+    public NetworkServerPlayer getPlayerForClient(ServerClient c) {
+        if(c == mAttackerClient) return mAttackerPlayer;
+        else if (c == mDefenderClient) return mDefenderPlayer;
+        else return null;
+    }
+
     public ServerClient getAttackerClient() {
         return mAttackerClient;
     }
 
+    public NetworkServerPlayer getAttackerPlayer() { return mAttackerPlayer; }
+
     public ServerClient getDefenderClient() {
         return mDefenderClient;
     }
+
+    public NetworkServerPlayer getDefenderPlayer() { return mDefenderPlayer; }
 
     public List<ServerClient> getSpectators() {
         return mSpectators;
@@ -248,12 +258,12 @@ public class ServerGame {
 
         @Override
         public void statusText(String text) {
-
+            System.out.println("Command engine status: " + text);
         }
 
         @Override
         public void modalStatus(String title, String text) {
-
+            System.out.println("Command engine status: " + title + " - " + text);
         }
 
         @Override

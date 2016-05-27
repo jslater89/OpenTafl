@@ -391,6 +391,19 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                         LocalHuman localPlayer = (LocalHuman) Player.getNewPlayer(Player.Type.HUMAN);
 
                         Player attacker, defender;
+
+                        System.out.println("Network player role: " + networkPlayer.getGameRole());
+
+                        // Wait for the game joining to finish.
+                        while(networkPlayer.getGameRole() == GameRole.OUT_OF_GAME) {
+                            try {
+                                System.out.println("Waiting for other player role");
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                // doesn't matter
+                            }
+                        }
+
                         if(networkPlayer.getGameRole() == GameRole.ATTACKER) {
                             attacker = networkPlayer;
                             defender = localPlayer;
@@ -713,6 +726,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onStartGame(Rules r) {
+
+        }
+
+        @Override
+        public void onServerMoveReceived(MoveRecord move) {
 
         }
     }

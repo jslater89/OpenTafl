@@ -27,6 +27,7 @@ public class ClientServerConnection {
         public void onGameListReceived(List<ClientGameInformation> games);
         public void onDisconnect(boolean planned);
         public void onStartGame(Rules r);
+        public void onServerMoveReceived(MoveRecord move);
     }
 
     public enum State {
@@ -50,6 +51,7 @@ public class ClientServerConnection {
 
     private UUID mServerGameUUID;
     private GameRole mGameRole = GameRole.OUT_OF_GAME;
+    private NetworkClientPlayer mNetworkPlayer;
 
     private boolean mPlannedDisconnect = false;
 
@@ -94,7 +96,8 @@ public class ClientServerConnection {
     }
 
     public NetworkClientPlayer getNetworkPlayer() {
-        return new NetworkClientPlayer(this);
+        mNetworkPlayer = new NetworkClientPlayer(this);
+        return mNetworkPlayer;
     }
 
     public State getCurrentState() {
@@ -187,6 +190,7 @@ public class ClientServerConnection {
         public void onStateChanged(State newState) {
             switch(newState) {
                 case LOGGED_IN:
+                    mGameRole = GameRole.OUT_OF_GAME;
                 case IN_PREGAME:
                     requestGameUpdate();
                     break;
@@ -210,6 +214,9 @@ public class ClientServerConnection {
                     break;
                 case JOINING_GAME:
                 case CREATING_GAME:
+                case IN_PREGAME:
+                case IN_GAME:
+                    // If we joined as the attackers, the other player is the defender.
                     if(message.equals(SuccessPacket.JOINED_ATTACKERS)) {
                         mGameRole = GameRole.ATTACKER;
                     }
@@ -218,16 +225,14 @@ public class ClientServerConnection {
                     }
                     setState(State.IN_PREGAME);
                     break;
-                case IN_PREGAME:
-                    break;
             }
         }
 
         @Override
         public void onErrorReceived(String message) {
-            /*if(message.equals(ErrorPacket.GAME_CANCELED)) {
+            if(message.equals(ErrorPacket.GAME_CANCELED)) {
                 requestGameUpdate();
-            }*/
+            }
 
             switch(mCurrentState) {
 
@@ -260,6 +265,11 @@ public class ClientServerConnection {
         public void onStartGame(Rules r) {
             setState(State.IN_GAME);
             mExternalCallback.onStartGame(r);
+        }
+
+        @Override
+        public void onServerMoveReceived(MoveRecord move) {
+            mNetworkPlayer.onMoveDecided(move);
         }
     }
 }

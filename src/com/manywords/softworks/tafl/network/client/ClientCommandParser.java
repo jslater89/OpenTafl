@@ -1,5 +1,8 @@
 package com.manywords.softworks.tafl.network.client;
 
+import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
+import com.manywords.softworks.tafl.network.packet.ingame.MoveResultPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.GameListPacket;
@@ -30,6 +33,16 @@ public class ClientCommandParser {
         else if(data.startsWith("start-game")) {
             StartGamePacket packet = StartGamePacket.parse(data);
             callback.onStartGame(packet.rules);
+        }
+        else if(data.startsWith("move-result")) {
+            MoveResultPacket packet = MoveResultPacket.parse(data);
+            if(packet.moveResult != GameState.GOOD_MOVE) {
+                callback.onErrorReceived(ErrorPacket.DESYNC);
+            }
+        }
+        else if(data.startsWith("move")) {
+            MovePacket packet = MovePacket.parse(data);
+            callback.onServerMoveReceived(packet.move);
         }
     }
 }

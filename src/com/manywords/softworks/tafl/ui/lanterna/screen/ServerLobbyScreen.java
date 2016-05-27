@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.network.client.ClientGameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
@@ -322,6 +323,11 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void onStartGame(Rules r) {
             TerminalUtils.runOnUiThread(mGui, () -> TerminalUtils.startNetworkGame(mGui, mTerminalCallback, mConnection, r, null));
+        }
+
+        @Override
+        public void onServerMoveReceived(MoveRecord move) {
+
         }
     }
 }

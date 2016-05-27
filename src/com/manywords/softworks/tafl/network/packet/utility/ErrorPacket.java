@@ -11,7 +11,8 @@ public class ErrorPacket extends NetworkPacket {
     public static final String GAME_CANCELED = "game-canceled";
     public static final String GAME_FULL = "game-full";
     public static final String INVALID_GAME_PASSWORD = "invalid-game-password";
-    public static final String OPPONENT_LEFT = "opponent-left";
+    public static final String OPPONENT_LEFT = "opponent-left"; // TODO: implement opponent_left to end game
+    public static final String DESYNC = "desync";
 
     public final String error;
 

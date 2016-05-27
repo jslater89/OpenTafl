@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server.task;
 
+import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
@@ -37,6 +38,9 @@ public class HandleClientCommunicationTask implements Runnable {
         }
         else if(data.startsWith("join-game")) {
             mServer.getTaskQueue().pushTask(new JoinGameTask(mServer, mClient, JoinGamePacket.parse(data)));
+        }
+        else if(data.startsWith("move")) {
+            mServer.getTaskQueue().pushTask(new MoveTask(mServer, mClient, MovePacket.parse(data)), PriorityTaskQueue.Priority.HIGH);
         }
     }
 

@@ -48,13 +48,28 @@ start-game <OTN rules string>
 clock-update <maintime/overtimetime/overtimelength/overtimecount> <maintime/overtimetime/overtimelength/overtimecount>
     Attacker clock first. All times in milliseconds.
 
+move <OTN move string>
+
+    From client to server: I have decided a move. From server to client: this is an opponent move.
+
+move-result <int result code>
+
+    n.b. OpenTafl's implementation verifies the move on the client side before sending to the server. Move results
+    which aren't 'GOOD_MOVE' indicate a desync.
+
+await-move <attackers|defenders>
+
+    Sent from the server to a client when it is that client's turn.
+
 end-game
 
 leave-game guid
     error not-in-game
     success
 
-    Cancel Game should be a button in the server lobby interface.
+    Leave Game should be a button in the server lobby interface.
+
+
 
 
 spectate-game guid

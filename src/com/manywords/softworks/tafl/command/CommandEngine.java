@@ -206,6 +206,30 @@ public class CommandEngine {
                             mGame.getCurrentState().getBoard().getOccupier(move.start.x, move.start.y),
                             mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y)).getLastMoveResult();
 
+            // non-error moves
+            if(result >= GameState.GOOD_MOVE) {
+                mLastPlayer = mCurrentPlayer;
+                mCurrentPlayer = (mGame.getCurrentSide().isAttackingSide() ? mAttacker : mDefender);
+                callbackMoveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", null), move);
+                callbackGameStateAdvanced();
+
+                // Send a move result to the last player to move.
+                if(mLastPlayer.isAttackingSide()) {
+                    mAttacker.moveResult(result);
+                }
+                else {
+                    mDefender.moveResult(result);
+                }
+
+                // Send an opponent move update to the other player.
+                if(mAttacker != mLastPlayer) {
+                    mAttacker.opponentMove(move);
+                }
+                else {
+                    mDefender.opponentMove(move);
+                }
+            }
+
             if (result == GameState.ATTACKER_WIN) {
                 callbackVictoryForSide(mGame.getCurrentState().getAttackers());
                 finishGame();
@@ -237,28 +261,6 @@ public class CommandEngine {
                 }
 
                 callbackMoveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), move);
-            }
-            else {
-                mLastPlayer = mCurrentPlayer;
-                mCurrentPlayer = (mGame.getCurrentSide().isAttackingSide() ? mAttacker : mDefender);
-                callbackMoveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", null), move);
-                callbackGameStateAdvanced();
-
-                // Send a move result to the last player to move.
-                if(mLastPlayer.isAttackingSide()) {
-                    mAttacker.moveResult(result);
-                }
-                else {
-                    mDefender.moveResult(result);
-                }
-
-                // Send an opponent move update to the other player.
-                if(mAttacker != mLastPlayer) {
-                    mAttacker.opponentMove(move);
-                }
-                else {
-                    mDefender.opponentMove(move);
-                }
             }
 
             if(replayPosition != -1) {
