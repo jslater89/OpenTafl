@@ -1,12 +1,12 @@
 package com.manywords.softworks.tafl.engine;
 
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
-import com.manywords.softworks.tafl.network.server.ServerClock;
+import com.manywords.softworks.tafl.engine.clock.GameClock;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.*;
@@ -44,11 +44,11 @@ public class Game {
         this(rules, callback, null);
     }
 
-    public Game(Rules rules, UiCallback callback, GameClock.TimeSpec timeSpec) {
+    public Game(Rules rules, UiCallback callback, TimeSpec timeSpec) {
         this(rules, callback, timeSpec, false);
     }
 
-    public Game(Rules rules, UiCallback callback, GameClock.TimeSpec timeSpec, boolean serverGame) {
+    public Game(Rules rules, UiCallback callback, TimeSpec timeSpec, boolean serverGame) {
         mGameRules = rules;
 
         if(timeSpec != null) {
@@ -116,7 +116,7 @@ public class Game {
     public void loadClock() {
         if(mTagMap != null && mTagMap.containsKey("time-control")) {
             String clockLengthString = mTagMap.get("time-control");
-            GameClock.TimeSpec clockLength = GameClock.getTimeSpecForGameNotationString(clockLengthString);
+            TimeSpec clockLength = GameClock.getTimeSpecForGameNotationString(clockLengthString);
 
             mClock = new GameClock(this, getCurrentState().getAttackers(), getCurrentState().getDefenders(), clockLength);
 
@@ -124,8 +124,8 @@ public class Game {
                 String remainingTimeString = mTagMap.get("time-remaining");
                 String[] remainingTimes = remainingTimeString.split(",");
 
-                GameClock.TimeSpec attackerTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
-                GameClock.TimeSpec defenderTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
+                TimeSpec attackerTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
+                TimeSpec defenderTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
 
                 GameClock.ClockEntry attackerClock = mClock.getClockEntry(true);
                 attackerClock.setTime(attackerTime);

@@ -3,9 +3,9 @@ package com.manywords.softworks.tafl.ui.lanterna;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
-import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.engine.clock.GameClock;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
@@ -39,7 +39,7 @@ public class TerminalUtils {
             return null;
         }
 
-        GameClock.TimeSpec ts = TerminalSettings.timeSpec;
+        TimeSpec ts = TerminalSettings.timeSpec;
         Game g;
         if(ts.mainTime == 0 && (ts.overtimeTime == 0 ||ts.overtimeCount == 0)) {
             g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), callback.getUiCallback());
@@ -59,7 +59,7 @@ public class TerminalUtils {
             LogicalScreen.TerminalCallback callback,
             ClientServerConnection connection,
             Rules rules,
-            GameClock.TimeSpec timeSpec) {
+            TimeSpec timeSpec) {
         // Terminal settings: local network player. For now, though...
 
         Game g;

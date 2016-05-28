@@ -1,7 +1,7 @@
 package com.manywords.softworks.tafl.command.player;
 
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.test.TaflTest;

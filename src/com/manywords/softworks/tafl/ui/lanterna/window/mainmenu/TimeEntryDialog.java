@@ -2,7 +2,7 @@ package com.manywords.softworks.tafl.ui.lanterna.window.mainmenu;
 
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.util.regex.Pattern;
@@ -45,7 +45,7 @@ public class TimeEntryDialog extends DialogWindow {
                 int overtimeCount = Integer.parseInt(overtimeCountInput.getTextOrDefault("0"));
                 long incrementTimeMillis = Integer.parseInt(incrementTimeInput.getTextOrDefault("0")) * 1000;
 
-                GameClock.TimeSpec ts = new GameClock.TimeSpec(mainTimeMillis, overtimeTimeMillis, overtimeCount, incrementTimeMillis);
+                TimeSpec ts = new TimeSpec(mainTimeMillis, overtimeTimeMillis, overtimeCount, incrementTimeMillis);
                 TerminalSettings.timeSpec = ts;
 
                 TimeEntryDialog.this.close();

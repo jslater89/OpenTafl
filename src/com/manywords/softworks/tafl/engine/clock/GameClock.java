@@ -1,9 +1,8 @@
-package com.manywords.softworks.tafl.engine;
+package com.manywords.softworks.tafl.engine.clock;
 
-import com.manywords.softworks.tafl.rules.Rules;
+import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.rules.Side;
 
-import java.time.LocalTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -211,54 +210,6 @@ public class GameClock {
 
         public void cancel() {
             mRunning = false;
-        }
-    }
-
-    public static class TimeSpec {
-        public long mainTime = 0;
-        public long overtimeTime = 0;
-        public int overtimeCount = 0;
-        public long incrementTime = 0;
-
-        public TimeSpec(long mainTime, long overtimeTime, int overtimeCount, long incrementTime) {
-            this.mainTime = mainTime;
-            this.overtimeTime = overtimeTime;
-            this.overtimeCount = overtimeCount;
-            this.incrementTime = incrementTime;
-        }
-
-        public String toString() {
-            return mainTime / 1000 + " " + overtimeTime / 1000 + "/" + overtimeCount + " " + incrementTime / 1000 + "i";
-        }
-
-        public String toGameNotationString() {
-            return mainTime / 1000 + " " + overtimeTime / 1000 + "/" + overtimeCount;
-        }
-
-        public String toHumanString() {
-            int mainTimeSeconds = (int) mainTime / 1000;
-            int overtimeSeconds = (int) overtimeTime / 1000;
-
-            int hours = mainTimeSeconds / 3600;
-            int minutes = (mainTimeSeconds % 3600) / 60;
-            int seconds = (mainTimeSeconds % 3600) % 60;
-            String m = (minutes >= 10 ? "" + minutes : "0" + minutes);
-            String s = (seconds >= 10 ? "" + seconds : "0" + seconds);
-            String mainTime = hours + ":" + m + ":" + s;
-
-            hours = overtimeSeconds / 3600;
-            minutes = (overtimeSeconds % 3600) / 60;
-            seconds = (overtimeSeconds % 3600) % 60;
-            m = (minutes >= 10 ? "" + minutes : "0" + minutes);
-            s = (seconds >= 10 ? "" + seconds : "0" + seconds);
-            String overtimeTime = hours + ":" + m + ":" + s;
-
-            String result = mainTime + " " + overtimeTime + "/" + overtimeCount;
-            return result;
-        }
-
-        public String toMillisString() {
-            return mainTime  + " " + overtimeTime + "/" + overtimeCount + " " + incrementTime + "i";
         }
     }
 

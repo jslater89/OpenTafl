@@ -5,7 +5,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
@@ -51,7 +51,7 @@ public class StatusWindow extends BasicWindow {
         mTextDisplay.addLine(text);
     }
 
-    public void handleTimeUpdate(Side side, GameClock.TimeSpec attackerEntry, GameClock.TimeSpec defenderEntry) {
+    public void handleTimeUpdate(Side side, TimeSpec attackerEntry, TimeSpec defenderEntry) {
         if(attackerEntry != null) {
             String attackerString = (side.isAttackingSide() ? "ATTACKER" : "Attacker") + "\n" + attackerEntry.toHumanString();
             mAttackerClockDisplay.setText(attackerString);

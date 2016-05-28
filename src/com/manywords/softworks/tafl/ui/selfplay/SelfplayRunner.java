@@ -1,8 +1,8 @@
 package com.manywords.softworks.tafl.ui.selfplay;
 
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -25,7 +25,7 @@ public class SelfplayRunner {
     private EngineSpec mFirstEngineSpec;
     private EngineSpec mSecondEngineSpec;
     private int mMatchCount;
-    private GameClock.TimeSpec mGameTimeSpec;
+    private TimeSpec mGameTimeSpec;
     private List<MatchResult> mMatchResults;
     private SelfplayWindow mHost;
 

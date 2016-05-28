@@ -1,8 +1,9 @@
 package com.manywords.softworks.tafl.test.mechanics;
 
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
@@ -23,7 +24,7 @@ public class GameClockTest extends TaflTest implements UiCallback {
 
         // Let time run out for the starting player.
         Rules rules = Berserk.newCommanderCornerCaptureKingTest();
-        mGame = new Game(rules, null, new GameClock.TimeSpec(500, 0, 0, 0));
+        mGame = new Game(rules, null, new TimeSpec(500, 0, 0, 0));
 
         Side defenders = mGame.getRules().getDefenders();
         Side attackers = mGame.getRules().getAttackers();
@@ -46,7 +47,7 @@ public class GameClockTest extends TaflTest implements UiCallback {
 
         mSideExpiredFor = null;
         mTimeExpired = false;
-        mGame = new Game(rules, null, new GameClock.TimeSpec(500, 0, 0, 0));
+        mGame = new Game(rules, null, new TimeSpec(500, 0, 0, 0));
         mGame.getClock().setCallback(mClockCallback);
 
         //System.out.println("Starting test 2");
@@ -74,7 +75,7 @@ public class GameClockTest extends TaflTest implements UiCallback {
 
         mSideExpiredFor = null;
         mTimeExpired = false;
-        mGame = new Game(rules, null, new GameClock.TimeSpec(500, 500, 2, 0));
+        mGame = new Game(rules, null, new TimeSpec(500, 500, 2, 0));
         mGame.getClock().setCallback(mClockCallback);
 
         //System.out.println("Starting test 3");
@@ -138,7 +139,7 @@ public class GameClockTest extends TaflTest implements UiCallback {
         // Test increment time adding
         mSideExpiredFor = null;
         mTimeExpired = false;
-        mGame = new Game(rules, null, new GameClock.TimeSpec(500, 0, 0, 250));
+        mGame = new Game(rules, null, new TimeSpec(500, 0, 0, 250));
         mGame.getClock().setCallback(mClockCallback);
 
         //System.out.println("Starting test 3");

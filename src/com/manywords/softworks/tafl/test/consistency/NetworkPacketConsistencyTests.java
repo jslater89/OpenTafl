@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.test.consistency;
 
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.NetworkDummyDataGenerator;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
@@ -37,7 +38,7 @@ public class NetworkPacketConsistencyTests extends TaflTest {
 
         assert first.equals(second);
 
-        CreateGamePacket cgp = new CreateGamePacket(UUID.randomUUID(), true, "hashypasswordy", Brandub.newBrandub7().getOTRString());
+        CreateGamePacket cgp = new CreateGamePacket(UUID.randomUUID(), true, "hashypasswordy", Brandub.newBrandub7().getOTRString(), new TimeSpec(300000, 15000, 3, 0));
         first = cgp.toString();
 
         cgp = CreateGamePacket.parse(first);

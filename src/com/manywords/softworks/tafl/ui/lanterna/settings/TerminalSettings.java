@@ -1,8 +1,8 @@
 package com.manywords.softworks.tafl.ui.lanterna.settings;
 
-import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import org.ini4j.Wini;
 
 import java.io.File;
@@ -38,7 +38,7 @@ public class TerminalSettings {
 
     public static int variant = 0;
 
-    public static GameClock.TimeSpec timeSpec = new GameClock.TimeSpec(0, 0, 0, 0);
+    public static TimeSpec timeSpec = new TimeSpec(0, 0, 0, 0);
 
     public static String labelForPlayerType(int i) {
         switch(i) {
@@ -143,7 +143,7 @@ public class TerminalSettings {
 
             shrinkLargeBoards = ini.get("display", "shrinklarge", boolean.class);
 
-            GameClock.TimeSpec ts = new GameClock.TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
+            TimeSpec ts = new TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
             timeSpec = ts;
         }
         catch(IOException e) {

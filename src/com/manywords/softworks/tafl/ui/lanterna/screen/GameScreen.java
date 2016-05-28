@@ -14,8 +14,8 @@ import com.manywords.softworks.tafl.command.player.LocalHuman;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.network.client.ClientGameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
@@ -589,8 +589,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         private void tryTimeUpdate() {
             if(!mInGame) {
                 Side currentSide = mReplay.getCurrentState().getCurrentSide();
-                GameClock.TimeSpec attackerClock = mReplay.getTimeGuess(true);
-                GameClock.TimeSpec defenderClock = mReplay.getTimeGuess(false);
+                TimeSpec attackerClock = mReplay.getTimeGuess(true);
+                TimeSpec defenderClock = mReplay.getTimeGuess(false);
                 mStatusWindow.handleTimeUpdate(currentSide, attackerClock, defenderClock);
             }
         }

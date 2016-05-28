@@ -1,12 +1,12 @@
 package com.manywords.softworks.tafl.command.player.external.engine;
 
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
@@ -37,9 +37,9 @@ public class ExternalEngineClient implements UiCallback {
 
     private Rules mRules;
     private Game mGame;
-    private GameClock.TimeSpec mClockLength;
-    private GameClock.TimeSpec mAttackerClock;
-    private GameClock.TimeSpec mDefenderClock;
+    private TimeSpec mClockLength;
+    private TimeSpec mAttackerClock;
+    private TimeSpec mDefenderClock;
     private UiWorkerThread mAiThread;
     private boolean mIsAttackingSide;
 
@@ -136,22 +136,22 @@ public class ExternalEngineClient implements UiCallback {
         int defenderOvertimes = Integer.parseInt(commandParts[4]);
 
         if(mClockLength == null) {
-            mClockLength = new GameClock.TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
+            mClockLength = new TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
             mAttackerClock = mDefenderClock = mClockLength;
         }
         else {
             if(attackerOvertime) {
-                mAttackerClock = new GameClock.TimeSpec(0, attackerMillis, attackerOvertimes, 0);
+                mAttackerClock = new TimeSpec(0, attackerMillis, attackerOvertimes, 0);
             }
             else {
-                mAttackerClock = new GameClock.TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
+                mAttackerClock = new TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
             }
 
             if(defenderOvertime) {
-                mDefenderClock = new GameClock.TimeSpec(0, defenderMillis, defenderOvertimes, 0);
+                mDefenderClock = new TimeSpec(0, defenderMillis, defenderOvertimes, 0);
             }
             else {
-                mDefenderClock = new GameClock.TimeSpec(defenderMillis, overtimeSeconds * 1000, defenderOvertimes, 0);
+                mDefenderClock = new TimeSpec(defenderMillis, overtimeSeconds * 1000, defenderOvertimes, 0);
             }
         }
     }

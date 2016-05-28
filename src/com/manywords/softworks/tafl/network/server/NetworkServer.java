@@ -184,6 +184,11 @@ public class NetworkServer {
             mGames.remove(g);
         }
 
+        IntervalTask clockUpdateTask = g.getClockUpdateTask();
+        if(clockUpdateTask != null) {
+            mGameClockTasks.removeBucketTask(clockUpdateTask);
+        }
+
         g.shutdown();
     }
 

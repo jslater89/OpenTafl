@@ -98,7 +98,7 @@ public class GameDetailWindow extends BasicWindow {
 
                 if (!d.canceled) {
                     if(d.hashedPassword.equals("")) d.hashedPassword = "none";
-                    mCreatePacket = new CreateGamePacket(UUID.randomUUID(), d.attackingSide, d.hashedPassword, d.rules.getOTRString());
+                    mCreatePacket = new CreateGamePacket(UUID.randomUUID(), d.attackingSide, d.hashedPassword, d.rules.getOTRString(), d.timeSpec);
                     mHost.createGame(mCreatePacket);
                 }
                 else {

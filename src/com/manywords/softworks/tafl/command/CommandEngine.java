@@ -1,9 +1,10 @@
 package com.manywords.softworks.tafl.command;
 
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Side;
@@ -375,8 +376,8 @@ public class CommandEngine {
             mReplay.prepareForGameStart(mReplay.getPosition());
 
             if(g.getClock() != null) {
-                GameClock.TimeSpec attackerClock = mReplay.getTimeGuess(true);
-                GameClock.TimeSpec defenderClock = mReplay.getTimeGuess(false);
+                TimeSpec attackerClock = mReplay.getTimeGuess(true);
+                TimeSpec defenderClock = mReplay.getTimeGuess(false);
 
                 g.getClock().getClockEntry(true).setTime(attackerClock);
                 g.getClock().getClockEntry(false).setTime(defenderClock);

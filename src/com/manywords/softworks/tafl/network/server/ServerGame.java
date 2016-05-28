@@ -178,8 +178,8 @@ public class ServerGame {
     }
 
     public void shutdown() {
-        if(mAttackerClient != null) mAttackerClient.setGame(null, GameRole.OUT_OF_GAME);
-        if(mDefenderClient != null) mDefenderClient.setGame(null, GameRole.OUT_OF_GAME);
+        if(mAttackerClient != null) removeClient(mAttackerClient);
+        if(mDefenderClient != null) removeClient(mDefenderClient);
 
         for(ServerClient c : mSpectators) {
             c.setGame(null, GameRole.OUT_OF_GAME);

@@ -1,8 +1,8 @@
 package com.manywords.softworks.tafl.test.mechanics;
 
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
@@ -30,7 +30,7 @@ public class ExternalEngineHostTest extends TaflTest implements UiCallback {
         EngineOutputReader r = new EngineOutputReader(inFromEngine, outToEngine);
 
         Rules rules = Brandub.newBrandub7();
-        Game g = new Game(rules, this, new GameClock.TimeSpec(0, 30000, 5, 1000));
+        Game g = new Game(rules, this, new TimeSpec(0, 30000, 5, 1000));
         r.mGame = g;
 
         ExternalEnginePlayer dummyPlayer = new ExternalEnginePlayer();

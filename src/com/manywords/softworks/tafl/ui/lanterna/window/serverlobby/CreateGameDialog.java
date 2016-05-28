@@ -3,7 +3,7 @@ package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialog;
-import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -20,6 +20,7 @@ public class CreateGameDialog extends DialogWindow {
     public Rules rules;
     public boolean attackingSide;
     public boolean canceled;
+    public TimeSpec timeSpec = new TimeSpec(300000, 15000, 3, 0);
 
     public CreateGameDialog(String title) {
         super(title);

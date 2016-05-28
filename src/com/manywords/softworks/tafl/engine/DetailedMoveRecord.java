@@ -24,6 +24,8 @@ package com.manywords.softworks.tafl.engine;
  * Created by jay on 2/8/16.
  */
 
+import com.manywords.softworks.tafl.engine.clock.GameClock;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.notation.TaflmanCodes;
 import com.manywords.softworks.tafl.rules.*;
@@ -54,7 +56,7 @@ public class DetailedMoveRecord extends MoveRecord {
     public final char[] captureArray;
 
     private String mComment = "";
-    private GameClock.TimeSpec mTimeRemaining;
+    private TimeSpec mTimeRemaining;
 
     public DetailedMoveRecord(Coord start, Coord end, char mover) {
         super(start, end);
@@ -80,16 +82,16 @@ public class DetailedMoveRecord extends MoveRecord {
         this.captureArray = buildCaptureArray(captures, capturedTaflmen);
     }
 
-    public void setTimeRemaining(GameClock.TimeSpec remaining) {
+    public void setTimeRemaining(TimeSpec remaining) {
         mTimeRemaining = remaining;
     }
 
-    public GameClock.TimeSpec getTimeRemaining() {
+    public TimeSpec getTimeRemaining() {
         return mTimeRemaining;
     }
 
     public void setComment(String comment) {
-        GameClock.TimeSpec ts = GameClock.getTimeSpecForGameNotationString(comment);
+        TimeSpec ts = GameClock.getTimeSpecForGameNotationString(comment);
         if(ts != null) {
             mComment = comment.replaceFirst(GameClock.TIME_SPEC_REGEX, "");
             mTimeRemaining = ts;
