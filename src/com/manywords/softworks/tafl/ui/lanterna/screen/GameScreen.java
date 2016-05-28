@@ -576,6 +576,14 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 tryTimeUpdate();
                 updateComments();
             }
+            else if(r.type == CommandResult.Type.CHAT) {
+                if(mServerConnection != null) {
+                    ClientServerConnection.ChatType type =
+                            (mServerConnection.getGameRole() == GameRole.KIBBITZER) ?
+                                    ClientServerConnection.ChatType.SPECTATOR : ClientServerConnection.ChatType.GAME;
+                    mServerConnection.sendChatMessage(type, mServerConnection.getUsername(), r.message);
+                }
+            }
         }
 
         private void tryTimeUpdate() {
@@ -659,6 +667,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(CommandResult.Type.REPLAY_ENTER);
             }
 
+            if(mServerConnection != null) {
+                types.add(CommandResult.Type.CHAT);
+            }
+
             if(mInGame || mPostGame || mInReplay) {
                 types.add(CommandResult.Type.INFO);
                 types.add(CommandResult.Type.SHOW);
@@ -700,8 +712,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         }
 
         @Override
-        public void onChatMessageReceived(String sender, String message) {
-
+        public void onChatMessageReceived(ClientServerConnection.ChatType type, String sender, String message) {
+            if(type == ClientServerConnection.ChatType.GAME) statusText(sender + ": " + message);
+            if(type == ClientServerConnection.ChatType.SPECTATOR
+                    && mServerConnection != null
+                    && mServerConnection.getGameRole() == GameRole.KIBBITZER) {
+                statusText(sender + ": " + message);
+            }
         }
 
         @Override

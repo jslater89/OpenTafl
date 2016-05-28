@@ -24,6 +24,5 @@ public class GameListUpdateTask extends IntervalTask {
     @Override
     public void run() {
         mClient.writePacket(GameListPacket.parse(mServer.getGames()));
-        //mClient.writePacket(GameListPacket.parse(NetworkDummyDataGenerator.getDummyGames(mServer, new Random().nextInt(25) + 1)));
     }
 }

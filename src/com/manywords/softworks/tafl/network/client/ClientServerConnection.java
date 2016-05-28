@@ -2,13 +2,13 @@ package com.manywords.softworks.tafl.network.client;
 
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
 import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.rules.Rules;
-import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -21,13 +21,19 @@ import java.util.UUID;
 public class ClientServerConnection {
     public interface ClientServerCallback {
         public void onStateChanged(State newState);
-        public void onChatMessageReceived(String sender, String message);
+        public void onChatMessageReceived(ChatType type, String sender, String message);
         public void onSuccessReceived(String message);
         public void onErrorReceived(String message);
         public void onGameListReceived(List<ClientGameInformation> games);
         public void onDisconnect(boolean planned);
         public void onStartGame(Rules r);
         public void onServerMoveReceived(MoveRecord move);
+    }
+
+    public enum ChatType {
+        LOBBY,
+        GAME,
+        SPECTATOR
     }
 
     public enum State {
@@ -49,6 +55,7 @@ public class ClientServerConnection {
     private PrintWriter mServerWriter;
     private Thread mReadThread;
 
+    private String mUsername;
     private UUID mServerGameUUID;
     private GameRole mGameRole = GameRole.OUT_OF_GAME;
     private NetworkClientPlayer mNetworkPlayer;
@@ -77,6 +84,7 @@ public class ClientServerConnection {
             mReadThread = new ReadThread();
             mReadThread.start();
 
+            mUsername = username;
             sendRegistrationMessage(username, hashedPassword);
             return true;
         } catch (IOException e) {
@@ -123,12 +131,18 @@ public class ClientServerConnection {
         }
     }
 
+    public String getUsername() {
+        return mUsername;
+    }
+
     public void sendRegistrationMessage(String username, String hashedPassword) {
         mServerWriter.println(new LoginPacket(username, hashedPassword));
     }
 
-    public void sendChatMessage(String sender, String message) {
-        mServerWriter.println(new LobbyChatPacket(sender, message));
+    public void sendChatMessage(ChatType type, String sender, String message) {
+        if(type == ChatType.LOBBY) mServerWriter.println(new LobbyChatPacket(sender, message));
+        else if(type == ChatType.GAME) mServerWriter.println(new GameChatPacket(sender, message));
+        else if(type == ChatType.SPECTATOR) mServerWriter.println(new GameChatPacket(sender, message));
     }
 
     public void sendJoinGameMessage(JoinGamePacket packet) {
@@ -199,8 +213,8 @@ public class ClientServerConnection {
         }
 
         @Override
-        public void onChatMessageReceived(String sender, String message) {
-            mExternalCallback.onChatMessageReceived(sender, message);
+        public void onChatMessageReceived(ChatType type, String sender, String message) {
+            mExternalCallback.onChatMessageReceived(type, sender, message);
         }
 
         @Override

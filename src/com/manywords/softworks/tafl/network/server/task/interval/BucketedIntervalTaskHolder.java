@@ -35,8 +35,18 @@ public class BucketedIntervalTaskHolder extends IntervalTaskHolder {
     }
 
     public void addBucketTask(IntervalTask task) {
-        int bucket = r.nextInt(mBuckets.length);
-        mBuckets[bucket].add(task);
+        if(!containsBucketTask(task)) {
+            int bucket = r.nextInt(mBuckets.length);
+            mBuckets[bucket].add(task);
+        }
+    }
+
+    public boolean containsBucketTask(IntervalTask task) {
+        for(List<IntervalTask> bucket : mBuckets) {
+            if(bucket.contains(task)) return true;
+        }
+
+        return false;
     }
 
     public void removeBucketTask(IntervalTask task) {

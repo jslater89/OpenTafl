@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.network.client;
 
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MoveResultPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
@@ -16,7 +17,7 @@ public class ClientCommandParser {
     public static void handlePacket(ClientServerConnection.ClientServerCallback callback, String data) {
         if(data.startsWith("lobby-chat")) {
             LobbyChatPacket packet = LobbyChatPacket.parse(data);
-            callback.onChatMessageReceived(packet.sender, packet.message);
+            callback.onChatMessageReceived(ClientServerConnection.ChatType.LOBBY, packet.sender, packet.message);
         }
         else if(data.startsWith("error")) {
             ErrorPacket packet = ErrorPacket.parse(data);
@@ -43,6 +44,10 @@ public class ClientCommandParser {
         else if(data.startsWith("move")) {
             MovePacket packet = MovePacket.parse(data);
             callback.onServerMoveReceived(packet.move);
+        }
+        else if(data.startsWith("game-chat")) {
+            GameChatPacket packet = GameChatPacket.parse(data);
+            callback.onChatMessageReceived(ClientServerConnection.ChatType.GAME, packet.sender, packet.message);
         }
     }
 }

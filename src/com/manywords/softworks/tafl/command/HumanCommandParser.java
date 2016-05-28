@@ -58,6 +58,9 @@ public class HumanCommandParser {
         else if(command.startsWith("jump")) {
             return newReplayJumpCommand(engine, command);
         }
+        else if(command.startsWith("chat")) {
+            return newChatCommand(engine, command);
+        }
         return null;
     }
 
@@ -78,6 +81,7 @@ public class HumanCommandParser {
     public static ReplayNext newReplayNextCommand(CommandEngine engine, String command) { return new ReplayNext(engine, command); }
     public static ReplayPrevious newReplayPreviousCommand(CommandEngine engine, String command) { return new ReplayPrevious(engine, command); }
     public static ReplayJump newReplayJumpCommand(CommandEngine engine, String command) { return new ReplayJump(engine, command); }
+    public static Chat newChatCommand(CommandEngine engine, String command) { return new Chat(engine, command); }
 
     public static class Move extends Command {
         public final Coord from;
@@ -286,6 +290,12 @@ public class HumanCommandParser {
                 }
                 turnIndex = index - 1;
             }
+        }
+    }
+    public static class Chat extends Command {
+        public final String message;
+        public Chat(CommandEngine engine, String command) {
+            message = command.replaceFirst("chat", "").trim();
         }
     }
 

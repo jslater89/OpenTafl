@@ -25,6 +25,7 @@ public class CommandResult {
         REPLAY_NEXT,
         REPLAY_PREVIOUS,
         REPLAY_JUMP,
+        CHAT,
     }
 
     public final Type type;

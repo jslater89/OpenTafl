@@ -86,6 +86,15 @@ public class ServerGame {
         else return false;
     }
 
+    public synchronized List<ServerClient> getAllClients() {
+        List<ServerClient> clients = new ArrayList<>();
+        if(mAttackerClient != null) clients.add(mAttackerClient);
+        if(mDefenderClient != null) clients.add(mDefenderClient);
+        clients.addAll(mSpectators);
+
+        return clients;
+    }
+
     public synchronized boolean tryJoinGame(ServerClient c, String password) {
         return tryJoinGame(c, password, true, true);
     }
@@ -108,11 +117,7 @@ public class ServerGame {
         }
 
         if(mAttackerClient != null && mDefenderClient != null) {
-            List<ServerClient> clients = new ArrayList<>();
-            clients.add(mAttackerClient);
-            clients.add(mDefenderClient);
-            clients.addAll(mSpectators);
-            mServer.getTaskQueue().pushTask(new StartGameTask(mServer, this, clients, new StartGamePacket(mGame.getRules())));
+            mServer.getTaskQueue().pushTask(new StartGameTask(mServer, this, getAllClients(), new StartGamePacket(mGame.getRules())));
         }
 
         return retval;

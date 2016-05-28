@@ -427,6 +427,11 @@ public class CommandEngine {
             if(state != null) return new CommandResult(CommandResult.Type.REPLAY_JUMP, CommandResult.SUCCESS, "", null);
             else return new CommandResult(CommandResult.Type.REPLAY_JUMP, CommandResult.FAIL, "Turn index " + j + " out of bounds.", null);
         }
+        // 18. CHAT COMMAND
+        else if(command instanceof HumanCommandParser.Chat) {
+            HumanCommandParser.Chat c = (HumanCommandParser.Chat) command;
+            return new CommandResult(CommandResult.Type.CHAT, CommandResult.SUCCESS, c.message, null);
+        }
 
         return new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, "Command not recognized", null);
     }

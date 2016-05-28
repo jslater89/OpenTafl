@@ -220,7 +220,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void sendChatMessage(String message) {
-            mConnection.sendChatMessage(TerminalSettings.onlinePlayerName, message);
+            mConnection.sendChatMessage(ClientServerConnection.ChatType.LOBBY, TerminalSettings.onlinePlayerName, message);
         }
 
         @Override
@@ -256,8 +256,8 @@ public class ServerLobbyScreen extends LogicalScreen {
         }
 
         @Override
-        public void onChatMessageReceived(String sender, String message) {
-            mChatWindow.onChatMessageReceived(sender, message);
+        public void onChatMessageReceived(ClientServerConnection.ChatType type, String sender, String message) {
+            if(type.equals(ClientServerConnection.ChatType.LOBBY)) mChatWindow.onChatMessageReceived(sender, message);
         }
 
         @Override

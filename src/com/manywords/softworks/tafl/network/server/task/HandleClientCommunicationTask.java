@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server.task;
 
+import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
@@ -28,7 +29,6 @@ public class HandleClientCommunicationTask implements Runnable {
         }
         else if(data.startsWith("game-list")) {
             mServer.getTaskQueue().pushTask(new SendPacketTask(GameListPacket.parse(mServer.getGames()), mClient), PriorityTaskQueue.Priority.LOW);
-            //mServer.getTaskQueue().pushTask(new SendPacketTask(GameListPacket.parse(NetworkDummyDataGenerator.getDummyGames(mServer, new Random().nextInt(20))), mClient), PriorityTaskQueue.Priority.LOW);
         }
         else if(data.startsWith("create-game")) {
             mServer.getTaskQueue().pushTask(new CreateGameTask(mServer, mClient, CreateGamePacket.parse(data)));
@@ -41,6 +41,9 @@ public class HandleClientCommunicationTask implements Runnable {
         }
         else if(data.startsWith("move")) {
             mServer.getTaskQueue().pushTask(new MoveTask(mServer, mClient, MovePacket.parse(data)), PriorityTaskQueue.Priority.HIGH);
+        }
+        else if(data.startsWith("game-chat")) {
+            mServer.getTaskQueue().pushTask(new GameChatTask(mServer, mClient, GameChatPacket.parse(data)), PriorityTaskQueue.Priority.LOW);
         }
     }
 
