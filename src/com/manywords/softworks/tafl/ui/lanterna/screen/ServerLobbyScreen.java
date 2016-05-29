@@ -331,5 +331,10 @@ public class ServerLobbyScreen extends LogicalScreen {
         public void onServerMoveReceived(MoveRecord move) {
 
         }
+
+        @Override
+        public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock) {
+
+        }
     }
 }

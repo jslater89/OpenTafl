@@ -30,6 +30,7 @@ public class ClientServerConnection {
         public void onDisconnect(boolean planned);
         public void onStartGame(Rules r);
         public void onServerMoveReceived(MoveRecord move);
+        public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock);
     }
 
     public enum ChatType {
@@ -300,6 +301,11 @@ public class ClientServerConnection {
         @Override
         public void onServerMoveReceived(MoveRecord move) {
             mNetworkPlayer.onMoveDecided(move);
+        }
+
+        @Override
+        public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock) {
+            mExternalCallback.onClockUpdateReceived(attackerClock, defenderClock);
         }
     }
 }

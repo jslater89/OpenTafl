@@ -750,6 +750,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         public void onServerMoveReceived(MoveRecord move) {
 
         }
+
+        @Override
+        public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock) {
+            if(mGame.getClock() != null) {
+                mGame.getClock().handleNetworkTimeUpdate(attackerClock, defenderClock);
+            }
+        }
     }
 
 }

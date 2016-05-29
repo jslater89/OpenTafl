@@ -54,6 +54,13 @@ public class GameClock {
         mServerMode = on;
     }
 
+    public void handleNetworkTimeUpdate(TimeSpec attackerClock, TimeSpec defenderClock) {
+        synchronized (mClocks) {
+            mClocks[ATTACKERS].setTime(attackerClock);
+            mClocks[DEFENDERS].setTime(defenderClock);
+        }
+    }
+
     public void setCallback(GameClockCallback callback) {
         mCallback = callback;
     }

@@ -256,8 +256,9 @@ public class ServerGame {
 
                 ClockUpdatePacket packet = new ClockUpdatePacket(attacker, defender);
 
-                mServer.sendPacketToClient(mAttackerClient, packet, PriorityTaskQueue.Priority.HIGH);
-                mServer.sendPacketToClient(mDefenderClient, packet, PriorityTaskQueue.Priority.HIGH);
+                // They can be null after the end of a game.
+                if(mAttackerClient != null) mServer.sendPacketToClient(mAttackerClient, packet, PriorityTaskQueue.Priority.HIGH);
+                if(mDefenderClient != null) mServer.sendPacketToClient(mDefenderClient, packet, PriorityTaskQueue.Priority.HIGH);
 
                 mServer.sendPacketToClients(getSpectators(), packet, PriorityTaskQueue.Priority.LOW);
             }

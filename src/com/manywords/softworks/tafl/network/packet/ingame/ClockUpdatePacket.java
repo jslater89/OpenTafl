@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.network.packet.NetworkPacket;
  * Created by jay on 5/28/16.
  */
 public class ClockUpdatePacket extends NetworkPacket {
+    public static final String PREFIX = "clock-update";
     public final TimeSpec attackerClock;
     public final TimeSpec defenderClock;
 
@@ -27,6 +28,6 @@ public class ClockUpdatePacket extends NetworkPacket {
 
     @Override
     public String toString() {
-        return "clock-update " + attackerClock.toMachineReadableString() + " " + defenderClock.toMachineReadableString();
+        return PREFIX + " " + attackerClock.toMachineReadableString() + " " + defenderClock.toMachineReadableString();
     }
 }
