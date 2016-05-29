@@ -1,10 +1,7 @@
 package com.manywords.softworks.tafl.network.client;
 
 import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.network.packet.ingame.ClockUpdatePacket;
-import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
-import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
-import com.manywords.softworks.tafl.network.packet.ingame.MoveResultPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.*;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.GameListPacket;
@@ -15,7 +12,8 @@ import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
  * Created by jay on 5/23/16.
  */
 public class ClientCommandParser {
-    // TODO: handle victory packets, game finished packets
+    // TODO: handle victory packets
+    // TODO: game finished packets
     public static void handlePacket(ClientServerConnection.ClientServerCallback callback, String data) {
         if(data.startsWith(LobbyChatPacket.PREFIX)) {
             LobbyChatPacket packet = LobbyChatPacket.parse(data);
@@ -54,6 +52,10 @@ public class ClientCommandParser {
         else if(data.startsWith(ClockUpdatePacket.PREFIX)) {
             ClockUpdatePacket packet = ClockUpdatePacket.parse(data);
             callback.onClockUpdateReceived(packet.attackerClock, packet.defenderClock);
+        }
+        else if(data.startsWith(VictoryPacket.PREFIX)) {
+            VictoryPacket packet = VictoryPacket.parse(data);
+            callback.onVictory(packet.victory);
         }
     }
 }

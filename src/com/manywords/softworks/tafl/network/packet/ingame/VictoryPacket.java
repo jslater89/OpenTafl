@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.rules.Side;
  * Created by jay on 5/28/16.
  */
 public class VictoryPacket extends NetworkPacket {
+    public static final String PREFIX = "victory";
     public enum Victory {
         ATTACKER,
         DEFENDER,
@@ -39,6 +40,6 @@ public class VictoryPacket extends NetworkPacket {
 
     @Override
     public String toString() {
-        return "victory " + victory;
+        return PREFIX + " " + victory;
     }
 }

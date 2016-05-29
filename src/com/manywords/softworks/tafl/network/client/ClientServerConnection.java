@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
+import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
@@ -31,6 +32,7 @@ public class ClientServerConnection {
         public void onStartGame(Rules r);
         public void onServerMoveReceived(MoveRecord move);
         public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock);
+        public void onVictory(VictoryPacket.Victory victory);
     }
 
     public enum ChatType {
@@ -261,7 +263,7 @@ public class ClientServerConnection {
 
         @Override
         public void onErrorReceived(String message) {
-            if(message.equals(ErrorPacket.GAME_CANCELED)) {
+            if(message.equals(ErrorPacket.LEAVE_GAME)) {
                 requestGameUpdate();
             }
 
@@ -306,6 +308,11 @@ public class ClientServerConnection {
         @Override
         public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock) {
             mExternalCallback.onClockUpdateReceived(attackerClock, defenderClock);
+        }
+
+        @Override
+        public void onVictory(VictoryPacket.Victory victory) {
+            mExternalCallback.onVictory(victory);
         }
     }
 }

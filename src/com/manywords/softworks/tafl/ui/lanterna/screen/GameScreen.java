@@ -20,6 +20,7 @@ import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection.ClientServerCallback;
+import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
@@ -756,6 +757,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             if(mGame.getClock() != null) {
                 mGame.getClock().handleNetworkTimeUpdate(attackerClock, defenderClock);
             }
+        }
+
+        @Override
+        public void onVictory(VictoryPacket.Victory victory) {
+            mCommandEngine.networkVictory(victory);
         }
     }
 

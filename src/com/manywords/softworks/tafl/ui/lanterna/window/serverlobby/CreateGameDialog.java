@@ -124,6 +124,13 @@ public class CreateGameDialog extends DialogWindow {
     }
 
     @Override
+    public Object showDialog(WindowBasedTextGUI textGUI) {
+        return super.showDialog(textGUI);
+
+        // TODO: push settings to TerminalSettings
+    }
+
+    @Override
     public TerminalSize getPreferredSize() {
         TerminalSize preferredSize = super.getPreferredSize();
         if(!preferredSize.equals(mCachedSize)) {

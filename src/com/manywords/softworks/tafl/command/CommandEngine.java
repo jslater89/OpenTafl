@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
+import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
@@ -142,6 +143,20 @@ public class CommandEngine {
         if(!quiet) {
             callbackGameFinished();
         }
+    }
+
+    public void networkVictory(VictoryPacket.Victory victory) {
+        if(victory == VictoryPacket.Victory.ATTACKER) {
+            callbackVictoryForSide(mGame.getCurrentState().getAttackers());
+        }
+        else if(victory == VictoryPacket.Victory.DEFENDER) {
+            callbackVictoryForSide(mGame.getCurrentState().getDefenders());
+        }
+        else if(victory == VictoryPacket.Victory.DRAW) {
+            callbackVictoryForSide(null);
+        }
+
+        finishGame();
     }
 
     public void stopPlayers() {

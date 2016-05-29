@@ -13,6 +13,7 @@ import com.manywords.softworks.tafl.network.packet.ingame.ClockUpdatePacket;
 import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
+import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.server.task.StartGameTask;
 import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
@@ -180,13 +181,22 @@ public class ServerGame {
     }
 
     public void removeClient(ServerClient client) {
-        // TODO: notify other client that the client left
-        // TODO: notify other client that hey, they win!
         if(client.equals(mAttackerClient)) {
             setAttackerClient(null);
+            if(mDefenderClient != null) {
+                mServer.sendPacketToClient(mDefenderClient, new VictoryPacket(VictoryPacket.Victory.DEFENDER), PriorityTaskQueue.Priority.LOW);
+                mServer.sendPacketToClient(mDefenderClient, new GameEndedPacket(), PriorityTaskQueue.Priority.LOW);
+                mServer.sendPacketToClient(mDefenderClient, new ErrorPacket(ErrorPacket.OPPONENT_LEFT), PriorityTaskQueue.Priority.LOW);
+            }
         }
         else if(client.equals(mDefenderClient)) {
             setDefenderClient(null);
+
+            if(mAttackerClient != null) {
+                mServer.sendPacketToClient(mAttackerClient, new VictoryPacket(VictoryPacket.Victory.ATTACKER), PriorityTaskQueue.Priority.LOW);
+                mServer.sendPacketToClient(mAttackerClient, new GameEndedPacket(), PriorityTaskQueue.Priority.LOW);
+                mServer.sendPacketToClient(mAttackerClient, new ErrorPacket(ErrorPacket.OPPONENT_LEFT), PriorityTaskQueue.Priority.LOW);
+            }
         }
         else {
             removeSpectator(client);

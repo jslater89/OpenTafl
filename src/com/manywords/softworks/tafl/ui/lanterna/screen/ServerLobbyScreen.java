@@ -13,6 +13,7 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
+import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
@@ -334,6 +335,11 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock) {
+
+        }
+
+        @Override
+        public void onVictory(VictoryPacket.Victory victory) {
 
         }
     }

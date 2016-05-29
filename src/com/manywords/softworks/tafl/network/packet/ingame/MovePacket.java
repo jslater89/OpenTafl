@@ -12,7 +12,7 @@ public class MovePacket extends NetworkPacket {
     public final MoveRecord move;
 
     public static MovePacket parse(String data) {
-        data = data.replaceFirst("move", "").trim();
+        data = data.replaceFirst(PREFIX, "").trim();
         MoveRecord m = MoveSerializer.loadMoveRecord(data);
         return new MovePacket(m);
     }

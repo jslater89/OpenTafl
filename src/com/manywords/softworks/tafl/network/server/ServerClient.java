@@ -28,6 +28,7 @@ public class ServerClient {
     private List<IntervalTask> mInGameTasks;
 
     private ServerGame mGame;
+    private boolean mInGame;
     private GameRole mGameRole = GameRole.OUT_OF_GAME;
 
     protected ServerClient() {
@@ -63,7 +64,7 @@ public class ServerClient {
         mGameRole = role;
 
         if(mGame == null) {
-            writePacket(new ErrorPacket(ErrorPacket.GAME_CANCELED));
+            writePacket(new ErrorPacket(ErrorPacket.LEAVE_GAME));
         }
     }
 
