@@ -20,29 +20,29 @@ public class HandleClientCommunicationTask implements Runnable {
     }
 
     private void processPacket(String data) {
-        if(data.startsWith("lobby-chat")) {
+        if(data.startsWith(LobbyChatPacket.PREFIX)) {
             LobbyChatPacket packet = LobbyChatPacket.parse(data);
             mServer.sendPacketToAllClients(packet, PriorityTaskQueue.Priority.LOW);
         }
-        else if(data.startsWith("login")) {
+        else if(data.startsWith(LoginPacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new LoginTask(mServer, mClient, LoginPacket.parse(data)));
         }
-        else if(data.startsWith("game-list")) {
+        else if(data.startsWith(GameListPacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new SendPacketTask(GameListPacket.parse(mServer.getGames()), mClient), PriorityTaskQueue.Priority.LOW);
         }
-        else if(data.startsWith("create-game")) {
+        else if(data.startsWith(CreateGamePacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new CreateGameTask(mServer, mClient, CreateGamePacket.parse(data)));
         }
-        else if(data.startsWith("leave-game")) {
+        else if(data.startsWith(LeaveGamePacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new LeaveGameTask(mServer, mClient, LeaveGamePacket.parse(data)));
         }
-        else if(data.startsWith("join-game")) {
+        else if(data.startsWith(JoinGamePacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new JoinGameTask(mServer, mClient, JoinGamePacket.parse(data)));
         }
-        else if(data.startsWith("move")) {
+        else if(data.startsWith(MovePacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new MoveTask(mServer, mClient, MovePacket.parse(data)), PriorityTaskQueue.Priority.HIGH);
         }
-        else if(data.startsWith("game-chat")) {
+        else if(data.startsWith(GameChatPacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new GameChatTask(mServer, mClient, GameChatPacket.parse(data)), PriorityTaskQueue.Priority.LOW);
         }
     }

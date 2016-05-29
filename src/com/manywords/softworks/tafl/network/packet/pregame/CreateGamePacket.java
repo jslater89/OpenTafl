@@ -11,6 +11,7 @@ import java.util.UUID;
  * Created by jay on 5/26/16.
  */
 public class CreateGamePacket extends NetworkPacket {
+    public static final String PREFIX = "create-game";
     public final UUID uuid;
     public final boolean attackingSide;
     public final boolean passworded;
@@ -51,6 +52,6 @@ public class CreateGamePacket extends NetworkPacket {
     }
 
     public String toString() {
-        return "create-game " + uuid.toString() + " " + (attackingSide ? "attackers" : "defenders") + " " + passwordHash + " " + timeSpec.toMachineReadableString() + " " + otnRulesString;
+        return PREFIX + " " + uuid.toString() + " " + (attackingSide ? "attackers" : "defenders") + " " + passwordHash + " " + timeSpec.toMachineReadableString() + " " + otnRulesString;
     }
 }

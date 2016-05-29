@@ -4,6 +4,7 @@ package com.manywords.softworks.tafl.network.packet.pregame;
  * Created by jay on 5/23/16.
  */
 public class LoginPacket {
+    public static final String PREFIX = "login";
     public final String username;
     public final String password;
 
@@ -23,6 +24,6 @@ public class LoginPacket {
 
     @Override
     public String toString() {
-        return "login \"" + username +"\" " + password;
+        return PREFIX + " \"" + username +"\" " + password;
     }
 }

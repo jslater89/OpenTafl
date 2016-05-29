@@ -8,6 +8,7 @@ import java.util.UUID;
  * Created by jay on 5/26/16.
  */
 public class JoinGamePacket extends NetworkPacket {
+    public static final String PREFIX = "join-game";
     public final UUID uuid;
     public final boolean spectate;
     public final String hashedPassword;
@@ -26,6 +27,6 @@ public class JoinGamePacket extends NetworkPacket {
     }
 
     public String toString() {
-        return "join-game " + uuid + " " + spectate + " " + hashedPassword;
+        return PREFIX + " " + uuid + " " + spectate + " " + hashedPassword;
     }
 }

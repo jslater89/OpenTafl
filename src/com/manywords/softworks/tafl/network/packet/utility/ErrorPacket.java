@@ -13,6 +13,7 @@ public class ErrorPacket extends NetworkPacket {
     public static final String INVALID_GAME_PASSWORD = "invalid-game-password";
     public static final String OPPONENT_LEFT = "opponent-left"; // TODO: implement opponent_left to end game
     public static final String DESYNC = "desync";
+    public static final String PREFIX = "error";
 
     public final String error;
 
@@ -25,6 +26,6 @@ public class ErrorPacket extends NetworkPacket {
     }
 
     public String toString() {
-        return "error " + error;
+        return PREFIX + " " + error;
     }
 }

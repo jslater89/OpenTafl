@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.network.packet.NetworkPacket;
  * Created by jay on 5/26/16.
  */
 public class MoveResultPacket extends NetworkPacket {
+    public static final String PREFIX = "move-result";
     public int moveResult;
 
     public static MoveResultPacket parse(String data) {
@@ -20,6 +21,6 @@ public class MoveResultPacket extends NetworkPacket {
 
     @Override
     public String toString() {
-        return "move-result " + moveResult;
+        return PREFIX + " " + moveResult;
     }
 }

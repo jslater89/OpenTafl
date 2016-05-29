@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.notation.MoveSerializer;
  * Created by jay on 5/26/16.
  */
 public class MovePacket extends NetworkPacket {
+    public static final java.lang.String PREFIX = "move-record";
     public final MoveRecord move;
 
     public static MovePacket parse(String data) {
@@ -22,6 +23,6 @@ public class MovePacket extends NetworkPacket {
 
     @Override
     public String toString() {
-        return "move " + move.toString();
+        return PREFIX + " " + move.toString();
     }
 }

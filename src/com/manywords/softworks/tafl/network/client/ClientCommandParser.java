@@ -17,7 +17,7 @@ import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
 public class ClientCommandParser {
     // TODO: handle victory packets, game finished packets
     public static void handlePacket(ClientServerConnection.ClientServerCallback callback, String data) {
-        if(data.startsWith("lobby-chat")) {
+        if(data.startsWith(LobbyChatPacket.PREFIX)) {
             LobbyChatPacket packet = LobbyChatPacket.parse(data);
             callback.onChatMessageReceived(ClientServerConnection.ChatType.LOBBY, packet.sender, packet.message);
         }

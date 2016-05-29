@@ -9,6 +9,8 @@ import com.manywords.softworks.tafl.rules.Rules;
  * Created by jay on 5/26/16.
  */
 public class StartGamePacket extends NetworkPacket {
+    public static final String PREFIX = "start-game";
+
     public final Rules rules;
 
     public static StartGamePacket parse(String data) {
@@ -23,6 +25,6 @@ public class StartGamePacket extends NetworkPacket {
 
     @Override
     public String toString() {
-        return "start-game " + rules.getOTRString();
+        return PREFIX + " " + rules.getOTRString();
     }
 }

@@ -12,6 +12,7 @@ import java.util.List;
  * Created by jay on 5/24/16.
  */
 public class GameListPacket extends NetworkPacket {
+    public static final String PREFIX = "game-list";
     public final List<GameInformation> games;
 
     public static GameListPacket parse(String data) {
@@ -71,7 +72,7 @@ public class GameListPacket extends NetworkPacket {
     }
 
     public String toString() {
-        String result = "game-list ";
+        String result = PREFIX + " ";
         for(GameInformation g : games) {
             result += g.toString() + "||";
         }

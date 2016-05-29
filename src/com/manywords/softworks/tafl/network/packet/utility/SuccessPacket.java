@@ -9,6 +9,7 @@ public class SuccessPacket extends NetworkPacket {
     public static final String JOINED_ATTACKERS = "attackers";
     public static final String JOINED_DEFENDERS = "defenders";
     public static final String LOGGED_IN = "logged-in";
+    public static final String PREFIX = "success";
 
     public final String message;
 
@@ -21,6 +22,6 @@ public class SuccessPacket extends NetworkPacket {
     }
     @Override
     public String toString() {
-        return "success " + message;
+        return PREFIX + " " + message;
     }
 }

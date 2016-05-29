@@ -8,6 +8,7 @@ import java.util.UUID;
  * Created by jay on 5/26/16.
  */
 public class LeaveGamePacket extends NetworkPacket {
+    public static final String PREFIX = "leave-game";
     public final UUID uuid;
 
     public static LeaveGamePacket parse(String data) {
@@ -21,6 +22,6 @@ public class LeaveGamePacket extends NetworkPacket {
     }
 
     public String toString() {
-        return "leave-game " + uuid;
+        return PREFIX + " " + uuid;
     }
 }

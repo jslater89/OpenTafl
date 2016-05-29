@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.network.packet.NetworkPacket;
  * Created by jay on 5/23/16.
  */
 public class LobbyChatPacket extends NetworkPacket {
+    public static final String PREFIX = "lobby-chat";
     public final String sender;
     public final String message;
 
@@ -20,6 +21,6 @@ public class LobbyChatPacket extends NetworkPacket {
     }
 
     public String toString() {
-        return "lobby-chat \"" + sender + "\" " + message;
+        return PREFIX + " " + "\"" + sender + "\" " + message;
     }
 }
