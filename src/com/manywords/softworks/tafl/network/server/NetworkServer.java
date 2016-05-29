@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.database.PlayerDatabase;
 import com.manywords.softworks.tafl.network.server.database.file.FileBackedPlayerDatabase;
@@ -90,7 +91,13 @@ public class NetworkServer {
 
     public void sendPacketToAllClients(NetworkPacket packet, PriorityTaskQueue.Priority priority) {
         for(ServerClient client : mClients) {
-            mTaskQueue.pushTask(new SendPacketTask(packet, client), priority);
+            sendPacketToClient(client, packet, priority);
+        }
+    }
+
+    public void sendPacketToClients(List<ServerClient> clients, NetworkPacket packet, PriorityTaskQueue.Priority priority) {
+        for(ServerClient client : clients) {
+            sendPacketToClient(client, packet, priority);
         }
     }
 
@@ -143,6 +150,10 @@ public class NetworkServer {
     }
 
     public boolean createGame(ServerClient client, UUID gameUUID, String password, Rules rules, boolean attackingSide) {
+        return createGame(client, gameUUID, password, rules, attackingSide, null);
+    }
+
+    public boolean createGame(ServerClient client, UUID gameUUID, String password, Rules rules, boolean attackingSide, TimeSpec clockSetting) {
         if(client.getGame() != null) {
             return false;
         }
@@ -151,6 +162,10 @@ public class NetworkServer {
         g.setRules(rules);
         if(!password.equals("none")) {
             g.setPassword(password);
+        }
+
+        if(clockSetting != null) {
+            g.setClock(clockSetting);
         }
 
         if(attackingSide) {
@@ -168,11 +183,12 @@ public class NetworkServer {
     }
 
     public void startGame(ServerGame game) {
-        game.startGame();
         IntervalTask clockUpdateTask = game.getClockUpdateTask();
         if(clockUpdateTask != null) {
             mGameClockTasks.addBucketTask(clockUpdateTask);
         }
+
+        game.startGame();
     }
 
     /**

@@ -31,7 +31,7 @@ public class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCa
     }
 
     @Override
-    public void timeUpdate(Side side) {
+    public void timeUpdate(boolean currentSideAttackers) {
 
     }
 

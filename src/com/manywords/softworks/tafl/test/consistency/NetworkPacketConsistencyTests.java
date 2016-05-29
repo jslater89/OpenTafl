@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.test.consistency;
 
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.NetworkDummyDataGenerator;
+import com.manywords.softworks.tafl.network.packet.ingame.ClockUpdatePacket;
+import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.test.TaflTest;
@@ -59,6 +61,22 @@ public class NetworkPacketConsistencyTests extends TaflTest {
 
         joinp = JoinGamePacket.parse(first);
         second = joinp.toString();
+
+        assert first.equals(second);
+
+        VictoryPacket vic = new VictoryPacket(VictoryPacket.Victory.ATTACKER);
+        first = vic.toString();
+
+        vic = VictoryPacket.parse(first);
+        second = vic.toString();
+
+        assert first.equals(second);
+
+        ClockUpdatePacket cloc = new ClockUpdatePacket(new TimeSpec(30000, 30000, 3, 0), new TimeSpec(47500, 12841, 2, 0));
+        first = cloc.toString();
+
+        cloc = ClockUpdatePacket.parse(first);
+        second = cloc.toString();
 
         assert first.equals(second);
 

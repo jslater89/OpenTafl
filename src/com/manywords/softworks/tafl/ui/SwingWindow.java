@@ -67,7 +67,7 @@ public class SwingWindow extends JFrame implements UiCallback {
     }
 
     @Override
-    public void timeUpdate(Side side) {
+    public void timeUpdate(boolean currentSideAttackers) {
 
     }
 

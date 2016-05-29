@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialog;
@@ -8,6 +9,7 @@ import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
+import com.manywords.softworks.tafl.ui.lanterna.window.mainmenu.TimeEntryDialog;
 
 import java.util.regex.Pattern;
 
@@ -20,7 +22,10 @@ public class CreateGameDialog extends DialogWindow {
     public Rules rules;
     public boolean attackingSide;
     public boolean canceled;
-    public TimeSpec timeSpec = new TimeSpec(300000, 15000, 3, 0);
+    public TimeSpec timeSpec = new TimeSpec(0, 0, 0, 0);
+
+    private TerminalSize mCachedSize = new TerminalSize(0, 0);
+    private TextBox mPasswordInput;
 
     public CreateGameDialog(String title) {
         super(title);
@@ -44,10 +49,25 @@ public class CreateGameDialog extends DialogWindow {
         });
         rules = BuiltInVariants.availableRules.get(TerminalSettings.variant);
 
+        final Label timeLabel = new Label("Untimed");
+        final Button timeButton = new Button("Clock settings", () -> {
+            TimeEntryDialog d = new TimeEntryDialog("Clock settings");
+            d.showDialog(getTextGUI());
+
+            if(d.timeSpec.mainTime == 0 && (d.timeSpec.overtimeTime == 0 || d.timeSpec.overtimeCount == 0)) {
+                timeSpec = new TimeSpec(0, 0, 0, 0);
+                timeLabel.setText("Untimed");
+            }
+            else {
+                timeSpec = d.timeSpec;
+                timeLabel.setText(timeSpec.toHumanString());
+            }
+        });
+
         final Label passwordLabel = new Label("Password");
-        final TextBox passwordInput = new TextBox();
-        passwordInput.setMask('*');
-        passwordInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
+        mPasswordInput = new TextBox();
+        mPasswordInput.setMask('*');
+        mPasswordInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
 
         final Label sideLabel = new Label("Side");
         final RadioBoxList<String> sideChooser = new RadioBoxList<>();
@@ -57,7 +77,7 @@ public class CreateGameDialog extends DialogWindow {
 
         final Button finishButton = new Button("Create", () -> {
             if(sideChooser.getCheckedItem().equals("Attackers")) attackingSide = true;
-            hashedPassword = passwordInput.getText();
+            hashedPassword = mPasswordInput.getText();
             hashedPassword = (hashedPassword.isEmpty() ? "none" : hashedPassword);
             if(!hashedPassword.equals("none")) {
                 hashedPassword = PasswordHasher.hashPassword("", hashedPassword);
@@ -72,22 +92,48 @@ public class CreateGameDialog extends DialogWindow {
             CreateGameDialog.this.close();
         });
 
-        p.addComponent(rulesButton);
-        p.addComponent(rulesLabel);
+        Panel topGridPanel = new Panel();
+        topGridPanel.setLayoutManager(new GridLayout(3));
+
+        topGridPanel.addComponent(rulesButton);
+        topGridPanel.addComponent(newSpacer());
+        topGridPanel.addComponent(rulesLabel);
+
+        topGridPanel.addComponent(timeButton);
+        topGridPanel.addComponent(newSpacer());
+        topGridPanel.addComponent(timeLabel);
+
+        p.addComponent(topGridPanel);
 
         p.addComponent(passwordLabel);
-        p.addComponent(passwordInput);
+        p.addComponent(mPasswordInput);
 
         p.addComponent(sideLabel);
         p.addComponent(sideChooser);
 
-        Panel buttonPanel = new Panel();
-        buttonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        buttonPanel.addComponent(finishButton);
-        buttonPanel.addComponent(cancelButton);
+        Panel bottomGridPanel = new Panel();
+        bottomGridPanel.setLayoutManager(new GridLayout(3));
 
-        p.addComponent(buttonPanel);
+        bottomGridPanel.addComponent(finishButton);
+        bottomGridPanel.addComponent(cancelButton);
+        bottomGridPanel.addComponent(newSpacer());
+
+        p.addComponent(bottomGridPanel);
 
         setComponent(p);
+    }
+
+    @Override
+    public TerminalSize getPreferredSize() {
+        TerminalSize preferredSize = super.getPreferredSize();
+        if(!preferredSize.equals(mCachedSize)) {
+            mCachedSize = preferredSize;
+            mPasswordInput.setPreferredSize(new TerminalSize(preferredSize.getColumns() - 2, 1));
+        }
+        return super.getPreferredSize();
+    }
+
+    private EmptySpace newSpacer() {
+        return new EmptySpace(new TerminalSize(4, 1));
     }
 }

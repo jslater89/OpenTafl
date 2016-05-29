@@ -5,4 +5,7 @@ package com.manywords.softworks.tafl.network.packet;
  */
 public abstract class NetworkPacket {
 
+    // Subclasses must implement toString
+    @Override
+    public abstract String toString();
 }

@@ -295,7 +295,9 @@ public class OptionsMenuWindow extends BasicWindow {
     }
 
     private void showTimeSpecDialog() {
-        new TimeEntryDialog("Clock settings").showDialog(getTextGUI());
+        TimeEntryDialog d = new TimeEntryDialog("Clock settings");
+        d.showDialog(getTextGUI());
+        TerminalSettings.timeSpec = d.timeSpec;
 
         refreshSettings();
     }

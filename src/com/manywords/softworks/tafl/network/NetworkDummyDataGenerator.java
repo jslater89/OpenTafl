@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.network;
 
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.client.ClientGameInformation;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerGame;
@@ -23,13 +24,13 @@ public class NetworkDummyDataGenerator {
         for(int i = 0; i < count; i++) {
             switch(new Random().nextInt(3)) {
                 case 0:
-                    games.add(new ClientGameInformation(UUID.randomUUID().toString(), "Brandub 7x7", "Fishbreath", "otherguy", true, 0));
+                    games.add(new ClientGameInformation(UUID.randomUUID().toString(), "Brandub 7x7", "Fishbreath", "otherguy", true, 0, new TimeSpec(0, 0, 0, 0).toMachineReadableString()));
                     break;
                 case 1:
-                    games.add(new ClientGameInformation(UUID.randomUUID().toString(), "Tablut 15x15", "Shenmage", "parvusimperator", false, 2));
+                    games.add(new ClientGameInformation(UUID.randomUUID().toString(), "Tablut 15x15", "Shenmage", "parvusimperator", false, 2, new TimeSpec(0, 0, 0, 0).toMachineReadableString()));
                     break;
                 case 2:
-                    games.add(new ClientGameInformation(UUID.randomUUID().toString(), "Foteviken Tablut 9x9", "Nasa", "OpenTafl AI", false, 28));
+                    games.add(new ClientGameInformation(UUID.randomUUID().toString(), "Foteviken Tablut 9x9", "Nasa", "OpenTafl AI", false, 28, new TimeSpec(0, 0, 0, 0).toMachineReadableString()));
                     break;
             }
         }

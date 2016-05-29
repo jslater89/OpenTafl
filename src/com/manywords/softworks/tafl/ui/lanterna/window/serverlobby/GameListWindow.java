@@ -27,8 +27,8 @@ public class GameListWindow extends BasicWindow {
     private Table<String> mGameTable;
     private List<ClientGameInformation> mGameList;
 
-    private static final String[] COLUMNS = {"Rules", "Attackers", "Defenders", "Password", "Spectators"};
-    private static final String[] EMPTY_ROW = {"", "", "", "", ""};
+    private static final String[] COLUMNS = {"Rules", "Attackers", "Defenders", "Clock Setting", "Password", "Spectators"};
+    private static final String[] EMPTY_ROW = {"", "", "", "", "", ""};
 
     public GameListWindow(LogicalScreen.TerminalCallback terminalCallback, GameListWindowHost host) {
         super("Game List");
@@ -55,7 +55,6 @@ public class GameListWindow extends BasicWindow {
             getTextGUI().setActiveWindow(GameListWindow.this);
         });
 
-        //generateDebugGames();
         p.addComponent(mGameTable);
 
         setComponent(p);
@@ -78,7 +77,9 @@ public class GameListWindow extends BasicWindow {
     private void updateTable() {
         TableModel<String> model = new TableModel<>(COLUMNS);
         for(ClientGameInformation g : mGameList) {
-            model.addRow(g.rulesName, g.attackerUsername, g.defenderUsername, g.password ? "Y" : "N", "" + g.spectators);
+            String clockSetting = "Untimed";
+            if(g.clockSetting.isEnabled()) clockSetting = g.clockSetting.toHumanString();
+            model.addRow(g.rulesName, g.attackerUsername, g.defenderUsername, clockSetting, g.password ? "Y" : "N", "" + g.spectators);
         }
 
         mGameTable.setTableModel(model);
@@ -87,8 +88,6 @@ public class GameListWindow extends BasicWindow {
     @Override
     public void setSize(TerminalSize size) {
         super.setSize(size);
-
-        System.out.println(size);
 
         mGameTable.setVisibleRows(size.getRows() - 2);
 

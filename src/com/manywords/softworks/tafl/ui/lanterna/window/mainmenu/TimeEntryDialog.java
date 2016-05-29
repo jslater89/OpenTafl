@@ -11,7 +11,9 @@ import java.util.regex.Pattern;
  * Created by jay on 2/21/16.
  */
 public class TimeEntryDialog extends DialogWindow {
-    protected TimeEntryDialog(String title) {
+    public TimeSpec timeSpec;
+
+    public TimeEntryDialog(String title) {
         super(title);
 
         Panel p = new Panel();
@@ -37,19 +39,15 @@ public class TimeEntryDialog extends DialogWindow {
         incrementTimeInput.setText("" + TerminalSettings.timeSpec.incrementTime / 1000);
         incrementTimeInput.setValidationPattern(Pattern.compile("[0-9]+"));
 
-        final Button finishButton = new Button("OK", new Runnable() {
-            @Override
-            public void run() {
-                long mainTimeMillis = Integer.parseInt(mainTimeInput.getTextOrDefault("0")) * 1000;
-                long overtimeTimeMillis = Integer.parseInt(overtimeInput.getTextOrDefault("0")) * 1000;
-                int overtimeCount = Integer.parseInt(overtimeCountInput.getTextOrDefault("0"));
-                long incrementTimeMillis = Integer.parseInt(incrementTimeInput.getTextOrDefault("0")) * 1000;
+        final Button finishButton = new Button("OK", () -> {
+            long mainTimeMillis = Integer.parseInt(mainTimeInput.getTextOrDefault("0")) * 1000;
+            long overtimeTimeMillis = Integer.parseInt(overtimeInput.getTextOrDefault("0")) * 1000;
+            int overtimeCount = Integer.parseInt(overtimeCountInput.getTextOrDefault("0"));
+            long incrementTimeMillis = Integer.parseInt(incrementTimeInput.getTextOrDefault("0")) * 1000;
 
-                TimeSpec ts = new TimeSpec(mainTimeMillis, overtimeTimeMillis, overtimeCount, incrementTimeMillis);
-                TerminalSettings.timeSpec = ts;
+            timeSpec = new TimeSpec(mainTimeMillis, overtimeTimeMillis, overtimeCount, incrementTimeMillis);
 
-                TimeEntryDialog.this.close();
-            }
+            TimeEntryDialog.this.close();
         });
 
         p.addComponent(mainTimeLabel);

@@ -6,10 +6,16 @@ import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.NetworkServerPlayer;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.clock.GameClock;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.PasswordHasher;
+import com.manywords.softworks.tafl.network.packet.ingame.ClockUpdatePacket;
+import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.server.task.StartGameTask;
 import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
+import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.UiCallback;
@@ -38,6 +44,7 @@ public class ServerGame {
     private Game mGame;
     private CommandEngine mCommandEngine;
     private ServerUiCallback mUiCallback = new ServerUiCallback();
+    private TimeSpec mClockSetting;
     private ClockUpdateTask mClockUpdateTask = new ClockUpdateTask();
 
     private ServerClient mAttackerClient;
@@ -57,11 +64,22 @@ public class ServerGame {
         mServer = server;
     }
 
-    public void setRules(Rules r) {
-        mGame = new Game(r, mUiCallback);
+    public synchronized void setClock(TimeSpec clockSetting) {
+        mClockSetting = clockSetting;
 
         // The game clock will be updated by our interval task.
-        if(mGame.getClock() != null) {
+        if(mGame != null) {
+            mGame.setClock(new GameClock(mGame, clockSetting));
+            mGame.getClock().setServerMode(true);
+        }
+
+    }
+
+    public synchronized void setRules(Rules r) {
+        mGame = new Game(r, mUiCallback);
+
+        if(mClockSetting != null) {
+            mGame.setClock(new GameClock(mGame, mClockSetting));
             mGame.getClock().setServerMode(true);
         }
 
@@ -230,6 +248,16 @@ public class ServerGame {
         public void run() {
             if(mGame != null && mGame.getClock() != null) {
                 mGame.getClock().updateClocks();
+
+                TimeSpec attacker = mGame.getClock().getClockEntry(true).toTimeSpec();
+                TimeSpec defender = mGame.getClock().getClockEntry(false).toTimeSpec();
+
+                ClockUpdatePacket packet = new ClockUpdatePacket(attacker, defender);
+
+                mServer.sendPacketToClient(mAttackerClient, packet, PriorityTaskQueue.Priority.HIGH);
+                mServer.sendPacketToClient(mDefenderClient, packet, PriorityTaskQueue.Priority.HIGH);
+
+                mServer.sendPacketToClients(getSpectators(), packet, PriorityTaskQueue.Priority.LOW);
             }
         }
     }
@@ -252,7 +280,7 @@ public class ServerGame {
         }
 
         @Override
-        public void timeUpdate(Side side) {
+        public void timeUpdate(boolean currentSideAttackers) {
 
         }
 
@@ -278,12 +306,12 @@ public class ServerGame {
 
         @Override
         public void victoryForSide(Side side) {
-
+            mServer.sendPacketToClients(getAllClients(), new VictoryPacket(side), PriorityTaskQueue.Priority.HIGH);
         }
 
         @Override
         public void gameFinished() {
-
+            mServer.sendPacketToClients(getAllClients(), new GameEndedPacket(), PriorityTaskQueue.Priority.HIGH);
         }
 
         @Override

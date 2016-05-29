@@ -30,7 +30,7 @@ public class BerserkHistoryDuplicationTest extends TaflTest implements UiCallbac
     }
 
     @Override
-    public void timeUpdate(Side side) {
+    public void timeUpdate(boolean currentSideAttackers) {
 
     }
 

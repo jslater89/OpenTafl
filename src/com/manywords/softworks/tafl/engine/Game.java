@@ -52,7 +52,7 @@ public class Game {
         mGameRules = rules;
 
         if(timeSpec != null) {
-            mClock = new GameClock(this, getRules().getAttackers(), getRules().getDefenders(), timeSpec);
+            mClock = new GameClock(this, timeSpec);
             if(serverGame) {
                 mClock.setServerMode(true);
             }
@@ -118,7 +118,7 @@ public class Game {
             String clockLengthString = mTagMap.get("time-control");
             TimeSpec clockLength = GameClock.getTimeSpecForGameNotationString(clockLengthString);
 
-            mClock = new GameClock(this, getCurrentState().getAttackers(), getCurrentState().getDefenders(), clockLength);
+            mClock = new GameClock(this, clockLength);
 
             if(mTagMap.containsKey("time-remaining")) {
                 String remainingTimeString = mTagMap.get("time-remaining");

@@ -34,7 +34,7 @@ public class RestrictedFortReentryTest extends TaflTest implements UiCallback {
     }
 
     @Override
-    public void timeUpdate(Side side) {
+    public void timeUpdate(boolean currentSideAttackers) {
 
     }
 

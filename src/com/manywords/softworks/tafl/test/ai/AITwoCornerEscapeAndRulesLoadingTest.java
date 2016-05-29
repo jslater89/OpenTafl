@@ -34,7 +34,7 @@ public class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements Ui
     }
 
     @Override
-    public void timeUpdate(Side side) {
+    public void timeUpdate(boolean currentSideAttackers) {
 
     }
 

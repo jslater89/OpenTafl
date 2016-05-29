@@ -217,7 +217,7 @@ public class RawTerminal implements UiCallback {
     }
 
     @Override
-    public void timeUpdate(Side side) {
+    public void timeUpdate(boolean currentSideAttackers) {
 
     }
 

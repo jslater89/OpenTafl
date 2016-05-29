@@ -163,17 +163,17 @@ public class CommandEngine {
 
     private final GameClock.GameClockCallback mClockCallback = new GameClock.GameClockCallback() {
         @Override
-        public void timeUpdate(Side currentSide) {
-            callbackTimeUpdate(currentSide);
+        public void timeUpdate(boolean currentSideAttackers) {
+            callbackTimeUpdate(currentSideAttackers);
 
             mAttacker.timeUpdate();
             mDefender.timeUpdate();
         }
 
         @Override
-        public void timeExpired(Side currentSide) {
+        public void timeExpired(boolean currentSideAttackers) {
             mPrimaryUiCallback.statusText("Time expired!");
-            if(currentSide.isAttackingSide()) {
+            if(currentSideAttackers) {
                 callbackVictoryForSide(mGame.getCurrentState().getDefenders());
             }
             else {
@@ -383,7 +383,7 @@ public class CommandEngine {
                 g.getClock().getClockEntry(false).setTime(defenderClock);
             }
             else if(TerminalSettings.timeSpec.mainTime != 0 || TerminalSettings.timeSpec.overtimeTime != 0) {
-                GameClock clock = new GameClock(g, g.getCurrentState().getAttackers(), g.getCurrentState().getDefenders(), TerminalSettings.timeSpec);
+                GameClock clock = new GameClock(g, TerminalSettings.timeSpec);
 
                 g.setClock(clock);
             }
@@ -459,9 +459,9 @@ public class CommandEngine {
         }
     }
 
-    private void callbackTimeUpdate(Side side) {
+    private void callbackTimeUpdate(boolean currentSideAttackers) {
         for(UiCallback c : mUiCallbacks) {
-            c.timeUpdate(side);
+            c.timeUpdate(currentSideAttackers);
         }
     }
 

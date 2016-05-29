@@ -97,7 +97,7 @@ public class TerminalUtils {
         Game g = rg.getGame();
 
         if(g.getClock() == null && (TerminalSettings.timeSpec.mainTime != 0 || TerminalSettings.timeSpec.overtimeTime != 0)) {
-            GameClock clock = new GameClock(g, g.getCurrentState().getAttackers(), g.getCurrentState().getDefenders(), TerminalSettings.timeSpec);
+            GameClock clock = new GameClock(g, TerminalSettings.timeSpec);
 
             g.setClock(clock);
         }

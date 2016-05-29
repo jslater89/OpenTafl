@@ -29,6 +29,11 @@ public class TimeSpec {
         return new TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
     }
 
+    public boolean isEnabled() {
+        // Clock is enabled if we have either main time or overtime time.
+        return !(mainTime == 0 && (overtimeTime == 0 || overtimeCount == 0));
+    }
+
     public String toString() {
         return mainTime / 1000 + " " + overtimeTime / 1000 + "/" + overtimeCount + " " + incrementTime / 1000 + "i";
     }

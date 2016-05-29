@@ -204,8 +204,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     }
 
     @Override
-    public void timeUpdate(Side side) {
-        mStatusWindow.handleTimeUpdate(side, mGame.getClock().getClockEntry(true).toTimeSpec(), mGame.getClock().getClockEntry(false).toTimeSpec());
+    public void timeUpdate(boolean currentSideAttackers) {
+        mStatusWindow.handleTimeUpdate(currentSideAttackers, mGame.getClock().getClockEntry(true).toTimeSpec(), mGame.getClock().getClockEntry(false).toTimeSpec());
     }
 
     @Override
@@ -588,7 +588,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         private void tryTimeUpdate() {
             if(!mInGame) {
-                Side currentSide = mReplay.getCurrentState().getCurrentSide();
+                boolean currentSide = mReplay.getCurrentState().getCurrentSide().isAttackingSide();
                 TimeSpec attackerClock = mReplay.getTimeGuess(true);
                 TimeSpec defenderClock = mReplay.getTimeGuess(false);
                 mStatusWindow.handleTimeUpdate(currentSide, attackerClock, defenderClock);

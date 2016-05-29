@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.packet.pregame;
 
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.client.ClientGameInformation;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.ServerGame;
@@ -15,7 +16,7 @@ public class GameListPacket extends NetworkPacket {
 
     public static GameListPacket parse(String data) {
         data = data.replaceFirst("game-list", "");
-        String[] records = data.split("\\|");
+        String[] records = data.split("\\|\\|");
 
         List<ClientGameInformation> games = new ArrayList<>();
 
@@ -28,10 +29,14 @@ public class GameListPacket extends NetworkPacket {
             String attackerName = elements[3];
             String defenderName = elements[5];
 
-            boolean password = elements[6].contains("password:true");
-            int spectators = Integer.parseInt(elements[6].replaceAll("[a-z]|\\s|:", ""));
+            String[] unquotedElements = elements[6].trim().split(" ");
 
-            games.add(new ClientGameInformation(uuid, rulesName, attackerName, defenderName, password, spectators));
+            boolean password = unquotedElements[0].contains("password:true");
+            int spectators = Integer.parseInt(unquotedElements[1].replaceAll("[a-z]|\\s|:", ""));
+
+            TimeSpec ts = TimeSpec.parseMachineReadableString(unquotedElements[2]);
+
+            games.add(new ClientGameInformation(uuid, rulesName, attackerName, defenderName, password, spectators, ts.toMachineReadableString()));
         }
 
         return new GameListPacket(games);
@@ -47,8 +52,15 @@ public class GameListPacket extends NetworkPacket {
             String defenderUsername = g.getDefenderClient() == null ? "<none>" :g.getDefenderClient().getUsername();
             boolean password = g.isPassworded();
             int spectators = g.getSpectators().size();
+            TimeSpec ts;
+            if(g.getGame().getClock() != null) {
+                ts = g.getGame().getClock().toTimeSpec();
+            }
+            else {
+                ts = new TimeSpec(0, 0, 0, 0);
+            }
 
-            games.add(new ClientGameInformation(uuidString, rulesName, attackerUsername, defenderUsername, password, spectators));
+            games.add(new ClientGameInformation(uuidString, rulesName, attackerUsername, defenderUsername, password, spectators, ts.toMachineReadableString()));
         }
 
         return new GameListPacket(games);
@@ -61,7 +73,7 @@ public class GameListPacket extends NetworkPacket {
     public String toString() {
         String result = "game-list ";
         for(ClientGameInformation g : games) {
-            result += g.toString() + "|";
+            result += g.toString() + "||";
         }
 
         return result;

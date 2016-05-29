@@ -51,14 +51,14 @@ public class StatusWindow extends BasicWindow {
         mTextDisplay.addLine(text);
     }
 
-    public void handleTimeUpdate(Side side, TimeSpec attackerEntry, TimeSpec defenderEntry) {
+    public void handleTimeUpdate(boolean attackingSide, TimeSpec attackerEntry, TimeSpec defenderEntry) {
         if(attackerEntry != null) {
-            String attackerString = (side.isAttackingSide() ? "ATTACKER" : "Attacker") + "\n" + attackerEntry.toHumanString();
+            String attackerString = (attackingSide ? "ATTACKER" : "Attacker") + "\n" + attackerEntry.toHumanString();
             mAttackerClockDisplay.setText(attackerString);
         }
 
         if(defenderEntry != null) {
-            String defenderString = (side.isAttackingSide() ? "Defender" : "DEFENDER") + "\n" + defenderEntry.toHumanString();
+            String defenderString = (attackingSide ? "Defender" : "DEFENDER") + "\n" + defenderEntry.toHumanString();
             mDefenderClockDisplay.setText(defenderString);
         }
     }

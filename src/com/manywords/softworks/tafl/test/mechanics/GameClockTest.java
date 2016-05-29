@@ -14,7 +14,7 @@ import com.manywords.softworks.tafl.command.player.Player;
 
 public class GameClockTest extends TaflTest implements UiCallback {
     boolean mTimeExpired;
-    Side mSideExpiredFor;
+    boolean mExpiredForAttackers;
     Game mGame;
 
     @Override
@@ -41,11 +41,11 @@ public class GameClockTest extends TaflTest implements UiCallback {
         }
 
         assert mTimeExpired;
-        assert !mSideExpiredFor.isAttackingSide();
+        assert !mExpiredForAttackers;
 
         // Have the first player slap the clock, and let time run out for the second.
 
-        mSideExpiredFor = null;
+        mExpiredForAttackers = false;
         mTimeExpired = false;
         mGame = new Game(rules, null, new TimeSpec(500, 0, 0, 0));
         mGame.getClock().setCallback(mClockCallback);
@@ -69,11 +69,11 @@ public class GameClockTest extends TaflTest implements UiCallback {
         }
 
         assert mTimeExpired;
-        assert mSideExpiredFor.isAttackingSide();
+        assert mExpiredForAttackers;
 
         // Test overtimes running down
 
-        mSideExpiredFor = null;
+        mExpiredForAttackers = false;
         mTimeExpired = false;
         mGame = new Game(rules, null, new TimeSpec(500, 500, 2, 0));
         mGame.getClock().setCallback(mClockCallback);
@@ -134,10 +134,10 @@ public class GameClockTest extends TaflTest implements UiCallback {
 
         // Sleeping for another 600msec pushes us past the end of the clock.
         assert mTimeExpired;
-        assert !mSideExpiredFor.isAttackingSide();
+        assert !mExpiredForAttackers;
 
         // Test increment time adding
-        mSideExpiredFor = null;
+        mExpiredForAttackers = false;
         mTimeExpired = false;
         mGame = new Game(rules, null, new TimeSpec(500, 0, 0, 250));
         mGame.getClock().setCallback(mClockCallback);
@@ -160,22 +160,22 @@ public class GameClockTest extends TaflTest implements UiCallback {
         }
 
         assert mTimeExpired;
-        assert !mSideExpiredFor.isAttackingSide();
+        assert !mExpiredForAttackers;
     }
 
     private final GameClock.GameClockCallback mClockCallback = new GameClock.GameClockCallback() {
         @Override
-        public void timeUpdate(Side currentSide) {
+        public void timeUpdate(boolean currentSideAttackers) {
             //System.out.println(mGame.getClock().getClockEntry(currentSide));
         }
 
         @Override
-        public void timeExpired(Side currentSide) {
+        public void timeExpired(boolean currentSideAttackers) {
             //System.out.println("Finishing test");
             //System.out.println("Expired: " + mGame.getClock().getClockEntry(currentSide));
             mGame.finish();
             mTimeExpired = true;
-            mSideExpiredFor = currentSide;
+            mExpiredForAttackers = currentSideAttackers;
         }
     };
 
@@ -195,7 +195,7 @@ public class GameClockTest extends TaflTest implements UiCallback {
     }
 
     @Override
-    public void timeUpdate(Side side) {
+    public void timeUpdate(boolean currentSideAttackers) {
 
     }
 

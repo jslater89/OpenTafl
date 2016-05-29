@@ -25,7 +25,13 @@ public class CreateGameTask implements Runnable {
 
     @Override
     public void run() {
-        boolean result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide);
+        boolean result;
+        if(mPacket.timeSpec.isEnabled()) {
+            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide, mPacket.timeSpec);
+        }
+        else {
+            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide);
+        }
 
         if(result) {
             mServer.sendPacketToClient(
