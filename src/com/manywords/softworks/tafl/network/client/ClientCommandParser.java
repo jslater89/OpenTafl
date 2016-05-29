@@ -21,33 +21,33 @@ public class ClientCommandParser {
             LobbyChatPacket packet = LobbyChatPacket.parse(data);
             callback.onChatMessageReceived(ClientServerConnection.ChatType.LOBBY, packet.sender, packet.message);
         }
-        else if(data.startsWith("error")) {
+        else if(data.startsWith(ErrorPacket.PREFIX)) {
             ErrorPacket packet = ErrorPacket.parse(data);
             callback.onErrorReceived(packet.error);
         }
-        else if(data.startsWith("success")) {
+        else if(data.startsWith(SuccessPacket.PREFIX)) {
             SuccessPacket packet = SuccessPacket.parse(data);
             callback.onSuccessReceived(packet.message);
         }
-        else if(data.startsWith("game-list")) {
+        else if(data.startsWith(GameListPacket.PREFIX)) {
             GameListPacket packet = GameListPacket.parse(data);
             callback.onGameListReceived(packet.games);
         }
-        else if(data.startsWith("start-game")) {
+        else if(data.startsWith(StartGamePacket.PREFIX)) {
             StartGamePacket packet = StartGamePacket.parse(data);
             callback.onStartGame(packet.rules);
         }
-        else if(data.startsWith("move-result")) {
+        else if(data.startsWith(MoveResultPacket.PREFIX)) {
             MoveResultPacket packet = MoveResultPacket.parse(data);
             if(packet.moveResult != GameState.GOOD_MOVE) {
                 callback.onErrorReceived(ErrorPacket.DESYNC);
             }
         }
-        else if(data.startsWith("move")) {
+        else if(data.startsWith(MovePacket.PREFIX)) {
             MovePacket packet = MovePacket.parse(data);
             callback.onServerMoveReceived(packet.move);
         }
-        else if(data.startsWith("game-chat")) {
+        else if(data.startsWith(GameChatPacket.PREFIX)) {
             GameChatPacket packet = GameChatPacket.parse(data);
             callback.onChatMessageReceived(ClientServerConnection.ChatType.GAME, packet.sender, packet.message);
         }
