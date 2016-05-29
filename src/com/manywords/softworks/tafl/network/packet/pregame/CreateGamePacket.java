@@ -1,7 +1,9 @@
 package com.manywords.softworks.tafl.network.packet.pregame;
 
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 
 import java.util.UUID;
 
@@ -38,6 +40,14 @@ public class CreateGamePacket extends NetworkPacket {
         this.passworded = !passwordHash.equals("none");
         this.otnRulesString = otnRulesString;
         this.timeSpec = timeSpec;
+    }
+
+    /**
+     * Incomplete information: used only for making sure the host has a way to get the timespec
+     * @return
+     */
+    public GameInformation toGameInformation() {
+        return new GameInformation(uuid.toString(), "", "", "", false, 0, timeSpec.toMachineReadableString());
     }
 
     public String toString() {

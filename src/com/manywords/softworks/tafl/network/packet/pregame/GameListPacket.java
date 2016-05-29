@@ -1,7 +1,7 @@
 package com.manywords.softworks.tafl.network.packet.pregame;
 
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
-import com.manywords.softworks.tafl.network.client.ClientGameInformation;
+import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.ServerGame;
 
@@ -12,13 +12,13 @@ import java.util.List;
  * Created by jay on 5/24/16.
  */
 public class GameListPacket extends NetworkPacket {
-    public final List<ClientGameInformation> games;
+    public final List<GameInformation> games;
 
     public static GameListPacket parse(String data) {
         data = data.replaceFirst("game-list", "");
         String[] records = data.split("\\|\\|");
 
-        List<ClientGameInformation> games = new ArrayList<>();
+        List<GameInformation> games = new ArrayList<>();
 
         if(data.trim().isEmpty()) return new GameListPacket(games);
 
@@ -36,14 +36,14 @@ public class GameListPacket extends NetworkPacket {
 
             TimeSpec ts = TimeSpec.parseMachineReadableString(unquotedElements[2]);
 
-            games.add(new ClientGameInformation(uuid, rulesName, attackerName, defenderName, password, spectators, ts.toMachineReadableString()));
+            games.add(new GameInformation(uuid, rulesName, attackerName, defenderName, password, spectators, ts.toMachineReadableString()));
         }
 
         return new GameListPacket(games);
     }
 
     public static GameListPacket parse(List<ServerGame> serverGames) {
-        List<ClientGameInformation> games = new ArrayList<>(serverGames.size());
+        List<GameInformation> games = new ArrayList<>(serverGames.size());
 
         for(ServerGame g : serverGames) {
             String uuidString = g.uuid.toString();
@@ -60,19 +60,19 @@ public class GameListPacket extends NetworkPacket {
                 ts = new TimeSpec(0, 0, 0, 0);
             }
 
-            games.add(new ClientGameInformation(uuidString, rulesName, attackerUsername, defenderUsername, password, spectators, ts.toMachineReadableString()));
+            games.add(new GameInformation(uuidString, rulesName, attackerUsername, defenderUsername, password, spectators, ts.toMachineReadableString()));
         }
 
         return new GameListPacket(games);
     }
 
-    public GameListPacket(List<ClientGameInformation> clientGames) {
+    public GameListPacket(List<GameInformation> clientGames) {
         games = clientGames;
     }
 
     public String toString() {
         String result = "game-list ";
-        for(ClientGameInformation g : games) {
+        for(GameInformation g : games) {
             result += g.toString() + "||";
         }
 

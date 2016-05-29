@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.network.client;
 
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
@@ -24,7 +26,7 @@ public class ClientServerConnection {
         public void onChatMessageReceived(ChatType type, String sender, String message);
         public void onSuccessReceived(String message);
         public void onErrorReceived(String message);
-        public void onGameListReceived(List<ClientGameInformation> games);
+        public void onGameListReceived(List<GameInformation> games);
         public void onDisconnect(boolean planned);
         public void onStartGame(Rules r);
         public void onServerMoveReceived(MoveRecord move);
@@ -59,6 +61,7 @@ public class ClientServerConnection {
     private UUID mServerGameUUID;
     private GameRole mGameRole = GameRole.OUT_OF_GAME;
     private NetworkClientPlayer mNetworkPlayer;
+    private GameInformation mLastJoinedGame = null;
 
     private boolean mPlannedDisconnect = false;
 
@@ -118,6 +121,7 @@ public class ClientServerConnection {
 
     public void sendCreateGameMessage(CreateGamePacket packet) {
         setState(State.CREATING_GAME);
+        mLastJoinedGame = packet.toGameInformation();
         mServerGameUUID = packet.uuid;
         mServerWriter.println(packet);
     }
@@ -135,6 +139,17 @@ public class ClientServerConnection {
         return mUsername;
     }
 
+    public GameInformation getLastJoinedGameInfo() {
+        return mLastJoinedGame;
+    }
+
+    public TimeSpec getLastClockSetting() {
+        if(mLastJoinedGame != null) {
+            return mLastJoinedGame.clockSetting;
+        }
+        else return null;
+    }
+
     public void sendRegistrationMessage(String username, String hashedPassword) {
         mServerWriter.println(new LoginPacket(username, hashedPassword));
     }
@@ -145,8 +160,9 @@ public class ClientServerConnection {
         else if(type == ChatType.SPECTATOR) mServerWriter.println(new GameChatPacket(sender, message));
     }
 
-    public void sendJoinGameMessage(JoinGamePacket packet) {
+    public void sendJoinGameMessage(GameInformation gameInfo, JoinGamePacket packet) {
         if(mCurrentState == State.LOGGED_IN) {
+            mLastJoinedGame = gameInfo;
             setState(State.JOINING_GAME);
             mServerGameUUID = packet.uuid;
             mServerWriter.println(packet);
@@ -266,7 +282,7 @@ public class ClientServerConnection {
         }
 
         @Override
-        public void onGameListReceived(List<ClientGameInformation> games) {
+        public void onGameListReceived(List<GameInformation> games) {
             mExternalCallback.onGameListReceived(games);
         }
 

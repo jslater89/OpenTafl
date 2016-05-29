@@ -3,7 +3,7 @@ package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.manywords.softworks.tafl.network.PasswordHasher;
-import com.manywords.softworks.tafl.network.client.ClientGameInformation;
+import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 
 import java.util.UUID;
@@ -19,7 +19,7 @@ public class JoinGameDialog extends DialogWindow {
 
     public JoinGamePacket packet = null;
 
-    public JoinGameDialog(String title, ClientGameInformation gameInfo) {
+    public JoinGameDialog(String title, GameInformation gameInfo) {
         super(title);
 
         Panel p = new Panel();
@@ -69,7 +69,7 @@ public class JoinGameDialog extends DialogWindow {
         setComponent(p);
     }
 
-    private JoinGamePacket createPacket(ClientGameInformation gameInfo, boolean spectate, String hashedPassword) {
+    private JoinGamePacket createPacket(GameInformation gameInfo, boolean spectate, String hashedPassword) {
         UUID gameId = UUID.fromString(gameInfo.uuid);
 
         return new JoinGamePacket(gameId, spectate, hashedPassword);

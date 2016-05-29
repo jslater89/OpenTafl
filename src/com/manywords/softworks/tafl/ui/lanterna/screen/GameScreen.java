@@ -17,7 +17,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
-import com.manywords.softworks.tafl.network.client.ClientGameInformation;
+import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection.ClientServerCallback;
 import com.manywords.softworks.tafl.network.server.GameRole;
@@ -732,7 +732,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         }
 
         @Override
-        public void onGameListReceived(List<ClientGameInformation> games) {
+        public void onGameListReceived(List<GameInformation> games) {
 
         }
 

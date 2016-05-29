@@ -6,7 +6,7 @@ import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.gui2.table.TableModel;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.manywords.softworks.tafl.network.client.ClientGameInformation;
+import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
@@ -20,12 +20,12 @@ import java.util.List;
 public class GameListWindow extends BasicWindow {
     public interface GameListWindowHost {
         public void requestGameUpdate();
-        public void joinGame(JoinGamePacket packet);
+        public void joinGame(GameInformation gameInfo, JoinGamePacket packet);
     }
     private LogicalScreen.TerminalCallback mTerminalCallback;
     private GameListWindowHost mHost;
     private Table<String> mGameTable;
-    private List<ClientGameInformation> mGameList;
+    private List<GameInformation> mGameList;
 
     private static final String[] COLUMNS = {"Rules", "Attackers", "Defenders", "Clock Setting", "Password", "Spectators"};
     private static final String[] EMPTY_ROW = {"", "", "", "", "", ""};
@@ -43,13 +43,13 @@ public class GameListWindow extends BasicWindow {
         mGameTable.setSelectAction(() -> {
             if(mGameTable.getTableModel().getRowCount() == 0) return;
 
-            ClientGameInformation gameInformation = mGameList.get(mGameTable.getSelectedRow());
+            final GameInformation gameInformation = mGameList.get(mGameTable.getSelectedRow());
             JoinGameDialog d = new JoinGameDialog("Join game", gameInformation);
             d.setHints(TerminalThemeConstants.CENTERED_MODAL);
             
             d.showDialog(getTextGUI());
             if(!d.canceled) {
-                mHost.joinGame(d.packet);
+                mHost.joinGame(gameInformation, d.packet);
             }
 
             getTextGUI().setActiveWindow(GameListWindow.this);
@@ -69,14 +69,14 @@ public class GameListWindow extends BasicWindow {
         }
     }
 
-    public void updateGameList(List<ClientGameInformation> games) {
+    public void updateGameList(List<GameInformation> games) {
         mGameList = games;
         updateTable();
     }
 
     private void updateTable() {
         TableModel<String> model = new TableModel<>(COLUMNS);
-        for(ClientGameInformation g : mGameList) {
+        for(GameInformation g : mGameList) {
             String clockSetting = "Untimed";
             if(g.clockSetting.isEnabled()) clockSetting = g.clockSetting.toHumanString();
             model.addRow(g.rulesName, g.attackerUsername, g.defenderUsername, clockSetting, g.password ? "Y" : "N", "" + g.spectators);

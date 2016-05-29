@@ -1,11 +1,11 @@
-package com.manywords.softworks.tafl.network.client;
+package com.manywords.softworks.tafl.network.packet;
 
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 
 /**
  * Created by jay on 5/24/16.
  */
-public class ClientGameInformation {
+public class GameInformation {
     public final String uuid;
     public final String rulesName;
     public final String attackerUsername;
@@ -14,7 +14,7 @@ public class ClientGameInformation {
     public final int spectators;
     public final TimeSpec clockSetting;
 
-    public ClientGameInformation(String uuid, String rulesName, String attackerUsername, String defenderUsername, boolean password, int spectators, String clockSetting) {
+    public GameInformation(String uuid, String rulesName, String attackerUsername, String defenderUsername, boolean password, int spectators, String clockSetting) {
         this.uuid = uuid;
         this.rulesName = rulesName;
         this.attackerUsername = attackerUsername;
