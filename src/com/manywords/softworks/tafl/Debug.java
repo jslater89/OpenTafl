@@ -31,10 +31,11 @@ public class Debug {
                     System.out.println("Unable to start.");
                 }
             }
+            /*
             else if(args.containsKey("--server-mode")) {
                 // Blocks here
                 NetworkServer ns = new NetworkServer(3);
-            }
+            }*/
             else if(args.containsKey("--dummy-client")) {
                 ConsoleReader reader = null;
                 Socket server = null;

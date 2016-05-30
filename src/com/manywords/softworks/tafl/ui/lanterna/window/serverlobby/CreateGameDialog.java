@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialog;
+import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
@@ -51,12 +52,16 @@ public class CreateGameDialog extends DialogWindow {
         });
         rules = BuiltInVariants.availableRules.get(TerminalSettings.variant);
 
+        timeSpec = TerminalSettings.timeSpec;
         final Label timeLabel = new Label("Untimed");
+        if(timeSpec != null && timeSpec.isEnabled()) {
+            timeLabel.setText(timeSpec.toHumanString());
+        }
         final Button timeButton = new Button("Clock settings", () -> {
             TimeEntryDialog d = new TimeEntryDialog("Clock settings");
             d.showDialog(getTextGUI());
 
-            if(d.timeSpec.mainTime == 0 && (d.timeSpec.overtimeTime == 0 || d.timeSpec.overtimeCount == 0)) {
+            if(!d.timeSpec.isEnabled()) {
                 timeSpec = new TimeSpec(0, 0, 0, 0);
                 timeLabel.setText("Untimed");
             }
