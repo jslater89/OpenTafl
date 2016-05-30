@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
@@ -177,6 +178,10 @@ public class ClientServerConnection {
 
     public void sendMoveDecidedMessage(MoveRecord move) {
         mServerWriter.println(new MovePacket(move));
+    }
+
+    public void sendGameEndedMessage() {
+        mServerWriter.println(new GameEndedPacket());
     }
 
     public void requestGameUpdate() {

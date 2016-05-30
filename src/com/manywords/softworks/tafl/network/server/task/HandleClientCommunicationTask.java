@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.network.server.task;
 
 import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
@@ -44,6 +45,9 @@ public class HandleClientCommunicationTask implements Runnable {
         }
         else if(data.startsWith(GameChatPacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new GameChatTask(mServer, mClient, GameChatPacket.parse(data)), PriorityTaskQueue.Priority.LOW);
+        }
+        else if(data.startsWith(GameEndedPacket.PREFIX)) {
+            SendVictoryTask.sendOnClientLeaving(mServer, mClient);
         }
     }
 

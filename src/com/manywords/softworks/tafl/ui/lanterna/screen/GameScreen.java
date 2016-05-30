@@ -542,6 +542,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     // Leave the game thread running for history.
                     statusText("Finished game. Enter 'quit' again to return to menu.");
                     mCommandEngine.finishGame();
+
+                    if(mServerConnection != null) {
+                        mServerConnection.sendGameEndedMessage();
+                    }
                 }
                 else {
                     leaveGameUi();
