@@ -213,6 +213,7 @@ public class ClientServerConnection {
             }
 
             System.out.println("Disconnected from server");
+            // TODO: handle in-game
             mExternalCallback.onDisconnect(mPlannedDisconnect);
         }
     }
