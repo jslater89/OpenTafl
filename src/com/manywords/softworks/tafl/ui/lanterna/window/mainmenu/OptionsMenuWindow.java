@@ -33,6 +33,7 @@ public class OptionsMenuWindow extends BasicWindow {
     private Label mAnalysisConfigLabel;
     private Label mThinkTimeLabel;
     private Label mShrinkLabel;
+    private Label mNetworkAddressLabel;
 
     private Interactable mLastFocused;
 
@@ -206,6 +207,21 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(mShrinkLabel);
 
+        // Blank line
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(newSpacer());
+
+        final Button networkAddressButton = new Button("Server address", () -> {
+            TerminalSettings.onlineServerHost = TextInputDialog.showDialog(getTextGUI(), "Server address", "Enter server address", TerminalSettings.onlineServerHost);
+            refreshSettings();
+        });
+        mNetworkAddressLabel = new Label(TerminalSettings.onlineServerHost);
+
+        optionsPanel.addComponent(networkAddressButton);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mNetworkAddressLabel);
+
         Button backButton = new Button("Back", new Runnable() {
             @Override
             public void run() {
@@ -256,6 +272,8 @@ public class OptionsMenuWindow extends BasicWindow {
         mThinkTimeLabel.setText("" + TerminalSettings.aiThinkTime);
 
         mShrinkLabel.setText(TerminalSettings.shrinkLargeBoards ? "On" : "Off");
+
+        mNetworkAddressLabel.setText(TerminalSettings.onlineServerHost);
     }
 
     private EmptySpace newSpacer() {

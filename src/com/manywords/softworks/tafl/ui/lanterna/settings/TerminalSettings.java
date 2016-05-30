@@ -22,7 +22,7 @@ public class TerminalSettings {
     public static boolean shrinkLargeBoards = true;
 
     public static String onlinePlayerName = "Fishbreath";
-    public static String onlineServerHost = "localhost";
+    public static String onlineServerHost = "intersect.manywords.press";
     public static int onlineServerPort = 11541;
 
     public static int attackers = AI;
@@ -93,6 +93,7 @@ public class TerminalSettings {
             ini.put("clock", "overtime", timeSpec.overtimeTime);
             ini.put("clock", "otcount", timeSpec.overtimeCount);
             ini.put("clock", "increment", timeSpec.incrementTime);
+            ini.put("network", "host", onlineServerHost);
             ini.store();
         }
         catch(IOException e) {
@@ -142,6 +143,9 @@ public class TerminalSettings {
             long incrementTime = ini.get("clock", "increment", long.class);
 
             shrinkLargeBoards = ini.get("display", "shrinklarge", boolean.class);
+
+            String onlineHost = ini.get("network", "host", String.class);
+            if(onlineHost != null) onlineServerHost = onlineHost;
 
             TimeSpec ts = new TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
             timeSpec = ts;
