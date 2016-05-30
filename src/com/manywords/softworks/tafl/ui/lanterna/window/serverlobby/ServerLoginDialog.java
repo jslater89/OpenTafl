@@ -66,14 +66,14 @@ public class ServerLoginDialog extends DialogWindow {
     }
 
     @Override
-    public void setSize(TerminalSize size) {
-        super.setSize(size);
+    public TerminalSize getPreferredSize() {
+        TerminalSize size = super.getPreferredSize();
 
-        mMainPanel.setPreferredSize(size);
-        TerminalSize thisSize = getSize();
-        TerminalSize inputSize = new TerminalSize(thisSize.getColumns() - 2, 1);
+        TerminalSize inputSize = new TerminalSize(size.getColumns() - 2, 1);
 
         mUsernameInput.setPreferredSize(inputSize);
         mPasswordInput.setPreferredSize(inputSize);
+
+        return size;
     }
 }

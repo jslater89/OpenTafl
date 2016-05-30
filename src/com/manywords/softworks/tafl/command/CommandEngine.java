@@ -146,19 +146,17 @@ public class CommandEngine {
     }
 
     public void networkVictory(VictoryPacket.Victory victory) {
-        if(mInGame) {
-            if (victory == VictoryPacket.Victory.ATTACKER) {
-                callbackVictoryForSide(mGame.getCurrentState().getAttackers());
-            }
-            else if (victory == VictoryPacket.Victory.DEFENDER) {
-                callbackVictoryForSide(mGame.getCurrentState().getDefenders());
-            }
-            else if (victory == VictoryPacket.Victory.DRAW) {
-                callbackVictoryForSide(null);
-            }
-
-            finishGame();
+        if (victory == VictoryPacket.Victory.ATTACKER) {
+            callbackVictoryForSide(mGame.getCurrentState().getAttackers());
         }
+        else if (victory == VictoryPacket.Victory.DEFENDER) {
+            callbackVictoryForSide(mGame.getCurrentState().getDefenders());
+        }
+        else if (victory == VictoryPacket.Victory.DRAW) {
+            callbackVictoryForSide(null);
+        }
+
+        finishGame();
     }
 
     public void stopPlayers() {

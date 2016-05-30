@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.manywords.softworks.tafl.network.PasswordHasher;
@@ -19,6 +20,8 @@ public class JoinGameDialog extends DialogWindow {
 
     public JoinGamePacket packet = null;
 
+    private TextBox mPasswordInput;
+
     public JoinGameDialog(String title, GameInformation gameInfo) {
         super(title);
 
@@ -29,12 +32,12 @@ public class JoinGameDialog extends DialogWindow {
         final Label usernameLabel = new Label("Joining as " + (freeSideAttackers ? "attackers" : "defenders"));
 
         final Label passwordLabel = new Label("Password");
-        final TextBox passwordInput = new TextBox();
-        passwordInput.setMask('*');
-        passwordInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
+        mPasswordInput = new TextBox();
+        mPasswordInput.setMask('*');
+        mPasswordInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
 
         final Button joinButton = new Button("Join", () -> {
-            hashedPassword = PasswordHasher.hashPassword("", passwordInput.getText());
+            hashedPassword = PasswordHasher.hashPassword("", mPasswordInput.getText());
             packet = createPacket(gameInfo, spectate, hashedPassword);
 
             JoinGameDialog.this.close();
@@ -42,7 +45,7 @@ public class JoinGameDialog extends DialogWindow {
 
         final Button spectateButton = new Button("Spectate", () -> {
             spectate = true;
-            hashedPassword = PasswordHasher.hashPassword("", passwordInput.getText());
+            hashedPassword = PasswordHasher.hashPassword("", mPasswordInput.getText());
             packet = createPacket(gameInfo, spectate, hashedPassword);
 
             JoinGameDialog.this.close();
@@ -56,7 +59,7 @@ public class JoinGameDialog extends DialogWindow {
         p.addComponent(usernameLabel);
 
         p.addComponent(passwordLabel);
-        p.addComponent(passwordInput);
+        p.addComponent(mPasswordInput);
 
         Panel buttonPanel = new Panel();
         buttonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
@@ -73,5 +76,16 @@ public class JoinGameDialog extends DialogWindow {
         UUID gameId = UUID.fromString(gameInfo.uuid);
 
         return new JoinGamePacket(gameId, spectate, hashedPassword);
+    }
+
+    @Override
+    public TerminalSize getPreferredSize() {
+        TerminalSize size = super.getPreferredSize();
+
+        TerminalSize inputSize = new TerminalSize(size.getColumns() - 2, 1);
+
+        mPasswordInput.setPreferredSize(inputSize);
+
+        return size;
     }
 }
