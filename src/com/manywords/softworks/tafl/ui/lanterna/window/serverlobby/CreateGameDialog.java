@@ -20,6 +20,7 @@ public class CreateGameDialog extends DialogWindow {
     
     public String hashedPassword;
     public Rules rules;
+    private int settingsRulesIndex = -1;
     public boolean attackingSide;
     public boolean canceled;
     public TimeSpec timeSpec = new TimeSpec(0, 0, 0, 0);
@@ -43,7 +44,8 @@ public class CreateGameDialog extends DialogWindow {
 
             String rulesDescription = ListSelectDialog.showDialog(getTextGUI(), "Rules", "Select a rules variant", rulesTextArray);
             if(rulesDescription != null) {
-                rules = BuiltInVariants.rulesForDescription(rulesDescription);
+                settingsRulesIndex = BuiltInVariants.indexForDescription(rulesDescription);
+                rules = BuiltInVariants.availableRules.get(settingsRulesIndex);
                 rulesLabel.setText(rules.toString());
             }
         });
@@ -83,6 +85,9 @@ public class CreateGameDialog extends DialogWindow {
                 hashedPassword = PasswordHasher.hashPassword("", hashedPassword);
             }
             canceled = false;
+
+            TerminalSettings.variant = settingsRulesIndex;
+            TerminalSettings.timeSpec = timeSpec;
 
             CreateGameDialog.this.close();
         });
@@ -126,8 +131,6 @@ public class CreateGameDialog extends DialogWindow {
     @Override
     public Object showDialog(WindowBasedTextGUI textGUI) {
         return super.showDialog(textGUI);
-
-        // TODO: push settings to TerminalSettings
     }
 
     @Override
