@@ -145,6 +145,7 @@ public class CommandEngine {
         }
     }
 
+    // TODO: gate on in-game, and make sure the player loses when using 'quit' in-game.
     public void networkVictory(VictoryPacket.Victory victory) {
         if (victory == VictoryPacket.Victory.ATTACKER) {
             callbackVictoryForSide(mGame.getCurrentState().getAttackers());
