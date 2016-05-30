@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.test.consistency;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.NetworkDummyDataGenerator;
 import com.manywords.softworks.tafl.network.packet.ingame.ClockUpdatePacket;
@@ -32,7 +33,7 @@ public class NetworkPacketConsistencyTests extends TaflTest {
 
         assert first.equals(second);
 
-        LoginPacket lp = new LoginPacket("Fish Breath", "hashypassword");
+        LoginPacket lp = new LoginPacket("Fish Breath", "hashypassword", OpenTafl.NETWORK_PROTOCOL_VERSION);
         first = lp.toString();
 
         lp = LoginPacket.parse(first);

@@ -5,6 +5,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
@@ -733,7 +734,18 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onErrorReceived(String message) {
+            MessageDialogBuilder b = new MessageDialogBuilder();
+            b.setTitle("Unhandled error");
+            b.setText("Error packet message:\n" + message);
+            b.addButton(MessageDialogButton.OK);
+            MessageDialog d = b.build();
+            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
 
+            // Ordinarily comes from a non-UI thread
+            TerminalUtils.runOnUiThread(mGui, () -> {
+                d.showDialog(mGui);
+                mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+            });
         }
 
         @Override

@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.client;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -155,7 +156,7 @@ public class ClientServerConnection {
     }
 
     public void sendRegistrationMessage(String username, String hashedPassword) {
-        mServerWriter.println(new LoginPacket(username, hashedPassword));
+        mServerWriter.println(new LoginPacket(username, hashedPassword, OpenTafl.NETWORK_PROTOCOL_VERSION));
     }
 
     public void sendChatMessage(ChatType type, String sender, String message) {

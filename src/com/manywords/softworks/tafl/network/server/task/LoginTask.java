@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server.task;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.LoginPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
@@ -24,6 +25,9 @@ public class LoginTask implements Runnable {
     @Override
     public void run() {
         // if login good
+        if (OpenTafl.NETWORK_PROTOCOL_VERSION != packet.networkProtocolVersion) {
+            server.sendPacketToClient(client, new ErrorPacket(ErrorPacket.VERSION_MISMATCH), PriorityTaskQueue.Priority.LOW);
+        }
         if (server.getPlayerDatabase().allowLoginFor(packet.username, packet.password)) {
             client.onRegistered(packet.username);
             server.sendPacketToClient(client, new SuccessPacket(SuccessPacket.LOGGED_IN), PriorityTaskQueue.Priority.LOW);
