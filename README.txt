@@ -140,6 +140,13 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 9. Version history
 
+v0.3.0.0b (released 06/xx/16):
+- Add network play initial operational capabilities
+    - Server mode and client-server interface
+    - Server lobby UI
+    - In-game UI
+    - 
+
 v0.2.5.2b (released 05/27/16):
 - Fix crash on close when no external engines are configured
 
