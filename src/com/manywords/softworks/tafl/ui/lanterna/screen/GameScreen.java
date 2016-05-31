@@ -734,18 +734,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onErrorReceived(String message) {
-            MessageDialogBuilder b = new MessageDialogBuilder();
-            b.setTitle("Unhandled error");
-            b.setText("Error packet message:\n" + message);
-            b.addButton(MessageDialogButton.OK);
-            MessageDialog d = b.build();
-            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
 
-            // Ordinarily comes from a non-UI thread
-            TerminalUtils.runOnUiThread(mGui, () -> {
-                d.showDialog(mGui);
-                mTerminalCallback.changeActiveScreen(new MainMenuScreen());
-            });
         }
 
         @Override
@@ -755,7 +744,20 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onDisconnect(boolean planned) {
+            if(!planned) {
+                MessageDialogBuilder b = new MessageDialogBuilder();
+                b.setTitle("Server connection failed");
+                b.setText("Server terminated the connection.");
+                b.addButton(MessageDialogButton.OK);
+                MessageDialog d = b.build();
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
 
+                TerminalUtils.runOnUiThread(mGui, () -> d.showDialog(mGui));
+            }
+
+            statusText("Server connection failed, game ended");
+            mCommandEngine.finishGame();
+            mServerConnection = null;
         }
 
         @Override
