@@ -4,6 +4,7 @@ import com.manywords.softworks.tafl.test.ai.*;
 import com.manywords.softworks.tafl.test.consistency.*;
 import com.manywords.softworks.tafl.test.mechanics.ExternalEngineHostTest;
 import com.manywords.softworks.tafl.test.mechanics.GameClockTest;
+import com.manywords.softworks.tafl.test.mechanics.KingMissingPositionRecordTest;
 import com.manywords.softworks.tafl.test.mechanics.ServerTickThreadTest;
 import com.manywords.softworks.tafl.test.rules.*;
 

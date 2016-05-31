@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.test;
+package com.manywords.softworks.tafl.test.mechanics;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
@@ -10,6 +10,7 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
+import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
 /**
