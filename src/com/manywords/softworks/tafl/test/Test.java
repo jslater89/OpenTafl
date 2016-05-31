@@ -7,6 +7,7 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
+        tests.add(new KingMissingPositionRecordTest());
         tests.add(new RestrictedFortReentryTest());
         tests.add(new ExternalEngineHostTest());
         tests.add(new ThreefoldDrawTest());
