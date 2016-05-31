@@ -50,6 +50,7 @@ public class Test {
         tests.add(new ExternalEngineHostTest());
         tests.add(new GameClockTest());
         tests.add(new ServerTickThreadTest());
+        tests.add(new KingMissingPositionRecordTest());
 
         // AI tests
         tests.add(new AIMatchingZobristTest());
