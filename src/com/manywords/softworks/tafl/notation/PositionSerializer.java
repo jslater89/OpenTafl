@@ -32,7 +32,6 @@ import java.util.List;
  */
 public class PositionSerializer {
     public static String getPositionRecord(Board b) {
-        System.out.println("Getting position record");
         char[][] board = b.getBoardArray();
 
         return getPositionRecord(board);
@@ -44,8 +43,6 @@ public class PositionSerializer {
             int emptyCount = 0;
 
             for(int x = 0; x < board.length; x++) {
-                if(Taflman.isKing(board[y][x])) System.out.println(Taflman.getStringSymbol(board[y][x]) + " " + x + "," + y);
-
                 if(board[y][x] == Taflman.EMPTY) {
                     emptyCount++;
                 }
@@ -62,7 +59,6 @@ public class PositionSerializer {
             otnString += "/";
         }
 
-        System.out.println("Done with position record");
         return otnString;
     }
 
