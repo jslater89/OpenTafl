@@ -13,7 +13,7 @@ repositories {
 dependencies {
     compile group: 'org.ini4j', name: 'ini4j', version: '0.5.4'
     compile group: 'jline', name: 'jline', version: '2.14.1'
-    compile group: 'com.googlecode.lanterna', name: 'lanterna', version: '3.0.0-beta2'
+    compile files('lib/lanterna-3.0.0-beta2.jar')
 }
 
 jar {
