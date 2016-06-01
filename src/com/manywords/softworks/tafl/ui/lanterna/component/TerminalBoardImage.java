@@ -182,7 +182,7 @@ public class TerminalBoardImage extends BasicTextImage {
         for(char taflman : taflmanMap.getTaflmen()) {
             if(taflman == Taflman.EMPTY) continue;
 
-            Coord c = taflmanMap.get(taflman);
+            Coord c = taflmanMap.getCoord(taflman);
 
             TextColor color = (Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS ? TerminalThemeConstants.RED : TerminalThemeConstants.WHITE);
             TextColor bg = TerminalThemeConstants.DKGRAY;

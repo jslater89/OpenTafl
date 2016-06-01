@@ -46,6 +46,8 @@ public class KingMissingPositionRecordTest extends TaflTest {
 
         state.makeMove(new MoveRecord(Coord.get(3, 10), Coord.get(3, 8)));
 
+        assert PositionSerializer.getPositionRecord(state.getBoard()).contains("K");
+
         state = game.getCurrentState();
 
         //System.out.println(PositionSerializer.getPositionRecord(state.getBoard()));
