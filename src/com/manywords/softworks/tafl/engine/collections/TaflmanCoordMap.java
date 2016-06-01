@@ -43,7 +43,9 @@ public class TaflmanCoordMap {
 
     public short size() { return mSize; }
 
-    public Coord get(char taflman) {
+    public Coord getCoord(char taflman) {
+        if(taflman == Taflman.EMPTY) return null;
+
         char taflmanSide = Taflman.getPackedSide(taflman);
         byte taflmanId = Taflman.getPackedId(taflman);
 

@@ -52,7 +52,7 @@ public abstract class BoardImpl extends Board {
     }
 
     public Coord findTaflmanSpace(char taflman) {
-        return mCachedTaflmanLocations.get(taflman);
+        return mCachedTaflmanLocations.getCoord(taflman);
     }
 
     public List<Character> getTaflmenWithMask(char mask, char value) {
@@ -75,7 +75,7 @@ public abstract class BoardImpl extends Board {
         char[][] boardArray = new char[getBoardDimension()][getBoardDimension()];
 
         for(char taflman : getCachedTaflmanLocations().getTaflmen()) {
-            Coord c = getCachedTaflmanLocations().get(taflman);
+            Coord c = getCachedTaflmanLocations().getCoord(taflman);
 
             if(c == null) continue;
             boardArray[c.y][c.x] = taflman;
