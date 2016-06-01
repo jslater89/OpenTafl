@@ -24,7 +24,7 @@ public class OpenTafl {
     }
 
     public static boolean DEV_MODE = false;
-    public static String CURRENT_VERSION = "v0.2.5.2b";
+    public static String CURRENT_VERSION = "v0.2.5.3b";
 
     public static void main(String[] args) {
         Map<String, String> mapArgs = getArgs(args);

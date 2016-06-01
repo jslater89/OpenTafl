@@ -105,6 +105,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
 
 8. Version history
 
+v0.2.5.3b (released 05/31/16):
+- Fix bug in taflman location list, which led to missing king in position
+  records
+
 v0.2.5.2b (released 05/27/16):
 - Fix crash on close when no external engines are configured
 
