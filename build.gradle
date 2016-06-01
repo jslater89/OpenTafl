@@ -1,0 +1,32 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'com.manywords.softworks.tafl.OpenTafl'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.ini4j', name: 'ini4j', version: '0.5.4'
+    compile group: 'jline', name: 'jline', version: '2.14.1'
+    compile group: 'com.googlecode.lanterna', name: 'lanterna', version: '3.0.0-beta2'
+}
+
+jar {
+    baseName = 'OpenTafl'
+    version =  'v0.3.0.0b'
+    manifest {
+        attributes ('Main-Class': mainClassName, "Class-Path": configurations.compile.collect { it.getName() }.join(' '))
+    }
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+}
+
+sourceSets.main.java.srcDirs = ['src']
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}

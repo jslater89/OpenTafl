@@ -134,7 +134,8 @@ game.
 8. Links
 http://softworks.manywords.press/opentafl (official website)
 http://soapbox.manywords.press/tag/tafl (development blog)
-http://conclave.manywords.press/forum/softworks/opentafl/ (forum, bug reports)
+https://bitbucket.org/Fishbreath/opentafl (source code, bug reports)
+http://conclave.manywords.press/forum/softworks/opentafl/ (forum)
 http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt (engine protocol specification)
 http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network protocol specification)
 

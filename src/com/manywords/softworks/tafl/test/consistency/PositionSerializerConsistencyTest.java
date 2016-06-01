@@ -1,13 +1,9 @@
 package com.manywords.softworks.tafl.test.consistency;
 
-import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
-import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
-import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
 import com.manywords.softworks.tafl.test.TaflTest;
-import com.sun.xml.internal.ws.dump.LoggingDumpTube;
 
 public class PositionSerializerConsistencyTest extends TaflTest {
 

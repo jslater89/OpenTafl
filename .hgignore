@@ -28,3 +28,5 @@ syntax: regexp
 
 ^saved-games/.*
 ^engines/.*
+^build/.*
+^\.gradle.*
