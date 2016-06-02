@@ -21,15 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class RawTerminal implements UiCallback {
-    public static final String RESET = "\u001B[0m";
-    public static final String BLACK = "\u001B[30m";
-    public static final String RED = "\u001B[31m";
-    public static final String GREEN = "\u001B[32m";
-    public static final String YELLOW = "\u001B[33m";
-    public static final String BLUE = "\u001B[34m";
-    public static final String PURPLE = "\u001B[35m";
-    public static final String CYAN = "\u001B[36m";
-    public static final String WHITE = "\u001B[37m";
 
     public static String ANSI_RESET = "\u001B[0m";
     public static String ANSI_BLACK = "\u001B[30m";
@@ -161,15 +152,15 @@ public class RawTerminal implements UiCallback {
     }
 
     public static void enableColor() {
-        ANSI_RESET = RESET;
-        ANSI_BLACK = BLACK;
-        ANSI_RED = RED;
-        ANSI_GREEN = GREEN;
-        ANSI_YELLOW = YELLOW;
-        ANSI_BLUE = BLUE;
-        ANSI_PURPLE = PURPLE;
-        ANSI_CYAN = CYAN;
-        ANSI_WHITE = WHITE;
+        ANSI_RESET = Ansi.RESET;
+        ANSI_BLACK = Ansi.BLACK;
+        ANSI_RED = Ansi.RED;
+        ANSI_GREEN = Ansi.GREEN;
+        ANSI_YELLOW = Ansi.YELLOW;
+        ANSI_BLUE = Ansi.BLUE;
+        ANSI_PURPLE = Ansi.PURPLE;
+        ANSI_CYAN = Ansi.CYAN;
+        ANSI_WHITE = Ansi.WHITE;
     }
 
     public boolean inGame() {

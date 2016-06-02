@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.lanterna.component.EnterTerminatedTextBox;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
@@ -68,7 +69,7 @@ public class ChatWindow extends BasicWindow {
 
     public void onChatMessageReceived(String sender, String message) {
         if(!message.trim().isEmpty()) {
-            mChatText.addLine(sender + ": " + message);
+            mChatText.addLine("**" + sender + "**" + ": " + message);
         }
     }
 
