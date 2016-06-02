@@ -119,9 +119,10 @@ counterclockwise.
 The initially-focused window is the game list window. Use the arrow keys to
 scroll, or press enter to select a game to join.
 
-The second window, the Server Menu window, provides buttons to create games,
-refresh the game list (the game list is automatically refreshed every few
-seconds), and leave the server.
+The second window, the Server Information window, provides buttons to create
+games, refresh the game list (the game list is automatically refreshed every
+few seconds), and leave the server. The Server Information window also contains
+a list of all players currently connected to the server.
 
 The third window, the Lobby Chat window, shows the lobby chat. Use Page Up and
 Page Down to scroll through the chat history. Type your messages in the text
@@ -141,11 +142,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 9. Version history
 
-v0.3.0.0b (released 06/xx/16):
+v0.3.0.0b (released 06/02/16):
 - Add network play initial operational capabilities
     - Server mode and client-server interface
     - Server lobby UI
-    - In-game UI
+    - Multiplayer games
 
 v0.2.5.3b (released 05/31/16):
 - Fix bug in taflman location list, which led to missing king in position
