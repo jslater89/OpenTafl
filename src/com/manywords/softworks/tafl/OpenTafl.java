@@ -67,7 +67,11 @@ public class OpenTafl {
         switch(runMode) {
             case SERVER:
                 // Blocks here
-                NetworkServer ns = new NetworkServer(4);
+                int threads = 4;
+                if(mapArgs.containsKey("threads")) {
+                    threads = Integer.parseInt(mapArgs.get("threads"));
+                }
+                NetworkServer ns = new NetworkServer(threads);
                 ns.start();
                 break;
             case WINDOW:
