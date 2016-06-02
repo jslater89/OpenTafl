@@ -37,6 +37,9 @@ public class ChatWindow extends BasicWindow {
         mChatText = new ScrollingLabel();
         p.addComponent(mChatText);
 
+        EmptySpace space = new EmptySpace();
+        p.addComponent(space);
+
         Label enterTextLabel = new Label("Enter message:");
         p.addComponent(enterTextLabel);
 
