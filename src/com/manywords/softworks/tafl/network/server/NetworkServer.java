@@ -238,7 +238,9 @@ public class NetworkServer {
         }
         clientExitingLobby(c);
 
-        sendPacketToClients(getLobbyClients(), new LobbyChatPacket("Server", c.getUsername() + " has disconnected."), PriorityTaskQueue.Priority.LOW);
+        if(c.getUsername() != null) {
+            sendPacketToClients(getLobbyClients(), new LobbyChatPacket("Server", c.getUsername() + " has disconnected."), PriorityTaskQueue.Priority.LOW);
+        }
     }
 
     public void clientEnteringLobby(ServerClient c) {

@@ -271,32 +271,16 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void onErrorReceived(String message) {
             if(message.equals(ErrorPacket.LOGIN_FAILED)) {
-                MessageDialogBuilder b = new MessageDialogBuilder();
-                b.setTitle("Login failed");
-                b.setText("Login/registration credentials invalid.");
-                b.addButton(MessageDialogButton.OK);
-                MessageDialog d = b.build();
-                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
-
-                // Ordinarily comes from a non-UI thread
-                TerminalUtils.runOnUiThread(mGui, () -> {
-                    d.showDialog(mGui);
-                    mTerminalCallback.changeActiveScreen(new MainMenuScreen());
-                });
+                showDialogOnUiThread("Login failed", "Login/registration credentials invalid.");
+            }
+            else if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
+                showDialogOnUiThread("Version mismatch",
+                        "The server is running a different version of OpenTafl.\n" +
+                                "Please visit softworks.manywords.press/opentafl for the latest version,\n" +
+                                "or tell the server host to upgrade.");
             }
             else {
-                MessageDialogBuilder b = new MessageDialogBuilder();
-                b.setTitle("Unhandled error");
-                b.setText("Error packet message:\n" + message);
-                b.addButton(MessageDialogButton.OK);
-                MessageDialog d = b.build();
-                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
-
-                // Ordinarily comes from a non-UI thread
-                TerminalUtils.runOnUiThread(mGui, () -> {
-                    d.showDialog(mGui);
-                    mTerminalCallback.changeActiveScreen(new MainMenuScreen());
-                });
+                showDialogOnUiThread("Unhandled error", "Error packet message:\n" + message);
             }
         }
 
@@ -313,18 +297,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void onDisconnect(boolean planned) {
             if(!planned) {
-                MessageDialogBuilder b = new MessageDialogBuilder();
-                b.setTitle("Server connection failed");
-                b.setText("Server terminated the connection.");
-                b.addButton(MessageDialogButton.OK);
-                MessageDialog d = b.build();
-                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
-
-                // Ordinarily comes from a non-UI thread
-                TerminalUtils.runOnUiThread(mGui, () -> {
-                    d.showDialog(mGui);
-                    mTerminalCallback.changeActiveScreen(new MainMenuScreen());
-                });
+                showDialogOnUiThread("Server connection failed", "Server terminated the connection.");
             }
         }
 
@@ -348,5 +321,20 @@ public class ServerLobbyScreen extends LogicalScreen {
         public void onVictory(VictoryPacket.Victory victory) {
 
         }
+    }
+
+    private void showDialogOnUiThread(String title, String text) {
+        MessageDialogBuilder b = new MessageDialogBuilder();
+        b.setTitle(title);
+        b.setText(text);
+        b.addButton(MessageDialogButton.OK);
+        MessageDialog d = b.build();
+        d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+
+        // Ordinarily comes from a non-UI thread
+        TerminalUtils.runOnUiThread(mGui, () -> {
+            d.showDialog(mGui);
+            mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+        });
     }
 }

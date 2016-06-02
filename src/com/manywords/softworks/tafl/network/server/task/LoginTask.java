@@ -29,7 +29,7 @@ public class LoginTask implements Runnable {
             server.sendPacketToClient(client, new ErrorPacket(ErrorPacket.VERSION_MISMATCH), PriorityTaskQueue.Priority.LOW);
             client.disconnect();
         }
-        if (server.getPlayerDatabase().allowLoginFor(packet.username, packet.password)) {
+        else if (server.getPlayerDatabase().allowLoginFor(packet.username, packet.password)) {
             client.onRegistered(packet.username);
             server.sendPacketToClient(client, new SuccessPacket(SuccessPacket.LOGGED_IN), PriorityTaskQueue.Priority.LOW);
         }
