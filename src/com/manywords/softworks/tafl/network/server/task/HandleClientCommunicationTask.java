@@ -56,7 +56,7 @@ public class HandleClientCommunicationTask implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Server received: " + mData);
+        mServer.println("Server received: " + mData);
         processPacket(mData);
     }
 }

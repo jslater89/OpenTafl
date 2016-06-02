@@ -75,11 +75,32 @@ public class ClientServerConnection {
     private ClientServerCallback mExternalCallback;
     private ClientServerCallback mInternalCallback = new InternalCallback();
 
+    boolean mChatty = true;
+
     public ClientServerConnection(String hostname, int port, ClientServerCallback callback) {
         this.hostname = hostname;
         this.port = port;
         mExternalCallback = callback;
     }
+
+    /* Test code */
+
+    ClientServerConnection(String hostname, int port) {
+        this.hostname = hostname;
+        this.port = port;
+    }
+
+    void setTestCallback(TestClientServerConnection.TestClientServerCallback callback) {
+        mExternalCallback = callback;
+        mChatty = false;
+    }
+
+    void println(String message) {
+        if(mChatty) System.out.println(message);
+    }
+
+    /**/
+
 
     public void setCallback(ClientServerCallback callback) {
         mExternalCallback = callback;
@@ -195,33 +216,33 @@ public class ClientServerConnection {
     private class ReadThread extends Thread {
         @Override
         public void run() {
-            System.out.println("Connecting to server: " + mServer.getInetAddress());
+            println("Connecting to server: " + mServer.getInetAddress());
             String inputData = "";
             try (
                     BufferedReader in = new BufferedReader(new InputStreamReader(mServer.getInputStream()));
             ) {
                 while((inputData = in.readLine()) != null) {
                     try {
-                        System.out.println("Client received: " + inputData);
+                        println("Client received: " + inputData);
                         ClientCommandParser.handlePacket(mInternalCallback, inputData);
                     }
                     catch(Exception e) {
-                        System.out.println("Encountered exception reading from server: ");
+                        println("Encountered exception reading from server: ");
                         e.printStackTrace(System.out);
                     }
                 }
             }
             catch(IOException e) {
-                System.out.println("Server connection error: " + e);
+                println("Server connection error: " + e);
             }
 
-            System.out.println("Disconnected from server");
-            mExternalCallback.onDisconnect(mPlannedDisconnect);
+            println("Disconnected from server");
+            mInternalCallback.onDisconnect(mPlannedDisconnect);
         }
     }
 
-    private void setState(State newState) {
-        System.out.println("State change: " + mCurrentState + " to " + newState);
+    void setState(State newState) {
+        println("State change: " + mCurrentState + " to " + newState);
         mCurrentState = newState;
         mInternalCallback.onStateChanged(newState);
     }
@@ -308,7 +329,8 @@ public class ClientServerConnection {
 
         @Override
         public void onDisconnect(boolean planned) {
-
+            setState(State.DISCONNECTED);
+            mExternalCallback.onDisconnect(planned);
         }
 
         @Override

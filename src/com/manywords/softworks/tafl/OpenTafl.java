@@ -68,6 +68,7 @@ public class OpenTafl {
             case SERVER:
                 // Blocks here
                 NetworkServer ns = new NetworkServer(4);
+                ns.start();
                 break;
             case WINDOW:
                 SwingWindow w = new SwingWindow();

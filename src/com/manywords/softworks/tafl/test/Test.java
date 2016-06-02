@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.test.mechanics.ExternalEngineHostTest;
 import com.manywords.softworks.tafl.test.mechanics.GameClockTest;
 import com.manywords.softworks.tafl.test.mechanics.KingMissingPositionRecordTest;
 import com.manywords.softworks.tafl.test.mechanics.ServerTickThreadTest;
+import com.manywords.softworks.tafl.test.network.ServerTest;
 import com.manywords.softworks.tafl.test.rules.*;
 
 import java.util.ArrayList;
@@ -14,6 +15,10 @@ import java.util.List;
 public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
+
+
+        // Network tests
+        tests.add(new ServerTest());
 
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
@@ -52,6 +57,7 @@ public class Test {
         tests.add(new GameClockTest());
         tests.add(new ServerTickThreadTest());
         tests.add(new KingMissingPositionRecordTest());
+
 
         // AI tests
         tests.add(new AIMatchingZobristTest());

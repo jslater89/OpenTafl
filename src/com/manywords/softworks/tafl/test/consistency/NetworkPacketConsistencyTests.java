@@ -87,8 +87,8 @@ public class NetworkPacketConsistencyTests extends TaflTest {
         cl = ClientListPacket.parse(first);
         second = cl.toString();
 
-        System.out.println(first);
-        System.out.println(second);
+        //System.out.println(first);
+        //System.out.println(second);
 
         assert first.equals(second);
     }

@@ -42,6 +42,7 @@ public class NetworkServer {
     private BucketedIntervalTaskHolder mGameClockTasks;
     private BucketedIntervalTaskHolder mGameListUpdateTasks;
 
+    private ServerSocket mServerSocket;
     private final List<ServerClient> mClients;
     private final List<ServerClient> mLobbyClients;
     private final List<ServerGame> mGames;
@@ -49,8 +50,14 @@ public class NetworkServer {
     private PlayerDatabase mPlayerDatabase;
 
     private boolean mRunning = true;
+    private boolean mChatty;
 
     public NetworkServer(int threadCount) {
+        this(threadCount, true);
+    }
+
+    public NetworkServer(int threadCount, boolean chatty) {
+        mChatty = chatty;
         mTaskQueue = new PriorityTaskQueue(threadCount);
         mClients = new ArrayList<>(64);
         mLobbyClients = new ArrayList<>(64);
@@ -68,8 +75,21 @@ public class NetworkServer {
         mTickThread.addTaskHolder(mGameClockTasks);
 
         mPlayerDatabase.addUpdateTasks(mTickThread, mTaskQueue);
+    }
 
+    public void println(String message) { if(mChatty) System.out.println(message); }
+
+    public void start() {
         startServer();
+    }
+
+    public void stop() {
+        mRunning = false;
+        try {
+            mServerSocket.close();
+        } catch (IOException e) {
+            // best effort
+        }
     }
 
     public PriorityTaskQueue getTaskQueue() {
@@ -110,19 +130,25 @@ public class NetworkServer {
         mTaskQueue.start();
         mTickThread.start();
 
-        try (
-            ServerSocket socket = new ServerSocket(11541);
-        ) {
+        try {
+            mServerSocket = new ServerSocket(11541);
+
             while(mRunning) {
-                Socket clientSocket = socket.accept();
+                Socket clientSocket = mServerSocket.accept();
                 new ServerClient(this, clientSocket);
             }
         } catch (IOException e) {
-            System.out.println("Failed to start server socket");
-            System.exit(-1);
+            println("Server socket exception");
+            //System.exit(-1);
+        } finally {
+            try {
+                mServerSocket.close();
+            } catch (IOException e) {
+                // best effort
+            }
         }
 
-        System.out.println("Server stopping.");
+        println("Server stopping.");
     }
 
     public List<ServerClient> getClients() {
