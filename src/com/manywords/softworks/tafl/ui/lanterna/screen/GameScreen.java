@@ -5,33 +5,46 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.command.player.LocalHuman;
+import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
+import com.manywords.softworks.tafl.network.packet.ClientInformation;
+import com.manywords.softworks.tafl.network.packet.GameInformation;
+import com.manywords.softworks.tafl.network.client.ClientServerConnection;
+import com.manywords.softworks.tafl.network.client.ClientServerConnection.ClientServerCallback;
+import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
+import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
+import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
-import com.manywords.softworks.tafl.ui.command.Command;
-import com.manywords.softworks.tafl.ui.command.CommandEngine;
-import com.manywords.softworks.tafl.ui.command.CommandResult;
-import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
+import com.manywords.softworks.tafl.command.Command;
+import com.manywords.softworks.tafl.command.CommandEngine;
+import com.manywords.softworks.tafl.command.CommandResult;
+import com.manywords.softworks.tafl.command.HumanCommandParser;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
-import com.manywords.softworks.tafl.ui.lanterna.window.*;
-import com.manywords.softworks.tafl.ui.player.Player;
-import com.manywords.softworks.tafl.ui.player.UiWorkerThread;
+import com.manywords.softworks.tafl.command.player.Player;
+import com.manywords.softworks.tafl.command.player.UiWorkerThread;
+import com.manywords.softworks.tafl.ui.lanterna.window.ingame.BoardWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.ingame.CommandWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.ingame.StatusWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,6 +63,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     private UiWorkerThread mCommandEngineThread;
     private Game mGame;
     private CommandEngine mCommandEngine;
+    private ClientServerConnection mServerConnection;
+    private ClientServerCallback mServerCallback = new ServerCallback();
 
     private ReplayGame mReplay;
 
@@ -67,10 +82,19 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         mTitle = title;
     }
 
+    public void setServerConnection(ClientServerConnection c) {
+        mServerConnection = c;
+    }
+
     @Override
     public void setActive(AdvancedTerminal t, WindowBasedTextGUI gui) {
         super.setActive(t, gui);
         mTerminalCallback = new GameScreenTerminalCallback();
+
+        // Set up network game stuff, if necessary
+        if(mServerConnection != null) {
+            mServerConnection.setCallback(mServerCallback);
+        }
 
         if(mGame != null) {
             mTerminalCallback.onEnteringGameScreen(mGame, mTitle);
@@ -102,8 +126,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) return;
 
         mBoardWindow.setHints(TerminalThemeConstants.BOARD_WINDOW);
-        mStatusWindow.setHints(TerminalThemeConstants.STATUS_WINDOW);
-        mCommandWindow.setHints(TerminalThemeConstants.COMMAND_WINDOW);
+        mStatusWindow.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
+        mCommandWindow.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
 
         TerminalSize screenSize = size;
         TerminalSize boardWindowSize = mBoardWindow.getPreferredSize();
@@ -156,7 +180,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         mCommandEngine.shutdown();
         mCommandEngineThread.cancel();
 
-        mTerminal.changeActiveScreen(new MainMenuScreen());
+        if(mServerConnection != null) {
+            mServerConnection.sendLeaveGameMessage();
+            mTerminal.changeActiveScreen(new ServerLobbyScreen(mServerConnection));
+        }
+        else {
+            mTerminal.changeActiveScreen(new MainMenuScreen());
+        }
     }
 
     @Override
@@ -177,8 +207,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     }
 
     @Override
-    public void timeUpdate(Side side) {
-        mStatusWindow.handleTimeUpdate(side, mGame.getClock().getClockEntry(true).toTimeSpec(), mGame.getClock().getClockEntry(false).toTimeSpec());
+    public void timeUpdate(boolean currentSideAttackers) {
+        mStatusWindow.handleTimeUpdate(currentSideAttackers, mGame.getClock().getClockEntry(true).toTimeSpec(), mGame.getClock().getClockEntry(false).toTimeSpec());
     }
 
     @Override
@@ -359,7 +389,38 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                 @Override
                 public void run() {
-                    mCommandEngine = new CommandEngine(g, GameScreen.this, TerminalSettings.getNewPlayer(TerminalSettings.attackers), TerminalSettings.getNewPlayer(TerminalSettings.defenders));
+                    if(mServerConnection != null) {
+                        NetworkClientPlayer networkPlayer = mServerConnection.getNetworkPlayer();
+                        LocalHuman localPlayer = (LocalHuman) Player.getNewPlayer(Player.Type.HUMAN);
+
+                        Player attacker, defender;
+
+                        System.out.println("Network player role: " + networkPlayer.getGameRole());
+
+                        // Wait for the game joining to finish.
+                        while(networkPlayer.getGameRole() == GameRole.OUT_OF_GAME) {
+                            try {
+                                System.out.println("Waiting for other player role");
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                // doesn't matter
+                            }
+                        }
+
+                        if(networkPlayer.getGameRole() == GameRole.ATTACKER) {
+                            attacker = networkPlayer;
+                            defender = localPlayer;
+                        }
+                        else {
+                            attacker = localPlayer;
+                            defender = networkPlayer;
+                        }
+
+                        mCommandEngine = new CommandEngine(g, GameScreen.this, attacker, defender);
+                    }
+                    else {
+                        mCommandEngine = new CommandEngine(g, GameScreen.this, TerminalSettings.getNewPlayer(TerminalSettings.attackers), TerminalSettings.getNewPlayer(TerminalSettings.defenders));
+                    }
                 }
             });
             mCommandEngineThread.start();
@@ -483,6 +544,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     // Leave the game thread running for history.
                     statusText("Finished game. Enter 'quit' again to return to menu.");
                     mCommandEngine.finishGame();
+
+                    if(mServerConnection != null) {
+                        mServerConnection.sendGameEndedMessage();
+                    }
                 }
                 else {
                     leaveGameUi();
@@ -518,13 +583,21 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 tryTimeUpdate();
                 updateComments();
             }
+            else if(r.type == CommandResult.Type.CHAT) {
+                if(mServerConnection != null) {
+                    ClientServerConnection.ChatType type =
+                            (mServerConnection.getGameRole() == GameRole.KIBBITZER) ?
+                                    ClientServerConnection.ChatType.SPECTATOR : ClientServerConnection.ChatType.GAME;
+                    mServerConnection.sendChatMessage(type, mServerConnection.getUsername(), r.message);
+                }
+            }
         }
 
         private void tryTimeUpdate() {
             if(!mInGame) {
-                Side currentSide = mReplay.getCurrentState().getCurrentSide();
-                GameClock.TimeSpec attackerClock = mReplay.getTimeGuess(true);
-                GameClock.TimeSpec defenderClock = mReplay.getTimeGuess(false);
+                boolean currentSide = mReplay.getCurrentState().getCurrentSide().isAttackingSide();
+                TimeSpec attackerClock = mReplay.getTimeGuess(true);
+                TimeSpec defenderClock = mReplay.getTimeGuess(false);
                 mStatusWindow.handleTimeUpdate(currentSide, attackerClock, defenderClock);
             }
         }
@@ -601,6 +674,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(CommandResult.Type.REPLAY_ENTER);
             }
 
+            if(mServerConnection != null) {
+                types.add(CommandResult.Type.CHAT);
+            }
+
             if(mInGame || mPostGame || mInReplay) {
                 types.add(CommandResult.Type.INFO);
                 types.add(CommandResult.Type.SHOW);
@@ -615,10 +692,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         }
 
         @Override
-        public void handleKeyStroke(KeyStroke key) {
+        public boolean handleKeyStroke(KeyStroke key) {
             if(key.getKeyType() == KeyType.PageUp || key.getKeyType() == KeyType.PageDown) {
                 mStatusWindow.handleInput(key);
+                return true;
             }
+            else return false;
         }
 
         @Override
@@ -629,6 +708,84 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         @Override
         public void setSelfplayWindow(Window w) {
             mTerminal.setSelfplayWindow(w);
+        }
+    }
+
+    private class ServerCallback implements ClientServerCallback {
+
+        @Override
+        public void onStateChanged(ClientServerConnection.State newState) {
+
+        }
+
+        @Override
+        public void onChatMessageReceived(ClientServerConnection.ChatType type, String sender, String message) {
+            if(type == ClientServerConnection.ChatType.GAME) statusText(sender + ": " + message);
+            if(type == ClientServerConnection.ChatType.SPECTATOR
+                    && mServerConnection != null
+                    && mServerConnection.getGameRole() == GameRole.KIBBITZER) {
+                statusText(sender + ": " + message);
+            }
+        }
+
+        @Override
+        public void onSuccessReceived(String message) {
+
+        }
+
+        @Override
+        public void onErrorReceived(String message) {
+
+        }
+
+        @Override
+        public void onGameListReceived(List<GameInformation> games) {
+
+        }
+
+        @Override
+        public void onClientListReceived(List<ClientInformation> clients) {
+
+        }
+
+        @Override
+        public void onDisconnect(boolean planned) {
+            if(!planned) {
+                MessageDialogBuilder b = new MessageDialogBuilder();
+                b.setTitle("Server connection failed");
+                b.setText("Server terminated the connection.");
+                b.addButton(MessageDialogButton.OK);
+                MessageDialog d = b.build();
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+
+                TerminalUtils.runOnUiThread(mGui, () -> d.showDialog(mGui));
+            }
+
+            statusText("Server connection failed, game ended");
+            mCommandEngine.finishGame();
+            mServerConnection = null;
+        }
+
+        @Override
+        public void onStartGame(Rules r) {
+
+        }
+
+        @Override
+        public void onServerMoveReceived(MoveRecord move) {
+
+        }
+
+        @Override
+        public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock) {
+            if(mGame.getClock() != null) {
+                mGame.getClock().handleNetworkTimeUpdate(attackerClock, defenderClock);
+            }
+        }
+
+        @Override
+        public void onVictory(VictoryPacket.Victory victory) {
+            mCommandEngine.networkVictory(victory);
         }
     }
 

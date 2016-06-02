@@ -4,13 +4,15 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
+import com.manywords.softworks.tafl.engine.clock.GameClock;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
+import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.lanterna.screen.GameScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
 
 import java.io.*;
 
@@ -18,6 +20,15 @@ import java.io.*;
  * Created by jay on 3/22/16.
  */
 public class TerminalUtils {
+    public static void runOnUiThread(WindowBasedTextGUI gui, Runnable task) {
+        if(gui == null || Thread.currentThread().equals(gui.getGUIThread().getThread())) {
+            task.run();
+        }
+        else {
+            gui.getGUIThread().invokeLater(task);
+        }
+    }
+
     public static Game startGame(WindowBasedTextGUI gui, LogicalScreen.TerminalCallback callback) {
         if(TerminalSettings.attackers == TerminalSettings.ENGINE && TerminalSettings.attackerEngineSpec == null) {
             MessageDialog.showMessageDialog(gui, "Incomplete configuration", "Attacker engine missing configuration file!");
@@ -28,7 +39,7 @@ public class TerminalUtils {
             return null;
         }
 
-        GameClock.TimeSpec ts = TerminalSettings.timeSpec;
+        TimeSpec ts = TerminalSettings.timeSpec;
         Game g;
         if(ts.mainTime == 0 && (ts.overtimeTime == 0 ||ts.overtimeCount == 0)) {
             g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), callback.getUiCallback());
@@ -39,6 +50,28 @@ public class TerminalUtils {
 
         // Blocks here
         GameScreen gameScreen = new GameScreen(g, BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        callback.changeActiveScreen(gameScreen);
+        return g;
+    }
+
+    public static Game startNetworkGame(
+            WindowBasedTextGUI gui,
+            LogicalScreen.TerminalCallback callback,
+            ClientServerConnection connection,
+            Rules rules,
+            TimeSpec timeSpec) {
+        // Terminal settings: local network player. For now, though...
+
+        Game g;
+        if(timeSpec == null || timeSpec.mainTime == 0 && (timeSpec.overtimeTime == 0 || timeSpec.overtimeCount == 0)) {
+            g = new Game(rules, callback.getUiCallback());
+        }
+        else {
+            g = new Game(rules, callback.getUiCallback(), timeSpec);
+        }
+
+        GameScreen gameScreen = new GameScreen(g, rules.toString());
+        gameScreen.setServerConnection(connection);
         callback.changeActiveScreen(gameScreen);
         return g;
     }
@@ -64,7 +97,7 @@ public class TerminalUtils {
         Game g = rg.getGame();
 
         if(g.getClock() == null && (TerminalSettings.timeSpec.mainTime != 0 || TerminalSettings.timeSpec.overtimeTime != 0)) {
-            GameClock clock = new GameClock(g, g.getCurrentState().getAttackers(), g.getCurrentState().getDefenders(), TerminalSettings.timeSpec);
+            GameClock clock = new GameClock(g, TerminalSettings.timeSpec);
 
             g.setClock(clock);
         }

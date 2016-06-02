@@ -4,13 +4,13 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.*;
-import com.manywords.softworks.tafl.ui.command.Command;
-import com.manywords.softworks.tafl.ui.command.CommandEngine;
-import com.manywords.softworks.tafl.ui.command.CommandResult;
-import com.manywords.softworks.tafl.ui.command.HumanCommandParser;
-import com.manywords.softworks.tafl.ui.player.LocalAi;
-import com.manywords.softworks.tafl.ui.player.LocalHuman;
-import com.manywords.softworks.tafl.ui.player.Player;
+import com.manywords.softworks.tafl.command.Command;
+import com.manywords.softworks.tafl.command.CommandEngine;
+import com.manywords.softworks.tafl.command.CommandResult;
+import com.manywords.softworks.tafl.command.HumanCommandParser;
+import com.manywords.softworks.tafl.command.player.LocalAi;
+import com.manywords.softworks.tafl.command.player.LocalHuman;
+import com.manywords.softworks.tafl.command.player.Player;
 import jline.console.ConsoleReader;
 
 import java.io.IOException;
@@ -21,15 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class RawTerminal implements UiCallback {
-    public static final String RESET = "\u001B[0m";
-    public static final String BLACK = "\u001B[30m";
-    public static final String RED = "\u001B[31m";
-    public static final String GREEN = "\u001B[32m";
-    public static final String YELLOW = "\u001B[33m";
-    public static final String BLUE = "\u001B[34m";
-    public static final String PURPLE = "\u001B[35m";
-    public static final String CYAN = "\u001B[36m";
-    public static final String WHITE = "\u001B[37m";
 
     public static String ANSI_RESET = "\u001B[0m";
     public static String ANSI_BLACK = "\u001B[30m";
@@ -161,15 +152,15 @@ public class RawTerminal implements UiCallback {
     }
 
     public static void enableColor() {
-        ANSI_RESET = RESET;
-        ANSI_BLACK = BLACK;
-        ANSI_RED = RED;
-        ANSI_GREEN = GREEN;
-        ANSI_YELLOW = YELLOW;
-        ANSI_BLUE = BLUE;
-        ANSI_PURPLE = PURPLE;
-        ANSI_CYAN = CYAN;
-        ANSI_WHITE = WHITE;
+        ANSI_RESET = Ansi.RESET;
+        ANSI_BLACK = Ansi.BLACK;
+        ANSI_RED = Ansi.RED;
+        ANSI_GREEN = Ansi.GREEN;
+        ANSI_YELLOW = Ansi.YELLOW;
+        ANSI_BLUE = Ansi.BLUE;
+        ANSI_PURPLE = Ansi.PURPLE;
+        ANSI_CYAN = Ansi.CYAN;
+        ANSI_WHITE = Ansi.WHITE;
     }
 
     public boolean inGame() {
@@ -217,7 +208,7 @@ public class RawTerminal implements UiCallback {
     }
 
     @Override
-    public void timeUpdate(Side side) {
+    public void timeUpdate(boolean currentSideAttackers) {
 
     }
 
@@ -286,7 +277,8 @@ public class RawTerminal implements UiCallback {
                 return "Local human player";
             case AI:
                 return "AI player";
-            case NETWORK:
+            case NETWORK_SERVER:
+            case NETWORK_CLIENT:
                 return "Network player";
             default:
                 return "How did you get here?";
@@ -646,7 +638,7 @@ public class RawTerminal implements UiCallback {
                 if (special.contains(space)) {
                     if (highlight != null
                             && highlight.x == i && highlight.y == rank) {
-                        String color = (Taflman.getSide(occupier).isAttackingSide() ? ANSI_RED : ANSI_WHITE);
+                        String color = (Taflman.getSide(board.getState(), occupier).isAttackingSide() ? ANSI_RED : ANSI_WHITE);
                         rowString += "*" + color + "*" + ANSI_BLUE + "*|";
                     } else {
                         rowString += ANSI_BLUE + "***|";
@@ -654,7 +646,7 @@ public class RawTerminal implements UiCallback {
                 } else {
                     if (highlight != null
                             && highlight.x == i && highlight.y == rank) {
-                        String color = (Taflman.getSide(occupier).isAttackingSide() ? ANSI_RED : ANSI_WHITE);
+                        String color = (Taflman.getSide(board.getState(), occupier).isAttackingSide() ? ANSI_RED : ANSI_WHITE);
                         rowString += color + " * " + ANSI_BLUE + "|";
                     } else {
                         rowString += ANSI_BLUE + "   |";

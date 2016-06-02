@@ -1,11 +1,12 @@
 package com.manywords.softworks.tafl.engine;
 
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
+import com.manywords.softworks.tafl.engine.clock.GameClock;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.*;
@@ -43,11 +44,18 @@ public class Game {
         this(rules, callback, null);
     }
 
-    public Game(Rules rules, UiCallback callback, GameClock.TimeSpec timeSpec) {
+    public Game(Rules rules, UiCallback callback, TimeSpec timeSpec) {
+        this(rules, callback, timeSpec, false);
+    }
+
+    public Game(Rules rules, UiCallback callback, TimeSpec timeSpec, boolean serverGame) {
         mGameRules = rules;
 
         if(timeSpec != null) {
-            mClock = new GameClock(this, getRules().getAttackers(), getRules().getDefenders(), timeSpec);
+            mClock = new GameClock(this, timeSpec);
+            if(serverGame) {
+                mClock.setServerMode(true);
+            }
         }
 
         int boardSquares = rules.getBoard().getBoardDimension() * rules.getBoard().getBoardDimension();
@@ -64,8 +72,6 @@ public class Game {
 
         // Create a new state off of the game rules.
         mCurrentState = new GameState(this, mGameRules);
-
-        Taflman.initialize(this, mGameRules);
 
         // Add the starting state to the history.
         mHistory.add(mCurrentState);
@@ -110,16 +116,16 @@ public class Game {
     public void loadClock() {
         if(mTagMap != null && mTagMap.containsKey("time-control")) {
             String clockLengthString = mTagMap.get("time-control");
-            GameClock.TimeSpec clockLength = GameClock.getTimeSpecForGameNotationString(clockLengthString);
+            TimeSpec clockLength = GameClock.getTimeSpecForGameNotationString(clockLengthString);
 
-            mClock = new GameClock(this, getCurrentState().getAttackers(), getCurrentState().getDefenders(), clockLength);
+            mClock = new GameClock(this, clockLength);
 
             if(mTagMap.containsKey("time-remaining")) {
                 String remainingTimeString = mTagMap.get("time-remaining");
                 String[] remainingTimes = remainingTimeString.split(",");
 
-                GameClock.TimeSpec attackerTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
-                GameClock.TimeSpec defenderTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
+                TimeSpec attackerTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
+                TimeSpec defenderTime = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
 
                 GameClock.ClockEntry attackerClock = mClock.getClockEntry(true);
                 attackerClock.setTime(attackerTime);
@@ -236,8 +242,6 @@ public class Game {
         return mCurrentState.getCurrentSide();
     }
 
-    // TODO: pass StateEvent object to notify UI of happenings
-    // in callback
     public GameState advanceState(GameState currentState, GameState nextState, boolean advanceTurn, char berserkingTaflman, boolean recordState) {
         nextState.updateGameState(
                 this,

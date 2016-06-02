@@ -4,10 +4,12 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
-import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
+import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
+import com.manywords.softworks.tafl.network.server.NetworkServer;
+import jline.console.ConsoleReader;
 
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
+import java.net.Socket;
 import java.util.Map;
 
 public class Debug {
@@ -16,18 +18,6 @@ public class Debug {
             ExternalEngineClient.run();
         }
         else {
-            /*Rules r = Brandub.newBrandub7();
-            Game g = new Game(r, null, new GameClock.TimeSpec(300000, 30000, 3, 5000));
-            ExternalEnginePlayer p = new ExternalEnginePlayer();
-            p.setGame(g);
-            p.setupEngine(null);
-
-            ExternalEngineHost h = p.getExternalEngineHost();
-            h.start(p.getGame());
-            h.clockUpdate(p.getGame().getClock().getClockEntry(g.getCurrentState().getAttackers()), p.getGame().getClock().getClockEntry(g.getCurrentState().getDefenders()));
-            h.analyze(5, 30);
-            */
-
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
             Terminal t = null;
 
@@ -39,6 +29,44 @@ public class Debug {
                     System.setErr(TerminalUtils.newDummyPrintStream());
                 } catch (IOException e) {
                     System.out.println("Unable to start.");
+                }
+            }
+            /*
+            else if(args.containsKey("--server-mode")) {
+                // Blocks here
+                NetworkServer ns = new NetworkServer(3);
+            }*/
+            else if(args.containsKey("--dummy-client")) {
+                ConsoleReader reader = null;
+                Socket server = null;
+                PrintWriter writer = null;
+                try {
+                    server = new Socket("localhost", 11541);
+                    reader = new ConsoleReader();
+                    writer = new PrintWriter(new OutputStreamWriter(server.getOutputStream()), true);
+                } catch (IOException e) {
+                    System.out.println("Error starting console reader! " + e);
+                    System.exit(-1);
+                }
+
+                while(true) {
+                    try {
+                        String toSend = reader.readLine("Send to server] ");
+                        if(toSend.equals("exit")) break;
+
+                        writer.println(toSend);
+
+                        server.getOutputStream().flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                try {
+                    writer.close();
+                    server.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
             else {

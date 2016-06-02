@@ -6,8 +6,9 @@ README
 4. External engines
 5. Replay mode
 6. AI self-play mode
-7. Links
-8. Version history
+7. Network play
+8. Links
+9. Version history
 
 1. Introduction
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
@@ -97,13 +98,55 @@ At the end of the self-play matches, a summary will be displayed on screen.
 Detailed results, including game records for every game, will be saved in the
 'selfplay-results' subdirectory under the main OpenTafl directory.
 
-7. Links
-http://softworks.manywords.press/opentafl
-http://soapbox.manywords.press/tag/tafl
-http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt
-http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt
+7. Network play
+OpenTafl can be played with humans and AIs (not yet implemented) from around
+the world, using its tafl server functionality. Anyone may run an OpenTafl
+server by running the OpenTafl command with the --server flag. An OpenTafl
+server is provided by Many Words Softworks at intersect.manywords.press. The
+currently-selected server may be changed in the options menu. Servers run on
+port 11541.
 
-8. Version history
+On connecting to a server, clients will be presented with a server login
+dialog. Enter your credentials to log in or register a new account. Inactive
+accounts are pruned weekly. (This interval is subject to change.)
+
+After joining a server, clients will be presented with the server lobby screen,
+comprising three windows. The focused window will be indicated by asterisks
+surrounding its title, which will also be rendered in capital letters. Press
+Tab to cycle window focus clockwise, or Shift-Tab to cycle focus
+counterclockwise.
+
+The initially-focused window is the game list window. Use the arrow keys to
+scroll, or press enter to select a game to join.
+
+The second window, the Server Information window, provides buttons to create
+games, refresh the game list (the game list is automatically refreshed every
+few seconds), and leave the server. The Server Information window also contains
+a list of all players currently connected to the server.
+
+The third window, the Lobby Chat window, shows the lobby chat. Use Page Up and
+Page Down to scroll through the chat history. Type your messages in the text
+entry box, and press Enter to send them.
+
+Upon entering a game, the interface functions as it does during single-player
+games. The 'chat' command may be used to interact with your opponent during a
+game.
+
+8. Links
+http://softworks.manywords.press/opentafl (official website)
+http://soapbox.manywords.press/tag/tafl (development blog)
+https://bitbucket.org/Fishbreath/opentafl (source code, bug reports)
+http://conclave.manywords.press/forum/softworks/opentafl/ (forum)
+http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt (engine protocol specification)
+http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network protocol specification)
+
+9. Version history
+
+v0.3.0.0b (released 06/02/16):
+- Add network play initial operational capabilities
+    - Server mode and client-server interface
+    - Server lobby UI
+    - Multiplayer games
 
 v0.2.5.3b (released 05/31/16):
 - Fix bug in taflman location list, which led to missing king in position

@@ -15,7 +15,7 @@ import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowDecorationRenderer;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowPostRenderer;
-import com.manywords.softworks.tafl.ui.lanterna.window.*;
+import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -86,10 +86,15 @@ public class AdvancedTerminal<T extends Terminal> {
             mActiveScreen.setInactive();
         }
         System.out.println("Deactivated old screen");
-        System.out.println("Removed remaining windows");
         System.out.println("Starting new screen");
 
         mActiveScreen = screen;
+
+        try {
+            Thread.sleep(50);
+        }
+        catch(Exception e) {}
+
         mActiveScreen.setSelfplayWindow(mSelfplayWindow);
         mActiveScreen.setActive(this, mGui);
     }

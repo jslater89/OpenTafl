@@ -1,9 +1,10 @@
 package com.manywords.softworks.tafl.engine.replay;
 
 import com.manywords.softworks.tafl.engine.*;
+import com.manywords.softworks.tafl.engine.clock.GameClock;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
-import javax.xml.soap.Detail;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +17,11 @@ public class ReplayGame {
     private List<DetailedMoveRecord> mMoveHistory;
     private int mStatePosition = 0;
 
-    private GameClock.TimeSpec mAttackerTimeLeft;
-    private GameClock.TimeSpec mDefenderTimeLeft;
+    private TimeSpec mAttackerTimeLeft;
+    private TimeSpec mDefenderTimeLeft;
 
-    private List<GameClock.TimeSpec> mAttackerTimeSpecByIndex;
-    private List<GameClock.TimeSpec> mDefenderTimeSpecByIndex;
+    private List<TimeSpec> mAttackerTimeSpecByIndex;
+    private List<TimeSpec> mDefenderTimeSpecByIndex;
 
     /**
      * This constructor takes a game object and plays the given
@@ -271,7 +272,7 @@ public class ReplayGame {
         }
     }
 
-    public GameClock.TimeSpec getTimeGuess(boolean isAttackingSide) {
+    public TimeSpec getTimeGuess(boolean isAttackingSide) {
         if(isAttackingSide && mAttackerTimeSpecByIndex.size() > mStatePosition) {
             return mAttackerTimeSpecByIndex.get(mStatePosition);
         }

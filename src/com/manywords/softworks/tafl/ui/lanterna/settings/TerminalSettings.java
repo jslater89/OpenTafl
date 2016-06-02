@@ -1,8 +1,8 @@
 package com.manywords.softworks.tafl.ui.lanterna.settings;
 
-import com.manywords.softworks.tafl.engine.GameClock;
-import com.manywords.softworks.tafl.ui.player.Player;
-import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
+import com.manywords.softworks.tafl.command.player.Player;
+import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import org.ini4j.Wini;
 
 import java.io.File;
@@ -21,6 +21,10 @@ public class TerminalSettings {
 
     public static boolean shrinkLargeBoards = true;
 
+    public static String onlinePlayerName = "Fishbreath";
+    public static String onlineServerHost = "intersect.manywords.press";
+    public static int onlineServerPort = 11541;
+
     public static int attackers = AI;
     public static int defenders = HUMAN;
 
@@ -34,7 +38,7 @@ public class TerminalSettings {
 
     public static int variant = 0;
 
-    public static GameClock.TimeSpec timeSpec = new GameClock.TimeSpec(0, 0, 0, 0);
+    public static TimeSpec timeSpec = new TimeSpec(0, 0, 0, 0);
 
     public static String labelForPlayerType(int i) {
         switch(i) {
@@ -89,6 +93,7 @@ public class TerminalSettings {
             ini.put("clock", "overtime", timeSpec.overtimeTime);
             ini.put("clock", "otcount", timeSpec.overtimeCount);
             ini.put("clock", "increment", timeSpec.incrementTime);
+            ini.put("network", "host", onlineServerHost);
             ini.store();
         }
         catch(IOException e) {
@@ -139,7 +144,10 @@ public class TerminalSettings {
 
             shrinkLargeBoards = ini.get("display", "shrinklarge", boolean.class);
 
-            GameClock.TimeSpec ts = new GameClock.TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
+            String onlineHost = ini.get("network", "host", String.class);
+            if(onlineHost != null) onlineServerHost = onlineHost;
+
+            TimeSpec ts = new TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
             timeSpec = ts;
         }
         catch(IOException e) {

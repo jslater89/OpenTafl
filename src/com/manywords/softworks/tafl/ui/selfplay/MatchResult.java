@@ -2,9 +2,7 @@ package com.manywords.softworks.tafl.ui.selfplay;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.ui.player.external.engine.EngineSpec;
-
-import java.io.File;
+import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
 
 /**
  * Created by jay on 3/22/16.

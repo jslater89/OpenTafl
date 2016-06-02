@@ -71,6 +71,11 @@ public class GameState {
         mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
     }
 
+    public void updateBoard(GameState previousState) {
+        mBoard = previousState.getBoard().deepCopy();
+        mBoard.setState(this);
+    }
+
     public void updateGameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist, char berserkingTaflman) {
         if (!((this instanceof GameTreeState) || (this instanceof GameState))) {
             throw new IllegalArgumentException("Only internal methods may directly call this constructor!");
@@ -250,11 +255,11 @@ public class GameState {
     public static final int ILLEGAL_MOVE_BERSERKER = -4;
 
     public GameState moveTaflman(char taflman, Coord destination) {
-        if (mBerserkingTaflman != Taflman.EMPTY && Taflman.getSide(taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {
+        if (mBerserkingTaflman != Taflman.EMPTY && Taflman.getSide(this, taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {
             return new GameState(ILLEGAL_SIDE_BERSERKER);
         }
 
-        if (Taflman.getSide(taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {
+        if (Taflman.getSide(this, taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {
             return new GameState(ILLEGAL_SIDE);
         }
 
@@ -277,6 +282,7 @@ public class GameState {
                 List<ShieldwallPosition> shieldwallPositionsAttackers = nextState.getBoard().detectShieldwallPositionsForSide(getAttackers());
                 List<ShieldwallPosition> shieldwallPositionsDefenders = nextState.getBoard().detectShieldwallPositionsForSide(getDefenders());
 
+
                 for (ShieldwallPosition position : shieldwallPositionsAttackers) {
                     captures.addAll(nextState.checkShieldwallPositionForCaptures(taflman, destination, position));
                 }
@@ -294,7 +300,6 @@ public class GameState {
                 nextState = mGame.advanceState(this, nextState, false, taflman, true);
                 nextState.mLastMoveResult = nextState.checkVictory();
             } else {
-                //nextState.setBerserkingTaflman(Taflman.EMPTY);
                 nextState.setBerserkingTaflman(Taflman.EMPTY);
                 nextState = mGame.advanceState(this, nextState, true, Taflman.EMPTY, true);
                 nextState.mLastMoveResult = nextState.checkVictory();
@@ -505,7 +510,7 @@ public class GameState {
         List<Character> edgefortTaflmen = new ArrayList<>();
         for (Coord space : fortSpaces) {
             for (char t : getBoard().getAdjacentNeighbors(space)) {
-                if (Taflman.getSide(t).isAttackingSide()) return false;
+                if (Taflman.getSide(this, t).isAttackingSide()) return false;
                 else edgefortTaflmen.add(t);
             }
         }
@@ -525,7 +530,7 @@ public class GameState {
             int friendlySpaces = 0;
             for(Coord c : adjacent) {
                 char occupier = getBoard().getOccupier(c);
-                if(occupier != Taflman.EMPTY && !Taflman.getSide(occupier).isAttackingSide()) {
+                if(occupier != Taflman.EMPTY && !Taflman.getSide(this, occupier).isAttackingSide()) {
                     friendlySpaces++;
                 }
             }

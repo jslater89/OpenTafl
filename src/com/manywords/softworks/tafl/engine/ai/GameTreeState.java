@@ -25,7 +25,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public short mValue = Evaluator.NO_VALUE;
     public List<GameTreeNode> mBranches = new ArrayList<GameTreeNode>();
 
-    // TODO: comment debug code here.
     private String debugOutputString = null;
 
     public GameTreeState(AiWorkspace workspace, GameState copyState) {
@@ -370,7 +369,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 List<Character> startAdjacent = getBoard().getAdjacentNeighbors(start);
                 boolean taflmanJumpCaptures = false;
                 if (considerJumps) {
-                    if (Taflman.getJumpMode(taflman) == Taflman.JUMP_CAPTURE) {
+                    if (Taflman.getJumpMode(mGame.getRules(), taflman) == Taflman.JUMP_CAPTURE) {
                         taflmanJumpCaptures = true;
                     }
                 }

@@ -41,6 +41,26 @@ public class BuiltInVariants {
             "9. Foteviken Tablut 9x9"
     ));
 
+    public static int indexForDescription(String description) {
+        for(int i = 0; i < rulesDescriptions.size(); i++) {
+            if(description.equals(rulesDescriptions.get(i))) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public static Rules rulesForDescription(String description) {
+        int i = indexForDescription(description);
+        if(i != -1) {
+            return availableRules.get(i);
+        }
+        else {
+            return null;
+        }
+    }
+
     public static void loadExternalRules(File externalRulesFile) {
         if(!externalRulesFile.exists()) return;
 

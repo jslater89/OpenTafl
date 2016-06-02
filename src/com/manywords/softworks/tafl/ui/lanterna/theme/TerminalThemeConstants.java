@@ -43,16 +43,10 @@ public class TerminalThemeConstants {
         BOARD_WINDOW.add(Window.Hint.NO_FOCUS);
     }
 
-    public static final ArrayList<Window.Hint> STATUS_WINDOW = new ArrayList<Window.Hint>();
+    public static final ArrayList<Window.Hint> MANUAL_LAYOUT = new ArrayList<Window.Hint>();
     static {
-        STATUS_WINDOW.add(Window.Hint.FIXED_POSITION);
-        STATUS_WINDOW.add(Window.Hint.FIXED_SIZE);
-    }
-
-    public static final ArrayList<Window.Hint> COMMAND_WINDOW = new ArrayList<Window.Hint>();
-    static {
-        COMMAND_WINDOW.add(Window.Hint.FIXED_POSITION);
-        COMMAND_WINDOW.add(Window.Hint.FIXED_SIZE);
+        MANUAL_LAYOUT.add(Window.Hint.FIXED_POSITION);
+        MANUAL_LAYOUT.add(Window.Hint.FIXED_SIZE);
     }
 
     public static final ArrayList<Window.Hint> CENTERED_MODAL = new ArrayList<>();

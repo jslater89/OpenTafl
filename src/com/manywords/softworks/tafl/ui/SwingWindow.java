@@ -2,8 +2,8 @@ package com.manywords.softworks.tafl.ui;
 
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.ui.command.CommandResult;
-import com.manywords.softworks.tafl.ui.player.Player;
+import com.manywords.softworks.tafl.command.CommandResult;
+import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.ui.swing.SquarePanel;
 
 import javax.swing.*;
@@ -67,7 +67,7 @@ public class SwingWindow extends JFrame implements UiCallback {
     }
 
     @Override
-    public void timeUpdate(Side side) {
+    public void timeUpdate(boolean currentSideAttackers) {
 
     }
 
@@ -88,13 +88,11 @@ public class SwingWindow extends JFrame implements UiCallback {
 
     @Override
     public void gameStateAdvanced() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void victoryForSide(Side side) {
-        // TODO Auto-generated method stub
 
     }
 

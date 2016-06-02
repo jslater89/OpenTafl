@@ -41,4 +41,8 @@ public class TerminalWindowDecorationRenderer extends DefaultWindowDecorationRen
 
         return graphics.newTextGraphics(new TerminalPosition(1, 1), graphics.getSize().withRelativeColumns(-2).withRelativeRows(-2));
     }
+
+    public TerminalSize getDecoratedSize(Window window, TerminalSize contentAreaSize) {
+        return contentAreaSize.withRelativeColumns(2).withRelativeRows(2).max(new TerminalSize(TerminalTextUtils.getColumnWidth(window.getTitle()) + 4, 1));
+    }
 }

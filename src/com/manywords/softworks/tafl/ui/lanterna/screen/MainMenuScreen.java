@@ -7,7 +7,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
-import com.manywords.softworks.tafl.ui.lanterna.window.MainMenuWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.mainmenu.MainMenuWindow;
 
 /**
  * Created by jay on 4/2/16.

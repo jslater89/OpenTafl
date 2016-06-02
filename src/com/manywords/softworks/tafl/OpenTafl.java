@@ -2,14 +2,16 @@ package com.manywords.softworks.tafl;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.test.Test;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
-import com.manywords.softworks.tafl.ui.player.external.engine.ExternalEngineClient;
+import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,18 +22,26 @@ public class OpenTafl {
         DEBUG,
         TEST,
         EXTERNAL_ENGINE,
-        FALLBACK
+        FALLBACK,
+        SERVER
     }
 
     public static boolean DEV_MODE = false;
-    public static String CURRENT_VERSION = "v0.2.5.3b";
+    public static final String CURRENT_VERSION = "v0.3.0.0b";
+    public static final int NETWORK_PROTOCOL_VERSION = 2;
 
     public static void main(String[] args) {
         Map<String, String> mapArgs = getArgs(args);
         Mode runMode = Mode.ADVANCED_TERMINAL;
 
+        System.out.println(mapArgs);
+        System.out.println(Arrays.asList(args));
+
         for (String arg : args) {
-            if (arg.contains("--engine")) {
+            if (arg.contains("--server")) {
+                runMode = Mode.SERVER;
+            }
+            else if (arg.contains("--engine")) {
                 runMode = Mode.EXTERNAL_ENGINE;
             }
             else if (arg.contains("--test")) {
@@ -55,6 +65,15 @@ public class OpenTafl {
         BuiltInVariants.loadExternalRules(new File("external-rules.conf"));
 
         switch(runMode) {
+            case SERVER:
+                // Blocks here
+                int threads = 4;
+                if(mapArgs.containsKey("threads")) {
+                    threads = Integer.parseInt(mapArgs.get("threads"));
+                }
+                NetworkServer ns = new NetworkServer(threads);
+                ns.start();
+                break;
             case WINDOW:
                 SwingWindow w = new SwingWindow();
                 break;

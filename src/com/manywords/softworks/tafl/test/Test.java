@@ -1,5 +1,14 @@
 package com.manywords.softworks.tafl.test;
 
+import com.manywords.softworks.tafl.test.ai.*;
+import com.manywords.softworks.tafl.test.consistency.*;
+import com.manywords.softworks.tafl.test.mechanics.ExternalEngineHostTest;
+import com.manywords.softworks.tafl.test.mechanics.GameClockTest;
+import com.manywords.softworks.tafl.test.mechanics.KingMissingPositionRecordTest;
+import com.manywords.softworks.tafl.test.mechanics.ServerTickThreadTest;
+import com.manywords.softworks.tafl.test.network.ServerTest;
+import com.manywords.softworks.tafl.test.rules.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,16 +16,23 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
-        tests.add(new KingMissingPositionRecordTest());
-        tests.add(new RestrictedFortReentryTest());
-        tests.add(new ExternalEngineHostTest());
-        tests.add(new ThreefoldDrawTest());
-        tests.add(new ThreefoldVictoryTest());
+
+        // Network tests
+        tests.add(new ServerTest());
+
+        // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
         tests.add(new MoveSerializerConsistencyTest());
         tests.add(new PositionSerializerConsistencyTest());
         tests.add(new RulesSerializerConsistencyTest());
         tests.add(new TranspositionTableConsistencyTest());
+        tests.add(new NetworkPacketConsistencyTests());
+        tests.add(new BerserkHistoryDuplicationTest());
+
+        // Rules tests
+        tests.add(new RestrictedFortReentryTest());
+        tests.add(new ThreefoldDrawTest());
+        tests.add(new ThreefoldVictoryTest());
         tests.add(new TablutKingCaptureTest());
         tests.add(new StrongKingCaptureTest());
         tests.add(new DoubleCaptureTest());
@@ -33,10 +49,17 @@ public class Test {
         tests.add(new CommanderCornerCaptureVictoryTest());
         tests.add(new JumpCaptureBerserkerTest());
         tests.add(new BerserkMoveDuplicationTest());
-        tests.add(new BerserkHistoryDuplicationTest());
         tests.add(new BadFetlarCaptureTest());
         tests.add(new BadCopenhagenCaptureTest());
+
+        // Mechanics tests
+        tests.add(new ExternalEngineHostTest());
         tests.add(new GameClockTest());
+        tests.add(new ServerTickThreadTest());
+        tests.add(new KingMissingPositionRecordTest());
+
+
+        // AI tests
         tests.add(new AIMatchingZobristTest());
         tests.add(new AICertainKingCaptureTest());
         tests.add(new AITwoCornerEscapeAndRulesLoadingTest());

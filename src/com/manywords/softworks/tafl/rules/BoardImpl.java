@@ -18,8 +18,6 @@ public abstract class BoardImpl extends Board {
         }
     }
 
-    // [y][x]
-    //TODO: privatize
     private TaflmanCoordMap mCachedTaflmanLocations = null;
     private Rules mRules;
     private GameState mState;
@@ -237,7 +235,7 @@ public abstract class BoardImpl extends Board {
         }
 
         // If this space isn't naturally hostile, then this isn't a hostile space.
-        return getRules().isSpaceHostileToSide(this, space, Taflman.getSide(taflman));
+        return getRules().isSpaceHostileToSide(this, space, Taflman.getSide(getState(), taflman));
     }
 
     /**
@@ -280,7 +278,7 @@ public abstract class BoardImpl extends Board {
             if (taflman != Taflman.EMPTY) {
                 // If this space contains a taflman of the side in question, then the side can be
                 // reached from an edge, and isn't surrounded.
-                if (Taflman.getSide(taflman).isAttackingSide() == side.isAttackingSide()) return false;
+                if (Taflman.getSide(getState(), taflman).isAttackingSide() == side.isAttackingSide()) return false;
             } else {
                 // If this space does not contain a taflman, add all of its neighbors which aren't scheduled
                 // for consideration and haven't already been considered.
@@ -346,7 +344,7 @@ public abstract class BoardImpl extends Board {
                 }
                 // If start position is null and this space is occupied, this is a potential
                 // start position.
-                else if (startPosition == null && getOccupier(space) != 0 && Taflman.getSide(getOccupier(space)) == side) {
+                else if (startPosition == null && getOccupier(space) != 0 && Taflman.getPackedSide(getOccupier(space)) == side.getSideChar()) {
                     startPosition = space;
                     surroundingTaflmen.add(getOccupier(space));
                     continue;
@@ -377,15 +375,15 @@ public abstract class BoardImpl extends Board {
                     // and that's okay from a rules perspective.
                     if (getOccupier(space) != 0 && Taflman.getPackedSide(getOccupier(space)) == side.getSideChar()) {
                         if (getOccupier(edge.get(index + 1)) != 0
-                                && Taflman.getSide(getOccupier(edge.get(index + 1))) == side
+                                && Taflman.getPackedSide(getOccupier(edge.get(index + 1))) == side.getSideChar()
                                 && getOccupier(getEdgeAdjacentSpace(direction, space)) != 0
-                                && Taflman.getSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == side) {
+                                && Taflman.getPackedSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == side.getSideChar()) {
                             surroundingTaflmen.add(getOccupier(getEdgeAdjacentSpace(direction, space)));
                             surroundedSpaces.add(space);
                             continue;
                         } else if (getOccupier(space) != 0 && Taflman.isKing(getOccupier(space))
                                 && getOccupier(getEdgeAdjacentSpace(direction, space)) != 0
-                                && Taflman.getSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == side) {
+                                && Taflman.getPackedSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == side.getSideChar()) {
                             surroundingTaflmen.add(getOccupier(getEdgeAdjacentSpace(direction, space)));
                             surroundedSpaces.add(space);
                             continue;
@@ -405,7 +403,7 @@ public abstract class BoardImpl extends Board {
                     }
 
                     if (getOccupier(getEdgeAdjacentSpace(direction, space)) != 0
-                            && Taflman.getSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == side) {
+                            && Taflman.getPackedSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == side.getSideChar()) {
                         surroundingTaflmen.add(getOccupier(getEdgeAdjacentSpace(direction, space)));
                         surroundedSpaces.add(space);
                     } else {

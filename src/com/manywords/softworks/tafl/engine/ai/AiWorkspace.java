@@ -1,11 +1,11 @@
 package com.manywords.softworks.tafl.engine.ai;
 
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.text.DecimalFormat;
@@ -21,8 +21,8 @@ public class AiWorkspace extends Game {
     public static final Evaluator evaluator = new FishyEvaluator();
 
     private Game mGame;
-    private GameClock.TimeSpec mClockLength;
-    private GameClock.TimeSpec mTimeRemaining;
+    private TimeSpec mClockLength;
+    private TimeSpec mTimeRemaining;
     private GameTreeState mStartingState;
 
     public long[] mAlphaCutoffs;
@@ -72,7 +72,7 @@ public class AiWorkspace extends Game {
         transpositionTable = new TranspositionTable((transpositionTable != null? transpositionTable.size() : 5));
     }
 
-    public void setTimeRemaining(GameClock.TimeSpec length, GameClock.TimeSpec entry) {
+    public void setTimeRemaining(TimeSpec length, TimeSpec entry) {
         mClockLength = length;
         mTimeRemaining = entry;
     }
@@ -81,7 +81,7 @@ public class AiWorkspace extends Game {
         mNoTime = true;
     }
 
-    private long planTimeUsage(Game g, GameClock.TimeSpec entry) {
+    private long planTimeUsage(Game g, TimeSpec entry) {
         // Math.minned against
         if(entry == null) return Long.MAX_VALUE;
         // Aim to make a certain number of moves in main time, using overtimes
