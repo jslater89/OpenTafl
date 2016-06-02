@@ -1,12 +1,8 @@
 package com.manywords.softworks.tafl.network.packet.pregame;
 
-import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
-import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.ServerClient;
-import com.manywords.softworks.tafl.network.server.ServerGame;
-import com.sun.deploy.util.SessionState;
 
 import java.util.ArrayList;
 import java.util.List;
