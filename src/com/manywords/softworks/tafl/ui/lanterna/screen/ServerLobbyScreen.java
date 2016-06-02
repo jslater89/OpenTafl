@@ -11,6 +11,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
@@ -23,7 +24,7 @@ import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ChatWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameDetailWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ServerDetailWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameListWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ServerLoginDialog;
 
@@ -36,7 +37,7 @@ public class ServerLobbyScreen extends LogicalScreen {
     private ClientServerConnection mConnection;
 
     private GameListWindow mGameList;
-    private GameDetailWindow mGameDetail;
+    private ServerDetailWindow mServerDetail;
     private ChatWindow mChatWindow;
 
     protected ServerLobbyTerminalCallback mTerminalCallback;
@@ -101,13 +102,13 @@ public class ServerLobbyScreen extends LogicalScreen {
 
     private void createWindows() {
         mGameList = new GameListWindow(mTerminalCallback, mTerminalCallback);
-        mGameDetail = new GameDetailWindow(mTerminalCallback, mTerminalCallback);
+        mServerDetail = new ServerDetailWindow(mTerminalCallback, mTerminalCallback);
         mChatWindow = new ChatWindow(mTerminalCallback, mTerminalCallback);
     }
 
     private void addWindows() {
         mGui.addWindow(mGameList);
-        mGui.addWindow(mGameDetail);
+        mGui.addWindow(mServerDetail);
         mGui.addWindow(mChatWindow);
 
         mGui.setActiveWindow(mGameList);
@@ -118,7 +119,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
     private void layoutWindows(TerminalSize size) {
         mGameList.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
-        mGameDetail.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
+        mServerDetail.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
         mChatWindow.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
 
         int serverListHeight = size.getRows() / 2 - 2;
@@ -128,21 +129,21 @@ public class ServerLobbyScreen extends LogicalScreen {
         int chatWidth = size.getColumns() - detailWidth - 4;
 
         mGameList.setSize(new TerminalSize(size.getColumns() - 2, serverListHeight));
-        mGameDetail.setSize(new TerminalSize(detailWidth, otherHeights));
+        mServerDetail.setSize(new TerminalSize(detailWidth, otherHeights));
         mChatWindow.setSize(new TerminalSize(chatWidth, otherHeights));
 
         mGameList.setPosition(new TerminalPosition(0, 0));
         mChatWindow.setPosition(new TerminalPosition(0, serverListHeight + 2));
-        mGameDetail.setPosition(new TerminalPosition(chatWidth + 2, serverListHeight + 2));
+        mServerDetail.setPosition(new TerminalPosition(chatWidth + 2, serverListHeight + 2));
     }
 
     private void removeWindows() {
         mGui.removeWindow(mGameList);
-        mGui.removeWindow(mGameDetail);
+        mGui.removeWindow(mServerDetail);
         mGui.removeWindow(mChatWindow);
 
         mGameList = null;
-        mGameDetail = null;
+        mServerDetail = null;
         mChatWindow = null;
     }
 
@@ -167,19 +168,19 @@ public class ServerLobbyScreen extends LogicalScreen {
             case FOCUS_LIST:
                 mGui.setActiveWindow(mGameList);
                 mGameList.notifyFocus(true);
-                mGameDetail.notifyFocus(false);
+                mServerDetail.notifyFocus(false);
                 mChatWindow.notifyFocus(false);
                 break;
             case FOCUS_DETAIL:
-                mGui.setActiveWindow(mGameDetail);
+                mGui.setActiveWindow(mServerDetail);
                 mGameList.notifyFocus(false);
-                mGameDetail.notifyFocus(true);
+                mServerDetail.notifyFocus(true);
                 mChatWindow.notifyFocus(false);
                 break;
             case FOCUS_CHAT:
                 mGui.setActiveWindow(mChatWindow);
                 mGameList.notifyFocus(false);
-                mGameDetail.notifyFocus(false);
+                mServerDetail.notifyFocus(false);
                 mChatWindow.notifyFocus(true);
                 break;
         }
@@ -201,7 +202,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         leaveUi();
     }
 
-    private class ServerLobbyTerminalCallback extends DefaultTerminalCallback implements ChatWindow.ChatWindowHost, GameListWindow.GameListWindowHost, GameDetailWindow.GameDetailHost {
+    private class ServerLobbyTerminalCallback extends DefaultTerminalCallback implements ChatWindow.ChatWindowHost, GameListWindow.GameListWindowHost, ServerDetailWindow.GameDetailHost {
         @Override
         public boolean handleKeyStroke(KeyStroke key) {
             if(key.getKeyType() == KeyType.Tab) {
@@ -254,7 +255,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void onStateChanged(ClientServerConnection.State newState) {
-            if(mGameDetail != null) mGameDetail.onConnectionStateChanged(newState);
+            if(mServerDetail != null) mServerDetail.onConnectionStateChanged(newState);
         }
 
         @Override
@@ -302,6 +303,11 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void onGameListReceived(List<GameInformation> games) {
             if(mGameList != null) mGameList.updateGameList(games);
+        }
+
+        @Override
+        public void onClientListReceived(List<ClientInformation> clients) {
+            if(mServerDetail != null) mServerDetail.updateClientList(clients);
         }
 
         @Override

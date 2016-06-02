@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.network.server;
 
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
+import com.manywords.softworks.tafl.network.packet.pregame.LobbyChatPacket;
 import com.manywords.softworks.tafl.network.server.database.PlayerDatabase;
 import com.manywords.softworks.tafl.network.server.database.file.FileBackedPlayerDatabase;
 import com.manywords.softworks.tafl.network.server.task.SendPacketTask;
@@ -114,7 +115,7 @@ public class NetworkServer {
         ) {
             while(mRunning) {
                 Socket clientSocket = socket.accept();
-                addClient(new ServerClient(this, clientSocket));
+                new ServerClient(this, clientSocket);
             }
         } catch (IOException e) {
             System.out.println("Failed to start server socket");
@@ -122,6 +123,18 @@ public class NetworkServer {
         }
 
         System.out.println("Server stopping.");
+    }
+
+    public List<ServerClient> getClients() {
+        synchronized (mClients) {
+            return new ArrayList<>(mClients);
+        }
+    }
+
+    public List<ServerClient> getLobbyClients() {
+        synchronized (mLobbyClients) {
+            return new ArrayList<>(mLobbyClients);
+        }
     }
 
     /**
@@ -208,6 +221,12 @@ public class NetworkServer {
         g.shutdown();
     }
 
+    public void onConnect(ServerClient c) {
+        synchronized (mClients) {
+            mClients.add(c);
+        }
+    }
+
     public void onDisconnect(ServerClient c) {
         synchronized (mClients) {
             mClients.remove(c);
@@ -218,9 +237,14 @@ public class NetworkServer {
             c.getGame().removeClient(c);
         }
         clientExitingLobby(c);
+
+        sendPacketToClients(getLobbyClients(), new LobbyChatPacket("Server", c.getUsername() + " has disconnected."), PriorityTaskQueue.Priority.LOW);
     }
 
-    private void clientEnteringLobby(ServerClient c) {
+    public void clientEnteringLobby(ServerClient c) {
+
+        sendPacketToClients(getLobbyClients(), new LobbyChatPacket("Server", c.getUsername() + " has connected."), PriorityTaskQueue.Priority.LOW);
+
         synchronized (mLobbyClients) {
             mLobbyClients.add(c);
         }
@@ -238,13 +262,5 @@ public class NetworkServer {
         for(IntervalTask t : c.getLobbyTasks()) {
             mGameListUpdateTasks.removeBucketTask(t);
         }
-    }
-
-    private void addClient(ServerClient c) {
-        synchronized (mClients) {
-            mClients.add(c);
-        }
-
-        clientEnteringLobby(c);
     }
 }

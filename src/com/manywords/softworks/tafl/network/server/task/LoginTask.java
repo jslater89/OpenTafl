@@ -27,6 +27,7 @@ public class LoginTask implements Runnable {
         // if login good
         if (OpenTafl.NETWORK_PROTOCOL_VERSION != packet.networkProtocolVersion) {
             server.sendPacketToClient(client, new ErrorPacket(ErrorPacket.VERSION_MISMATCH), PriorityTaskQueue.Priority.LOW);
+            client.disconnect();
         }
         if (server.getPlayerDatabase().allowLoginFor(packet.username, packet.password)) {
             client.onRegistered(packet.username);

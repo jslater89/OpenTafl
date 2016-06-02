@@ -23,13 +23,16 @@ public class HandleClientCommunicationTask implements Runnable {
     private void processPacket(String data) {
         if(data.startsWith(LobbyChatPacket.PREFIX)) {
             LobbyChatPacket packet = LobbyChatPacket.parse(data);
-            mServer.sendPacketToAllClients(packet, PriorityTaskQueue.Priority.LOW);
+            mServer.sendPacketToClients(mServer.getLobbyClients(), packet, PriorityTaskQueue.Priority.LOW);
         }
         else if(data.startsWith(LoginPacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new LoginTask(mServer, mClient, LoginPacket.parse(data)));
         }
         else if(data.startsWith(GameListPacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new SendPacketTask(GameListPacket.parse(mServer.getGames()), mClient), PriorityTaskQueue.Priority.LOW);
+        }
+        else if(data.startsWith(ClientListPacket.PREFIX)) {
+            mServer.getTaskQueue().pushTask(new SendPacketTask(ClientListPacket.parse(mServer.getLobbyClients()), mClient), PriorityTaskQueue.Priority.LOW);
         }
         else if(data.startsWith(CreateGamePacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new CreateGameTask(mServer, mClient, CreateGamePacket.parse(data)));

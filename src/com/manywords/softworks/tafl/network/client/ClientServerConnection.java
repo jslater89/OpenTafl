@@ -4,6 +4,7 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
@@ -30,6 +31,7 @@ public class ClientServerConnection {
         public void onSuccessReceived(String message);
         public void onErrorReceived(String message);
         public void onGameListReceived(List<GameInformation> games);
+        public void onClientListReceived(List<ClientInformation> clients);
         public void onDisconnect(boolean planned);
         public void onStartGame(Rules r);
         public void onServerMoveReceived(MoveRecord move);
@@ -187,6 +189,7 @@ public class ClientServerConnection {
 
     public void requestGameUpdate() {
         mServerWriter.println("game-list");
+        mServerWriter.println("client-list");
     }
 
     private class ReadThread extends Thread {
@@ -279,6 +282,9 @@ public class ClientServerConnection {
                     mExternalCallback.onErrorReceived(message);
                     break;
                 case LOGGED_IN:
+                    if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
+                        setState(State.DISCONNECTED);
+                    }
                     break;
                 case JOINING_GAME:
                 case CREATING_GAME:
@@ -293,6 +299,11 @@ public class ClientServerConnection {
         @Override
         public void onGameListReceived(List<GameInformation> games) {
             mExternalCallback.onGameListReceived(games);
+        }
+
+        @Override
+        public void onClientListReceived(List<ClientInformation> clients) {
+            mExternalCallback.onClientListReceived(clients);
         }
 
         @Override

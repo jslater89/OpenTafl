@@ -2,19 +2,24 @@ package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.table.Table;
+import com.googlecode.lanterna.gui2.table.TableModel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
+import com.manywords.softworks.tafl.network.packet.ClientInformation;
+import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
  * Created by jay on 5/23/16.
  */
-public class GameDetailWindow extends BasicWindow {
+public class ServerDetailWindow extends BasicWindow {
     public interface GameDetailHost {
         public void requestGameUpdate();
         public void createGame(CreateGamePacket packet);
@@ -24,19 +29,22 @@ public class GameDetailWindow extends BasicWindow {
     LogicalScreen.TerminalCallback mCallback;
     private GameDetailHost mHost;
 
+    private Table<String> mUserTable;
     private Panel mButtonPanel;
     private GameCreateButton mGameCreationButton;
     private GameCreateButtonAction mGameCreationButtonAction;
 
     private CreateGamePacket mCreatePacket;
 
-    public GameDetailWindow(LogicalScreen.TerminalCallback terminalCallback, GameDetailHost host) {
-        super("Game Details");
+    public ServerDetailWindow(LogicalScreen.TerminalCallback terminalCallback, GameDetailHost host) {
+        super("Server Info");
 
         mCallback = terminalCallback;
         mHost = host;
 
         Panel p = new Panel();
+
+        mUserTable = new Table<>("Connected Users");
 
         mButtonPanel = new Panel();
         mButtonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
@@ -56,8 +64,18 @@ public class GameDetailWindow extends BasicWindow {
         mButtonPanel.addComponent(exitButton);
 
         p.addComponent(mButtonPanel);
+        p.addComponent(mUserTable);
 
         setComponent(p);
+    }
+
+    public void updateClientList(List<ClientInformation> clients) {
+        TableModel<String> model = new TableModel<>("Connected Users");
+        for(ClientInformation c : clients) {
+            model.addRow(c.toString());
+        }
+
+        mUserTable.setTableModel(model);
     }
 
     private class GameCreateButton extends Button {
@@ -109,7 +127,7 @@ public class GameDetailWindow extends BasicWindow {
                 mHost.leaveGame();
             }
 
-            getTextGUI().setActiveWindow(GameDetailWindow.this);
+            getTextGUI().setActiveWindow(ServerDetailWindow.this);
 
         }
     }
@@ -137,6 +155,7 @@ public class GameDetailWindow extends BasicWindow {
     public void setSize(TerminalSize size) {
         super.setSize(size);
 
+        mUserTable.setVisibleRows(size.getRows() - 3);
         mButtonPanel.setPreferredSize(new TerminalSize(size.getColumns(), 3));
     }
 

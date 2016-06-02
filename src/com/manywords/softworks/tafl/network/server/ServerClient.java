@@ -55,6 +55,15 @@ public class ServerClient {
         }
     }
 
+    public void disconnect() {
+        mServer.onDisconnect(this);
+        try {
+            mClientSocket.close();
+        } catch (IOException e) {
+            // best effort
+        }
+    }
+
     public ServerGame getGame() {
         return mGame;
     }
@@ -86,11 +95,13 @@ public class ServerClient {
 
     public void onRegistered(String username) {
         mUsername = username;
+        mServer.clientEnteringLobby(this);
     }
 
     private class SocketListener extends Thread {
         public void run() {
             System.out.println("Client connecting: " + mClientSocket.getInetAddress());
+            mServer.onConnect(ServerClient.this);
             String inputData = "";
             try (
                 BufferedReader in = new BufferedReader(new InputStreamReader(mClientSocket.getInputStream()));

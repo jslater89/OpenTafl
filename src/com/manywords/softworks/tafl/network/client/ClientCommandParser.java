@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.network.client;
 
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.network.packet.ingame.*;
+import com.manywords.softworks.tafl.network.packet.pregame.ClientListPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.GameListPacket;
@@ -28,6 +29,10 @@ public class ClientCommandParser {
         else if(data.startsWith(GameListPacket.PREFIX)) {
             GameListPacket packet = GameListPacket.parse(data);
             callback.onGameListReceived(packet.games);
+        }
+        else if(data.startsWith(ClientListPacket.PREFIX)) {
+            ClientListPacket packet = ClientListPacket.parse(data);
+            callback.onClientListReceived(packet.clients);
         }
         else if(data.startsWith(StartGamePacket.PREFIX)) {
             StartGamePacket packet = StartGamePacket.parse(data);

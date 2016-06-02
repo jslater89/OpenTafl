@@ -93,6 +93,10 @@ public class ServerGame {
         mCommandEngine.startGame();
     }
 
+    public boolean isGameInProgress() {
+        return mCommandEngine.isInGame();
+    }
+
     public void setPassword(String password) {
         mBase64HashedPassword = PasswordHasher.hashPassword("", password);
     }

@@ -119,6 +119,10 @@ public class CommandEngine {
         waitForNextMove();
     }
 
+    public boolean isInGame() {
+        return mInGame;
+    }
+
     public Player getCurrentPlayer() {
         return mCurrentPlayer;
     }
