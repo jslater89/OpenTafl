@@ -146,7 +146,6 @@ v0.3.0.0b (released 06/xx/16):
     - Server mode and client-server interface
     - Server lobby UI
     - In-game UI
-    - 
 
 v0.2.5.3b (released 05/31/16):
 - Fix bug in taflman location list, which led to missing king in position

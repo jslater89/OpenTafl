@@ -25,7 +25,7 @@ public class NetworkPacketConsistencyTests extends TaflTest {
 
         assert first.equals(second);
 
-        LobbyChatPacket lc = new LobbyChatPacket("Fish Breath", "This is a chat message.");
+        LobbyChatPacket lc = new LobbyChatPacket("Fish Breath", "This is a \"chat message\".");
         first = lc.toString();
 
         lc = LobbyChatPacket.parse(first);

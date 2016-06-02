@@ -11,8 +11,9 @@ public class LobbyChatPacket extends NetworkPacket {
     public final String message;
 
     public static LobbyChatPacket parse(String data) {
-        String[] splitOnQuotes = data.split("\"");
-        return new LobbyChatPacket(splitOnQuotes[1], splitOnQuotes[2].trim());
+        String sender = data.split("\"")[1];
+        String message = data.replaceFirst(PREFIX + "\\s+?\".*?\"", "").trim();
+        return new LobbyChatPacket(sender, message);
     }
 
     public LobbyChatPacket(String sender, String message) {
