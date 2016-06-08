@@ -14,6 +14,20 @@ import com.manywords.softworks.tafl.ui.UiCallback;
  * Created by jay on 5/26/16.
  */
 public class NetworkServerPlayer extends Player {
+    /*
+     * Path of a move on the server:
+     *
+     * 1. Client A sends a move packet.
+     * 2. ServerClient for Client A enqueues a HandleCommunicationTask.
+     * 3. HandleCommunicationTask enqueues a MoveTask.
+     * 4. MoveTask calls NetworkServerPlayer.onMoveDecided.
+     * 5. onMoveDecided calls to the ServerGame's command engine.
+     * 6. The command engine makes the move.
+     * 7. The command engine sends the result via callback to the opposing Player.
+     * 8. The opposing NetworkServerPlayer's opponentMove task queues a send packet task
+     *    to send the move to the opposing player.
+     * 9. The MoveTask queues send packet tasks to send the move to spectators.
+     */
     private ServerClient mClient;
     private PlayerCallback mPlayerCallback;
     private NetworkServer mServer;
@@ -53,7 +67,7 @@ public class NetworkServerPlayer extends Player {
 
     @Override
     public void onMoveDecided(MoveRecord record) {
-        // Client calls into here
+        // ServerClient calls here
         synchronized(mClient.getGame()) {
             mPlayerCallback.onMoveDecided(this, record);
         }

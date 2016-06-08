@@ -8,10 +8,16 @@ import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.network.server.ServerGame;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 
+import java.util.List;
+
 /**
  * Created by jay on 5/27/16.
  */
 public class MoveTask implements Runnable {
+    /*
+     * See NetworkServerPlayer for the path of a move through the server.
+     *
+     */
     private final NetworkServer server;
     private final ServerClient movingClient;
     private final MovePacket movePacket;
@@ -27,7 +33,7 @@ public class MoveTask implements Runnable {
         ServerGame game = movingClient.getGame();
 
         game.getPlayerForClient(movingClient).onMoveDecided(movePacket.move);
-
-        // TODO: spectators
+        
+        server.sendPacketToClients(game.getSpectators(), movePacket, PriorityTaskQueue.Priority.LOW);
     }
 }

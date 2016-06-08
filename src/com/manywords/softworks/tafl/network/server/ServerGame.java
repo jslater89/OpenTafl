@@ -239,7 +239,7 @@ public class ServerGame {
     public NetworkServerPlayer getDefenderPlayer() { return mDefenderPlayer; }
 
     public List<ServerClient> getSpectators() {
-        return mSpectators;
+        return new ArrayList<>(mSpectators);
     }
 
     public boolean isPassworded() {
