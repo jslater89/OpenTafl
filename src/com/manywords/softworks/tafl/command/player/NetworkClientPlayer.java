@@ -14,16 +14,25 @@ public class NetworkClientPlayer extends Player {
     private ClientServerConnection mConnection;
     private PlayerCallback mCallback;
 
-    private GameRole mGameRole;
-
     public NetworkClientPlayer(ClientServerConnection c) {
         mConnection = c;
-        // The role of the player over the network is 'out of game', if we're out of game somehow, or the role we are not.
-        mGameRole = (c.getGameRole() == GameRole.OUT_OF_GAME ? GameRole.OUT_OF_GAME : (c.getGameRole() == GameRole.ATTACKER ? GameRole.DEFENDER : GameRole.ATTACKER));
+        // The role of the player over the network is 'out of game', if we're out of game somehow, or the role we are not.}
     }
 
     public GameRole getGameRole() {
-        return mGameRole;
+        GameRole role = GameRole.OUT_OF_GAME;
+
+        if(mConnection.getGameRole() == GameRole.KIBBITZER) {
+            role = GameRole.KIBBITZER;
+        }
+        else if(mConnection.getGameRole() == GameRole.ATTACKER) {
+            role = GameRole.DEFENDER;
+        }
+        else if(mConnection.getGameRole() == GameRole.DEFENDER) {
+            role = GameRole.ATTACKER;
+        }
+
+        return role;
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.*;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
@@ -64,6 +65,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     private ClientServerCallback mServerCallback = new ServerCallback();
 
     private ReplayGame mReplay;
+    // Used for spectators to catch up to the current state.
+    private List<MoveRecord> mPregameHistory;
 
     private boolean mInGame;
     private boolean mInReplay;
@@ -102,6 +105,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         else {
             throw new IllegalStateException("No game for GameScreen!");
         }
+    }
+
+    public void setHistory(List<MoveRecord> history) {
+        mPregameHistory = history;
     }
 
     @Override
@@ -413,8 +420,21 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             defender = networkPlayer;
                         }
                         else { /*(networkPlayer.getGameRole() == GameRole.KIBBITZER)*/
-                            attacker = new DoNothingPlayer();
-                            defender = new DoNothingPlayer();
+                            attacker = new SpectatorPlayer(mServerConnection);
+                            defender = new SpectatorPlayer(mServerConnection);
+
+                            if(mServerConnection.hasHistory()) {
+                                mPregameHistory = mServerConnection.consumeHistory();
+                            }
+
+                            if(mPregameHistory != null) {
+                                for(MoveRecord m : mPregameHistory) {
+                                    g.getCurrentState().makeMove(m);
+                                }
+                            }
+
+                            // Doesn't matter which one
+                            mServerConnection.setNetworkPlayer((SpectatorPlayer) attacker);
                         }
 
                         mCommandEngine = new CommandEngine(g, GameScreen.this, attacker, defender);
@@ -773,13 +793,33 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         }
 
         @Override
-        public void onStartGame(Rules r) {
+        public void onStartGame(Rules r, List<MoveRecord> history) {
 
         }
 
         @Override
-        public void onServerMoveReceived(MoveRecord move) {
+        public void onHistoryReceived(List<MoveRecord> moves) {
+            // TODO: wire this game up to the screen somehow.
 
+            throw new IllegalStateException("Not yet implemented");
+            /*Rules r = mGame.getRules();
+            mGame = new Game(r, GameScreen.this);
+            mCommandEngine = new CommandEngine(mGame, GameScreen.this, new SpectatorPlayer(mServerConnection), new SpectatorPlayer(mServerConnection));
+
+            if(mBoardWindow != null) {
+                mTerminalCallback.onEnteringGame(mGame);
+            }
+
+            for(MoveRecord m : moves) {
+                mCommandEngine.getCurrentPlayer().onMoveDecided(m);
+            }*/
+        }
+
+        @Override
+        public void onServerMoveReceived(MoveRecord move) {
+            System.out.println("Game screen received spectator move: " + move);
+            mCommandEngine.getCurrentPlayer().onMoveDecided(move);
+            TerminalUtils.runOnUiThread(mGui, () -> mBoardWindow.rerenderBoard());
         }
 
         @Override

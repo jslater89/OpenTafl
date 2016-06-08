@@ -4,6 +4,7 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
@@ -15,6 +16,7 @@ import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * Created by jay on 3/22/16.
@@ -59,8 +61,8 @@ public class TerminalUtils {
             LogicalScreen.TerminalCallback callback,
             ClientServerConnection connection,
             Rules rules,
-            TimeSpec timeSpec) {
-        // Terminal settings: local network player. For now, though...
+            TimeSpec timeSpec,
+            List<MoveRecord> history) {
 
         Game g;
         if(timeSpec == null || timeSpec.mainTime == 0 && (timeSpec.overtimeTime == 0 || timeSpec.overtimeCount == 0)) {
@@ -71,6 +73,7 @@ public class TerminalUtils {
         }
 
         GameScreen gameScreen = new GameScreen(g, rules.toString());
+        gameScreen.setHistory(history);
         gameScreen.setServerConnection(connection);
         callback.changeActiveScreen(gameScreen);
         return g;

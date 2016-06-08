@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.network.server.task;
 
 import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
+import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
 import com.manywords.softworks.tafl.network.server.GameRole;
@@ -60,8 +61,11 @@ public class JoinGameTask implements Runnable {
                             new SuccessPacket(SuccessPacket.JOINED_SPECTATOR),
                             PriorityTaskQueue.Priority.STANDARD);
 
-                    // Send an initial history update, too.
-                    mServer.sendPacketToClient(mClient, HistoryPacket.parseHistory(g.getGame().getHistory()), PriorityTaskQueue.Priority.LOW);
+                    // Alert the client if the game has started.
+                    if(g.isGameInProgress()) {
+                        mServer.sendPacketToClient(mClient, new StartGamePacket(g.getRules()), PriorityTaskQueue.Priority.LOW);
+                        mServer.sendPacketToClient(mClient, HistoryPacket.parseHistory(g.getGame().getHistory()), PriorityTaskQueue.Priority.LOW);
+                    }
                 }
             }
         }

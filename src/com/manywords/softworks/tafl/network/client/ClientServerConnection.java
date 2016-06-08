@@ -36,7 +36,8 @@ public class ClientServerConnection {
         public void onClientListReceived(List<ClientInformation> clients);
         public void onDisconnect(boolean planned);
         public Game getGame();
-        public void onStartGame(Rules r);
+        public void onStartGame(Rules r, List<MoveRecord> history);
+        public void onHistoryReceived(List<MoveRecord> moves);
         public void onServerMoveReceived(MoveRecord move);
         public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock);
         public void onVictory(VictoryPacket.Victory victory);
@@ -72,6 +73,7 @@ public class ClientServerConnection {
     private GameRole mGameRole = GameRole.OUT_OF_GAME;
     private NetworkClientPlayer mNetworkPlayer;
     private GameInformation mLastJoinedGame = null;
+    private List<MoveRecord> mLastHistory = null;
 
     private boolean mPlannedDisconnect = false;
 
@@ -142,12 +144,23 @@ public class ClientServerConnection {
         return mNetworkPlayer;
     }
 
+    public void setNetworkPlayer(NetworkClientPlayer player) {
+        mNetworkPlayer = player;
+    }
+
     public State getCurrentState() {
         return mCurrentState;
     }
 
     public GameRole getGameRole() {
         return mGameRole;
+    }
+
+    public boolean hasHistory() { return mLastHistory != null; }
+    public List<MoveRecord> consumeHistory() {
+        List<MoveRecord> history = mLastHistory;
+        mLastHistory = null;
+        return history;
     }
 
     public void sendCreateGameMessage(CreateGamePacket packet) {
@@ -345,9 +358,15 @@ public class ClientServerConnection {
         }
 
         @Override
-        public void onStartGame(Rules r) {
+        public void onStartGame(Rules r, List<MoveRecord> history) {
             setState(State.IN_GAME);
-            mExternalCallback.onStartGame(r);
+            mExternalCallback.onStartGame(r, history);
+        }
+
+        @Override
+        public void onHistoryReceived(List<MoveRecord> moves) {
+            mLastHistory = moves;
+            mExternalCallback.onHistoryReceived(moves);
         }
 
         @Override
@@ -356,10 +375,7 @@ public class ClientServerConnection {
                 mNetworkPlayer.onMoveDecided(move);
             }
             else {
-                int result = mNetworkPlayer.getGame().getCurrentState().makeMove(move);
-                if(result != GameState.GOOD_MOVE) {
-                    // TODO: reinit game
-                }
+                mExternalCallback.onServerMoveReceived(move);
             }
         }
 
