@@ -11,9 +11,9 @@ public class MovePacket extends NetworkPacket {
     public static final java.lang.String PREFIX = "move-record";
     public final MoveRecord move;
 
-    public static MovePacket parse(String data) {
+    public static MovePacket parse(int dimension, String data) {
         data = data.replaceFirst(PREFIX, "").trim();
-        MoveRecord m = MoveSerializer.loadMoveRecord(data);
+        MoveRecord m = MoveSerializer.loadMoveRecord(dimension, data);
         return new MovePacket(m);
     }
 

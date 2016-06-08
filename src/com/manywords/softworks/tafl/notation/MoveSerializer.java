@@ -51,14 +51,14 @@ public class MoveSerializer {
             move += "x";
 
             for(int i = 0; i < record.captureArray.length; i++) {
-                move += DetailedMoveRecord.getCaptureString(record.captureArray[i], i == 0);
+                move += DetailedMoveRecord.getCaptureString(record.dimension, record.captureArray[i], i == 0);
             }
         }
 
         return move;
     }
 
-    public static DetailedMoveRecord loadMoveRecord(String record) {
+    public static DetailedMoveRecord loadMoveRecord(int dimension, String record) {
         final int MOVER_TYPE = 1;
         final int START_SPACE = 2;
         final int MOVE_TYPE = 3;
@@ -109,7 +109,7 @@ public class MoveSerializer {
 
         String statusCode = groups[STATUS_CODE];
 
-        DetailedMoveRecord move = new DetailedMoveRecord(start, end, mover, capturedSpaces, capturedTaflmen, wasJump, wasBerserk);
+        DetailedMoveRecord move = new DetailedMoveRecord(dimension, start, end, mover, capturedSpaces, capturedTaflmen, wasJump, wasBerserk);
         return move;
     }
 

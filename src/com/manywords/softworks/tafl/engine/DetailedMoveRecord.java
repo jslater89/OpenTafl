@@ -54,32 +54,36 @@ public class DetailedMoveRecord extends MoveRecord {
     // bit 4: SIDE_MASK
     private static final char LOCATION_MASK = 16 + 32 + 64 + 128 + 256 + 512 + 1024 + 2048 + 4096; // bits 5-13
     public final char[] captureArray;
+    public final int dimension;
 
     private String mComment = "";
     private TimeSpec mTimeRemaining;
 
-    public DetailedMoveRecord(Coord start, Coord end, char mover) {
+    public DetailedMoveRecord(int dimension, Coord start, Coord end, char mover) {
         super(start, end);
+        this.dimension = dimension;
         flags = moveRecordFlagFor(mover);
 
         this.captureArray = new char[0];
     }
 
-    public DetailedMoveRecord(Coord start, Coord end, char mover, List<Coord> captures, List<Character> capturedTaflmen) {
+    public DetailedMoveRecord(int dimension, Coord start, Coord end, char mover, List<Coord> captures, List<Character> capturedTaflmen) {
         super(start, end, captures);
+        this.dimension = dimension;
         flags = moveRecordFlagFor(mover);
-        this.captureArray = buildCaptureArray(captures, capturedTaflmen);
+        this.captureArray = buildCaptureArray(dimension, captures, capturedTaflmen);
     }
 
-    public DetailedMoveRecord(Coord start, Coord end, char mover, List<Coord> captures, List<Character> capturedTaflmen, boolean wasJump, boolean wasBerserk) {
+    public DetailedMoveRecord(int dimension, Coord start, Coord end, char mover, List<Coord> captures, List<Character> capturedTaflmen, boolean wasJump, boolean wasBerserk) {
         super(start, end, captures);
+        this.dimension = dimension;
         byte flags = 0;
         flags |= moveRecordFlagFor(mover);
         if(wasJump) flags |= JUMP;
         if(wasBerserk) flags |= BERSERK;
         this.flags = flags;
 
-        this.captureArray = buildCaptureArray(captures, capturedTaflmen);
+        this.captureArray = buildCaptureArray(dimension, captures, capturedTaflmen);
     }
 
     public void setTimeRemaining(TimeSpec remaining) {
@@ -113,12 +117,12 @@ public class DetailedMoveRecord extends MoveRecord {
         return (flags & BERSERK) == BERSERK;
     }
 
-    private char[] buildCaptureArray(List<Coord> captures, List<Character> capturedTaflmen) {
+    private char[] buildCaptureArray(int dimension, List<Coord> captures, List<Character> capturedTaflmen) {
         if(capturedTaflmen.size() != captures.size()) throw new IllegalArgumentException("captureArray and capturedTaflmen differ");
 
         char[] captureArray = new char[captures.size()];
         for(int i = 0; i < captureArray.length; i++) {
-            char index = (char) Coord.getIndex(captures.get(i));
+            char index = (char) Coord.getIndex(dimension, captures.get(i));
             index = (char)(index << 4);
             byte taflmanFlag = moveRecordFlagFor(capturedTaflmen.get(i));
 
@@ -155,14 +159,14 @@ public class DetailedMoveRecord extends MoveRecord {
         return typeFlag;
     }
 
-    public static String getCaptureString(char captureEntry, boolean first) {
+    public static String getCaptureString(int dimension, char captureEntry, boolean first) {
         String captureRecord = "";
 
         if(!first) captureRecord += "/";
 
         char taflmanChar = getTaflmanCharForFlag((byte) captureEntry);
         int index = (captureEntry & LOCATION_MASK) >> 4;
-        Coord location = Coord.getCoordForIndex(index);
+        Coord location = Coord.getCoordForIndex(dimension, index);
 
         captureRecord += (taflmanChar != 0 ? taflmanChar : "") + Board.getChessString(location);
 

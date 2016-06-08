@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.network.client;
 
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.command.player.Player;
+import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
@@ -44,6 +45,7 @@ public class TestClientServerConnection extends ClientServerConnection {
         return dummyPlayer;
     }
 
+    public Game game;
     public NetworkClientPlayer dummyPlayer = new NetworkClientPlayer(this);
     public State state = State.DISCONNECTED;
     public LobbyChatPacket lastLobbyChat;
@@ -96,8 +98,14 @@ public class TestClientServerConnection extends ClientServerConnection {
         }
 
         @Override
+        public Game getGame() {
+            return game;
+        }
+
+        @Override
         public void onStartGame(Rules r) {
             gameEnded = false;
+            game = new Game(r, null);
         }
 
         @Override

@@ -13,14 +13,16 @@ public class TaflmanCoordListMap {
     private char[] mTaflmen;
     private TableEntry[] mEntries;
 
+    private final int mDimension;
     private final short mSize;
     private final byte mAttackers;
     private final byte mDefenders;
 
-    public TaflmanCoordListMap(byte attackers, byte defenders) {
+    public TaflmanCoordListMap(int dimension, byte attackers, byte defenders) {
         this.mSize = (byte)(attackers + defenders);
         this.mAttackers = attackers;
         this.mDefenders = defenders;
+        mDimension = dimension;
         mTaflmen = new char[mSize];
         mEntries = new TableEntry[mSize];
 
@@ -33,6 +35,7 @@ public class TaflmanCoordListMap {
         mSize = other.size();
         this.mAttackers = other.mAttackers;
         this.mDefenders = other.mDefenders;
+        this.mDimension = other.mDimension;
         mTaflmen = new char[mSize];
         mEntries = new TableEntry[mSize];
 
@@ -59,7 +62,7 @@ public class TaflmanCoordListMap {
         if(coords.length > 0) {
             ArrayList<Coord> list = new ArrayList<Coord>(coords.length);
             for(int i = 0; i < coords.length; i++) {
-                list.add(Coord.getCoordForIndex(coords[i]));
+                list.add(Coord.getCoordForIndex(mDimension, coords[i]));
             }
             return list;
         }
@@ -95,7 +98,7 @@ public class TaflmanCoordListMap {
 
         int i = 0;
         for(Coord c : spaces) {
-            coords[i++] = (char) Coord.getIndex(c);
+            coords[i++] = (char) Coord.getIndex(mDimension, c);
         }
 
         mEntries[index].coords = coords;

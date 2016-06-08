@@ -162,7 +162,7 @@ public class ExternalEngineClient implements UiCallback {
         String[] moves = commandParts[0].split("\\|");
 
         for(String move : moves) {
-            mGame.getCurrentState().makeMove(MoveSerializer.loadMoveRecord(move));
+            mGame.getCurrentState().makeMove(MoveSerializer.loadMoveRecord(mGame.getRules().boardSize, move));
         }
     }
 

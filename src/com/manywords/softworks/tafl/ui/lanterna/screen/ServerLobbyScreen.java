@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
@@ -299,6 +300,11 @@ public class ServerLobbyScreen extends LogicalScreen {
             if(!planned) {
                 showDialogOnUiThread("Server connection failed", "Server terminated the connection.");
             }
+        }
+
+        @Override
+        public Game getGame() {
+            return null;
         }
 
         @Override

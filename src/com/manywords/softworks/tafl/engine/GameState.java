@@ -25,7 +25,7 @@ public class GameState {
         }
 
         mZobristHash = zobristHash();
-        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
+        mTaflmanMoveCache = new TaflmanMoveCache(getBoard().getBoardDimension(), mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
     }
 
     public GameState(Game game, Rules startingRules, Board board, Side attackers, Side defenders) {
@@ -43,7 +43,7 @@ public class GameState {
         }
 
         mZobristHash = zobristHash();
-        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
+        mTaflmanMoveCache = new TaflmanMoveCache(getBoard().getBoardDimension(), mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
     }
 
     public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist) {
@@ -68,7 +68,7 @@ public class GameState {
         mExitingMove = copyState.getExitingMove();
         mEnteringMove = copyState.getEnteringMove();
         mBerserkingTaflman = copyState.getBerserkingTaflman();
-        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
+        mTaflmanMoveCache = new TaflmanMoveCache(getBoard().getBoardDimension(), mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
     }
 
     public void updateBoard(GameState previousState) {
@@ -93,7 +93,7 @@ public class GameState {
             mZobristHash = updateZobristHash(previousState.mZobristHash, previousState.getBoard(), previousState.getExitingMove());
         }
 
-        mTaflmanMoveCache = new TaflmanMoveCache(mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
+        mTaflmanMoveCache = new TaflmanMoveCache(getBoard().getBoardDimension(), mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
         boolean changeSides = true;
 
         if(berserkingTaflman != Taflman.EMPTY) {
@@ -578,7 +578,7 @@ public class GameState {
         long hash = 0;
         for (char taflman : getBoard().getCachedTaflmanLocations().getTaflmen()) {
             int typeIndex = getZobristTypeIndex(taflman);
-            int coordIndex = Coord.getIndex(getBoard().findTaflmanSpace(taflman));
+            int coordIndex = Coord.getIndex(getBoard().getBoardDimension(), getBoard().findTaflmanSpace(taflman));
             hash = hash ^ mGame.mZobristConstants[coordIndex][typeIndex];
         }
 

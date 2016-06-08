@@ -97,6 +97,11 @@ public class ServerGame {
         return mCommandEngine.isInGame();
     }
 
+    public Rules getRules() {
+        if(mGame != null) return mGame.getRules();
+        else return null;
+    }
+
     public void setPassword(String password) {
         mBase64HashedPassword = PasswordHasher.hashPassword("", password);
     }

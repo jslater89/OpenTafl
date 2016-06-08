@@ -128,12 +128,12 @@ public class GameSerializer {
         g.setTagMap(tagMap);
         g.loadClock();
 
-        List<DetailedMoveRecord> moves = parseMoves(gameRecord);
+        List<DetailedMoveRecord> moves = parseMoves(r.getBoard().getBoardDimension(), gameRecord);
 
         return new GameContainer(g, moves);
     }
 
-    public static List<DetailedMoveRecord> parseMoves(String gameRecord) {
+    public static List<DetailedMoveRecord> parseMoves(int dimension, String gameRecord) {
         List<DetailedMoveRecord> moves = new ArrayList<>();
         String moveStart = "1. ";
         String moveEnd = "\n";
@@ -170,7 +170,7 @@ public class GameSerializer {
                 lastMovesAdded = 0;
                 commentIndex = moves.size();
                 for(String move : moveStrings) {
-                    DetailedMoveRecord m = MoveSerializer.loadMoveRecord(move);
+                    DetailedMoveRecord m = MoveSerializer.loadMoveRecord(dimension, move);
                     moves.add(m);
                     lastMovesAdded++;
                 }

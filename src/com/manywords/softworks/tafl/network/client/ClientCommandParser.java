@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.GameListPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.LobbyChatPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
+import com.manywords.softworks.tafl.rules.Rules;
 
 /**
  * Created by jay on 5/23/16.
@@ -44,8 +45,9 @@ public class ClientCommandParser {
                 callback.onErrorReceived(ErrorPacket.DESYNC);
             }
         }
-        else if(data.startsWith(MovePacket.PREFIX)) {
-            MovePacket packet = MovePacket.parse(data);
+        else if(data.startsWith(MovePacket.PREFIX) && callback.getGame() != null) {
+            Rules r = callback.getGame().getRules();
+            MovePacket packet = MovePacket.parse(r.boardSize, data);
             callback.onServerMoveReceived(packet.move);
         }
         else if(data.startsWith(GameChatPacket.PREFIX)) {

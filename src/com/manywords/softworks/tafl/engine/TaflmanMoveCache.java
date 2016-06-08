@@ -13,6 +13,7 @@ import java.util.Set;
  * Created by jay on 12/11/15.
  */
 public class TaflmanMoveCache {
+    private static int mDimension;
     private static TaflmanCoordListMap mCachedAllowableMoves;
     private static TaflmanCoordListMap mCachedAllowableDestinations;
     private static TaflmanCoordListMap mCachedCapturingMoves;
@@ -23,16 +24,17 @@ public class TaflmanMoveCache {
     private static byte mDefenders;
     private static long mValidZobrist;
 
-    public TaflmanMoveCache(long zobrist, byte attackers, byte defenders) {
-        if(mAttackers != attackers || mDefenders != defenders) {
+    public TaflmanMoveCache(int dimension, long zobrist, byte attackers, byte defenders) {
+        if(mAttackers != attackers || mDefenders != defenders || mDimension != dimension) {
+            mDimension = dimension;
             mAttackers = attackers;
             mDefenders = defenders;
 
-            mCachedAllowableMoves = new TaflmanCoordListMap(attackers, defenders);
-            mCachedAllowableDestinations = new TaflmanCoordListMap(attackers, defenders);
-            mCachedCapturingMoves = new TaflmanCoordListMap(attackers, defenders);
-            mCachedReachableSpaces = new TaflmanCoordListMap(attackers, defenders);
-            mCachedJumps = new TaflmanCoordListMap(attackers, defenders);
+            mCachedAllowableMoves = new TaflmanCoordListMap(mDimension, attackers, defenders);
+            mCachedAllowableDestinations = new TaflmanCoordListMap(mDimension, attackers, defenders);
+            mCachedCapturingMoves = new TaflmanCoordListMap(mDimension, attackers, defenders);
+            mCachedReachableSpaces = new TaflmanCoordListMap(mDimension, attackers, defenders);
+            mCachedJumps = new TaflmanCoordListMap(mDimension, attackers, defenders);
         }
 
         mCachedAllowableMoves.reset();

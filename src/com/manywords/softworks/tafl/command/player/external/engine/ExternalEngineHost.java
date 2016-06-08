@@ -274,7 +274,7 @@ public class ExternalEngineHost {
 
     public void handleMoveCommand(String command) {
         command = command.replace("move ", "");
-        MoveRecord move = MoveSerializer.loadMoveRecord(command);
+        MoveRecord move = MoveSerializer.loadMoveRecord(mGame.getRules().boardSize, command);
 
         mPlayer.onMoveDecided(move);
     }
@@ -306,7 +306,7 @@ public class ExternalEngineHost {
                 List<MoveRecord> moves = new ArrayList<>(moveArray.length);
 
                 for(String move : moveArray) {
-                    MoveRecord record = MoveSerializer.loadMoveRecord(move);
+                    MoveRecord record = MoveSerializer.loadMoveRecord(mGame.getRules().boardSize, move);
                     moves.add(record);
                 }
 
