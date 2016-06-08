@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server.task;
 
+import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
@@ -36,15 +37,32 @@ public class JoinGameTask implements Runnable {
                 mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.INVALID_GAME_PASSWORD), PriorityTaskQueue.Priority.LOW);
             }
 
-            result = g.tryJoinGame(mClient, mPacket.hashedPassword);
-            if(!result) {
-                mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.GAME_FULL), PriorityTaskQueue.Priority.LOW);
+            if(mPacket.getType() == JoinGamePacket.Type.JOIN) {
+                result = g.tryJoinGame(mClient, mPacket.hashedPassword);
+                if (!result) {
+                    mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.GAME_FULL), PriorityTaskQueue.Priority.LOW);
+                }
+                else {
+                    mServer.sendPacketToClient(
+                            mClient,
+                            new SuccessPacket(mClient.getGameRole() == GameRole.ATTACKER ? SuccessPacket.JOINED_ATTACKERS : SuccessPacket.JOINED_DEFENDERS),
+                            PriorityTaskQueue.Priority.STANDARD);
+                }
             }
-            else {
-                mServer.sendPacketToClient(
-                        mClient,
-                        new SuccessPacket(mClient.getGameRole() == GameRole.ATTACKER ? SuccessPacket.JOINED_ATTACKERS : SuccessPacket.JOINED_DEFENDERS),
-                        PriorityTaskQueue.Priority.STANDARD);
+            else if(mPacket.getType() == JoinGamePacket.Type.SPECTATE) {
+                result = g.trySpectateGame(mClient, mPacket.hashedPassword);
+                if (!result) {
+                    mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.UNKNOWN_ERROR), PriorityTaskQueue.Priority.LOW);
+                }
+                else {
+                    mServer.sendPacketToClient(
+                            mClient,
+                            new SuccessPacket(SuccessPacket.JOINED_SPECTATOR),
+                            PriorityTaskQueue.Priority.STANDARD);
+
+                    // Send an initial history update, too.
+                    mServer.sendPacketToClient(mClient, HistoryPacket.parseHistory(g.getGame().getHistory()), PriorityTaskQueue.Priority.LOW);
+                }
             }
         }
         else {

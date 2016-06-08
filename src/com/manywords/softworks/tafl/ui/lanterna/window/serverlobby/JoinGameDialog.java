@@ -6,6 +6,7 @@ import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
+import com.manywords.softworks.tafl.network.packet.pregame.SpectateGamePacket;
 
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -38,7 +39,7 @@ public class JoinGameDialog extends DialogWindow {
 
         final Button joinButton = new Button("Join", () -> {
             hashedPassword = PasswordHasher.hashPassword("", mPasswordInput.getText());
-            packet = createPacket(gameInfo, spectate, hashedPassword);
+            packet = createPacket(JoinGamePacket.Type.JOIN, gameInfo, spectate, hashedPassword);
 
             JoinGameDialog.this.close();
         });
@@ -46,7 +47,7 @@ public class JoinGameDialog extends DialogWindow {
         final Button spectateButton = new Button("Spectate", () -> {
             spectate = true;
             hashedPassword = PasswordHasher.hashPassword("", mPasswordInput.getText());
-            packet = createPacket(gameInfo, spectate, hashedPassword);
+            packet = createPacket(JoinGamePacket.Type.SPECTATE, gameInfo, spectate, hashedPassword);
 
             JoinGameDialog.this.close();
         });
@@ -72,10 +73,11 @@ public class JoinGameDialog extends DialogWindow {
         setComponent(p);
     }
 
-    private JoinGamePacket createPacket(GameInformation gameInfo, boolean spectate, String hashedPassword) {
+    private JoinGamePacket createPacket(JoinGamePacket.Type type, GameInformation gameInfo, boolean spectate, String hashedPassword) {
         UUID gameId = UUID.fromString(gameInfo.uuid);
 
-        return new JoinGamePacket(gameId, spectate, hashedPassword);
+        if(type == JoinGamePacket.Type.JOIN) return new JoinGamePacket(gameId, spectate, hashedPassword);
+        else return new SpectateGamePacket(gameId, spectate, hashedPassword);
     }
 
     @Override

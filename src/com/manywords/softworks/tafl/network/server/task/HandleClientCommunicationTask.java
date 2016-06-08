@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.network.server.task;
 
 import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
@@ -44,6 +45,9 @@ public class HandleClientCommunicationTask implements Runnable {
         else if(data.startsWith(JoinGamePacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new JoinGameTask(mServer, mClient, JoinGamePacket.parse(data)));
         }
+        else if(data.startsWith(SpectateGamePacket.PREFIX)) {
+            mServer.getTaskQueue().pushTask(new JoinGameTask(mServer, mClient, SpectateGamePacket.parse(data)));
+        }
         else if(data.startsWith(MovePacket.PREFIX) && mClient.getGame() != null) {
             Rules r = mClient.getGame().getRules();
             mServer.getTaskQueue().pushTask(new MoveTask(mServer, mClient, MovePacket.parse(r.boardSize, data)), PriorityTaskQueue.Priority.HIGH);
@@ -51,7 +55,11 @@ public class HandleClientCommunicationTask implements Runnable {
         else if(data.startsWith(GameChatPacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new GameChatTask(mServer, mClient, GameChatPacket.parse(data)), PriorityTaskQueue.Priority.LOW);
         }
+        else if(data.startsWith(HistoryPacket.PREFIX) && mClient.getGame() != null) {
+            mServer.sendPacketToClient(mClient, HistoryPacket.parseHistory(mClient.getGame().getGame().getHistory()), PriorityTaskQueue.Priority.LOW);
+        }
         else if(data.startsWith(GameEndedPacket.PREFIX)) {
+            // TODO: only send this if the game isn't over already
             SendVictoryTask.sendOnClientLeaving(mServer, mClient);
         }
     }

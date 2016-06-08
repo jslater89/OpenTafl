@@ -11,8 +11,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.OpenTafl;
-import com.manywords.softworks.tafl.command.player.LocalHuman;
-import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
+import com.manywords.softworks.tafl.command.player.*;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -39,8 +38,6 @@ import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
-import com.manywords.softworks.tafl.command.player.Player;
-import com.manywords.softworks.tafl.command.player.UiWorkerThread;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.BoardWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.CommandWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.StatusWindow;
@@ -411,9 +408,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             attacker = networkPlayer;
                             defender = localPlayer;
                         }
-                        else {
+                        else if(networkPlayer.getGameRole() == GameRole.DEFENDER) {
                             attacker = localPlayer;
                             defender = networkPlayer;
+                        }
+                        else { /*(networkPlayer.getGameRole() == GameRole.KIBBITZER)*/
+                            attacker = new DoNothingPlayer();
+                            defender = new DoNothingPlayer();
                         }
 
                         mCommandEngine = new CommandEngine(g, GameScreen.this, attacker, defender);

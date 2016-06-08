@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 public class SuccessPacket extends NetworkPacket {
     public static final String JOINED_ATTACKERS = "attackers";
     public static final String JOINED_DEFENDERS = "defenders";
+    public static final String JOINED_SPECTATOR = "spectator";
     public static final String LOGGED_IN = "logged-in";
     public static final String PREFIX = "success";
 

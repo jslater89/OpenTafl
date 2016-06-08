@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.network.client;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
@@ -288,6 +289,9 @@ public class ClientServerConnection {
                     else if(message.equals(SuccessPacket.JOINED_DEFENDERS)) {
                         mGameRole = GameRole.DEFENDER;
                     }
+                    else if(message.equals(SuccessPacket.JOINED_SPECTATOR)) {
+                        mGameRole = GameRole.KIBBITZER;
+                    }
                     setState(State.IN_PREGAME);
                     break;
             }
@@ -348,7 +352,15 @@ public class ClientServerConnection {
 
         @Override
         public void onServerMoveReceived(MoveRecord move) {
-            mNetworkPlayer.onMoveDecided(move);
+            if(mGameRole != GameRole.KIBBITZER) {
+                mNetworkPlayer.onMoveDecided(move);
+            }
+            else {
+                int result = mNetworkPlayer.getGame().getCurrentState().makeMove(move);
+                if(result != GameState.GOOD_MOVE) {
+                    // TODO: reinit game
+                }
+            }
         }
 
         @Override

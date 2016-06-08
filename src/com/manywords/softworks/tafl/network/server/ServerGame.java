@@ -11,6 +11,7 @@ import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.network.packet.ingame.ClockUpdatePacket;
 import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
@@ -146,6 +147,20 @@ public class ServerGame {
 
         if(mAttackerClient != null && mDefenderClient != null) {
             mServer.getTaskQueue().pushTask(new StartGameTask(mServer, this, getAllClients(), new StartGamePacket(mGame.getRules())));
+        }
+
+        return retval;
+    }
+
+    public synchronized boolean trySpectateGame(ServerClient c, String password) {
+        boolean retval;
+
+        if(!tryPassword(password)) {
+            retval = false;
+        }
+        else {
+            addSpectator(c);
+            retval = true;
         }
 
         return retval;

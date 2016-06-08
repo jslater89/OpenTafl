@@ -8,6 +8,7 @@ import com.googlecode.lanterna.gui2.table.TableModel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
+import com.manywords.softworks.tafl.network.packet.pregame.SpectateGamePacket;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
