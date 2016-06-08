@@ -12,10 +12,12 @@ public class MoveSerializerConsistencyTest extends TaflTest {
 
     @Override
     public void run() {
-        Coord.initialize(11);
         String move = "Ne6^=e8xce7/ne9/Kf8/d8";
-        DetailedMoveRecord moveRecord = MoveSerializer.loadMoveRecord(move);
+        DetailedMoveRecord moveRecord = MoveSerializer.loadMoveRecord(9, move);
         String serializedMove = MoveSerializer.getMoveRecord(moveRecord);
+
+        //System.out.println(move);
+        //System.out.println(serializedMove);
 
         assert move.equals(serializedMove);
     }

@@ -12,14 +12,16 @@ public class TaflmanCoordMap {
     private char[] mTaflmen;
     private char[] mCoords;
 
+    private final int mDimension;
     private final short mSize;
     private final byte mAttackers;
     private final byte mDefenders;
 
-    public TaflmanCoordMap(byte attackers, byte defenders) {
+    public TaflmanCoordMap(int dimension, byte attackers, byte defenders) {
         this.mSize = (byte)(attackers + defenders);
         this.mAttackers = attackers;
         this.mDefenders = defenders;
+        this.mDimension = dimension;
         mTaflmen = new char[mSize];
         mCoords = new char[mSize];
 
@@ -32,6 +34,7 @@ public class TaflmanCoordMap {
         mSize = other.size();
         this.mAttackers = other.mAttackers;
         this.mDefenders = other.mDefenders;
+        this.mDimension = other.mDimension;
         mTaflmen = new char[mSize];
         mCoords = new char[mSize];
 
@@ -58,7 +61,7 @@ public class TaflmanCoordMap {
         byte entryId = Taflman.getPackedId(entry);
 
         if(coord != (char) -1 && taflmanSide == entrySide && taflmanId == entryId) {
-            return Coord.getCoordForIndex(coord);
+            return Coord.getCoordForIndex(mDimension, coord);
         }
         else {
             return null;
@@ -66,7 +69,7 @@ public class TaflmanCoordMap {
     }
 
     public char getTaflman(Coord c) {
-        return getTaflman(Coord.getIndex(c));
+        return getTaflman(Coord.getIndex(mDimension, c));
     }
 
     public char getTaflman(int c) {
@@ -92,7 +95,7 @@ public class TaflmanCoordMap {
 
         // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
         int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
-        char coord = (char) Coord.getIndex(space);
+        char coord = (char) Coord.getIndex(mDimension, space);
 
         mCoords[index] = coord;
         mTaflmen[index] = taflman;
@@ -106,7 +109,7 @@ public class TaflmanCoordMap {
     public String toString() {
         String s = "";
         for(int i = 0; i < mSize; i++) {
-            s += Taflman.getStringSymbol(mTaflmen[i]) + " id " + Taflman.getPackedId(mTaflmen[i]) + "@" + Coord.getCoordForIndex(mCoords[i]) + ", ";
+            s += Taflman.getStringSymbol(mTaflmen[i]) + " id " + Taflman.getPackedId(mTaflmen[i]) + "@" + Coord.getCoordForIndex(mDimension, mCoords[i]) + ", ";
         }
         s += "\n";
 

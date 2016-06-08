@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.network.client;
 
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
+import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
@@ -33,6 +34,7 @@ public class ClientServerConnection {
         public void onGameListReceived(List<GameInformation> games);
         public void onClientListReceived(List<ClientInformation> clients);
         public void onDisconnect(boolean planned);
+        public Game getGame();
         public void onStartGame(Rules r);
         public void onServerMoveReceived(MoveRecord move);
         public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock);
@@ -331,6 +333,11 @@ public class ClientServerConnection {
         public void onDisconnect(boolean planned) {
             setState(State.DISCONNECTED);
             mExternalCallback.onDisconnect(planned);
+        }
+
+        @Override
+        public Game getGame() {
+            return mExternalCallback.getGame();
         }
 
         @Override

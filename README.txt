@@ -142,6 +142,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 9. Version history
 
+v0.3.0.1b (released 06/08/16):
+- Hotfix for server-side bug with multiple games of different dimensions in
+  progress
+
 v0.3.0.0b (released 06/02/16):
 - Add network play initial operational capabilities
     - Server mode and client-server interface

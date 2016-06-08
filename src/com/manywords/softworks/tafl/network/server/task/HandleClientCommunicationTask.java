@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
+import com.manywords.softworks.tafl.rules.Rules;
 
 
 public class HandleClientCommunicationTask implements Runnable {
@@ -43,8 +44,9 @@ public class HandleClientCommunicationTask implements Runnable {
         else if(data.startsWith(JoinGamePacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new JoinGameTask(mServer, mClient, JoinGamePacket.parse(data)));
         }
-        else if(data.startsWith(MovePacket.PREFIX)) {
-            mServer.getTaskQueue().pushTask(new MoveTask(mServer, mClient, MovePacket.parse(data)), PriorityTaskQueue.Priority.HIGH);
+        else if(data.startsWith(MovePacket.PREFIX) && mClient.getGame() != null) {
+            Rules r = mClient.getGame().getRules();
+            mServer.getTaskQueue().pushTask(new MoveTask(mServer, mClient, MovePacket.parse(r.boardSize, data)), PriorityTaskQueue.Priority.HIGH);
         }
         else if(data.startsWith(GameChatPacket.PREFIX)) {
             mServer.getTaskQueue().pushTask(new GameChatTask(mServer, mClient, GameChatPacket.parse(data)), PriorityTaskQueue.Priority.LOW);

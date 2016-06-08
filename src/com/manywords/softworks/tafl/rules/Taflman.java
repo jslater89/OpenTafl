@@ -136,15 +136,16 @@ public class Taflman {
     }
 
     public static List<Coord> getAllowableMovesFrom(GameState state, char taflman, Coord space, boolean withJump) {
-        Rules rules = getBoard(state).getRules();
-        List<Coord> allowableMoves = new ArrayList<Coord>(getBoard(state).getBoardDimension() * 2);
+        Board b = getBoard(state);
+        Rules rules = b.getRules();
+        List<Coord> allowableMoves = new ArrayList<Coord>(b.getBoardDimension() * 2);
 
         // Moves on the same rank (row)
 //        int x = space.x;
 //        int y = space.y;
 //        int boardSize = getBoard(state).getBoardDimension();
 
-        for(List<Coord> direction : Coord.getRankAndFileCoords(space)) {
+        for(List<Coord> direction : Coord.getRankAndFileCoords(b.getBoardDimension(), space)) {
             for(Coord potentialMove : direction) {
                 boolean canPass = rules.canTaflmanMoveThrough(getBoard(state), taflman, potentialMove);
                 if (getBoard(state).getOccupier(potentialMove) != EMPTY || !canPass) {
@@ -455,7 +456,7 @@ public class Taflman {
         }
 
         if(detailed) {
-            DetailedMoveRecord m = new DetailedMoveRecord(start, destination, taflman, captures, capturedTaflmen, wasJump, wasBerserk);
+            DetailedMoveRecord m = new DetailedMoveRecord(getBoard(state).getBoardDimension(), start, destination, taflman, captures, capturedTaflmen, wasJump, wasBerserk);
             if(state.mGame.getClock() != null && m.getTimeRemaining() == null) {
                 m.setTimeRemaining(state.mGame.getClock().getClockEntry(state.getCurrentSide()).toTimeSpec());
             }

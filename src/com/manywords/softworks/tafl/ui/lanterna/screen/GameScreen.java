@@ -767,6 +767,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         }
 
         @Override
+        public Game getGame() {
+            return mGame;
+        }
+
+        @Override
         public void onStartGame(Rules r) {
 
         }

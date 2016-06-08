@@ -78,7 +78,6 @@ public class RulesSerializer {
 
 
     public static String getRulesRecord(Rules rules) {
-        Coord.initialize(rules.boardSize);
         String otnrString = "";
 
         otnrString += "dim:";
@@ -244,7 +243,6 @@ public class RulesSerializer {
         Map<String, String> config = getRulesMap(otnrString);
 
         int boardDimension = Integer.parseInt(config.get("dim"));
-        Coord.initialize(boardDimension);
         String startPosition = config.get("start");
         startingTaflmen = PositionSerializer.parseTaflmenFromPosition(startPosition);
 

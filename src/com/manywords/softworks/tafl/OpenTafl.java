@@ -4,6 +4,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.test.Test;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.RawTerminal;
@@ -27,7 +28,7 @@ public class OpenTafl {
     }
 
     public static boolean DEV_MODE = false;
-    public static final String CURRENT_VERSION = "v0.3.0.0b";
+    public static final String CURRENT_VERSION = "v0.3.0.1b";
     public static final int NETWORK_PROTOCOL_VERSION = 2;
 
     public static void main(String[] args) {
@@ -62,6 +63,7 @@ public class OpenTafl {
         }
 
         directoryCheck();
+        Coord.initialize();
         BuiltInVariants.loadExternalRules(new File("external-rules.conf"));
 
         switch(runMode) {

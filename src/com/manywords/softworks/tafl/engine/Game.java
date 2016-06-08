@@ -67,7 +67,6 @@ public class Game {
             }
         }
 
-        Coord.initialize(rules.getBoard().getBoardDimension());
         mHistory = new ArrayList<GameState>();
 
         // Create a new state off of the game rules.

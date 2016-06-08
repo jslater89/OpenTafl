@@ -16,10 +16,6 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
-
-        // Network tests
-        tests.add(new ServerTest());
-
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
         tests.add(new MoveSerializerConsistencyTest());
@@ -52,12 +48,14 @@ public class Test {
         tests.add(new BadFetlarCaptureTest());
         tests.add(new BadCopenhagenCaptureTest());
 
+        // Network tests
+        tests.add(new ServerTest());
+
         // Mechanics tests
         tests.add(new ExternalEngineHostTest());
         tests.add(new GameClockTest());
         tests.add(new ServerTickThreadTest());
         tests.add(new KingMissingPositionRecordTest());
-
 
         // AI tests
         tests.add(new AIMatchingZobristTest());

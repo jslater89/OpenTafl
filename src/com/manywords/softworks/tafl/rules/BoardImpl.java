@@ -7,7 +7,7 @@ import java.util.*;
 
 public abstract class BoardImpl extends Board {
     public BoardImpl(int dimension) {
-        Coord.initialize(dimension);
+
     }
 
     public BoardImpl(Board board) {
@@ -30,7 +30,7 @@ public abstract class BoardImpl extends Board {
     private void initializeTaflmanLocations(Side attackers, Side defenders) {
         byte defenderCount = (byte) defenders.getStartingTaflmen().size();
         byte attackerCount = (byte) attackers.getStartingTaflmen().size();
-        mCachedTaflmanLocations = new TaflmanCoordMap(attackerCount, defenderCount);
+        mCachedTaflmanLocations = new TaflmanCoordMap(getBoardDimension(), attackerCount, defenderCount);
 
         for(Side.TaflmanHolder t : attackers.getStartingTaflmen()) {
             mCachedTaflmanLocations.put(t.packed, t.coord);
@@ -123,7 +123,7 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public List<Coord> getAdjacentSpaces(Coord space) {
-        return Coord.getAdjacentSpaces(space);
+        return Coord.getAdjacentSpaces(getBoardDimension(), space);
     }
 
     @Override
@@ -156,7 +156,7 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public List<Coord> getDiagonalSpaces(Coord space) {
-        return Coord.getDiagonalSpaces(space);
+        return Coord.getDiagonalSpaces(getBoardDimension(), space);
     }
 
     @Override
@@ -432,27 +432,27 @@ public abstract class BoardImpl extends Board {
     }
 
     public List<Coord> getEdgesFlat() {
-        return Coord.getEdgesFlat();
+        return Coord.getEdgesFlat(getBoardDimension());
     }
 
     @Override
     public List<Coord> getTopEdge() {
-        return Coord.getTopEdge();
+        return Coord.getTopEdge(getBoardDimension());
     }
 
     @Override
     public List<Coord> getBottomEdge() {
-        return Coord.getBottomEdge();
+        return Coord.getBottomEdge(getBoardDimension());
     }
 
     @Override
     public List<Coord> getLeftEdge() {
-        return Coord.getLeftEdge();
+        return Coord.getLeftEdge(getBoardDimension());
     }
 
     @Override
     public List<Coord> getRightEdge() {
-        return Coord.getRightEdge();
+        return Coord.getRightEdge(getBoardDimension());
     }
 
     public static final int DIRECTION_X = 0;
