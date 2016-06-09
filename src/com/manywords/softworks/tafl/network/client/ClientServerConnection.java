@@ -306,7 +306,7 @@ public class ClientServerConnection {
                     else if(message.equals(SuccessPacket.JOINED_SPECTATOR)) {
                         mGameRole = GameRole.KIBBITZER;
                     }
-                    System.out.println("Joined game as " + mGameRole);
+                    println("Joined game as " + mGameRole);
                     setState(State.IN_PREGAME);
                     break;
             }
