@@ -127,6 +127,7 @@ public class NetworkServer {
     }
 
     private void startServer() {
+        System.out.println("Starting server with network protocol version " + OpenTafl.NETWORK_PROTOCOL_VERSION);
         mTaskQueue.start();
         mTickThread.start();
 
