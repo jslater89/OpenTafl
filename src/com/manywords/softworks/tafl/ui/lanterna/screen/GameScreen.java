@@ -578,8 +578,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                         }
                         else {
                             mCommandEngine.finishGame();
+                            statusText("Finished game. Enter 'quit' again to return to menu.");
                         }
-
+                    }
+                    else {
+                        mCommandEngine.finishGame();
                         statusText("Finished game. Enter 'quit' again to return to menu.");
                     }
                 }
