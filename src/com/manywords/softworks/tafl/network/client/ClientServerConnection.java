@@ -3,14 +3,12 @@ package com.manywords.softworks.tafl.network.client;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
-import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
-import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
-import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
-import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.*;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
@@ -35,7 +33,8 @@ public class ClientServerConnection {
         public void onClientListReceived(List<ClientInformation> clients);
         public void onDisconnect(boolean planned);
         public Game getGame();
-        public void onStartGame(Rules r);
+        public void onStartGame(Rules r, List<MoveRecord> history);
+        public void onHistoryReceived(List<MoveRecord> moves);
         public void onServerMoveReceived(MoveRecord move);
         public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock);
         public void onVictory(VictoryPacket.Victory victory);
@@ -71,6 +70,7 @@ public class ClientServerConnection {
     private GameRole mGameRole = GameRole.OUT_OF_GAME;
     private NetworkClientPlayer mNetworkPlayer;
     private GameInformation mLastJoinedGame = null;
+    private List<MoveRecord> mLastHistory = null;
 
     private boolean mPlannedDisconnect = false;
 
@@ -141,12 +141,23 @@ public class ClientServerConnection {
         return mNetworkPlayer;
     }
 
+    public void setNetworkPlayer(NetworkClientPlayer player) {
+        mNetworkPlayer = player;
+    }
+
     public State getCurrentState() {
         return mCurrentState;
     }
 
     public GameRole getGameRole() {
         return mGameRole;
+    }
+
+    public boolean hasHistory() { return mLastHistory != null; }
+    public List<MoveRecord> consumeHistory() {
+        List<MoveRecord> history = mLastHistory;
+        mLastHistory = null;
+        return history;
     }
 
     public void sendCreateGameMessage(CreateGamePacket packet) {
@@ -178,6 +189,10 @@ public class ClientServerConnection {
             return mLastJoinedGame.clockSetting;
         }
         else return null;
+    }
+
+    public void sendHistoryRequest() {
+        mServerWriter.println(HistoryPacket.PREFIX);
     }
 
     public void sendRegistrationMessage(String username, String hashedPassword) {
@@ -288,6 +303,9 @@ public class ClientServerConnection {
                     else if(message.equals(SuccessPacket.JOINED_DEFENDERS)) {
                         mGameRole = GameRole.DEFENDER;
                     }
+                    else if(message.equals(SuccessPacket.JOINED_SPECTATOR)) {
+                        mGameRole = GameRole.KIBBITZER;
+                    }
                     setState(State.IN_PREGAME);
                     break;
             }
@@ -341,14 +359,25 @@ public class ClientServerConnection {
         }
 
         @Override
-        public void onStartGame(Rules r) {
+        public void onStartGame(Rules r, List<MoveRecord> history) {
             setState(State.IN_GAME);
-            mExternalCallback.onStartGame(r);
+            mExternalCallback.onStartGame(r, history);
+        }
+
+        @Override
+        public void onHistoryReceived(List<MoveRecord> moves) {
+            mLastHistory = moves;
+            mExternalCallback.onHistoryReceived(moves);
         }
 
         @Override
         public void onServerMoveReceived(MoveRecord move) {
-            mNetworkPlayer.onMoveDecided(move);
+            if(mGameRole != GameRole.KIBBITZER) {
+                mNetworkPlayer.onMoveDecided(move);
+            }
+            else {
+                mExternalCallback.onServerMoveReceived(move);
+            }
         }
 
         @Override

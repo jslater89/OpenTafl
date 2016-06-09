@@ -7,7 +7,6 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
-import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.LobbyChatPacket;
@@ -103,9 +102,14 @@ public class TestClientServerConnection extends ClientServerConnection {
         }
 
         @Override
-        public void onStartGame(Rules r) {
+        public void onStartGame(Rules r, List<MoveRecord> history) {
             gameEnded = false;
             game = new Game(r, null);
+        }
+
+        @Override
+        public void onHistoryReceived(List<MoveRecord> moves) {
+
         }
 
         @Override

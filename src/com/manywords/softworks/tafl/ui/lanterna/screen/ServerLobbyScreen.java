@@ -308,9 +308,14 @@ public class ServerLobbyScreen extends LogicalScreen {
         }
 
         @Override
-        public void onStartGame(Rules r) {
+        public void onStartGame(Rules r, List<MoveRecord> history) {
             final TimeSpec clockSetting = mConnection.getLastClockSetting();
-            TerminalUtils.runOnUiThread(mGui, () -> TerminalUtils.startNetworkGame(mGui, mTerminalCallback, mConnection, r, clockSetting));
+            TerminalUtils.runOnUiThread(mGui, () -> TerminalUtils.startNetworkGame(mGui, mTerminalCallback, mConnection, r, clockSetting, history));
+        }
+
+        @Override
+        public void onHistoryReceived(List<MoveRecord> moves) {
+
         }
 
         @Override

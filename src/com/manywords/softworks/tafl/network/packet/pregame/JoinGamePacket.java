@@ -8,10 +8,15 @@ import java.util.UUID;
  * Created by jay on 5/26/16.
  */
 public class JoinGamePacket extends NetworkPacket {
+    public enum Type {
+        JOIN,
+        SPECTATE
+    }
     public static final String PREFIX = "join-game";
     public final UUID uuid;
     public final boolean spectate;
     public final String hashedPassword;
+    private final Type type;
 
     public static JoinGamePacket parse(String data) {
         data = data.replaceFirst("join-game", "").trim();
@@ -24,6 +29,11 @@ public class JoinGamePacket extends NetworkPacket {
         this.uuid = uuid;
         this.spectate = spectate;
         this.hashedPassword = hashedPassword;
+        this.type = Type.JOIN;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     public String toString() {

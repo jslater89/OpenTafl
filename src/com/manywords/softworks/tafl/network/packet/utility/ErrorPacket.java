@@ -14,6 +14,7 @@ public class ErrorPacket extends NetworkPacket {
     public static final String OPPONENT_LEFT = "opponent-left";
     public static final String DESYNC = "desync";
     public static final String VERSION_MISMATCH = "version-mismatch";
+    public static final String UNKNOWN_ERROR = "unknown-error";
 
     public static final String PREFIX = "error";
 

@@ -91,7 +91,9 @@ public class CreateGameDialog extends DialogWindow {
             }
             canceled = false;
 
-            TerminalSettings.variant = settingsRulesIndex;
+            if(settingsRulesIndex >= 0) {
+                TerminalSettings.variant = settingsRulesIndex;
+            }
             TerminalSettings.timeSpec = timeSpec;
 
             CreateGameDialog.this.close();

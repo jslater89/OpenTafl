@@ -70,14 +70,14 @@ leave-game guid
     Leave Game should be a button in the server lobby interface.
 
 
-
-
 spectate-game guid
     error invalid-password
     error game-not-started
     success
 
     On success, opens a game interface which gets its updates from the server.
+
+history
 
 game-chat "player name" message
 

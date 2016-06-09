@@ -11,8 +11,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.OpenTafl;
-import com.manywords.softworks.tafl.command.player.LocalHuman;
-import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
+import com.manywords.softworks.tafl.command.player.*;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -25,7 +24,6 @@ import com.manywords.softworks.tafl.network.client.ClientServerConnection.Client
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.notation.GameSerializer;
-import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
@@ -39,8 +37,6 @@ import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
-import com.manywords.softworks.tafl.command.player.Player;
-import com.manywords.softworks.tafl.command.player.UiWorkerThread;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.BoardWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.CommandWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.StatusWindow;
@@ -67,6 +63,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     private ClientServerCallback mServerCallback = new ServerCallback();
 
     private ReplayGame mReplay;
+    // Used for spectators to catch up to the current state.
+    private List<MoveRecord> mPregameHistory;
 
     private boolean mInGame;
     private boolean mInReplay;
@@ -105,6 +103,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         else {
             throw new IllegalStateException("No game for GameScreen!");
         }
+    }
+
+    public void setHistory(List<MoveRecord> history) {
+        mPregameHistory = history;
     }
 
     @Override
@@ -360,10 +362,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         private void blockUntilCommandEngineReady(Game g) {
             // Set up a game thread
-            if(mCommandEngine == null) {
-                System.out.println("Starting command engine thread");
-                startCommandEngineThread(g);
+            if(mCommandEngine != null) {
+                mCommandEngine.finishGameQuietly();
+                mCommandEngine = null;
             }
+
+            System.out.println("Starting command engine thread");
+            startCommandEngineThread(g);
 
             while(mCommandEngine == null) {
                 try {
@@ -411,9 +416,26 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             attacker = networkPlayer;
                             defender = localPlayer;
                         }
-                        else {
+                        else if(networkPlayer.getGameRole() == GameRole.DEFENDER) {
                             attacker = localPlayer;
                             defender = networkPlayer;
+                        }
+                        else { /*(networkPlayer.getGameRole() == GameRole.KIBBITZER)*/
+                            attacker = new SpectatorPlayer(mServerConnection);
+                            defender = new SpectatorPlayer(mServerConnection);
+
+                            if(mServerConnection.hasHistory()) {
+                                mPregameHistory = mServerConnection.consumeHistory();
+                            }
+
+                            if(mPregameHistory != null) {
+                                for(MoveRecord m : mPregameHistory) {
+                                    g.getCurrentState().makeMove(m);
+                                }
+                            }
+
+                            // Doesn't matter which one
+                            mServerConnection.setNetworkPlayer((SpectatorPlayer) attacker);
                         }
 
                         mCommandEngine = new CommandEngine(g, GameScreen.this, attacker, defender);
@@ -452,7 +474,9 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         public void handleInGameCommand(String command) {
 
             if(command.startsWith("dump")) {
-                System.out.println(RulesSerializer.getRulesRecord(mGame.getRules()));
+                if(mServerConnection != null) {
+                    mServerConnection.sendHistoryRequest();
+                }
                 return;
             }
 
@@ -772,13 +796,23 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         }
 
         @Override
-        public void onStartGame(Rules r) {
+        public void onStartGame(Rules r, List<MoveRecord> history) {
 
         }
 
         @Override
-        public void onServerMoveReceived(MoveRecord move) {
+        public void onHistoryReceived(List<MoveRecord> moves) {
+            Rules r = mGame.getRules();
+            Game g = new Game(r, GameScreen.this);
 
+            mTerminalCallback.onEnteringGameScreen(g, r.getName());
+        }
+
+        @Override
+        public void onServerMoveReceived(MoveRecord move) {
+            System.out.println("Game screen received spectator move: " + move);
+            mCommandEngine.getCurrentPlayer().onMoveDecided(move);
+            TerminalUtils.runOnUiThread(mGui, () -> mBoardWindow.rerenderBoard());
         }
 
         @Override
