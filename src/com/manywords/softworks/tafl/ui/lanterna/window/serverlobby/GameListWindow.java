@@ -28,7 +28,7 @@ public class GameListWindow extends BasicWindow {
     private Table<String> mGameTable;
     private List<GameInformation> mGameList;
 
-    private static final String[] COLUMNS = {"Rules", "Attackers", "Defenders", "Clock Setting", "Password", "Spectators"};
+    private static final String[] COLUMNS = {"Rules", "Attackers", "Defenders", "Clock Setting", "Started", "Password", "Spectators"};
     private static final String[] EMPTY_ROW = {"", "", "", "", "", ""};
 
     public GameListWindow(LogicalScreen.TerminalCallback terminalCallback, GameListWindowHost host) {
@@ -80,7 +80,7 @@ public class GameListWindow extends BasicWindow {
         for(GameInformation g : mGameList) {
             String clockSetting = "Untimed";
             if(g.clockSetting.isEnabled()) clockSetting = g.clockSetting.toHumanString();
-            model.addRow(g.rulesName, g.attackerUsername, g.defenderUsername, clockSetting, g.password ? "Y" : "N", "" + g.spectators);
+            model.addRow(g.rulesName, g.attackerUsername, g.defenderUsername, clockSetting, g.started ? "Y" : "N", g.password ? "Y" : "N", "" + g.spectators);
         }
 
         mGameTable.setTableModel(model);

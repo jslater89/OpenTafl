@@ -55,6 +55,8 @@ public class ServerGame {
     private NetworkServerPlayer mDefenderPlayer;
     private final List<ServerClient> mSpectators = new ArrayList<>();
 
+    private boolean mHasStarted;
+
     private String mBase64HashedPassword = "";
 
     public ServerGame() {
@@ -91,11 +93,16 @@ public class ServerGame {
     }
 
     public void startGame() {
+        mHasStarted = true;
         mCommandEngine.startGame();
     }
 
     public boolean isGameInProgress() {
         return mCommandEngine.isInGame();
+    }
+
+    public boolean hasGameStarted() {
+        return mHasStarted;
     }
 
     public Rules getRules() {
@@ -125,7 +132,7 @@ public class ServerGame {
     }
 
     public synchronized boolean tryJoinGame(ServerClient c, String password) {
-        return tryJoinGame(c, password, true, true);
+        return !mHasStarted && tryJoinGame(c, password, true, true);
     }
 
     public synchronized boolean tryJoinGame(ServerClient c, String password, boolean attackers, boolean defenders) {

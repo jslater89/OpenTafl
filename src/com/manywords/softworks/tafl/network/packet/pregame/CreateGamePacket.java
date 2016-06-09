@@ -48,7 +48,7 @@ public class CreateGamePacket extends NetworkPacket {
      * @return
      */
     public GameInformation toGameInformation() {
-        return new GameInformation(uuid.toString(), "", "", "", false, 0, timeSpec.toMachineReadableString());
+        return new GameInformation(uuid.toString(), "", "", "", false, false, 0, timeSpec.toMachineReadableString());
     }
 
     public String toString() {

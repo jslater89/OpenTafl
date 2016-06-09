@@ -27,7 +27,7 @@ public class GameListUpdateTask extends IntervalTask {
         // Don't send lobby updates to a client in the game UI.
         if(mClient.getGame() == null || !mClient.getGame().isGameInProgress()) {
             mClient.writePacket(GameListPacket.parse(mServer.getGames()));
-            mClient.writePacket(ClientListPacket.parse(mServer.getLobbyClients()));
+            mClient.writePacket(ClientListPacket.parse(mServer.getClients()));
         }
     }
 }

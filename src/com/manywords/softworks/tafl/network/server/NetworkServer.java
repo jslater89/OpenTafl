@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.LobbyChatPacket;

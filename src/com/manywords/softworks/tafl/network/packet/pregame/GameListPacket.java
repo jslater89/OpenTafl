@@ -33,11 +33,12 @@ public class GameListPacket extends NetworkPacket {
             String[] unquotedElements = elements[6].trim().split(" ");
 
             boolean password = unquotedElements[0].contains("password:true");
-            int spectators = Integer.parseInt(unquotedElements[1].replaceAll("[a-z]|\\s|:", ""));
+            boolean started = unquotedElements[1].contains("started:true");
+            int spectators = Integer.parseInt(unquotedElements[2].replaceAll("[a-z]|\\s|:", ""));
 
-            TimeSpec ts = TimeSpec.parseMachineReadableString(unquotedElements[2]);
+            TimeSpec ts = TimeSpec.parseMachineReadableString(unquotedElements[3]);
 
-            games.add(new GameInformation(uuid, rulesName, attackerName, defenderName, password, spectators, ts.toMachineReadableString()));
+            games.add(new GameInformation(uuid, rulesName, attackerName, defenderName, password, started, spectators, ts.toMachineReadableString()));
         }
 
         return new GameListPacket(games);
@@ -52,6 +53,7 @@ public class GameListPacket extends NetworkPacket {
             String attackerUsername = g.getAttackerClient() == null ? "<none>" :g.getAttackerClient().getUsername();
             String defenderUsername = g.getDefenderClient() == null ? "<none>" :g.getDefenderClient().getUsername();
             boolean password = g.isPassworded();
+            boolean started = g.hasGameStarted();
             int spectators = g.getSpectators().size();
             TimeSpec ts;
             if(g.getGame().getClock() != null) {
@@ -61,7 +63,7 @@ public class GameListPacket extends NetworkPacket {
                 ts = new TimeSpec(0, 0, 0, 0);
             }
 
-            games.add(new GameInformation(uuidString, rulesName, attackerUsername, defenderUsername, password, spectators, ts.toMachineReadableString()));
+            games.add(new GameInformation(uuidString, rulesName, attackerUsername, defenderUsername, password, started, spectators, ts.toMachineReadableString()));
         }
 
         return new GameListPacket(games);

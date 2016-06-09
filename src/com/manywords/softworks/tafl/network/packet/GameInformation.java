@@ -11,15 +11,17 @@ public class GameInformation {
     public final String attackerUsername;
     public final String defenderUsername;
     public final boolean password;
+    public final boolean started;
     public final int spectators;
     public final TimeSpec clockSetting;
 
-    public GameInformation(String uuid, String rulesName, String attackerUsername, String defenderUsername, boolean password, int spectators, String clockSetting) {
+    public GameInformation(String uuid, String rulesName, String attackerUsername, String defenderUsername, boolean password, boolean started, int spectators, String clockSetting) {
         this.uuid = uuid;
         this.rulesName = rulesName;
         this.attackerUsername = attackerUsername;
         this.defenderUsername = defenderUsername;
         this.password = password;
+        this.started = started;
         this.spectators = spectators;
         this.clockSetting = TimeSpec.parseMachineReadableString(clockSetting);
     }
@@ -33,6 +35,6 @@ public class GameInformation {
     }
 
     public String toString() {
-        return uuid + " \"" + rulesName + "\" " + " \"" + attackerUsername + "\" " + " \"" + defenderUsername + "\" " + "password:" + password + " spectators:" + spectators + " " + clockSetting.toMachineReadableString();
+        return uuid + " \"" + rulesName + "\" " + " \"" + attackerUsername + "\" " + " \"" + defenderUsername + "\" " + "password:" + password + " started:" + started + " spectators:" + spectators + " " + clockSetting.toMachineReadableString();
     }
 }

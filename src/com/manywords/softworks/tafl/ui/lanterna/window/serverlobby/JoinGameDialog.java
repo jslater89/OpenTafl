@@ -64,7 +64,7 @@ public class JoinGameDialog extends DialogWindow {
 
         Panel buttonPanel = new Panel();
         buttonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        buttonPanel.addComponent(joinButton);
+        if(!gameInfo.started) buttonPanel.addComponent(joinButton);
         buttonPanel.addComponent(spectateButton);
         buttonPanel.addComponent(cancelButton);
 
