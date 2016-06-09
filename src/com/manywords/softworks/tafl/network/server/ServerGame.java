@@ -343,13 +343,11 @@ public class ServerGame {
 
         @Override
         public void victoryForSide(Side side) {
-            // TODO: verify that these work
             mServer.sendPacketToClients(getAllClients(), new VictoryPacket(side), PriorityTaskQueue.Priority.HIGH);
         }
 
         @Override
         public void gameFinished() {
-            // TODO: verify that these work
             mServer.sendPacketToClients(getAllClients(), new GameEndedPacket(), PriorityTaskQueue.Priority.HIGH);
         }
 

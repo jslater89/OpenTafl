@@ -14,7 +14,6 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.*;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
@@ -25,7 +24,6 @@ import com.manywords.softworks.tafl.network.client.ClientServerConnection.Client
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.notation.GameSerializer;
-import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
@@ -364,10 +362,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         private void blockUntilCommandEngineReady(Game g) {
             // Set up a game thread
-            if(mCommandEngine == null) {
-                System.out.println("Starting command engine thread");
-                startCommandEngineThread(g);
+            if(mCommandEngine != null) {
+                mCommandEngine.finishGameQuietly();
+                mCommandEngine = null;
             }
+
+            System.out.println("Starting command engine thread");
+            startCommandEngineThread(g);
 
             while(mCommandEngine == null) {
                 try {
@@ -473,7 +474,9 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         public void handleInGameCommand(String command) {
 
             if(command.startsWith("dump")) {
-                System.out.println(RulesSerializer.getRulesRecord(mGame.getRules()));
+                if(mServerConnection != null) {
+                    mServerConnection.sendHistoryRequest();
+                }
                 return;
             }
 
@@ -799,20 +802,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onHistoryReceived(List<MoveRecord> moves) {
-            // TODO: wire this game up to the screen somehow.
+            Rules r = mGame.getRules();
+            Game g = new Game(r, GameScreen.this);
 
-            throw new IllegalStateException("Not yet implemented");
-            /*Rules r = mGame.getRules();
-            mGame = new Game(r, GameScreen.this);
-            mCommandEngine = new CommandEngine(mGame, GameScreen.this, new SpectatorPlayer(mServerConnection), new SpectatorPlayer(mServerConnection));
-
-            if(mBoardWindow != null) {
-                mTerminalCallback.onEnteringGame(mGame);
-            }
-
-            for(MoveRecord m : moves) {
-                mCommandEngine.getCurrentPlayer().onMoveDecided(m);
-            }*/
+            mTerminalCallback.onEnteringGameScreen(g, r.getName());
         }
 
         @Override

@@ -8,10 +8,7 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
-import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
-import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
-import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
-import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.*;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.utility.SuccessPacket;
@@ -192,6 +189,10 @@ public class ClientServerConnection {
             return mLastJoinedGame.clockSetting;
         }
         else return null;
+    }
+
+    public void sendHistoryRequest() {
+        mServerWriter.println(HistoryPacket.PREFIX);
     }
 
     public void sendRegistrationMessage(String username, String hashedPassword) {

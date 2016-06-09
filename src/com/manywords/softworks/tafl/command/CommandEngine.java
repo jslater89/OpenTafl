@@ -138,6 +138,10 @@ public class CommandEngine {
         finishGame(false);
     }
 
+    public void finishGameQuietly() {
+        finishGame(true);
+    }
+
     private void finishGame(boolean quiet) {
         mInGame = false;
         mGame.finish();
