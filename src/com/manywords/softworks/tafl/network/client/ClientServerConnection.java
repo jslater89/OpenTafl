@@ -306,6 +306,7 @@ public class ClientServerConnection {
                     else if(message.equals(SuccessPacket.JOINED_SPECTATOR)) {
                         mGameRole = GameRole.KIBBITZER;
                     }
+                    System.out.println("Joined game as " + mGameRole);
                     setState(State.IN_PREGAME);
                     break;
             }
@@ -315,6 +316,18 @@ public class ClientServerConnection {
         public void onErrorReceived(String message) {
             if(message.equals(ErrorPacket.LEAVE_GAME)) {
                 requestGameUpdate();
+            }
+
+            if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
+                mExternalCallback.onErrorReceived(message);
+                try {
+                    mServer.close();
+                } catch (IOException e) {
+                    // Best effort
+                }
+                setState(State.DISCONNECTED);
+
+                return;
             }
 
             switch(mCurrentState) {
