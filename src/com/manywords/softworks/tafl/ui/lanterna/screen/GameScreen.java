@@ -565,12 +565,22 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 }
 
                 if(mInGame) {
-                    // Leave the game thread running for history.
-                    statusText("Finished game. Enter 'quit' again to return to menu.");
-                    mCommandEngine.finishGame();
+                    // TODO: if the player is a human playing locally, alert them that they have lost
 
                     if(mServerConnection != null) {
                         mServerConnection.sendGameEndedMessage();
+
+                        if(mServerConnection.getGameRole() == GameRole.ATTACKER) {
+                            mCommandEngine.networkVictory(VictoryPacket.Victory.DEFENDER);
+                        }
+                        else if(mServerConnection.getGameRole() == GameRole.DEFENDER) {
+                            mCommandEngine.networkVictory(VictoryPacket.Victory.ATTACKER);
+                        }
+                        else {
+                            mCommandEngine.finishGame();
+                        }
+
+                        statusText("Finished game. Enter 'quit' again to return to menu.");
                     }
                 }
                 else {
@@ -824,7 +834,9 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onVictory(VictoryPacket.Victory victory) {
-            mCommandEngine.networkVictory(victory);
+            if(mCommandEngine.isInGame()) {
+                mCommandEngine.networkVictory(victory);
+            }
         }
     }
 

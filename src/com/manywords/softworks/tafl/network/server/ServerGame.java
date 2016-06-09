@@ -212,6 +212,8 @@ public class ServerGame {
                 mServer.sendPacketToClient(mDefenderClient, new GameEndedPacket(), PriorityTaskQueue.Priority.LOW);
                 mServer.sendPacketToClient(mDefenderClient, new ErrorPacket(ErrorPacket.OPPONENT_LEFT), PriorityTaskQueue.Priority.LOW);
             }
+
+            mCommandEngine.networkVictory(VictoryPacket.Victory.DEFENDER);
         }
         else if(client.equals(mDefenderClient)) {
             setDefenderClient(null);
@@ -221,6 +223,8 @@ public class ServerGame {
                 mServer.sendPacketToClient(mAttackerClient, new GameEndedPacket(), PriorityTaskQueue.Priority.LOW);
                 mServer.sendPacketToClient(mAttackerClient, new ErrorPacket(ErrorPacket.OPPONENT_LEFT), PriorityTaskQueue.Priority.LOW);
             }
+
+            mCommandEngine.networkVictory(VictoryPacket.Victory.ATTACKER);
         }
         else {
             removeSpectator(client);
