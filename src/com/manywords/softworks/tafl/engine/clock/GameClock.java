@@ -93,7 +93,10 @@ public class GameClock {
 
     public void stop() {
         mRunning = false;
-        mUpdateThread.cancel();
+
+        if(!mServerMode) {
+            mUpdateThread.cancel();
+        }
     }
 
     /**
