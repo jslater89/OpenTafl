@@ -91,5 +91,13 @@ public class NetworkPacketConsistencyTests extends TaflTest {
         //System.out.println(second);
 
         assert first.equals(second);
+
+        SpectateGamePacket specp = new SpectateGamePacket(UUID.randomUUID(), true, "hashypassword");
+        first = specp.toString();
+
+        specp = SpectateGamePacket.parse(first);
+        second = specp.toString();
+
+        assert first.equals(second);
     }
 }
