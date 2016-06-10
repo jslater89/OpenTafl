@@ -272,16 +272,22 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void onErrorReceived(String message) {
             if(message.equals(ErrorPacket.LOGIN_FAILED)) {
-                showDialogOnUiThread("Login failed", "Login/registration credentials invalid.");
+                showDialogOnUiThread("Login failed", "Login/registration credentials invalid.", true);
             }
             else if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
                 showDialogOnUiThread("Version mismatch",
                         "The server is running a different version of OpenTafl.\n" +
                                 "Please visit softworks.manywords.press/opentafl for the latest version,\n" +
-                                "or tell the server host to upgrade.");
+                                "or tell the server host to upgrade.", true);
+            }
+            else if(message.equals(ErrorPacket.ALREADY_HOSTING)) {
+                showDialogOnUiThread("Already in game", "Leave your current game before joining another.", false);
+            }
+            else if(message.equals(ErrorPacket.GAME_ENDED)) {
+                showDialogOnUiThread("Game over", "Cannot spectate ended games.", false);
             }
             else {
-                showDialogOnUiThread("Unhandled error", "Error packet message:\n" + message);
+                showDialogOnUiThread("Unhandled error", "Error packet message:\n" + message, false);
             }
         }
 
@@ -298,7 +304,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void onDisconnect(boolean planned) {
             if(!planned) {
-                showDialogOnUiThread("Server connection failed", "Server terminated the connection.");
+                showDialogOnUiThread("Server connection failed", "Server terminated the connection.", true);
             }
         }
 
@@ -334,7 +340,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         }
     }
 
-    private void showDialogOnUiThread(String title, String text) {
+    private void showDialogOnUiThread(String title, String text, boolean critical) {
         MessageDialogBuilder b = new MessageDialogBuilder();
         b.setTitle(title);
         b.setText(text);
@@ -345,7 +351,10 @@ public class ServerLobbyScreen extends LogicalScreen {
         // Ordinarily comes from a non-UI thread
         TerminalUtils.runOnUiThread(mGui, () -> {
             d.showDialog(mGui);
-            mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+            if(critical) {
+                mConnection.disconnect();
+                mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+            }
         });
     }
 }

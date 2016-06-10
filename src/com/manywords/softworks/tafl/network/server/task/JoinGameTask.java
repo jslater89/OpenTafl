@@ -70,7 +70,7 @@ public class JoinGameTask implements Runnable {
             }
         }
         else {
-            mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.LEAVE_GAME), PriorityTaskQueue.Priority.LOW);
+            mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.GAME_CANCELED), PriorityTaskQueue.Priority.LOW);
         }
     }
 }

@@ -8,7 +8,8 @@ import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 public class ErrorPacket extends NetworkPacket {
     public static final String LOGIN_FAILED = "invalid-login";
     public static final String ALREADY_HOSTING = "already-hosting";
-    public static final String LEAVE_GAME = "game-canceled";
+    public static final String GAME_CANCELED = "game-canceled";
+    public static final String GAME_ENDED = "game-ended";
     public static final String GAME_FULL = "game-full";
     public static final String INVALID_GAME_PASSWORD = "invalid-game-password";
     public static final String OPPONENT_LEFT = "opponent-left";

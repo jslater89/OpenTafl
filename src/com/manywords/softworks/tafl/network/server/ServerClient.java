@@ -73,7 +73,7 @@ public class ServerClient {
         mGameRole = role;
 
         if(mGame == null) {
-            writePacket(new ErrorPacket(ErrorPacket.LEAVE_GAME));
+            writePacket(new ErrorPacket(ErrorPacket.GAME_CANCELED));
         }
     }
 

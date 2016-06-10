@@ -3,7 +3,6 @@ package com.manywords.softworks.tafl.network.client;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
@@ -206,14 +205,17 @@ public class ClientServerConnection {
     }
 
     public void sendJoinGameMessage(GameInformation gameInfo, JoinGamePacket packet) {
-        if(mCurrentState == State.LOGGED_IN) {
+        if(mCurrentState != State.LOGGED_IN) {
+            mInternalCallback.onErrorReceived(ErrorPacket.ALREADY_HOSTING);
+        }
+        else if(gameInfo.started && gameInfo.hasFreeSide()) {
+            mInternalCallback.onErrorReceived(ErrorPacket.GAME_ENDED);
+        }
+        else {
             mLastJoinedGame = gameInfo;
             setState(State.JOINING_GAME);
             mServerGameUUID = packet.uuid;
             mServerWriter.println(packet);
-        }
-        else {
-            mInternalCallback.onErrorReceived(ErrorPacket.ALREADY_HOSTING);
         }
     }
 
@@ -314,7 +316,7 @@ public class ClientServerConnection {
 
         @Override
         public void onErrorReceived(String message) {
-            if(message.equals(ErrorPacket.LEAVE_GAME)) {
+            if(message.equals(ErrorPacket.GAME_CANCELED)) {
                 requestGameUpdate();
             }
 
@@ -327,6 +329,12 @@ public class ClientServerConnection {
                 }
                 setState(State.DISCONNECTED);
 
+                return;
+            }
+
+            // These errors don't break anything or require state changes.
+            if(message.equals(ErrorPacket.ALREADY_HOSTING) || message.equals(ErrorPacket.GAME_ENDED)) {
+                mExternalCallback.onErrorReceived(message);
                 return;
             }
 
