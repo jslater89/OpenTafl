@@ -33,7 +33,7 @@ public class ClientListPacket extends NetworkPacket {
         List<ClientInformation> clients = new ArrayList<>(serverClients.size());
 
         for(ServerClient c : serverClients) {
-            clients.add(new ClientInformation(c.getUsername()));
+            if(c.getUsername() != null) clients.add(new ClientInformation(c.getUsername()));
         }
 
         return new ClientListPacket(clients);
