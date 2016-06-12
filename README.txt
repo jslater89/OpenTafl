@@ -12,9 +12,9 @@ README
 
 1. Introduction
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
-Norse boardgame. At present, it supports local play against another human
-and an AI. Future features will include network play and support for 
-third-party AI engines, among others.
+Norse boardgame. At present, it supports local play against another human or
+the built-in AI. Other features include support for play against external AI
+engines which use the OpenTafl Engine Protocol and network play against humans.
 
 You can follow the development of OpenTafl at soapbox.manywords.press/tag/tafl.
 
@@ -142,7 +142,7 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 9. Version history
 
-v0.3.1.0b (released 06/11/16):
+v0.3.1.0b (released 06/12/16):
 - Spectator mode
 - Minor networking bugfixes
 
