@@ -121,21 +121,21 @@ public class OpenTafl {
 
         String argName = "";
         String argBody = "";
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].startsWith("--")) {
-                if(!argName.isEmpty()) {
+        for (String arg : args) {
+            if (arg.startsWith("--")) {
+                if (!argName.isEmpty()) {
                     mapArgs.put(argName, argBody);
                 }
 
-                argName = args[i];
+                argName = arg;
                 argBody = "";
             }
             else {
-                if(argBody.isEmpty()) {
-                    argBody = args[i];
+                if (argBody.isEmpty()) {
+                    argBody = arg;
                 }
                 else {
-                    argBody += " " + args[i];
+                    argBody += " " + arg;
                 }
             }
         }
@@ -148,8 +148,12 @@ public class OpenTafl {
     }
 
     private static void directoryCheck() {
-        if(!new File("saved-games").exists()) {
+        if(!new File("saved-games/replays").exists()) {
             new File("saved-games/replays").mkdirs();
+            new File("saved-games/headless-ai").mkdirs();
+        }
+
+        if(!new File("saved-games/headless-ai").exists()) {
             new File("saved-games/headless-ai").mkdirs();
         }
 

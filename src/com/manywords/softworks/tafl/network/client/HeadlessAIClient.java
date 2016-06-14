@@ -14,12 +14,15 @@ import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
+import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -161,7 +164,13 @@ public class HeadlessAIClient {
     }
 
     private void leaveGame() {
+        if(mCommandEngine == null) return;
+        
         mCommandEngine.finishGameQuietly();
+
+        String date = new SimpleDateFormat("yyyy.MM.dd.HH.mm").format(new Date());
+        File saveFile = new File("saved-games/headless-ai", "ai-game." + date + ".otg");
+        GameSerializer.writeGameToFile(mGame, saveFile, true);
 
         mGame = null;
         mCommandEngine = null;
