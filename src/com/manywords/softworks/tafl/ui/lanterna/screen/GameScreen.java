@@ -235,12 +235,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
     @Override
     public void modalStatus(String title, String text) {
-        mGui.getGUIThread().invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new ScrollingMessageDialog(title, text, MessageDialogButton.Close).showDialog(mGui);
-            }
-        });
+        mGui.getGUIThread().invokeLater(() -> new ScrollingMessageDialog(title, text, MessageDialogButton.Close).showDialog(mGui));
     }
 
     @Override
