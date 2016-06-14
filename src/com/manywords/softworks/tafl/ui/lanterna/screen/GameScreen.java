@@ -250,6 +250,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
     @Override
     public void victoryForSide(Side side) {
+        if(!mCommandEngine.isInGame()) return;
+
         mBoardWindow.rerenderBoard();
 
         // Notify the player if this is a victory on move repetition
