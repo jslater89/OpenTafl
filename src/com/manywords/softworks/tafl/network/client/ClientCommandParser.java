@@ -80,5 +80,8 @@ public class ClientCommandParser {
             VictoryPacket packet = VictoryPacket.parse(data);
             callback.onVictory(packet.victory);
         }
+        else {
+            System.out.println("Unknown packet! " + data);
+        }
     }
 }

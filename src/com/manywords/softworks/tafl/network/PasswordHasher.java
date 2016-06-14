@@ -11,6 +11,8 @@ import java.security.SecureRandom;
  * Created by jay on 5/25/16.
  */
 public class PasswordHasher {
+    public static final String NO_PASSWORD = "none";
+
     public static String generateSalt() {
         byte[] salt = new byte[8];
         new SecureRandom().nextBytes(salt);

@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.network.client.HeadlessAIClient;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Coord;
@@ -24,7 +25,8 @@ public class OpenTafl {
         TEST,
         EXTERNAL_ENGINE,
         FALLBACK,
-        SERVER
+        SERVER,
+        HEADLESS_AI
     }
 
     public static boolean DEV_MODE = false;
@@ -36,29 +38,31 @@ public class OpenTafl {
         Mode runMode = Mode.ADVANCED_TERMINAL;
 
         System.out.println(mapArgs);
-        System.out.println(Arrays.asList(args));
 
         for (String arg : args) {
-            if (arg.contains("--server")) {
+            if (arg.contains("--server") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.SERVER;
             }
-            else if (arg.contains("--engine")) {
+            else if (arg.contains("--engine") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.EXTERNAL_ENGINE;
             }
-            else if (arg.contains("--test")) {
+            else if (arg.contains("--test") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.TEST;
             }
-            else if (arg.contains("--debug")) {
-                runMode = Mode.DEBUG;
+            else if (arg.contains("--debug") && runMode == Mode.ADVANCED_TERMINAL) {
+                //runMode = Mode.DEBUG;
             }
-            else if (arg.contains("--window")) {
+            else if (arg.contains("--window") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.WINDOW;
             }
-            else if(arg.contains("--fallback")) {
+            else if(arg.contains("--fallback") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.FALLBACK;
             }
             else if(arg.contains("--dev")) {
                 DEV_MODE = true;
+            }
+            else if(arg.contains("--headless") && runMode == Mode.ADVANCED_TERMINAL) {
+                runMode = Mode.HEADLESS_AI;
             }
         }
 
@@ -75,6 +79,15 @@ public class OpenTafl {
                 }
                 NetworkServer ns = new NetworkServer(threads);
                 ns.start();
+                break;
+            case HEADLESS_AI:
+                try {
+                    HeadlessAIClient client = HeadlessAIClient.startFromArgs(mapArgs);
+                }
+                catch(Exception e) {
+                    System.out.println("Failed to start headless AI client with error: " + e);
+                    e.printStackTrace(System.out);
+                }
                 break;
             case WINDOW:
                 SwingWindow w = new SwingWindow();
@@ -107,22 +120,13 @@ public class OpenTafl {
         Map<String, String> mapArgs = new HashMap<String, String>();
 
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-v")) {
-                if (i + 1 < args.length) {
-                    mapArgs.put("-v", args[i + 1]);
-                    i++;
+            if (args[i].startsWith("--")) {
+                if(i + 1 < args.length) {
+                    mapArgs.put(args[i], args[i + 1]);
                 }
-            }
-
-            else if (args[i].equals("-d")) {
-                if (i + 1 < args.length) {
-                    mapArgs.put("-d", args[i + 1]);
-                    i++;
+                else {
+                    mapArgs.put(args[i], "");
                 }
-            }
-
-            else {
-                mapArgs.put(args[i], "");
             }
         }
 

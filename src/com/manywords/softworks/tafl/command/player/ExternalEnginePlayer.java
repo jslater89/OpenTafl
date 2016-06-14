@@ -21,13 +21,18 @@ public class ExternalEnginePlayer extends Player {
     private PlayerCallback mCallback;
     private ExternalEngineHost mHost;
     private MoveRecord mMyLastMove;
+    private EngineSpec mEngineSpec;
 
     boolean mAttackerExpired = true;
     boolean mDefenderExpired = true;
     private int mAttackerOvertimes = -1;
     private int mDefenderOvertimes = -1;
 
-    public void setupEngine(EngineSpec spec) {
+    public void setEngineSpec(EngineSpec spec) {
+        mEngineSpec = spec;
+    }
+
+    private void setupEngine(EngineSpec spec) {
         mHost = new ExternalEngineHost(this, spec);
         mMyLastMove = null;
         if(getGame() == null) throw new IllegalStateException("ExternalEnginePlayer game is null when setting up engine!");
@@ -49,7 +54,8 @@ public class ExternalEnginePlayer extends Player {
         super.setupPlayer();
         mAttackerOvertimes = -1;
         mDefenderOvertimes = -1;
-        setupEngine(this.isAttackingSide() ? TerminalSettings.attackerEngineSpec : TerminalSettings.defenderEngineSpec);
+        if(mEngineSpec == null) mEngineSpec = this.isAttackingSide() ? TerminalSettings.attackerEngineSpec : TerminalSettings.defenderEngineSpec;
+        setupEngine(mEngineSpec);
     }
 
     public ExternalEngineHost setupAnalysisEngine() {

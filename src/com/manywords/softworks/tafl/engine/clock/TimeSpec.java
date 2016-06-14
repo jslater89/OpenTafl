@@ -17,7 +17,11 @@ public class TimeSpec {
     }
 
     public static TimeSpec parseMachineReadableString(String timeSpec) {
-        String[] parts = timeSpec.split("\\|");
+        return parseMachineReadableString(timeSpec, "\\|");
+    }
+
+    public static TimeSpec parseMachineReadableString(String timeSpec, String componentSeparator) {
+        String[] parts = timeSpec.split(componentSeparator);
         long mainTime = Long.parseLong(parts[0]);
 
         String[] overtimeParts = parts[1].split("/");

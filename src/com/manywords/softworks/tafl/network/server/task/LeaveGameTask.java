@@ -23,6 +23,8 @@ public class LeaveGameTask implements Runnable {
     public void run() {
         ServerGame g = server.getGame(packet.uuid);
 
-        g.removeClient(client);
+        if(g != null) {
+            g.removeClient(client);
+        }
     }
 }

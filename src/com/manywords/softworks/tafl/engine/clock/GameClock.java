@@ -152,6 +152,7 @@ public class GameClock {
     }
 
     public void updateClocks() {
+        if(!mRunning) return;
         if(mOutOfTime) return;
 
         synchronized (mClocks) {

@@ -30,7 +30,13 @@ public class JoinGameDialog extends DialogWindow {
         p.setLayoutManager(new LinearLayout());
 
         boolean freeSideAttackers = gameInfo.freeSideAttackers();
-        final Label usernameLabel = new Label("Joining as " + (freeSideAttackers ? "attackers" : "defenders"));
+        final Label usernameLabel;
+        if(gameInfo.hasFreeSide()) {
+            usernameLabel = new Label("Joining as " + (freeSideAttackers ? "attackers" : "defenders"));
+        }
+        else {
+            usernameLabel = new Label("Joining as " + "spectator");
+        }
 
         final Label passwordLabel = new Label("Password");
         mPasswordInput = new TextBox();

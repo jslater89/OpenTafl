@@ -15,6 +15,13 @@ public interface UiCallback {
      */
 
     public void gameStarting();
+
+    /**
+     * Sent when the game mode changes between real game and replay.
+     *
+     * @param mode
+     * @param gameObject If mode is GAME, a Game object; otherwise a ReplayGame object.
+     */
     public void modeChanging(Mode mode, Object gameObject);
     public void awaitingMove(Player player, boolean isAttackingSide);
     public void timeUpdate(boolean currentSideAttackers);

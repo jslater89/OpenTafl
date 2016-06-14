@@ -120,6 +120,7 @@ public class ClientServerConnection {
             sendRegistrationMessage(username, hashedPassword);
             return true;
         } catch (IOException e) {
+            println("Failed to connect: " + e);
             return false;
         }
     }
