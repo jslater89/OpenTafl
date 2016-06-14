@@ -178,8 +178,9 @@ public class GameClockTest extends TaflTest implements UiCallback {
         }
 
         mGame.getClock().updateClocks();
+        mGame.getClock().updateClients();
 
-        System.out.println(mGame.getClock().getClockEntry(false));
+        //System.out.println(mGame.getClock().getClockEntry(false));
 
         assert mTimeExpired;
         assert !mExpiredForAttackers;
