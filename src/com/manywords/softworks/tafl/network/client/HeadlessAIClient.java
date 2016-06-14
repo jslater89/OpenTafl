@@ -14,6 +14,7 @@ import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
+import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -44,21 +45,26 @@ public class HeadlessAIClient {
 
     private boolean mAttackingSide;
 
-    // If true, create game mode:
+    // create game mode:
         // Create game mode: automatically create games, leave immediately when games end and create new game.
         // Leave server when terminated.
-    // If false, join game mode:
+    // join game mode:
         // Join a game against the named player, if that player/game combo is present on the server. If not,
         // leave server.
     private boolean mCreateGame;
+    private boolean mJoinGame;
 
     // Create game mode variables
     private Rules mRules;
     private TimeSpec mClockSetting;
     private String mGamePassword;
 
+    // Join game mode variables
+    private String mOpponentUsername;
+
     public static HeadlessAIClient startFromArgs(Map<String, String> args) {
         boolean create = false;
+        boolean join = false;
         Rules r = null;
         String server = "";
         File engineFile = null;
@@ -67,9 +73,11 @@ public class HeadlessAIClient {
         boolean attackers = false;
         TimeSpec ts = null;
         String gamePassword = "";
+        String opponentUsername = "";
 
         for(Map.Entry<String, String> entry : args.entrySet()) {
             if(entry.getKey().contains("--create")) create = true;
+            if(entry.getKey().contains("--join")) join = true;
 
             if(entry.getKey().contains("--server")) server = entry.getValue();
             if(entry.getKey().contains("--engine")) engineFile = new File(entry.getValue());
@@ -80,16 +88,32 @@ public class HeadlessAIClient {
             if(entry.getKey().contains("--rules")) r = BuiltInVariants.availableRules.get(Integer.parseInt(entry.getValue()) - 1);
             if(entry.getKey().contains("--clock")) ts = TimeSpec.parseMachineReadableString(entry.getValue(), "\\+");
             if(entry.getKey().contains("--game-password")) gamePassword = entry.getValue().trim();
+
+            if(entry.getKey().contains("--opponent")) opponentUsername = entry.getValue().trim();
         }
 
+        if((create && join) || (!create && !join)) {
+            throw new IllegalArgumentException("Use one of --join or --create in headless mode");
+        }
+
+        if(server.isEmpty()) throw new IllegalArgumentException("Missing server address");
+        if(engineFile == null || !engineFile.exists()) throw new IllegalArgumentException("Server engine file does not exist");
+        if(username.isEmpty()) throw new IllegalArgumentException("Missing username");
+        if(password.isEmpty()) throw new IllegalArgumentException("Missing password");
+        HeadlessAIClient c = new HeadlessAIClient(server, 11541, engineFile, attackers, username, password);
+
         if(create) {
-            HeadlessAIClient c = new HeadlessAIClient(server, 11541, engineFile, attackers, username, password);
+            if(r == null) throw new IllegalArgumentException("No rules given");
+            if(ts == null) throw new IllegalArgumentException("No clock specification given");
+
             c.setCreateGameMode(r, ts, gamePassword);
-            return c;
         }
         else {
-            return null;
+            if(opponentUsername == null) throw new IllegalArgumentException("No opponent username given");
+
+            c.setJoinGameMode(opponentUsername, gamePassword);
         }
+        return c;
     }
 
     public HeadlessAIClient(String serverAddress, int port, File engineSpecFile, boolean attackers, String username, String password) {
@@ -97,6 +121,7 @@ public class HeadlessAIClient {
             throw new IllegalArgumentException("Bad engine spec file!");
         }
 
+        mAttackingSide = attackers;
         mEngineConfig = new EngineSpec(engineSpecFile);
 
         mConnection = new ClientServerConnection(serverAddress, port, mServerCallback);
@@ -134,6 +159,15 @@ public class HeadlessAIClient {
         createServerGame();
     }
 
+    private void setJoinGameMode(String opponentUsername, String gamePassword) {
+        mJoinGame = true;
+
+        mOpponentUsername = opponentUsername;
+        mGamePassword = gamePassword;
+
+        mConnection.requestGameUpdate();
+    }
+
     private void createServerGame() {
         if(mConnection.getCurrentState() == ClientServerConnection.State.LOGGED_IN) {
             String password = (mGamePassword.equals(PasswordHasher.NO_PASSWORD) ? mGamePassword : PasswordHasher.hashPassword("", mGamePassword));
@@ -164,18 +198,30 @@ public class HeadlessAIClient {
     }
 
     private void leaveGame() {
-        if(mCommandEngine == null) return;
-        
-        mCommandEngine.finishGameQuietly();
+        if(mJoinGame) {
+            if(mGame != null) {
+                String date = new SimpleDateFormat("yyyy.MM.dd.HH.mm").format(new Date());
+                File saveFile = new File("saved-games/headless-ai", "ai-game." + date + ".otg");
+                GameSerializer.writeGameToFile(mGame, saveFile, true);
+            }
 
-        String date = new SimpleDateFormat("yyyy.MM.dd.HH.mm").format(new Date());
-        File saveFile = new File("saved-games/headless-ai", "ai-game." + date + ".otg");
-        GameSerializer.writeGameToFile(mGame, saveFile, true);
+            mConnection.disconnect();
+            System.exit(0);
+        }
+        else if(mCreateGame) {
+            if (mCommandEngine == null) return;
 
-        mGame = null;
-        mCommandEngine = null;
+            mCommandEngine.finishGameQuietly();
 
-        mConnection.sendLeaveGameMessage();
+            String date = new SimpleDateFormat("yyyy.MM.dd.HH.mm").format(new Date());
+            File saveFile = new File("saved-games/headless-ai", "ai-game." + date + ".otg");
+            GameSerializer.writeGameToFile(mGame, saveFile, true);
+
+            mGame = null;
+            mCommandEngine = null;
+
+            mConnection.sendLeaveGameMessage();
+        }
     }
 
     private class HeadlessServerCallback implements ClientServerConnection.ClientServerCallback {
@@ -185,9 +231,6 @@ public class HeadlessAIClient {
             if(newState == ClientServerConnection.State.LOGGED_IN) {
                 if(mCreateGame) {
                     createServerGame();
-                }
-                else {
-                    // join the game
                 }
             }
         }
@@ -206,11 +249,31 @@ public class HeadlessAIClient {
         public void onErrorReceived(String message) {
             mLastServerError = message;
             System.out.println("Received error: " + message);
+
+            if(mJoinGame && mCommandEngine == null) {
+                System.out.println("Error joining game: quitting");
+            }
         }
 
         @Override
         public void onGameListReceived(List<GameInformation> games) {
+            if(mJoinGame && mCommandEngine == null) {
+                for(GameInformation game : games) {
+                    System.out.println(mOpponentUsername + "-" + game.attackerUsername);
+                    if(mOpponentUsername.equals(game.attackerUsername) || mOpponentUsername.equals(game.defenderUsername)) {
+                        mAttackingSide = game.freeSideAttackers();
+                        mClockSetting = game.clockSetting;
 
+                        if(mClockSetting == null) {
+                            System.out.println("Headless client can only play timed games.");
+                            mConnection.disconnect();
+                            System.exit(0);
+                        }
+
+                        mConnection.sendJoinGameMessage(game, new JoinGamePacket(UUID.fromString(game.uuid), false, PasswordHasher.hashPassword("", mGamePassword)));
+                    }
+                }
+            }
         }
 
         @Override
