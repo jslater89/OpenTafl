@@ -119,15 +119,29 @@ public class OpenTafl {
     public static Map<String, String> getArgs(String[] args) {
         Map<String, String> mapArgs = new HashMap<String, String>();
 
+        String argName = "";
+        String argBody = "";
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("--")) {
-                if(i + 1 < args.length) {
-                    mapArgs.put(args[i], args[i + 1]);
+                if(!argName.isEmpty()) {
+                    mapArgs.put(argName, argBody);
+                }
+
+                argName = args[i];
+                argBody = "";
+            }
+            else {
+                if(argBody.isEmpty()) {
+                    argBody = args[i];
                 }
                 else {
-                    mapArgs.put(args[i], "");
+                    argBody += " " + args[i];
                 }
             }
+        }
+
+        if(!argName.isEmpty()) {
+            mapArgs.put(argName, argBody);
         }
 
         return mapArgs;
@@ -136,6 +150,7 @@ public class OpenTafl {
     private static void directoryCheck() {
         if(!new File("saved-games").exists()) {
             new File("saved-games/replays").mkdirs();
+            new File("saved-games/headless-ai").mkdirs();
         }
 
         if(!new File("engines").exists()) {
