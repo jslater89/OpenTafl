@@ -59,6 +59,8 @@ public class GameClock {
             mClocks[ATTACKERS].setTime(attackerClock);
             mClocks[DEFENDERS].setTime(defenderClock);
         }
+
+        updateClocks();
     }
 
     public void setCallback(GameClockCallback callback) {
@@ -178,23 +180,29 @@ public class GameClock {
             if (currentEntry.mOvertimeMillis > 0 && currentEntry.mOvertimeCount > 0) {
                 currentEntry.mOvertimeMillis -= leftover;
 
-                if(currentEntry.mOvertimeMillis < 0) {
+                while(currentEntry.mOvertimeMillis <= 0) {
                     leftover = -currentEntry.mOvertimeMillis;
-
                     currentEntry.mOvertimeCount--;
-                    if(currentEntry.mOvertimeCount > 0) {
-                        // Don't care about the case where we lose two overtimes at once,
-                        // because we check often enough that we'll never hit that.
-                        currentEntry.mOvertimeMillis = mOvertimeMillis - leftover;
-                    }
-                    else {
+                    currentEntry.mOvertimeMillis = mOvertimeMillis - leftover;
+
+                    if(currentEntry.mOvertimeCount <= 0) {
                         mOutOfTime = true;
+                        break;
                     }
                 }
             }
             else {
                 mOutOfTime = true;
             }
+
+            if(mOutOfTime) currentEntry.mOvertimeMillis = 0;
+        }
+    }
+
+    public void updateClients() {
+        mCallback.timeUpdate(mClocks[mCurrentPlayer].mAttackingSide);
+        if(mOutOfTime) {
+            mCallback.timeExpired(mClocks[mCurrentPlayer].mAttackingSide);
         }
     }
 
@@ -212,10 +220,7 @@ public class GameClock {
                 }
 
                 updateClocks();
-                mCallback.timeUpdate(mClocks[mCurrentPlayer].mAttackingSide);
-                if(mOutOfTime) {
-                    mCallback.timeExpired(mClocks[mCurrentPlayer].mAttackingSide);
-                }
+                updateClients();
             }
         }
 

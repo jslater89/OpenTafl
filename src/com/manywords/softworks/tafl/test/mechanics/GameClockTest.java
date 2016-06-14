@@ -161,6 +161,28 @@ public class GameClockTest extends TaflTest implements UiCallback {
 
         assert mTimeExpired;
         assert !mExpiredForAttackers;
+
+        // Test server-style slow ticks.
+        mExpiredForAttackers = false;
+        mTimeExpired = false;
+        mGame = new Game(rules, null, new TimeSpec(0, 500, 4, 0));
+        mGame.getClock().setCallback(mClockCallback);
+        mGame.getClock().setServerMode(true);
+
+        mGame.start();
+
+        try {
+            Thread.sleep(2750);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        mGame.getClock().updateClocks();
+
+        System.out.println(mGame.getClock().getClockEntry(false));
+
+        assert mTimeExpired;
+        assert !mExpiredForAttackers;
     }
 
     private final GameClock.GameClockCallback mClockCallback = new GameClock.GameClockCallback() {

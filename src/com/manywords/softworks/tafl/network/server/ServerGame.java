@@ -295,6 +295,7 @@ public class ServerGame {
         public void run() {
             if(mGame != null && mGame.getClock() != null) {
                 mGame.getClock().updateClocks();
+                mGame.getClock().updateClients();
 
                 TimeSpec attacker = mGame.getClock().getClockEntry(true).toTimeSpec();
                 TimeSpec defender = mGame.getClock().getClockEntry(false).toTimeSpec();
@@ -302,8 +303,10 @@ public class ServerGame {
                 ClockUpdatePacket packet = new ClockUpdatePacket(attacker, defender);
 
                 // They can be null after the end of a game.
-                if(mAttackerClient != null) mServer.sendPacketToClient(mAttackerClient, packet, PriorityTaskQueue.Priority.HIGH);
-                if(mDefenderClient != null) mServer.sendPacketToClient(mDefenderClient, packet, PriorityTaskQueue.Priority.HIGH);
+                if(mCommandEngine.isInGame()) {
+                    if (mAttackerClient != null) mServer.sendPacketToClient(mAttackerClient, packet, PriorityTaskQueue.Priority.HIGH);
+                    if (mDefenderClient != null) mServer.sendPacketToClient(mDefenderClient, packet, PriorityTaskQueue.Priority.HIGH);
+                }
 
                 mServer.sendPacketToClients(getSpectators(), packet, PriorityTaskQueue.Priority.LOW);
             }
