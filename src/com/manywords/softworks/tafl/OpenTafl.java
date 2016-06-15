@@ -25,7 +25,8 @@ public class OpenTafl {
         EXTERNAL_ENGINE,
         FALLBACK,
         SERVER,
-        HEADLESS_AI
+        HEADLESS_AI,
+        HELP
     }
 
     public static boolean silent = false;
@@ -58,6 +59,9 @@ public class OpenTafl {
             }
             else if(arg.contains("--headless") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.HEADLESS_AI;
+            }
+            else if(arg.contains("--help")) {
+                runMode = Mode.HELP;
             }
             else if(arg.contains("--dev") || arg.contains("--debug")) {
                 chatty = true;
@@ -121,6 +125,9 @@ public class OpenTafl {
                 RawTerminal display = new RawTerminal();
                 display.runUi();
                 break;
+            case HELP:
+                printHelpMessage();
+                break;
         }
     }
 
@@ -168,5 +175,34 @@ public class OpenTafl {
         if(!new File("engines").exists()) {
             new File("engines").mkdirs();
         }
+    }
+
+    private static void printHelpMessage() {
+        System.out.println("OPENTAFL COMMAND USAGE");
+        System.out.println("OpenTafl runs in several modes, each with a selection of options:");
+        System.out.println();
+        System.out.println("<no flags>: standard UI");
+        System.out.println("--server: network server mode (runs on port 11541)");
+        System.out.println("\t--threads [#]: number of worker threads to spawn");
+        System.out.println("--engine: run as external engine");
+        System.out.println("--test: run the built-in tests");
+        System.out.println("--headless: run as a headless AI client");
+        System.out.println("\t--server [address]: server address");
+        System.out.println("\t--username [name]: server login username");
+        System.out.println("\t--password [pw]: server login password");
+        System.out.println("\t--engine [path]: path to the external engine config file to use");
+        System.out.println("\t--create: run in game host mode");
+        System.out.println("\t\t--rules [#]: rules variant to host (use 1-[number-of-variants] from in-game variant selector)");
+        System.out.println("\t\t--clock [maintime-millis]+[overtime-millis]/[overtime-count]+[increment-millis]: set game clock");
+        System.out.println("\t\t--side [attackers|defenders]: set the side to play");
+        System.out.println("\t\t--game-password [pw]: password for created games");
+        System.out.println("\t--join: run in join game mode");
+        System.out.println("\t\t--opponent [username]: join game against opponent username");
+        System.out.println("\t\t--game-password [pw]: password for game to join");
+        System.out.println();
+        System.out.println("The following flags apply to all modes: ");
+        System.out.println();
+        System.out.println("--chatty: print extra debug messages");
+        System.out.println("--silent: print no messages");
     }
 }
