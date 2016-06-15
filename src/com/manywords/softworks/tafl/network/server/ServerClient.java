@@ -100,7 +100,7 @@ public class ServerClient {
 
     private class SocketListener extends Thread {
         public void run() {
-            mServer.println("Client connecting: " + mClientSocket.getInetAddress());
+            mServer.standardPrint("Client connecting: " + mClientSocket.getInetAddress());
             mServer.onConnect(ServerClient.this);
             String inputData = "";
             try (
@@ -111,10 +111,10 @@ public class ServerClient {
                 }
             }
             catch(IOException e) {
-                mServer.println("Client connection error: " + e);
+                mServer.chattyPrint("Client connection error: " + e);
             }
 
-            mServer.println("Client disconnecting: " + mClientSocket.getInetAddress());
+            mServer.standardPrint("Client disconnecting: " + mClientSocket.getInetAddress());
             try {
                 mClientSocket.close();
             } catch (IOException e) {

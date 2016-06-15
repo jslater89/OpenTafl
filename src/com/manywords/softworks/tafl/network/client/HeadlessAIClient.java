@@ -140,7 +140,7 @@ public class HeadlessAIClient {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) { }
-            mConnection.println("Connecting...");
+            mConnection.chattyPrint("Connecting...");
             retryAttempts++;
         }
 
@@ -149,7 +149,7 @@ public class HeadlessAIClient {
         }
 
         // Logged in.
-        mConnection.println("Connected.");
+        mConnection.standardPrint("Connected.");
     }
 
     public ClientServerConnection getConnection() {

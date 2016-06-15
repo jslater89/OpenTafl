@@ -93,8 +93,12 @@ public class ClientServerConnection {
         mExternalCallback = callback;
     }
 
-    void println(String message) {
+    void chattyPrint(String message) {
         if(OpenTafl.chatty) System.out.println(message);
+    }
+
+    void standardPrint(String message) {
+        if(!OpenTafl.silent) System.out.println(message);
     }
 
     /**/
@@ -117,7 +121,7 @@ public class ClientServerConnection {
             sendRegistrationMessage(username, hashedPassword);
             return true;
         } catch (IOException e) {
-            println("Failed to connect: " + e);
+            standardPrint("Failed to connect: " + e);
             return false;
         }
     }
@@ -233,33 +237,33 @@ public class ClientServerConnection {
     private class ReadThread extends Thread {
         @Override
         public void run() {
-            println("Connecting to server: " + mServer.getInetAddress());
+            standardPrint("Connecting to server: " + mServer.getInetAddress());
             String inputData = "";
             try (
                     BufferedReader in = new BufferedReader(new InputStreamReader(mServer.getInputStream()));
             ) {
                 while((inputData = in.readLine()) != null) {
                     try {
-                        println("Client received: " + inputData);
+                        chattyPrint("Client received: " + inputData);
                         ClientCommandParser.handlePacket(mInternalCallback, inputData);
                     }
                     catch(Exception e) {
-                        println("Encountered exception reading from server: ");
+                        chattyPrint("Encountered exception reading from server: ");
                         e.printStackTrace(System.out);
                     }
                 }
             }
             catch(IOException e) {
-                println("Server connection error: " + e);
+                chattyPrint("Server connection error: " + e);
             }
 
-            println("Disconnected from server");
+            standardPrint("Disconnected from server");
             mInternalCallback.onDisconnect(mPlannedDisconnect);
         }
     }
 
     void setState(State newState) {
-        println("State change: " + mCurrentState + " to " + newState);
+        chattyPrint("State change: " + mCurrentState + " to " + newState);
         mCurrentState = newState;
         mInternalCallback.onStateChanged(newState);
     }
@@ -306,7 +310,7 @@ public class ClientServerConnection {
                     else if(message.equals(SuccessPacket.JOINED_SPECTATOR)) {
                         mGameRole = GameRole.KIBBITZER;
                     }
-                    println("Joined game as " + mGameRole);
+                    chattyPrint("Joined game as " + mGameRole);
                     setState(State.IN_PREGAME);
                     break;
             }

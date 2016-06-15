@@ -77,7 +77,9 @@ public class NetworkServer {
         mPlayerDatabase.addUpdateTasks(mTickThread, mTaskQueue);
     }
 
-    public void println(String message) { if(OpenTafl.chatty) System.out.println(message); }
+    public void chattyPrint(String message) { if(OpenTafl.chatty) System.out.println(message); }
+
+    public void standardPrint(String message) { if(!OpenTafl.silent) System.out.println(message); }
 
     public void start() {
         startServer();
@@ -127,7 +129,7 @@ public class NetworkServer {
     }
 
     private void startServer() {
-        println("Starting server with network protocol version " + OpenTafl.NETWORK_PROTOCOL_VERSION);
+        standardPrint("Starting server with network protocol version " + OpenTafl.NETWORK_PROTOCOL_VERSION);
         mTaskQueue.start();
         mTickThread.start();
 
@@ -139,7 +141,7 @@ public class NetworkServer {
                 new ServerClient(this, clientSocket);
             }
         } catch (IOException e) {
-            println("Server socket exception");
+            chattyPrint("Server socket exception");
             //System.exit(-1);
         } finally {
             try {
@@ -149,7 +151,7 @@ public class NetworkServer {
             }
         }
 
-        println("Server stopping.");
+        standardPrint("Server stopping.");
     }
 
     public List<ServerClient> getClients() {
