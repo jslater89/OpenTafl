@@ -334,8 +334,12 @@ public class ClientServerConnection {
                 return;
             }
 
-            // These errors don't break anything or require state changes.
+            // These errors don't break anything, they just mean we can't do stuff.
             if(message.equals(ErrorPacket.ALREADY_HOSTING) || message.equals(ErrorPacket.GAME_ENDED)) {
+                // A joining player goes back to loggged in, a hosting player stays as host
+                if(mCurrentState == State.JOINING_GAME) {
+                    setState(State.LOGGED_IN);
+                }
                 mExternalCallback.onErrorReceived(message);
                 return;
             }
