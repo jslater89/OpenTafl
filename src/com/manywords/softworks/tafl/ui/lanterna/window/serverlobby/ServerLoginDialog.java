@@ -25,6 +25,8 @@ public class ServerLoginDialog extends DialogWindow {
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
 
+        Label serverLabel = new Label(TerminalSettings.onlineServerHost + ":" + TerminalSettings.onlineServerPort);
+
         final Label usernameLabel = new Label("Username");
         mUsernameInput = new TextBox();
         mUsernameInput.setValidationPattern(Pattern.compile("([[a-z][A-Z][0-9]\\-_\\.\\*])+"));
@@ -47,6 +49,8 @@ public class ServerLoginDialog extends DialogWindow {
             canceled = true;
             ServerLoginDialog.this.close();
         });
+
+        p.addComponent(serverLabel);
 
         p.addComponent(usernameLabel);
         p.addComponent(mUsernameInput);

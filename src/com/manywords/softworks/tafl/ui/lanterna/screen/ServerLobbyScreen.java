@@ -71,7 +71,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
 
         if(mConnection.getCurrentState() == ClientServerConnection.State.DISCONNECTED) {
-            ServerLoginDialog dialog = new ServerLoginDialog("Login to server " + TerminalSettings.onlineServerHost + ":" + TerminalSettings.onlineServerPort);
+            ServerLoginDialog dialog = new ServerLoginDialog("Login to server");
             dialog.setHints(TerminalThemeConstants.CENTERED_MODAL);
             dialog.showDialog(mGui);
 
