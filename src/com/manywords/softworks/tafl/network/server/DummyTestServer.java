@@ -97,6 +97,9 @@ public class DummyTestServer {
                     else if(inputData.startsWith("leave-game")) {
 
                     }
+                    else if(inputData.startsWith("game-list")) {
+                        prodClient("game-list");
+                    }
                 }
             }
             catch(IOException e) {

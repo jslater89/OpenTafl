@@ -270,20 +270,26 @@ public class HeadlessAIClient {
         @Override
         public void onGameListReceived(List<GameInformation> games) {
             if(mJoinGame && mCommandEngine == null) {
+                boolean foundOpponent = false;
                 for(GameInformation game : games) {
                     System.out.println(mOpponentUsername + "-" + game.attackerUsername);
                     if(mOpponentUsername.equals(game.attackerUsername) || mOpponentUsername.equals(game.defenderUsername)) {
+                        foundOpponent = true;
                         mAttackingSide = game.freeSideAttackers();
                         mClockSetting = game.clockSetting;
 
                         if(mClockSetting == null) {
-                            System.out.println("Headless client can only play timed games.");
+                            mConnection.standardPrint("Headless client can only play timed games.");
                             mConnection.disconnect();
-                            System.exit(0);
                         }
 
                         mConnection.sendJoinGameMessage(game, new JoinGamePacket(UUID.fromString(game.uuid), false, PasswordHasher.hashPassword("", mGamePassword)));
                     }
+                }
+
+                if(!foundOpponent) {
+                    mConnection.standardPrint("Opponent " + mOpponentUsername + " not found.");
+                    mConnection.disconnect();
                 }
             }
         }

@@ -62,8 +62,23 @@ public class HeadlessAITest extends TaflTest {
         sleep(250);
 
         assert mClient.getConnection().getCurrentState() == ClientServerConnection.State.IN_PREGAME;
+        mClient.getConnection().disconnect();
+
+        args.clear();
+        args.put("--headless", "");
+        args.put("--join", "");
+        args.put("--server", "localhost");
+        args.put("--username", "OpenTafl AI");
+        args.put("--password", "aipw");
+        args.put("--opponent", "whoever");
+        args.put("--engine", "engines/opentafl-debug.ini");
+        mClient = HeadlessAIClient.startFromArgs(args, false);
+
+        sleep(250);
+
+        // Opponent isn't present on the server
+        assert mClient.getConnection().getCurrentState() == ClientServerConnection.State.DISCONNECTED;
 
         mServer.stop();
-        mClient.getConnection().disconnect();
     }
 }
