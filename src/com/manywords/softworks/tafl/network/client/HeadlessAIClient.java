@@ -44,6 +44,7 @@ public class HeadlessAIClient {
     private ClientServerConnection.ClientServerCallback mServerCallback = new HeadlessServerCallback();
 
     private boolean mAttackingSide;
+    private boolean mCreatingGame;
 
     // create game mode:
         // Create game mode: automatically create games, leave immediately when games end and create new game.
@@ -182,6 +183,7 @@ public class HeadlessAIClient {
 
     private void createServerGame() {
         if(mConnection.getCurrentState() == ClientServerConnection.State.LOGGED_IN) {
+            mCreatingGame = true;
             String password = (mGamePassword.equals(PasswordHasher.NO_PASSWORD) ? mGamePassword : PasswordHasher.hashPassword("", mGamePassword));
             CreateGamePacket packet = new CreateGamePacket(UUID.randomUUID(), mAttackingSide, password, mRules.getOTRString(), mClockSetting);
             mConnection.sendCreateGameMessage(packet);
@@ -242,9 +244,12 @@ public class HeadlessAIClient {
         @Override
         public void onStateChanged(ClientServerConnection.State newState) {
             if(newState == ClientServerConnection.State.LOGGED_IN) {
-                if(mCreateGame) {
+                if(mCreateGame && !mCreatingGame) {
                     createServerGame();
                 }
+            }
+            else if(newState == ClientServerConnection.State.IN_PREGAME) {
+                mCreatingGame = false;
             }
         }
 

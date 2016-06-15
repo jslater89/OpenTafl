@@ -263,9 +263,11 @@ public class ClientServerConnection {
     }
 
     void setState(State newState) {
-        chattyPrint("State change: " + mCurrentState + " to " + newState);
-        mCurrentState = newState;
-        mInternalCallback.onStateChanged(newState);
+        if(mCurrentState != newState) {
+            chattyPrint("State change: " + mCurrentState + " to " + newState);
+            mCurrentState = newState;
+            mInternalCallback.onStateChanged(newState);
+        }
     }
 
     private class InternalCallback implements ClientServerCallback {
@@ -312,6 +314,7 @@ public class ClientServerConnection {
                     }
                     chattyPrint("Joined game as " + mGameRole);
                     setState(State.IN_PREGAME);
+                    mExternalCallback.onSuccessReceived(message);
                     break;
             }
         }
@@ -321,8 +324,7 @@ public class ClientServerConnection {
             if(message.equals(ErrorPacket.GAME_CANCELED)) {
                 requestGameUpdate();
             }
-
-            if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
+            else if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
                 mExternalCallback.onErrorReceived(message);
                 try {
                     mServer.close();
@@ -333,9 +335,8 @@ public class ClientServerConnection {
 
                 return;
             }
-
             // These errors don't break anything, they just mean we can't do stuff.
-            if(message.equals(ErrorPacket.ALREADY_HOSTING) || message.equals(ErrorPacket.GAME_ENDED)) {
+            else if(message.equals(ErrorPacket.ALREADY_HOSTING) || message.equals(ErrorPacket.GAME_ENDED) || message.equals(ErrorPacket.OPPONENT_LEFT)) {
                 // A joining player goes back to loggged in, a hosting player stays as host
                 if(mCurrentState == State.JOINING_GAME) {
                     setState(State.LOGGED_IN);
