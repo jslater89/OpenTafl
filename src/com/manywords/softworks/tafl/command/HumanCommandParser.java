@@ -87,6 +87,7 @@ public class HumanCommandParser {
         public final Coord from;
         public final Coord to;
         public Move(CommandEngine engine, String command) {
+            super(Type.MOVE);
             if(engine.getMode() != UiCallback.Mode.GAME) {
                 mError = "Not in game mode.";
             }
@@ -123,6 +124,7 @@ public class HumanCommandParser {
         public final List<Coord> captures;
 
         public Info(CommandEngine engine, String command) {
+            super(Type.INFO);
             String[] commandParts = command.split(" ");
             if (commandParts.length != 2) {
                 mError = "Wrong command format, try info [file+rank] [file+rank] (e.g. info a4)";
@@ -165,31 +167,37 @@ public class HumanCommandParser {
     }
     public static class Show extends Command {
         public Show(CommandEngine engine, String command) {
+            super(Type.SHOW);
             // Always succeeds
         }
     }
     public static class History extends Command {
         public History(CommandEngine engine, String command) {
+            super(Type.HISTORY);
             // Always succeeds
         }
     }
     public static class Help extends Command {
         public Help(CommandEngine engine, String command) {
+            super(Type.HELP);
             // Always succeeds
         }
     }
     public static class Rules extends Command {
         public Rules(CommandEngine engine, String command) {
+            super(Type.RULES);
             // Always succeeds
         }
     }
     public static class Save extends Command {
         public Save(CommandEngine engine, String command) {
+            super(Type.SAVE);
             // Always succeeds
         }
     }
     public static class Quit extends Command {
         public Quit(CommandEngine engine, String command) {
+            super(Type.QUIT);
             // Always succeeds
         }
     }
@@ -198,6 +206,7 @@ public class HumanCommandParser {
         public final int seconds;
 
         public Analyze(CommandEngine engine, String command) {
+            super(Type.ANALYZE);
             String[] commandParts = command.split(" ");
             if(commandParts.length == 3) {
                 int tempMoves, tempSecs;
@@ -234,6 +243,7 @@ public class HumanCommandParser {
     }
     public static class ReplayEnter extends Command {
         public ReplayEnter(CommandEngine engine, String command) {
+            super(Type.REPLAY_ENTER);
             if(engine.getMode() == UiCallback.Mode.REPLAY) {
                 mError = "Already in replay mode.";
             }
@@ -241,6 +251,7 @@ public class HumanCommandParser {
     }
     public static class ReplayPlayHere extends Command {
         public ReplayPlayHere(CommandEngine engine, String command) {
+            super(Type.REPLAY_PLAY_HERE);
             if(engine.getMode() != UiCallback.Mode.REPLAY) {
                 mError = "Not in replay mode.";
             }
@@ -248,6 +259,7 @@ public class HumanCommandParser {
     }
     public static class ReplayReturn extends Command {
         public ReplayReturn(CommandEngine engine, String command) {
+            super(Type.REPLAY_RETURN);
             if(engine.getMode() != UiCallback.Mode.REPLAY) {
                 mError = "Not in replay mode.";
             }
@@ -255,6 +267,7 @@ public class HumanCommandParser {
     }
     public static class ReplayNext extends Command {
         public ReplayNext(CommandEngine engine, String command) {
+            super(Type.REPLAY_NEXT);
             if(engine.getMode() != UiCallback.Mode.REPLAY) {
                 mError = "Not in replay mode.";
             }
@@ -262,6 +275,7 @@ public class HumanCommandParser {
     }
     public static class ReplayPrevious extends Command {
         public ReplayPrevious(CommandEngine engine, String command) {
+            super(Type.REPLAY_PREVIOUS);
             if(engine.getMode() != UiCallback.Mode.REPLAY) {
                 mError = "Not in replay mode.";
             }
@@ -271,6 +285,7 @@ public class HumanCommandParser {
         public final int turnIndex;
 
         public ReplayJump(CommandEngine engine, String command) {
+            super(Type.REPLAY_JUMP);
             if(engine.getMode() != UiCallback.Mode.REPLAY) {
                 mError = "Not in replay mode.";
             }
@@ -295,21 +310,22 @@ public class HumanCommandParser {
     public static class Chat extends Command {
         public final String message;
         public Chat(CommandEngine engine, String command) {
+            super(Type.CHAT);
             message = command.replaceFirst("chat", "").trim();
         }
     }
 
-    public static String getHelpString(List<CommandResult.Type> types) {
+    public static String getHelpString(List<Command.Type> types) {
         StringBuilder help = new StringBuilder();
 
-        for(CommandResult.Type t : types) {
+        for(Command.Type t : types) {
             help.append(getHelpString(t));
         }
 
         return help.toString();
     }
 
-    public static String getHelpString(CommandResult.Type type) {
+    public static String getHelpString(Command.Type type) {
         switch (type) {
             case NONE:
                 return "";

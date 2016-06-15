@@ -7,33 +7,12 @@ public class CommandResult {
     public static final int SUCCESS = 1;
     public static final int FAIL = 0;
 
-    public enum Type {
-        NONE, // No or unknown command type
-        SENT, // The command just issued
-        MOVE,
-        INFO,
-        SHOW,
-        HISTORY,
-        HELP,
-        RULES,
-        SAVE,
-        QUIT,
-        ANALYZE,
-        REPLAY_ENTER,
-        REPLAY_PLAY_HERE,
-        REPLAY_RETURN,
-        REPLAY_NEXT,
-        REPLAY_PREVIOUS,
-        REPLAY_JUMP,
-        CHAT,
-    }
-
-    public final Type type;
+    public final Command.Type type;
     public final int result;
     public final String message;
     public final Object extra;
 
-    public CommandResult(Type t, int res, String mes, Object ex) {
+    public CommandResult(Command.Type t, int res, String mes, Object ex) {
         result = res;
         message = mes;
         type = t;

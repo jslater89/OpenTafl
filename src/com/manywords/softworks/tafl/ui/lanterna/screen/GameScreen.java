@@ -481,12 +481,16 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
 
             Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
+            if(c == null || !getCurrentCommands().contains(c.getType())) {
+                statusText("Command not available at this time.");
+                return;
+            }
             CommandResult r = mCommandEngine.executeCommand(c);
 
             if(r.result != CommandResult.SUCCESS) {
                 statusText(r.message);
             }
-            else if (r.type == CommandResult.Type.MOVE) {
+            else if (r.type == Command.Type.MOVE) {
                 if(r.extra != null) {
                     if(mCommandEngine.getCurrentPlayer().getType() == Player.Type.HUMAN) {
                         mCommandEngine.getCurrentPlayer().onMoveDecided((MoveRecord) r.extra);
@@ -499,25 +503,25 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     throw new IllegalStateException("Received successful move command with no move record");
                 }
             }
-            else if (r.type == CommandResult.Type.INFO) {
+            else if (r.type == Command.Type.INFO) {
                 HumanCommandParser.Info infoCommand = (HumanCommandParser.Info) c;
                 mBoardWindow.rerenderBoard(infoCommand.location, infoCommand.stops, infoCommand.moves, infoCommand.captures);
             }
-            else if (r.type == CommandResult.Type.SHOW) {
+            else if (r.type == Command.Type.SHOW) {
                 mBoardWindow.rerenderBoard();
             }
-            else if (r.type == CommandResult.Type.HISTORY) {
+            else if (r.type == Command.Type.HISTORY) {
                 String gameRecord = (String) r.extra;
                 statusText(gameRecord);
             }
-            else if (r.type == CommandResult.Type.HELP) {
+            else if (r.type == Command.Type.HELP) {
                 String helpString = HumanCommandParser.getHelpString(getCurrentCommands());
 
                 ScrollingMessageDialog dialog = new ScrollingMessageDialog("OpenTafl " + OpenTafl.CURRENT_VERSION + " Help", helpString, MessageDialogButton.Close);
                 dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
                 dialog.showDialog(mGui);
             }
-            else if (r.type == CommandResult.Type.SAVE) {
+            else if (r.type == Command.Type.SAVE) {
                 String title;
                 Game game;
                 if(mInGame || mPostGame) {
@@ -544,14 +548,14 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     MessageDialog.showMessageDialog(mGui, "Unable to save", "Unable to write savegame file.");
                 }
             }
-            else if (r.type == CommandResult.Type.RULES) {
+            else if (r.type == Command.Type.RULES) {
                 String rulesString = (String) r.extra;
 
                 ScrollingMessageDialog dialog = new ScrollingMessageDialog("Rules", rulesString, MessageDialogButton.Close);
                 dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
                 dialog.showDialog(mGui);
             }
-            else if (r.type == CommandResult.Type.QUIT) {
+            else if (r.type == Command.Type.QUIT) {
                 if(mSelfplayWindow != null) {
                     SelfplayWindow w = mSelfplayWindow;
                     mSelfplayWindow = null;
@@ -589,37 +593,37 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     leaveGameUi();
                 }
             }
-            else if(r.type == CommandResult.Type.ANALYZE) {
+            else if(r.type == Command.Type.ANALYZE) {
                 statusText("AI analysis beginning.");
             }
-            else if(r.type == CommandResult.Type.REPLAY_ENTER) {
+            else if(r.type == Command.Type.REPLAY_ENTER) {
                 statusText("Entered replay mode.");
                 mBoardWindow.rerenderBoard();
             }
-            else if(r.type == CommandResult.Type.REPLAY_PLAY_HERE) {
+            else if(r.type == Command.Type.REPLAY_PLAY_HERE) {
                 statusText("Starting new game from this position...");
                 mBoardWindow.rerenderBoard();
             }
-            else if(r.type == CommandResult.Type.REPLAY_RETURN) {
+            else if(r.type == Command.Type.REPLAY_RETURN) {
                 statusText("Returning to game.");
                 mBoardWindow.rerenderBoard();
             }
-            else if(r.type == CommandResult.Type.REPLAY_NEXT) {
+            else if(r.type == Command.Type.REPLAY_NEXT) {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
                 updateComments();
             }
-            else if(r.type == CommandResult.Type.REPLAY_PREVIOUS) {
+            else if(r.type == Command.Type.REPLAY_PREVIOUS) {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
                 updateComments();
             }
-            else if(r.type == CommandResult.Type.REPLAY_JUMP) {
+            else if(r.type == Command.Type.REPLAY_JUMP) {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
                 updateComments();
             }
-            else if(r.type == CommandResult.Type.CHAT) {
+            else if(r.type == Command.Type.CHAT) {
                 if(mServerConnection != null) {
                     ClientServerConnection.ChatType type =
                             (mServerConnection.getGameRole() == GameRole.KIBBITZER) ?
@@ -691,43 +695,43 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
         }
 
-        private List<CommandResult.Type> getCurrentCommands() {
-            List<CommandResult.Type> types = new ArrayList<>();
+        private List<Command.Type> getCurrentCommands() {
+            List<Command.Type> types = new ArrayList<>();
 
             if(mInGame) {
-                types.add(CommandResult.Type.MOVE);
+                types.add(Command.Type.MOVE);
             }
 
             if(mInReplay) {
-                types.add(CommandResult.Type.REPLAY_NEXT);
-                types.add(CommandResult.Type.REPLAY_PREVIOUS);
-                types.add(CommandResult.Type.REPLAY_JUMP);
-                types.add(CommandResult.Type.REPLAY_RETURN);
+                types.add(Command.Type.REPLAY_NEXT);
+                types.add(Command.Type.REPLAY_PREVIOUS);
+                types.add(Command.Type.REPLAY_JUMP);
+                types.add(Command.Type.REPLAY_RETURN);
             }
 
             if(mInReplay && mServerConnection == null) {
-                types.add(CommandResult.Type.REPLAY_PLAY_HERE);
+                types.add(Command.Type.REPLAY_PLAY_HERE);
             }
 
             if(mServerConnection != null) {
-                types.add(CommandResult.Type.SAVE);
+                types.add(Command.Type.SAVE);
             }
 
             if(mInGame || mPostGame) {
-                types.add(CommandResult.Type.REPLAY_ENTER);
+                types.add(Command.Type.REPLAY_ENTER);
             }
 
             if(mServerConnection != null) {
-                types.add(CommandResult.Type.CHAT);
+                types.add(Command.Type.CHAT);
             }
 
             if(mInGame || mPostGame || mInReplay) {
-                types.add(CommandResult.Type.INFO);
-                types.add(CommandResult.Type.SHOW);
-                types.add(CommandResult.Type.ANALYZE);
-                types.add(CommandResult.Type.HISTORY);
-                types.add(CommandResult.Type.HELP);
-                types.add(CommandResult.Type.QUIT);
+                types.add(Command.Type.INFO);
+                types.add(Command.Type.SHOW);
+                types.add(Command.Type.ANALYZE);
+                types.add(Command.Type.HISTORY);
+                types.add(Command.Type.HELP);
+                types.add(Command.Type.QUIT);
             }
 
             return types;
