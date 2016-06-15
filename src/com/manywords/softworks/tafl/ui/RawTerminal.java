@@ -474,7 +474,7 @@ public class RawTerminal implements UiCallback {
             printStatus();
             statusText(r.message);
         }
-        else if (r.type == CommandResult.Type.MOVE) {
+        else if (r.type == Command.Type.MOVE) {
             if(r.extra != null) {
                 mPlayers[mCurrentPlayer].onMoveDecided((MoveRecord) r.extra);
             }
@@ -482,7 +482,7 @@ public class RawTerminal implements UiCallback {
                 throw new IllegalStateException("Received successful move command with no move record");
             }
         }
-        else if (r.type == CommandResult.Type.INFO) {
+        else if (r.type == Command.Type.INFO) {
             HumanCommandParser.Info infoCommand = (HumanCommandParser.Info) c;
             renderGameStateWithAllowableMoves(mGame.getCurrentState(),
                     infoCommand.location,
@@ -490,15 +490,15 @@ public class RawTerminal implements UiCallback {
                     infoCommand.moves,
                     infoCommand.captures);
         }
-        else if (r.type == CommandResult.Type.SHOW) {
+        else if (r.type == Command.Type.SHOW) {
             renderGameState(mGame.getCurrentState());
             printStatus();
         }
-        else if (r.type == CommandResult.Type.HISTORY) {
+        else if (r.type == Command.Type.HISTORY) {
             String gameRecord = (String) r.extra;
             statusText(gameRecord);
         }
-        else if (r.type == CommandResult.Type.QUIT) {
+        else if (r.type == Command.Type.QUIT) {
             mCommandEngine.finishGame();
             mInGame = false;
             mInMenu = true;

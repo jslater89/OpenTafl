@@ -14,6 +14,7 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.*;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
@@ -426,6 +427,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             }
 
                             if(mPregameHistory != null) {
+                                System.out.println("Game screen consuming history");
                                 for(MoveRecord m : mPregameHistory) {
                                     g.getCurrentState().makeMove(m);
                                 }
@@ -818,8 +820,16 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onHistoryReceived(List<MoveRecord> moves) {
+            System.out.println("Game screen received history");
             Rules r = mGame.getRules();
             Game g = new Game(r, GameScreen.this);
+
+            for(MoveRecord move : moves) {
+                int moveResult = g.getCurrentState().makeMove(move);
+                if(moveResult != GameState.GOOD_MOVE) {
+                    // TODO: punt back to lobby
+                }
+            }
 
             mTerminalCallback.onEnteringGameScreen(g, r.getName());
         }

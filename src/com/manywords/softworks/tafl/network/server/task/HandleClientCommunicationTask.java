@@ -56,7 +56,7 @@ public class HandleClientCommunicationTask implements Runnable {
             mServer.getTaskQueue().pushTask(new GameChatTask(mServer, mClient, GameChatPacket.parse(data)), PriorityTaskQueue.Priority.LOW);
         }
         else if(data.startsWith(HistoryPacket.PREFIX) && mClient.getGame() != null) {
-            mServer.sendPacketToClient(mClient, HistoryPacket.parseHistory(mClient.getGame().getGame().getHistory()), PriorityTaskQueue.Priority.LOW);
+            mServer.sendPacketToClient(mClient, HistoryPacket.parseHistory(mClient.getGame().getGame().getHistory(), mClient.getGame().getRules().boardSize), PriorityTaskQueue.Priority.LOW);
         }
         else if(data.startsWith(GameEndedPacket.PREFIX)) {
             // TODO: only send this if the game isn't over already

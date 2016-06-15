@@ -321,7 +321,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void onHistoryReceived(List<MoveRecord> moves) {
-
+            System.out.println("History delivered to server lobby screen");
         }
 
         @Override
