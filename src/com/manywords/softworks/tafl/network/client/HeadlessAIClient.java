@@ -224,6 +224,7 @@ public class HeadlessAIClient {
             if (mCommandEngine == null) return;
 
             mCommandEngine.finishGameQuietly();
+            mCommandEngine.shutdown();
 
             String date = new SimpleDateFormat("yyyy.MM.dd.HH.mm").format(new Date());
             File saveFile = new File("saved-games/headless-ai", "ai-game." + date + ".otg");
