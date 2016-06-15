@@ -22,9 +22,13 @@ public class HistoryPacket extends NetworkPacket {
         data = data.replaceFirst(PREFIX, "");
         String[] parts = data.trim().split(" ");
         int dimension = Integer.parseInt(parts[0]);
-        String[] records = parts[1].split("\\|\\|");
 
         List<MoveRecord> moves = new ArrayList<>();
+        if(parts.length < 2 || parts[1].trim().isEmpty()) {
+            return new HistoryPacket(moves, dimension);
+        }
+        String[] records = parts[1].split("\\|\\|");
+
 
         if(data.trim().isEmpty()) return new HistoryPacket(moves, dimension);
 
