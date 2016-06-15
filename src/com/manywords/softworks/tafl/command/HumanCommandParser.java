@@ -377,6 +377,11 @@ public class HumanCommandParser {
                 return
                         "jump [turn-number]\n" +
                                 "Jump to the beginning of the given turn in the replay.\n\n";
+
+            case CHAT:
+                return
+                        "chat [text]\n" +
+                                "Send a chat message to other players in the current game.\n\n";
         }
 
         return "";

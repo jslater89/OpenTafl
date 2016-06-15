@@ -700,8 +700,15 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(CommandResult.Type.REPLAY_NEXT);
                 types.add(CommandResult.Type.REPLAY_PREVIOUS);
                 types.add(CommandResult.Type.REPLAY_JUMP);
-                types.add(CommandResult.Type.REPLAY_PLAY_HERE);
                 types.add(CommandResult.Type.REPLAY_RETURN);
+            }
+
+            if(mInReplay && mServerConnection == null) {
+                types.add(CommandResult.Type.REPLAY_PLAY_HERE);
+            }
+
+            if(mServerConnection != null) {
+                types.add(CommandResult.Type.SAVE);
             }
 
             if(mInGame || mPostGame) {
@@ -718,7 +725,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(CommandResult.Type.ANALYZE);
                 types.add(CommandResult.Type.HISTORY);
                 types.add(CommandResult.Type.HELP);
-                types.add(CommandResult.Type.SAVE);
                 types.add(CommandResult.Type.QUIT);
             }
 
