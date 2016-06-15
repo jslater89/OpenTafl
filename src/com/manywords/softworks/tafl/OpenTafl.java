@@ -39,7 +39,7 @@ public class OpenTafl {
         Map<String, String> mapArgs = getArgs(args);
         Mode runMode = Mode.ADVANCED_TERMINAL;
 
-        System.out.println(mapArgs);
+        //System.out.println(mapArgs);
 
         for (String arg : args) {
             if (arg.contains("--server") && runMode == Mode.ADVANCED_TERMINAL) {
