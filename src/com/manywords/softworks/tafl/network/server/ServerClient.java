@@ -71,10 +71,6 @@ public class ServerClient {
     public void setGame(ServerGame game, GameRole role) {
         mGame = game;
         mGameRole = role;
-
-        if(mGame == null) {
-            writePacket(new ErrorPacket(ErrorPacket.GAME_CANCELED));
-        }
     }
 
     public GameRole getGameRole() {
