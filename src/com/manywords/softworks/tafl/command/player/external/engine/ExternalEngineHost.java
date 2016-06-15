@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.command.player.external.engine;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
@@ -59,7 +60,7 @@ public class ExternalEngineHost {
         ProcessBuilder b = new ProcessBuilder();
         b.directory(absoluteDirectory);
         b.command(commandLine);
-        System.out.println(b.command());
+        if(OpenTafl.chatty) System.out.println(b.command());
 
         try {
             mExternalEngine = b.start();
@@ -339,7 +340,7 @@ public class ExternalEngineHost {
             String[] commands = strCommand.split("\n");
 
             for(String cmd : commands) {
-                System.out.println("Host received: " + cmd);
+                if(OpenTafl.chatty) System.out.println("Host received: " + cmd);
 
                 if (cmd.startsWith("hello")) {
                     mConnected = true;

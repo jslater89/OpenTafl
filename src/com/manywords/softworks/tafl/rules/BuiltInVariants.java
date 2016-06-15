@@ -81,7 +81,7 @@ public class BuiltInVariants {
             System.out.println("Couldn't read file: read error");
         }
 
-        if(OpenTafl.DEV_MODE) {
+        if(OpenTafl.devMode) {
             dumpRules();
         }
     }

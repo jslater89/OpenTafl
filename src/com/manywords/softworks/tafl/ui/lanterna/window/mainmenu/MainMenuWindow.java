@@ -71,7 +71,7 @@ public class MainMenuWindow extends BasicWindow {
         });
         p.addComponent(viewReplayButton);
 
-        if(OpenTafl.DEV_MODE) {
+        if(OpenTafl.devMode) {
             Button tourneyButton = new Button("AI selfplay", () -> mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback)));
             p.addComponent(tourneyButton);
         }

@@ -76,8 +76,6 @@ public class ClientServerConnection {
     private ClientServerCallback mExternalCallback;
     private ClientServerCallback mInternalCallback = new InternalCallback();
 
-    boolean mChatty = true;
-
     public ClientServerConnection(String hostname, int port, ClientServerCallback callback) {
         this.hostname = hostname;
         this.port = port;
@@ -93,11 +91,10 @@ public class ClientServerConnection {
 
     void setTestCallback(TestClientServerConnection.TestClientServerCallback callback) {
         mExternalCallback = callback;
-        mChatty = false;
     }
 
     void println(String message) {
-        if(mChatty) System.out.println(message);
+        if(OpenTafl.chatty) System.out.println(message);
     }
 
     /**/

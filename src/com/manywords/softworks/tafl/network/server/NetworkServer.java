@@ -52,14 +52,12 @@ public class NetworkServer {
     private PlayerDatabase mPlayerDatabase;
 
     private boolean mRunning = true;
-    private boolean mChatty;
 
     public NetworkServer(int threadCount) {
         this(threadCount, true);
     }
 
     public NetworkServer(int threadCount, boolean chatty) {
-        mChatty = chatty;
         mTaskQueue = new PriorityTaskQueue(threadCount);
         mClients = new ArrayList<>(64);
         mLobbyClients = new ArrayList<>(64);
@@ -79,7 +77,7 @@ public class NetworkServer {
         mPlayerDatabase.addUpdateTasks(mTickThread, mTaskQueue);
     }
 
-    public void println(String message) { if(mChatty) System.out.println(message); }
+    public void println(String message) { if(OpenTafl.chatty) System.out.println(message); }
 
     public void start() {
         startServer();

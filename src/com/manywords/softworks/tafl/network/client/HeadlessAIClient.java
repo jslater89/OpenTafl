@@ -63,6 +63,10 @@ public class HeadlessAIClient {
     private String mOpponentUsername;
 
     public static HeadlessAIClient startFromArgs(Map<String, String> args) {
+        return startFromArgs(args, true);
+    }
+
+    public static HeadlessAIClient startFromArgs(Map<String, String> args, boolean chatty) {
         boolean create = false;
         boolean join = false;
         Rules r = null;
@@ -100,7 +104,7 @@ public class HeadlessAIClient {
         if(engineFile == null || !engineFile.exists()) throw new IllegalArgumentException("Server engine file does not exist");
         if(username.isEmpty()) throw new IllegalArgumentException("Missing username");
         if(password.isEmpty()) throw new IllegalArgumentException("Missing password");
-        HeadlessAIClient c = new HeadlessAIClient(server, 11541, engineFile, attackers, username, password);
+        HeadlessAIClient c = new HeadlessAIClient(server, 11541, engineFile, attackers, username, password, chatty);
 
         if(create) {
             if(r == null) throw new IllegalArgumentException("No rules given");
@@ -117,6 +121,10 @@ public class HeadlessAIClient {
     }
 
     public HeadlessAIClient(String serverAddress, int port, File engineSpecFile, boolean attackers, String username, String password) {
+        this(serverAddress, port, engineSpecFile, attackers, username, password, true);
+    }
+
+    public HeadlessAIClient(String serverAddress, int port, File engineSpecFile, boolean attackers, String username, String password, boolean chatty) {
         if(!EngineSpec.validateEngineFile(engineSpecFile)) {
             throw new IllegalArgumentException("Bad engine spec file!");
         }
@@ -132,7 +140,7 @@ public class HeadlessAIClient {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) { }
-            System.out.println("Connecting...");
+            mConnection.println("Connecting...");
             retryAttempts++;
         }
 
@@ -141,7 +149,11 @@ public class HeadlessAIClient {
         }
 
         // Logged in.
-        System.out.println("Connected.");
+        mConnection.println("Connected.");
+    }
+
+    public ClientServerConnection getConnection() {
+        return mConnection;
     }
 
     private void setCreateGameMode(Rules rules, TimeSpec ts, String gamePassword) {

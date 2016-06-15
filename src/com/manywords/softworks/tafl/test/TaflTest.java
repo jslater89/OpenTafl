@@ -5,5 +5,13 @@ public abstract class TaflTest {
         System.out.println(o);
     }
 
+    protected void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public abstract void run();
 }

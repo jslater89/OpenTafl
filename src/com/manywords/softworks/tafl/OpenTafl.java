@@ -13,7 +13,6 @@ import com.manywords.softworks.tafl.ui.SwingWindow;
 import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +28,8 @@ public class OpenTafl {
         HEADLESS_AI
     }
 
-    public static boolean DEV_MODE = false;
+    public static boolean chatty = false;
+    public static boolean devMode = false;
     public static final String CURRENT_VERSION = "v0.3.2.0b";
     public static final int NETWORK_PROTOCOL_VERSION = 4;
 
@@ -39,6 +39,7 @@ public class OpenTafl {
 
         System.out.println(mapArgs);
 
+        boolean chattyForced = false;
         for (String arg : args) {
             if (arg.contains("--server") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.SERVER;
@@ -47,9 +48,11 @@ public class OpenTafl {
                 runMode = Mode.EXTERNAL_ENGINE;
             }
             else if (arg.contains("--test") && runMode == Mode.ADVANCED_TERMINAL) {
+                if(!chattyForced) chatty = false;
                 runMode = Mode.TEST;
             }
             else if (arg.contains("--debug") && runMode == Mode.ADVANCED_TERMINAL) {
+                chatty = true;
                 //runMode = Mode.DEBUG;
             }
             else if (arg.contains("--window") && runMode == Mode.ADVANCED_TERMINAL) {
@@ -58,11 +61,17 @@ public class OpenTafl {
             else if(arg.contains("--fallback") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.FALLBACK;
             }
-            else if(arg.contains("--dev")) {
-                DEV_MODE = true;
-            }
             else if(arg.contains("--headless") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.HEADLESS_AI;
+            }
+            else if(arg.contains("--dev")) {
+                chatty = true;
+                chattyForced = true;
+                devMode = true;
+            }
+            else if (arg.contains("--chatty")) {
+                chatty = true;
+                chattyForced = true;
             }
         }
 

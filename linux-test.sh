@@ -2,4 +2,4 @@
 
 CLASSPATH=out/production/TaflEngine:lib/*
 
-java -ea -cp $CLASSPATH com/manywords/softworks/tafl/OpenTafl --test
+java -ea -cp $CLASSPATH com/manywords/softworks/tafl/OpenTafl --test $*

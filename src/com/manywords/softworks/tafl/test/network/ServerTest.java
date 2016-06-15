@@ -136,12 +136,4 @@ public class ServerTest extends TaflTest {
         assert mPlayer1.state == ClientServerConnection.State.DISCONNECTED;
         assert mPlayer2.state == ClientServerConnection.State.DISCONNECTED;
     }
-
-    private void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

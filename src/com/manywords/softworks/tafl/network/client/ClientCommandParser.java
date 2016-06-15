@@ -54,6 +54,9 @@ public class ClientCommandParser {
                 callback.onErrorReceived(ErrorPacket.DESYNC);
             }
         }
+        else if(data.startsWith(AwaitMovePacket.PREFIX)) {
+            // Do nothing
+        }
         else if(data.startsWith(MovePacket.PREFIX) && callback.getGame() != null) {
             Rules r = callback.getGame().getRules();
             MovePacket packet = MovePacket.parse(r.boardSize, data);
@@ -79,6 +82,9 @@ public class ClientCommandParser {
         else if(data.startsWith(VictoryPacket.PREFIX)) {
             VictoryPacket packet = VictoryPacket.parse(data);
             callback.onVictory(packet.victory);
+        }
+        else if(data.startsWith(GameEndedPacket.PREFIX)) {
+            // Do nothing
         }
         else {
             System.out.println("Unknown packet! " + data);
