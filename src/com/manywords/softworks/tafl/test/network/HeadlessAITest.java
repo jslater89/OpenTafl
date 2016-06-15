@@ -56,6 +56,7 @@ public class HeadlessAITest extends TaflTest {
 
         sleep(250);
 
+        // TODO: set up the dummy server to listen for/prod a few moves out of this
         assert mClient.getConnection().getCurrentState() == ClientServerConnection.State.IN_GAME;
         mServer.prodVictory();
 
