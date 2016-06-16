@@ -481,14 +481,24 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
 
             Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
-            if(c == null || !getCurrentCommands().contains(c.getType())) {
+            if(c == null){
+                // This is handled below.
+            }
+            else if(!getCurrentCommands().contains(c.getType())) {
                 statusText("Command not available at this time.");
                 return;
             }
             CommandResult r = mCommandEngine.executeCommand(c);
 
             if(r.result != CommandResult.SUCCESS) {
-                statusText(r.message);
+                if(r.type == Command.Type.NONE) {
+                    if(!command.isEmpty()) {
+                        statusText("Unrecognized command: " + command);
+                    }
+                }
+                else {
+                    statusText(r.message);
+                }
             }
             else if (r.type == Command.Type.MOVE) {
                 if(r.extra != null) {
@@ -713,10 +723,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(Command.Type.REPLAY_PLAY_HERE);
             }
 
-            if(mServerConnection != null) {
-                types.add(Command.Type.SAVE);
-            }
-
             if(mInGame || mPostGame) {
                 types.add(Command.Type.REPLAY_ENTER);
             }
@@ -731,6 +737,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(Command.Type.ANALYZE);
                 types.add(Command.Type.HISTORY);
                 types.add(Command.Type.HELP);
+                types.add(Command.Type.RULES);
+                types.add(Command.Type.SAVE);
                 types.add(Command.Type.QUIT);
             }
 
