@@ -44,7 +44,7 @@ public class HeadlessAITest extends TaflTest {
         args.put("--password", "aipw");
         args.put("--rules", "3");
         args.put("--clock", "0+10000/2+0");
-        args.put("--engine", "engines/opentafl-debug.ini");
+        args.put("--engine", "engines/opentafl.ini");
         mClient = HeadlessAIClient.startFromArgs(args, false);
 
         sleep(250);
@@ -72,7 +72,7 @@ public class HeadlessAITest extends TaflTest {
         args.put("--username", "OpenTafl AI");
         args.put("--password", "aipw");
         args.put("--opponent", "whoever");
-        args.put("--engine", "engines/opentafl-debug.ini");
+        args.put("--engine", "engines/opentafl.ini");
         mClient = HeadlessAIClient.startFromArgs(args, false);
 
         sleep(250);
