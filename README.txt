@@ -134,6 +134,11 @@ games. The 'chat' command may be used to interact with your opponent during a
 game.
 
 8. Headless AI mode
+OpenTafl can be started in headless AI mode, connecting an external engine to a
+network server. The AI can be set to join a game already present on the server,
+or to continuously host games. Whether joining games or hosting games, the AI
+must use a game clock. The AI will save records of all games it plays in the
+saved-games/headless-ai directory under the OpenTafl directory.
 
 9. Links
 http://softworks.manywords.press/opentafl (official website)
