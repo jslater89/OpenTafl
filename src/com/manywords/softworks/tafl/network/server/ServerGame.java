@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.CommandEngine;
 import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.Player;
@@ -295,6 +296,7 @@ public class ServerGame {
         public void run() {
             if(mGame != null && mGame.getClock() != null) {
                 mGame.getClock().updateClocks();
+                mGame.getClock().updateClients();
 
                 TimeSpec attacker = mGame.getClock().getClockEntry(true).toTimeSpec();
                 TimeSpec defender = mGame.getClock().getClockEntry(false).toTimeSpec();
@@ -302,8 +304,10 @@ public class ServerGame {
                 ClockUpdatePacket packet = new ClockUpdatePacket(attacker, defender);
 
                 // They can be null after the end of a game.
-                if(mAttackerClient != null) mServer.sendPacketToClient(mAttackerClient, packet, PriorityTaskQueue.Priority.HIGH);
-                if(mDefenderClient != null) mServer.sendPacketToClient(mDefenderClient, packet, PriorityTaskQueue.Priority.HIGH);
+                if(mCommandEngine.isInGame()) {
+                    if (mAttackerClient != null) mServer.sendPacketToClient(mAttackerClient, packet, PriorityTaskQueue.Priority.HIGH);
+                    if (mDefenderClient != null) mServer.sendPacketToClient(mDefenderClient, packet, PriorityTaskQueue.Priority.HIGH);
+                }
 
                 mServer.sendPacketToClients(getSpectators(), packet, PriorityTaskQueue.Priority.LOW);
             }
@@ -339,12 +343,12 @@ public class ServerGame {
 
         @Override
         public void statusText(String text) {
-            System.out.println("Command engine status: " + text);
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Command engine status: " + text);
         }
 
         @Override
         public void modalStatus(String title, String text) {
-            System.out.println("Command engine status: " + title + " - " + text);
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Command engine status: " + title + " - " + text);
         }
 
         @Override

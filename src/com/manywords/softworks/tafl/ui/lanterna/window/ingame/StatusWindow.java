@@ -5,6 +5,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingLabel;
@@ -47,7 +48,7 @@ public class StatusWindow extends BasicWindow {
     }
 
     public void addStatus(String text) {
-        System.out.println("Got status line: " + text);
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Got status line: " + text);
         mTextDisplay.addLine(text);
     }
 

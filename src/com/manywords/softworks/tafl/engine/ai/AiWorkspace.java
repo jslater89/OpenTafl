@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
@@ -51,7 +52,8 @@ public class AiWorkspace extends Game {
     private GameState mOriginalStartingState;
     private UiCallback mUiCallback;
 
-    public boolean chatty = false;
+    public boolean chatty = OpenTafl.logLevel == OpenTafl.LogLevel.CHATTY;
+    public boolean silent = OpenTafl.logLevel == OpenTafl.LogLevel.SILENT;
 
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory());

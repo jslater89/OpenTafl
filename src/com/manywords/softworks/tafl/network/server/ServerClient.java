@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.HandleClientCommunicationTask;
@@ -50,7 +51,7 @@ public class ServerClient {
         try {
             mClientWriter = new PrintWriter(new OutputStreamWriter(mClientSocket.getOutputStream()), true);
         } catch (IOException e) {
-            System.err.println("Failed to connect to client!");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Failed to connect to client!");
             mServer.onDisconnect(this);
         }
     }
@@ -71,10 +72,6 @@ public class ServerClient {
     public void setGame(ServerGame game, GameRole role) {
         mGame = game;
         mGameRole = role;
-
-        if(mGame == null) {
-            writePacket(new ErrorPacket(ErrorPacket.GAME_CANCELED));
-        }
     }
 
     public GameRole getGameRole() {
@@ -100,7 +97,7 @@ public class ServerClient {
 
     private class SocketListener extends Thread {
         public void run() {
-            mServer.println("Client connecting: " + mClientSocket.getInetAddress());
+            mServer.standardPrint("Client connecting: " + mClientSocket.getInetAddress());
             mServer.onConnect(ServerClient.this);
             String inputData = "";
             try (
@@ -111,10 +108,10 @@ public class ServerClient {
                 }
             }
             catch(IOException e) {
-                mServer.println("Client connection error: " + e);
+                mServer.chattyPrint("Client connection error: " + e);
             }
 
-            mServer.println("Client disconnecting: " + mClientSocket.getInetAddress());
+            mServer.standardPrint("Client disconnecting: " + mClientSocket.getInetAddress());
             try {
                 mClientSocket.close();
             } catch (IOException e) {

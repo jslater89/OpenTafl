@@ -153,7 +153,6 @@ public class CommandEngine {
         }
     }
 
-    // TODO: gate on in-game, and make sure the player loses when using 'quit' in-game.
     public void networkVictory(VictoryPacket.Victory victory) {
         if (victory == VictoryPacket.Victory.ATTACKER) {
             callbackVictoryForSide(mGame.getCurrentState().getAttackers());
@@ -223,7 +222,7 @@ public class CommandEngine {
             String message = "Illegal play. ";
             if(player != mCurrentPlayer) {
                 message += "Not your turn.";
-                callbackMoveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), null);
+                callbackMoveResult(new CommandResult(Command.Type.MOVE, CommandResult.FAIL, message, null), null);
                 return;
             }
             int result =
@@ -235,7 +234,7 @@ public class CommandEngine {
             if(result >= GameState.GOOD_MOVE) {
                 mLastPlayer = mCurrentPlayer;
                 mCurrentPlayer = (mGame.getCurrentSide().isAttackingSide() ? mAttacker : mDefender);
-                callbackMoveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", null), move);
+                callbackMoveResult(new CommandResult(Command.Type.MOVE, CommandResult.SUCCESS, "", null), move);
                 callbackGameStateAdvanced();
 
                 // Send a move result to the last player to move.
@@ -285,7 +284,7 @@ public class CommandEngine {
                     mDefender.moveResult(result);
                 }
 
-                callbackMoveResult(new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null), move);
+                callbackMoveResult(new CommandResult(Command.Type.MOVE, CommandResult.FAIL, message, null), move);
             }
 
             if(replayPosition != -1) {
@@ -306,21 +305,21 @@ public class CommandEngine {
     public CommandResult executeCommand(Command command) {
         // 1. NULL COMMAND: FAILURE
         if(command == null) {
-            return new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, "Command not recognized", null);
+            return new CommandResult(Command.Type.NONE, CommandResult.FAIL, "Command not recognized", null);
         }
         // 2. COMMAND WITH ERROR: FAILURE
         else if(!command.getError().equals("")) {
-            return new CommandResult(CommandResult.Type.SENT, CommandResult.FAIL, command.mError, null);
+            return new CommandResult(Command.Type.SENT, CommandResult.FAIL, command.mError, null);
         }
         // 3. MOVE COMMAND: RETURN MOVE RECORD (receiver sends to callback after verifying side &c)
         else if(command instanceof HumanCommandParser.Move) {
             if(!mInGame) {
-                return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, "Game over", null);
+                return new CommandResult(Command.Type.MOVE, CommandResult.FAIL, "Game over", null);
             }
 
             HumanCommandParser.Move m = (HumanCommandParser.Move) command;
             if(m.from == null || m.to == null) {
-                return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, "Invalid coords", null);
+                return new CommandResult(Command.Type.MOVE, CommandResult.FAIL, "Invalid coords", null);
             }
 
             String message = "";
@@ -328,21 +327,21 @@ public class CommandEngine {
             char piece = mGame.getCurrentState().getPieceAt(m.from.x, m.from.y);
             if (piece == Taflman.EMPTY) {
                 message = "No taflman at " + m.from;
-                return new CommandResult(CommandResult.Type.MOVE, CommandResult.FAIL, message, null);
+                return new CommandResult(Command.Type.MOVE, CommandResult.FAIL, message, null);
             }
 
             Coord destination = mGame.getCurrentState().getSpaceAt(m.to.x, m.to.y);
             MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mGame.getCurrentState(), piece), destination);
 
-            return new CommandResult(CommandResult.Type.MOVE, CommandResult.SUCCESS, "", record);
+            return new CommandResult(Command.Type.MOVE, CommandResult.SUCCESS, "", record);
         }
         // 4. INFO COMMAND: SUCCESS (command parser does all the required verification)
         else if(command instanceof HumanCommandParser.Info) {
-            return new CommandResult(CommandResult.Type.INFO, CommandResult.SUCCESS, "", null);
+            return new CommandResult(Command.Type.INFO, CommandResult.SUCCESS, "", null);
         }
         // 5. SHOW COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Show) {
-            return new CommandResult(CommandResult.Type.SHOW, CommandResult.SUCCESS, "", null);
+            return new CommandResult(Command.Type.SHOW, CommandResult.SUCCESS, "", null);
         }
         // 6. HISTORY COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.History) {
@@ -354,41 +353,41 @@ public class CommandEngine {
                 gameRecord = mGame.getHistoryString();
             }
 
-            return new CommandResult(CommandResult.Type.HISTORY, CommandResult.SUCCESS, "", gameRecord);
+            return new CommandResult(Command.Type.HISTORY, CommandResult.SUCCESS, "", gameRecord);
         }
         // 7. HELP COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Help) {
-            return new CommandResult(CommandResult.Type.HELP, CommandResult.SUCCESS, "", null);
+            return new CommandResult(Command.Type.HELP, CommandResult.SUCCESS, "", null);
         }
         // 8. RULES COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Rules) {
-            return new CommandResult(CommandResult.Type.RULES, CommandResult.SUCCESS, "", HumanReadableRulesPrinter.getHumanReadableRules(getGame().getRules()));
+            return new CommandResult(Command.Type.RULES, CommandResult.SUCCESS, "", HumanReadableRulesPrinter.getHumanReadableRules(getGame().getRules()));
         }
         // 9. SAVE COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Save) {
-            return new CommandResult(CommandResult.Type.SAVE, CommandResult.SUCCESS, "", null);
+            return new CommandResult(Command.Type.SAVE, CommandResult.SUCCESS, "", null);
         }
         // 10. QUIT COMMAND: SUCCESS
         else if(command instanceof HumanCommandParser.Quit) {
-            return new CommandResult(CommandResult.Type.QUIT, CommandResult.SUCCESS, "", null);
+            return new CommandResult(Command.Type.QUIT, CommandResult.SUCCESS, "", null);
         }
         // 11. ANALYZE COMMAND
         else if(command instanceof HumanCommandParser.Analyze) {
             HumanCommandParser.Analyze a = (HumanCommandParser.Analyze) command;
 
             if(mAnalysisEngine == null) {
-                return new CommandResult(CommandResult.Type.ANALYZE, CommandResult.FAIL, "No analysis engine loaded", null);
+                return new CommandResult(Command.Type.ANALYZE, CommandResult.FAIL, "No analysis engine loaded", null);
             }
             else {
                 mAnalysisEngine.analyzePosition(a.moves, a.seconds, mGame.getCurrentState());
-                return new CommandResult(CommandResult.Type.ANALYZE, CommandResult.SUCCESS, "", null);
+                return new CommandResult(Command.Type.ANALYZE, CommandResult.SUCCESS, "", null);
             }
         }
         // 12. REPLAY START COMMAND
         else if(command instanceof HumanCommandParser.ReplayEnter) {
             ReplayGame rg = new ReplayGame(mGame);
             enterReplay(rg);
-            return new CommandResult(CommandResult.Type.REPLAY_ENTER, CommandResult.SUCCESS, "", null);
+            return new CommandResult(Command.Type.REPLAY_ENTER, CommandResult.SUCCESS, "", null);
         }
         // 13. REPLAY PLAY HERE COMMAND
         else if(command instanceof HumanCommandParser.ReplayPlayHere) {
@@ -413,13 +412,13 @@ public class CommandEngine {
             }
 
             enterGame(g);
-            return new CommandResult(CommandResult.Type.REPLAY_PLAY_HERE, CommandResult.SUCCESS, "", null);
+            return new CommandResult(Command.Type.REPLAY_PLAY_HERE, CommandResult.SUCCESS, "", null);
         }
         // 14. REPLAY RETURN COMMAND
         else if(command instanceof HumanCommandParser.ReplayReturn) {
             leaveReplay();
 
-            return new CommandResult(CommandResult.Type.REPLAY_RETURN, CommandResult.SUCCESS, "", null);
+            return new CommandResult(Command.Type.REPLAY_RETURN, CommandResult.SUCCESS, "", null);
         }
         // 15. REPLAY NEXT COMMAND
         else if(command instanceof HumanCommandParser.ReplayNext) {
@@ -428,8 +427,8 @@ public class CommandEngine {
             mAttacker.positionChanged(state);
             mDefender.positionChanged(state);
 
-            if(state != null) return new CommandResult(CommandResult.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", null);
-            else return new CommandResult(CommandResult.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
+            if(state != null) return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", null);
+            else return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
         }
         // 16. REPLAY PREV COMMAND
         else if(command instanceof HumanCommandParser.ReplayPrevious) {
@@ -438,8 +437,8 @@ public class CommandEngine {
             mAttacker.positionChanged(state);
             mDefender.positionChanged(state);
 
-            if(state != null) return new CommandResult(CommandResult.Type.REPLAY_PREVIOUS, CommandResult.SUCCESS, "", null);
-            else return new CommandResult(CommandResult.Type.REPLAY_PREVIOUS, CommandResult.FAIL, "At the start of the game history.", null);
+            if(state != null) return new CommandResult(Command.Type.REPLAY_PREVIOUS, CommandResult.SUCCESS, "", null);
+            else return new CommandResult(Command.Type.REPLAY_PREVIOUS, CommandResult.FAIL, "At the start of the game history.", null);
         }
         // 17. REPLAY JUMP COMMAND
         else if(command instanceof HumanCommandParser.ReplayJump) {
@@ -449,16 +448,16 @@ public class CommandEngine {
             mAttacker.positionChanged(state);
             mDefender.positionChanged(state);
 
-            if(state != null) return new CommandResult(CommandResult.Type.REPLAY_JUMP, CommandResult.SUCCESS, "", null);
-            else return new CommandResult(CommandResult.Type.REPLAY_JUMP, CommandResult.FAIL, "Turn index " + j + " out of bounds.", null);
+            if(state != null) return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.SUCCESS, "", null);
+            else return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.FAIL, "Turn index " + j + " out of bounds.", null);
         }
         // 18. CHAT COMMAND
         else if(command instanceof HumanCommandParser.Chat) {
             HumanCommandParser.Chat c = (HumanCommandParser.Chat) command;
-            return new CommandResult(CommandResult.Type.CHAT, CommandResult.SUCCESS, c.message, null);
+            return new CommandResult(Command.Type.CHAT, CommandResult.SUCCESS, c.message, null);
         }
 
-        return new CommandResult(CommandResult.Type.NONE, CommandResult.FAIL, "Command not recognized", null);
+        return new CommandResult(Command.Type.NONE, CommandResult.FAIL, "Command not recognized", null);
     }
 
     public Game getGame() {

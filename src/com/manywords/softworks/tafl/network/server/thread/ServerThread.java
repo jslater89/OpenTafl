@@ -1,5 +1,7 @@
 package com.manywords.softworks.tafl.network.server.thread;
 
+import com.manywords.softworks.tafl.OpenTafl;
+
 /**
  * Created by jay on 5/22/16.
  */
@@ -27,8 +29,8 @@ public class ServerThread extends Thread {
                     task.run();
                 }
                 catch(Exception e) {
-                    System.out.println("Encountered exception reading from client: ");
-                    e.printStackTrace(System.out);
+                    OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Encountered exception reading from client: ");
+                    OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
                 }
             }
 

@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.client;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.network.packet.ingame.*;
 import com.manywords.softworks.tafl.network.packet.pregame.ClientListPacket;
@@ -14,7 +15,6 @@ import com.manywords.softworks.tafl.rules.Rules;
  * Created by jay on 5/23/16.
  */
 public class ClientCommandParser {
-    private static String sCachedHistory = "";
 
     public static void handlePacket(ClientServerConnection.ClientServerCallback callback, String data) {
         if(data.startsWith(LobbyChatPacket.PREFIX)) {
@@ -39,14 +39,7 @@ public class ClientCommandParser {
         }
         else if(data.startsWith(StartGamePacket.PREFIX)) {
             StartGamePacket packet = StartGamePacket.parse(data);
-
-            if(!sCachedHistory.isEmpty()) {
-                callback.onStartGame(packet.rules, HistoryPacket.parse(packet.rules.boardSize, sCachedHistory).moves);
-                sCachedHistory = "";
-            }
-            else {
-                callback.onStartGame(packet.rules, null);
-            }
+            callback.onStartGame(packet.rules, null);
         }
         else if(data.startsWith(MoveResultPacket.PREFIX)) {
             MoveResultPacket packet = MoveResultPacket.parse(data);
@@ -54,19 +47,17 @@ public class ClientCommandParser {
                 callback.onErrorReceived(ErrorPacket.DESYNC);
             }
         }
+        else if(data.startsWith(AwaitMovePacket.PREFIX)) {
+            // Do nothing
+        }
         else if(data.startsWith(MovePacket.PREFIX) && callback.getGame() != null) {
             Rules r = callback.getGame().getRules();
             MovePacket packet = MovePacket.parse(r.boardSize, data);
             callback.onServerMoveReceived(packet.move);
         }
-        else if(data.startsWith(HistoryPacket.PREFIX) && callback.getGame() != null) {
+        else if(data.startsWith(HistoryPacket.PREFIX)) {
             // History packet in game: refresh based on state.
-            Rules r = callback.getGame().getRules();
-            callback.onHistoryReceived(HistoryPacket.parse(r.boardSize, data).moves);
-        }
-        else if(data.startsWith(HistoryPacket.PREFIX) && callback.getGame() == null) {
-            // History packet pregame: hold onto it; a start-game packet is probably coming soon.
-            sCachedHistory = data;
+            callback.onHistoryReceived(HistoryPacket.parse(data).moves);
         }
         else if(data.startsWith(GameChatPacket.PREFIX)) {
             GameChatPacket packet = GameChatPacket.parse(data);
@@ -79,6 +70,12 @@ public class ClientCommandParser {
         else if(data.startsWith(VictoryPacket.PREFIX)) {
             VictoryPacket packet = VictoryPacket.parse(data);
             callback.onVictory(packet.victory);
+        }
+        else if(data.startsWith(GameEndedPacket.PREFIX)) {
+            // Do nothing
+        }
+        else {
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Unknown packet! " + data);
         }
     }
 }

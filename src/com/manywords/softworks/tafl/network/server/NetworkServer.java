@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.network.server;
 
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.LobbyChatPacket;
 import com.manywords.softworks.tafl.network.server.database.PlayerDatabase;
@@ -51,14 +52,12 @@ public class NetworkServer {
     private PlayerDatabase mPlayerDatabase;
 
     private boolean mRunning = true;
-    private boolean mChatty;
 
     public NetworkServer(int threadCount) {
         this(threadCount, true);
     }
 
     public NetworkServer(int threadCount, boolean chatty) {
-        mChatty = chatty;
         mTaskQueue = new PriorityTaskQueue(threadCount);
         mClients = new ArrayList<>(64);
         mLobbyClients = new ArrayList<>(64);
@@ -78,7 +77,9 @@ public class NetworkServer {
         mPlayerDatabase.addUpdateTasks(mTickThread, mTaskQueue);
     }
 
-    public void println(String message) { if(mChatty) System.out.println(message); }
+    public void chattyPrint(String message) { OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, message); }
+
+    public void standardPrint(String message) { OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, message); }
 
     public void start() {
         startServer();
@@ -128,7 +129,7 @@ public class NetworkServer {
     }
 
     private void startServer() {
-        println("Starting server with network protocol version " + OpenTafl.NETWORK_PROTOCOL_VERSION);
+        standardPrint("Starting server with network protocol version " + OpenTafl.NETWORK_PROTOCOL_VERSION);
         mTaskQueue.start();
         mTickThread.start();
 
@@ -140,7 +141,7 @@ public class NetworkServer {
                 new ServerClient(this, clientSocket);
             }
         } catch (IOException e) {
-            println("Server socket exception");
+            chattyPrint("Server socket exception");
             //System.exit(-1);
         } finally {
             try {
@@ -150,7 +151,7 @@ public class NetworkServer {
             }
         }
 
-        println("Server stopping.");
+        standardPrint("Server stopping.");
     }
 
     public List<ServerClient> getClients() {
@@ -201,7 +202,7 @@ public class NetworkServer {
 
         ServerGame g = new ServerGame(this, gameUUID);
         g.setRules(rules);
-        if(!password.equals("none")) {
+        if(!password.equals(PasswordHasher.NO_PASSWORD)) {
             g.setPassword(password);
         }
 

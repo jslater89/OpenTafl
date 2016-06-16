@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -71,7 +72,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
 
         if(mConnection.getCurrentState() == ClientServerConnection.State.DISCONNECTED) {
-            ServerLoginDialog dialog = new ServerLoginDialog("Login to server " + TerminalSettings.onlineServerHost + ":" + TerminalSettings.onlineServerPort);
+            ServerLoginDialog dialog = new ServerLoginDialog("Login to server");
             dialog.setHints(TerminalThemeConstants.CENTERED_MODAL);
             dialog.showDialog(mGui);
 
@@ -321,7 +322,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void onHistoryReceived(List<MoveRecord> moves) {
-
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "History delivered to server lobby screen");
         }
 
         @Override

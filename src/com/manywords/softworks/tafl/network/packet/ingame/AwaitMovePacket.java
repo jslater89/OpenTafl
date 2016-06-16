@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.network.packet.NetworkPacket;
  * Created by jay on 5/26/16.
  */
 public class AwaitMovePacket extends NetworkPacket {
+    public static final String PREFIX = "await-move";
     public final boolean attackingSide;
 
     public static AwaitMovePacket parse(String data) {
@@ -22,6 +23,6 @@ public class AwaitMovePacket extends NetworkPacket {
     }
 
     public String toString() {
-        return "await-move " + (attackingSide ? "attackers" : "defenders");
+        return PREFIX + " " + (attackingSide ? "attackers" : "defenders");
     }
 }

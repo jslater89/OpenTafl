@@ -76,12 +76,12 @@ public class BuiltInVariants {
                 rulesDescriptions.add(description);
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Couldn't read file: not found");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Couldn't read file: not found");
         } catch (IOException e) {
-            System.out.println("Couldn't read file: read error");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Couldn't read file: read error");
         }
 
-        if(OpenTafl.DEV_MODE) {
+        if(OpenTafl.devMode) {
             dumpRules();
         }
     }
@@ -98,7 +98,7 @@ public class BuiltInVariants {
             w.flush();
             w.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
         }
     }
 }

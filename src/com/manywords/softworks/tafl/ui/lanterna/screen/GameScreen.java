@@ -14,6 +14,7 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.*;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
@@ -235,12 +236,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
     @Override
     public void modalStatus(String title, String text) {
-        mGui.getGUIThread().invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new ScrollingMessageDialog(title, text, MessageDialogButton.Close).showDialog(mGui);
-            }
-        });
+        mGui.getGUIThread().invokeLater(() -> new ScrollingMessageDialog(title, text, MessageDialogButton.Close).showDialog(mGui));
     }
 
     @Override
@@ -250,6 +246,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
     @Override
     public void victoryForSide(Side side) {
+        if(!mCommandEngine.isInGame()) return;
+
         mBoardWindow.rerenderBoard();
 
         // Notify the player if this is a victory on move repetition
@@ -278,23 +276,23 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         if(mSelfplayWindow != null) {
             // Run this stuff on the UI thread.
             mGui.getGUIThread().invokeLater(() -> {
-                System.out.println("Leaving game, entering selfplay window");
+                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Leaving game, entering selfplay window");
                 mSelfplayWindow.notifyGameFinished(mGame);
 
                 // Shut down the players so they don't clutter us
                 mCommandEngine.shutdown();
 
-                System.out.println("Removing windows");
+                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removing windows");
                 mBoardWindow.close();
-                System.out.println("Removed board");
+                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removed board");
                 mStatusWindow.close();
-                System.out.println("Removed status");
+                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removed status");
                 mCommandWindow.close();
-                System.out.println("Removed command");
-                System.out.println("Removed windows");
+                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removed command");
+                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removed windows");
             });
 
-            System.out.println("Started selfplay window thread");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Started selfplay window thread");
         }
     }
 
@@ -318,7 +316,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         public void onEnteringGameScreen(Game g, String title) {
             // Set up a game thread
             blockUntilCommandEngineReady(g);
-            System.out.println("Command engine ready");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Command engine ready");
 
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
                 createWindows(g, g.getRules().getName());
@@ -367,19 +365,19 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 mCommandEngine = null;
             }
 
-            System.out.println("Starting command engine thread");
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Starting command engine thread");
             startCommandEngineThread(g);
 
             while(mCommandEngine == null) {
                 try {
-                    System.out.println("Waiting...");
+                    OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Waiting...");
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
                 }
             }
 
-            System.out.println("Command engine ready");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Command engine ready");
         }
 
         private void startCommandEngineThread(Game g) {
@@ -400,12 +398,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                         Player attacker, defender;
 
-                        System.out.println("Network player role: " + networkPlayer.getGameRole());
+                        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Network player role: " + networkPlayer.getGameRole());
 
                         // Wait for the game joining to finish.
                         while(networkPlayer.getGameRole() == GameRole.OUT_OF_GAME) {
                             try {
-                                System.out.println("Waiting for other player role");
+                                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Waiting for other player role");
                                 Thread.sleep(100);
                             } catch (InterruptedException e) {
                                 // doesn't matter
@@ -429,6 +427,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             }
 
                             if(mPregameHistory != null) {
+                                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Game screen consuming history");
                                 for(MoveRecord m : mPregameHistory) {
                                     g.getCurrentState().makeMove(m);
                                 }
@@ -482,12 +481,26 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
 
             Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
+            if(c == null){
+                // This is handled below.
+            }
+            else if(!getCurrentCommands().contains(c.getType())) {
+                statusText("Command not available at this time.");
+                return;
+            }
             CommandResult r = mCommandEngine.executeCommand(c);
 
             if(r.result != CommandResult.SUCCESS) {
-                statusText(r.message);
+                if(r.type == Command.Type.NONE) {
+                    if(!command.isEmpty()) {
+                        statusText("Unrecognized command: " + command);
+                    }
+                }
+                else {
+                    statusText(r.message);
+                }
             }
-            else if (r.type == CommandResult.Type.MOVE) {
+            else if (r.type == Command.Type.MOVE) {
                 if(r.extra != null) {
                     if(mCommandEngine.getCurrentPlayer().getType() == Player.Type.HUMAN) {
                         mCommandEngine.getCurrentPlayer().onMoveDecided((MoveRecord) r.extra);
@@ -500,25 +513,25 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     throw new IllegalStateException("Received successful move command with no move record");
                 }
             }
-            else if (r.type == CommandResult.Type.INFO) {
+            else if (r.type == Command.Type.INFO) {
                 HumanCommandParser.Info infoCommand = (HumanCommandParser.Info) c;
                 mBoardWindow.rerenderBoard(infoCommand.location, infoCommand.stops, infoCommand.moves, infoCommand.captures);
             }
-            else if (r.type == CommandResult.Type.SHOW) {
+            else if (r.type == Command.Type.SHOW) {
                 mBoardWindow.rerenderBoard();
             }
-            else if (r.type == CommandResult.Type.HISTORY) {
+            else if (r.type == Command.Type.HISTORY) {
                 String gameRecord = (String) r.extra;
                 statusText(gameRecord);
             }
-            else if (r.type == CommandResult.Type.HELP) {
+            else if (r.type == Command.Type.HELP) {
                 String helpString = HumanCommandParser.getHelpString(getCurrentCommands());
 
                 ScrollingMessageDialog dialog = new ScrollingMessageDialog("OpenTafl " + OpenTafl.CURRENT_VERSION + " Help", helpString, MessageDialogButton.Close);
                 dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
                 dialog.showDialog(mGui);
             }
-            else if (r.type == CommandResult.Type.SAVE) {
+            else if (r.type == Command.Type.SAVE) {
                 String title;
                 Game game;
                 if(mInGame || mPostGame) {
@@ -545,14 +558,14 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     MessageDialog.showMessageDialog(mGui, "Unable to save", "Unable to write savegame file.");
                 }
             }
-            else if (r.type == CommandResult.Type.RULES) {
+            else if (r.type == Command.Type.RULES) {
                 String rulesString = (String) r.extra;
 
                 ScrollingMessageDialog dialog = new ScrollingMessageDialog("Rules", rulesString, MessageDialogButton.Close);
                 dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
                 dialog.showDialog(mGui);
             }
-            else if (r.type == CommandResult.Type.QUIT) {
+            else if (r.type == Command.Type.QUIT) {
                 if(mSelfplayWindow != null) {
                     SelfplayWindow w = mSelfplayWindow;
                     mSelfplayWindow = null;
@@ -590,37 +603,37 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     leaveGameUi();
                 }
             }
-            else if(r.type == CommandResult.Type.ANALYZE) {
+            else if(r.type == Command.Type.ANALYZE) {
                 statusText("AI analysis beginning.");
             }
-            else if(r.type == CommandResult.Type.REPLAY_ENTER) {
+            else if(r.type == Command.Type.REPLAY_ENTER) {
                 statusText("Entered replay mode.");
                 mBoardWindow.rerenderBoard();
             }
-            else if(r.type == CommandResult.Type.REPLAY_PLAY_HERE) {
+            else if(r.type == Command.Type.REPLAY_PLAY_HERE) {
                 statusText("Starting new game from this position...");
                 mBoardWindow.rerenderBoard();
             }
-            else if(r.type == CommandResult.Type.REPLAY_RETURN) {
+            else if(r.type == Command.Type.REPLAY_RETURN) {
                 statusText("Returning to game.");
                 mBoardWindow.rerenderBoard();
             }
-            else if(r.type == CommandResult.Type.REPLAY_NEXT) {
+            else if(r.type == Command.Type.REPLAY_NEXT) {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
                 updateComments();
             }
-            else if(r.type == CommandResult.Type.REPLAY_PREVIOUS) {
+            else if(r.type == Command.Type.REPLAY_PREVIOUS) {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
                 updateComments();
             }
-            else if(r.type == CommandResult.Type.REPLAY_JUMP) {
+            else if(r.type == Command.Type.REPLAY_JUMP) {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
                 updateComments();
             }
-            else if(r.type == CommandResult.Type.CHAT) {
+            else if(r.type == Command.Type.CHAT) {
                 if(mServerConnection != null) {
                     ClientServerConnection.ChatType type =
                             (mServerConnection.getGameRole() == GameRole.KIBBITZER) ?
@@ -692,37 +705,41 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
         }
 
-        private List<CommandResult.Type> getCurrentCommands() {
-            List<CommandResult.Type> types = new ArrayList<>();
+        private List<Command.Type> getCurrentCommands() {
+            List<Command.Type> types = new ArrayList<>();
 
             if(mInGame) {
-                types.add(CommandResult.Type.MOVE);
+                types.add(Command.Type.MOVE);
             }
 
             if(mInReplay) {
-                types.add(CommandResult.Type.REPLAY_NEXT);
-                types.add(CommandResult.Type.REPLAY_PREVIOUS);
-                types.add(CommandResult.Type.REPLAY_JUMP);
-                types.add(CommandResult.Type.REPLAY_PLAY_HERE);
-                types.add(CommandResult.Type.REPLAY_RETURN);
+                types.add(Command.Type.REPLAY_NEXT);
+                types.add(Command.Type.REPLAY_PREVIOUS);
+                types.add(Command.Type.REPLAY_JUMP);
+                types.add(Command.Type.REPLAY_RETURN);
+            }
+
+            if(mInReplay && mServerConnection == null) {
+                types.add(Command.Type.REPLAY_PLAY_HERE);
             }
 
             if(mInGame || mPostGame) {
-                types.add(CommandResult.Type.REPLAY_ENTER);
+                types.add(Command.Type.REPLAY_ENTER);
             }
 
             if(mServerConnection != null) {
-                types.add(CommandResult.Type.CHAT);
+                types.add(Command.Type.CHAT);
             }
 
             if(mInGame || mPostGame || mInReplay) {
-                types.add(CommandResult.Type.INFO);
-                types.add(CommandResult.Type.SHOW);
-                types.add(CommandResult.Type.ANALYZE);
-                types.add(CommandResult.Type.HISTORY);
-                types.add(CommandResult.Type.HELP);
-                types.add(CommandResult.Type.SAVE);
-                types.add(CommandResult.Type.QUIT);
+                types.add(Command.Type.INFO);
+                types.add(Command.Type.SHOW);
+                types.add(Command.Type.ANALYZE);
+                types.add(Command.Type.HISTORY);
+                types.add(Command.Type.HELP);
+                types.add(Command.Type.RULES);
+                types.add(Command.Type.SAVE);
+                types.add(Command.Type.QUIT);
             }
 
             return types;
@@ -815,15 +832,23 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onHistoryReceived(List<MoveRecord> moves) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Game screen received history");
             Rules r = mGame.getRules();
             Game g = new Game(r, GameScreen.this);
+
+            for(MoveRecord move : moves) {
+                int moveResult = g.getCurrentState().makeMove(move);
+                if(moveResult != GameState.GOOD_MOVE) {
+                    // TODO: punt back to lobby
+                }
+            }
 
             mTerminalCallback.onEnteringGameScreen(g, r.getName());
         }
 
         @Override
         public void onServerMoveReceived(MoveRecord move) {
-            System.out.println("Game screen received spectator move: " + move);
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Game screen received spectator move: " + move);
             mCommandEngine.getCurrentPlayer().onMoveDecided(move);
             TerminalUtils.runOnUiThread(mGui, () -> mBoardWindow.rerenderBoard());
         }

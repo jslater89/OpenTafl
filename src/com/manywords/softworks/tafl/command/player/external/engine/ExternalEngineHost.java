@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.command.player.external.engine;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
@@ -37,8 +38,8 @@ public class ExternalEngineHost {
             mOutboundPipe = new BufferedOutputStream(new PipedOutputStream(connectToOutput));
         }
         catch(IOException e) {
-            System.out.println("Could not connect input streams");
-            e.printStackTrace(System.out);
+            OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Could not connect input streams");
+            OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
             System.exit(-1);
         }
 
@@ -59,7 +60,7 @@ public class ExternalEngineHost {
         ProcessBuilder b = new ProcessBuilder();
         b.directory(absoluteDirectory);
         b.command(commandLine);
-        System.out.println(b.command());
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, b.command());
 
         try {
             mExternalEngine = b.start();
@@ -70,8 +71,8 @@ public class ExternalEngineHost {
             mCommThread.start();
 
         } catch (IOException e) {
-            System.out.println("Failed to start: " + e);
-            e.printStackTrace(System.out);
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Failed to start: " + e);
+            OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
             System.exit(1);
         }
     }
@@ -339,7 +340,7 @@ public class ExternalEngineHost {
             String[] commands = strCommand.split("\n");
 
             for(String cmd : commands) {
-                System.out.println("Host received: " + cmd);
+                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Host received: " + cmd);
 
                 if (cmd.startsWith("hello")) {
                     mConnected = true;

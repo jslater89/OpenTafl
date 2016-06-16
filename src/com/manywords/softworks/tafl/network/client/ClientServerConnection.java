@@ -76,8 +76,6 @@ public class ClientServerConnection {
     private ClientServerCallback mExternalCallback;
     private ClientServerCallback mInternalCallback = new InternalCallback();
 
-    boolean mChatty = true;
-
     public ClientServerConnection(String hostname, int port, ClientServerCallback callback) {
         this.hostname = hostname;
         this.port = port;
@@ -93,11 +91,14 @@ public class ClientServerConnection {
 
     void setTestCallback(TestClientServerConnection.TestClientServerCallback callback) {
         mExternalCallback = callback;
-        mChatty = false;
     }
 
-    void println(String message) {
-        if(mChatty) System.out.println(message);
+    void chattyPrint(String message) {
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, message);
+    }
+
+    void standardPrint(String message) {
+        OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, message);
     }
 
     /**/
@@ -120,6 +121,7 @@ public class ClientServerConnection {
             sendRegistrationMessage(username, hashedPassword);
             return true;
         } catch (IOException e) {
+            standardPrint("Failed to connect: " + e);
             return false;
         }
     }
@@ -235,35 +237,37 @@ public class ClientServerConnection {
     private class ReadThread extends Thread {
         @Override
         public void run() {
-            println("Connecting to server: " + mServer.getInetAddress());
+            standardPrint("Connecting to server: " + mServer.getInetAddress());
             String inputData = "";
             try (
                     BufferedReader in = new BufferedReader(new InputStreamReader(mServer.getInputStream()));
             ) {
                 while((inputData = in.readLine()) != null) {
                     try {
-                        println("Client received: " + inputData);
+                        chattyPrint("Client received: " + inputData);
                         ClientCommandParser.handlePacket(mInternalCallback, inputData);
                     }
                     catch(Exception e) {
-                        println("Encountered exception reading from server: ");
-                        e.printStackTrace(System.out);
+                        chattyPrint("Encountered exception reading from server: ");
+                        OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
                     }
                 }
             }
             catch(IOException e) {
-                println("Server connection error: " + e);
+                chattyPrint("Server connection error: " + e);
             }
 
-            println("Disconnected from server");
+            standardPrint("Disconnected from server");
             mInternalCallback.onDisconnect(mPlannedDisconnect);
         }
     }
 
     void setState(State newState) {
-        println("State change: " + mCurrentState + " to " + newState);
-        mCurrentState = newState;
-        mInternalCallback.onStateChanged(newState);
+        if(mCurrentState != newState) {
+            chattyPrint("State change: " + mCurrentState + " to " + newState);
+            mCurrentState = newState;
+            mInternalCallback.onStateChanged(newState);
+        }
     }
 
     private class InternalCallback implements ClientServerCallback {
@@ -308,8 +312,9 @@ public class ClientServerConnection {
                     else if(message.equals(SuccessPacket.JOINED_SPECTATOR)) {
                         mGameRole = GameRole.KIBBITZER;
                     }
-                    println("Joined game as " + mGameRole);
+                    chattyPrint("Joined game as " + mGameRole);
                     setState(State.IN_PREGAME);
+                    mExternalCallback.onSuccessReceived(message);
                     break;
             }
         }
@@ -319,8 +324,7 @@ public class ClientServerConnection {
             if(message.equals(ErrorPacket.GAME_CANCELED)) {
                 requestGameUpdate();
             }
-
-            if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
+            else if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
                 mExternalCallback.onErrorReceived(message);
                 try {
                     mServer.close();
@@ -331,9 +335,12 @@ public class ClientServerConnection {
 
                 return;
             }
-
-            // These errors don't break anything or require state changes.
-            if(message.equals(ErrorPacket.ALREADY_HOSTING) || message.equals(ErrorPacket.GAME_ENDED)) {
+            // These errors don't break anything, they just mean we can't do stuff.
+            else if(message.equals(ErrorPacket.ALREADY_HOSTING) || message.equals(ErrorPacket.GAME_ENDED) || message.equals(ErrorPacket.OPPONENT_LEFT)) {
+                // A joining player goes back to loggged in, a hosting player stays as host
+                if(mCurrentState == State.JOINING_GAME) {
+                    setState(State.LOGGED_IN);
+                }
                 mExternalCallback.onErrorReceived(message);
                 return;
             }
