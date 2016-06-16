@@ -144,10 +144,12 @@ public class CreateGameDialog extends DialogWindow {
     public TerminalSize getPreferredSize() {
         TerminalSize preferredSize = super.getPreferredSize();
         if(!preferredSize.equals(mCachedSize)) {
+            mPasswordInput.setPreferredSize(new TerminalSize(1, 1));
+            preferredSize = super.getPreferredSize();
             mCachedSize = preferredSize;
-            mPasswordInput.setPreferredSize(new TerminalSize(preferredSize.getColumns() - 2, 1));
+            mPasswordInput.setPreferredSize(new TerminalSize(preferredSize.getColumns() - 1, 1));
         }
-        return super.getPreferredSize();
+        return preferredSize;
     }
 
     private EmptySpace newSpacer() {
