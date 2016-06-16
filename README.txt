@@ -7,8 +7,9 @@ README
 5. Replay mode
 6. AI self-play mode
 7. Network play
-8. Links
-9. Version history
+8. Headless AI mode
+9. Links
+10. Version history
 
 1. Introduction
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
@@ -132,7 +133,9 @@ Upon entering a game, the interface functions as it does during single-player
 games. The 'chat' command may be used to interact with your opponent during a
 game.
 
-8. Links
+8. Headless AI mode
+
+9. Links
 http://softworks.manywords.press/opentafl (official website)
 http://soapbox.manywords.press/tag/tafl (development blog)
 https://bitbucket.org/Fishbreath/opentafl (source code, bug reports)
@@ -140,7 +143,15 @@ http://conclave.manywords.press/forum/softworks/opentafl/ (forum)
 http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt (engine protocol specification)
 http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network protocol specification)
 
-9. Version history
+10. Version history
+
+v0.3.2.0b (released 06/17/16):
+- Headless AI mode
+- Fewer debug prints, options for chattiness
+- Many bugfixes re: networking
+    - Spectator mode should work more reliably
+    - No longer able to use replay mode to start a new game during a network
+      game
 
 v0.3.1.0b (released 06/12/16):
 - Spectator mode
