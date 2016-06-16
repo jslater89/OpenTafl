@@ -39,7 +39,7 @@ public class ExternalEngineHost {
         }
         catch(IOException e) {
             OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Could not connect input streams");
-            e.printStackTrace(System.out);
+            OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
             System.exit(-1);
         }
 
@@ -72,7 +72,7 @@ public class ExternalEngineHost {
 
         } catch (IOException e) {
             OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Failed to start: " + e);
-            e.printStackTrace(System.out);
+            OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
             System.exit(1);
         }
     }

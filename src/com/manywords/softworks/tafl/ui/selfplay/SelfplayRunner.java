@@ -170,7 +170,7 @@ public class SelfplayRunner {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
             }
         }
 
@@ -196,7 +196,7 @@ public class SelfplayRunner {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
             }
         }
 

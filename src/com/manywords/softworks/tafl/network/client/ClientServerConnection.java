@@ -249,7 +249,7 @@ public class ClientServerConnection {
                     }
                     catch(Exception e) {
                         chattyPrint("Encountered exception reading from server: ");
-                        e.printStackTrace(System.out);
+                        OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
                     }
                 }
             }

@@ -90,8 +90,8 @@ public class CommunicationThread extends Thread {
             } catch (IOException e) {
                 OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Exception reading command: " + e);
             } catch (InterruptedException e) {
-                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Interrupted while waiting for stopped process exit");
-                e.printStackTrace(System.out);
+                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Interrupted while waiting for stopped process exit");
+                OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
             }
         }
 

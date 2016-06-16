@@ -373,7 +373,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Waiting...");
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
                 }
             }
 

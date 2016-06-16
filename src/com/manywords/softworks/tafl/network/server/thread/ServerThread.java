@@ -30,7 +30,7 @@ public class ServerThread extends Thread {
                 }
                 catch(Exception e) {
                     OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Encountered exception reading from client: ");
-                    e.printStackTrace(System.out);
+                    OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
                 }
             }
 

@@ -98,7 +98,7 @@ public class BuiltInVariants {
             w.flush();
             w.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
         }
     }
 }

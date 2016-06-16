@@ -13,6 +13,8 @@ import com.manywords.softworks.tafl.ui.SwingWindow;
 import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,8 +102,8 @@ public class OpenTafl {
                     HeadlessAIClient client = HeadlessAIClient.startFromArgs(mapArgs);
                 }
                 catch(Exception e) {
-                    System.out.println("Failed to start headless AI client with error: " + e);
-                    e.printStackTrace(System.out);
+                    OpenTafl.logPrint(LogLevel.SILENT, "Failed to start headless AI client with error: " + e);
+                    OpenTafl.logStackTrace(LogLevel.SILENT, e);
                 }
                 break;
             case WINDOW:
@@ -178,6 +180,13 @@ public class OpenTafl {
             // Critical errors which should always be displayed
             System.out.println(o.toString());
         }
+    }
+
+    public static void logStackTrace(LogLevel messageLevel, Throwable e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        logPrint(messageLevel, sw.toString());
     }
 
     private static void directoryCheck() {

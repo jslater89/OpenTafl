@@ -1,5 +1,7 @@
 package com.manywords.softworks.tafl.test;
 
+import com.manywords.softworks.tafl.OpenTafl;
+
 public abstract class TaflTest {
     public void println(Object o) {
         System.out.println(o);
@@ -9,7 +11,7 @@ public abstract class TaflTest {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
         }
     }
 
