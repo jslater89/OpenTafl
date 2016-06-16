@@ -77,9 +77,9 @@ public class NetworkServer {
         mPlayerDatabase.addUpdateTasks(mTickThread, mTaskQueue);
     }
 
-    public void chattyPrint(String message) { if(OpenTafl.chatty) System.out.println(message); }
+    public void chattyPrint(String message) { OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, message); }
 
-    public void standardPrint(String message) { if(!OpenTafl.silent) System.out.println(message); }
+    public void standardPrint(String message) { OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, message); }
 
     public void start() {
         startServer();

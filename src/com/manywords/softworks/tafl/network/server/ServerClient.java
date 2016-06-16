@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.HandleClientCommunicationTask;
@@ -50,7 +51,7 @@ public class ServerClient {
         try {
             mClientWriter = new PrintWriter(new OutputStreamWriter(mClientSocket.getOutputStream()), true);
         } catch (IOException e) {
-            System.err.println("Failed to connect to client!");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Failed to connect to client!");
             mServer.onDisconnect(this);
         }
     }

@@ -29,11 +29,17 @@ public class OpenTafl {
         HELP
     }
 
-    public static boolean silent = false;
-    public static boolean chatty = false;
-    public static boolean devMode = false;
+    public static enum LogLevel {
+        CHATTY,
+        NORMAL,
+        SILENT
+    }
+
     public static final String CURRENT_VERSION = "v0.3.2.0b";
     public static final int NETWORK_PROTOCOL_VERSION = 4;
+
+    public static boolean devMode = false;
+    public static LogLevel logLevel = LogLevel.NORMAL;
 
     public static void main(String[] args) {
         Map<String, String> mapArgs = getArgs(args);
@@ -64,17 +70,14 @@ public class OpenTafl {
                 runMode = Mode.HELP;
             }
             else if(arg.contains("--dev") || arg.contains("--debug")) {
-                chatty = true;
-                silent = false;
+                logLevel = LogLevel.CHATTY;
                 devMode = true;
             }
             else if (arg.contains("--chatty")) {
-                chatty = true;
-                silent = false;
+                logLevel = LogLevel.CHATTY;
             }
             else if (arg.contains("--silent")) {
-                silent = true;
-                chatty = false;
+                logLevel = LogLevel.SILENT;
             }
         }
 
@@ -160,6 +163,21 @@ public class OpenTafl {
         }
 
         return mapArgs;
+    }
+
+    public static void logPrint(LogLevel messageLevel, Object o) {
+        if(logLevel == LogLevel.CHATTY) {
+            // Incidental messages
+            System.out.println(o.toString());
+        }
+        else if(logLevel == LogLevel.NORMAL && messageLevel != LogLevel.CHATTY) {
+            // Normal messages
+            System.out.println(o.toString());
+        }
+        else if(messageLevel == LogLevel.SILENT) {
+            // Critical errors which should always be displayed
+            System.out.println(o.toString());
+        }
     }
 
     private static void directoryCheck() {

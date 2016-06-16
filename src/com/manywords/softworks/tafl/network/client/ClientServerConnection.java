@@ -94,11 +94,11 @@ public class ClientServerConnection {
     }
 
     void chattyPrint(String message) {
-        if(OpenTafl.chatty) System.out.println(message);
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, message);
     }
 
     void standardPrint(String message) {
-        if(!OpenTafl.silent) System.out.println(message);
+        OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, message);
     }
 
     /**/

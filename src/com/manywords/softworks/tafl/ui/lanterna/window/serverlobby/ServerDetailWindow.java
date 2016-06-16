@@ -119,9 +119,6 @@ public class ServerDetailWindow extends BasicWindow {
                     mCreatePacket = new CreateGamePacket(UUID.randomUUID(), d.attackingSide, d.hashedPassword, d.rules.getOTRString(), d.timeSpec);
                     mHost.createGame(mCreatePacket);
                 }
-                else {
-                    System.out.println("Canceled");
-                }
             }
             else if(mButton.isCanceling()) {
                 mHost.leaveGame();

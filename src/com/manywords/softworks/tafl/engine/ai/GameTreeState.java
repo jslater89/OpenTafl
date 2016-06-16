@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
@@ -527,7 +528,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                         evaluation = workspace.evaluator.evaluate(GameTreeState.this);
                     }
                     setValue(evaluation);
-                    System.out.println("Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
+                    OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
                 }
                 MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
                 if (mParent != null) {

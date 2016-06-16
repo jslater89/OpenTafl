@@ -9,6 +9,7 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -60,7 +61,7 @@ public class AdvancedTerminal<T extends Terminal> {
             s.startScreen();
         }
         catch(IOException e) {
-            System.out.println("Failed to start");
+            OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Failed to start: " + e);
             System.exit(0);
         }
 
@@ -81,12 +82,9 @@ public class AdvancedTerminal<T extends Terminal> {
     }
 
     public void changeActiveScreen(LogicalScreen screen) {
-        System.out.println("Terminal screen changing");
         if(mActiveScreen != null) {
             mActiveScreen.setInactive();
         }
-        System.out.println("Deactivated old screen");
-        System.out.println("Starting new screen");
 
         mActiveScreen = screen;
 

@@ -76,9 +76,9 @@ public class BuiltInVariants {
                 rulesDescriptions.add(description);
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Couldn't read file: not found");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Couldn't read file: not found");
         } catch (IOException e) {
-            System.out.println("Couldn't read file: read error");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Couldn't read file: read error");
         }
 
         if(OpenTafl.devMode) {

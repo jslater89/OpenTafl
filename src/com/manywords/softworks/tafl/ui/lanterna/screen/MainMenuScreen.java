@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
@@ -69,7 +70,7 @@ public class MainMenuScreen extends LogicalScreen {
 
         @Override
         public void changeActiveScreen(LogicalScreen screen) {
-            System.out.println("Changing screen");
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Changing screen");
             mTerminal.changeActiveScreen(screen);
         }
     }

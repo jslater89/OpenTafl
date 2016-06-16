@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -321,7 +322,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void onHistoryReceived(List<MoveRecord> moves) {
-            System.out.println("History delivered to server lobby screen");
+            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "History delivered to server lobby screen");
         }
 
         @Override

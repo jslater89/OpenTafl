@@ -35,7 +35,7 @@ public class DummyTestServer {
                 mReadThread.start();
             }
         } catch (IOException e) {
-            if(OpenTafl.chatty) System.out.println(e);
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, e);
         } finally {
             try {
                 mServerSocket.close();

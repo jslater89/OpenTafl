@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.CommandEngine;
 import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.Player;
@@ -342,12 +343,12 @@ public class ServerGame {
 
         @Override
         public void statusText(String text) {
-            System.out.println("Command engine status: " + text);
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Command engine status: " + text);
         }
 
         @Override
         public void modalStatus(String title, String text) {
-            System.out.println("Command engine status: " + title + " - " + text);
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Command engine status: " + title + " - " + text);
         }
 
         @Override

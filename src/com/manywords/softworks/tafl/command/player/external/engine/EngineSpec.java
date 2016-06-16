@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.command.player.external.engine;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import org.ini4j.Wini;
 
 import java.io.File;
@@ -58,7 +59,7 @@ public class EngineSpec {
             String args = ini.get("engine", "arguments", String.class);
 
             if(dir == null || dir.equals("") || command == null || command.equals("") || filename == null || filename.equals("")) {
-                System.out.println("Missing elements");
+                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Missing elements");
                 return false;
             }
 
@@ -66,8 +67,8 @@ public class EngineSpec {
             File engineDir = new File(engineFileDir, dir);
             File engineFile = new File(engineDir, filename);
             if(!engineFile.exists()) {
-                System.out.println("File does not exist: " + engineFile);
-                System.out.println(engineFile.getAbsolutePath());
+                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "File does not exist: " + engineFile);
+                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, engineFile.getAbsolutePath());
                 return false;
             }
 

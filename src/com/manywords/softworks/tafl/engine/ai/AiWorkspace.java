@@ -52,8 +52,8 @@ public class AiWorkspace extends Game {
     private GameState mOriginalStartingState;
     private UiCallback mUiCallback;
 
-    public boolean chatty = OpenTafl.chatty;
-    public boolean silent = OpenTafl.silent;
+    public boolean chatty = OpenTafl.logLevel == OpenTafl.LogLevel.CHATTY;
+    public boolean silent = OpenTafl.logLevel == OpenTafl.LogLevel.SILENT;
 
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory());
