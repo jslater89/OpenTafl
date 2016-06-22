@@ -16,6 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class AiWorkspace extends Game {
+    private static String lastRulesString = "";
     public static TranspositionTable transpositionTable = null;
 
     private static final DecimalFormat doubleFormat = new DecimalFormat("#.00");
@@ -65,9 +66,12 @@ public class AiWorkspace extends Game {
         mUiCallback = ui;
         mThreadPool = new AiThreadPool(Math.min(1, Runtime.getRuntime().availableProcessors() - 1));
 
-        if (transpositionTable == null || transpositionTable.size() != transpositionTableSize) {
+        // If the transposition table is null, the size is different, or the rules are different, create a new transposition table.
+        if (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !startingGame.getRules().getOTRString().equals(lastRulesString)) {
             transpositionTable = new TranspositionTable(transpositionTableSize);
         }
+
+        lastRulesString = startingGame.getRules().getOTRString();
     }
 
     public static void resetTranspositionTable() {
