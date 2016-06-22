@@ -25,38 +25,38 @@ public class Benchmark {
 
         g = new Game(brandub, null);
         w = new AiWorkspace(null, g, g.getCurrentState(), 0);
-        w.explore(10);
-        size = w.getGameTreeSize(10);
+        w.explore(30);
+        size = w.getGameTreeSize(30);
         totalSize += size;
 
-        System.out.println("Brandub 7: " + size + " at " + size / 10d + "/sec");
+        System.out.println("Brandub 7: " + size + " at " + size / 30d + "/sec");
 
         g = new Game(tablut, null);
         w = new AiWorkspace(null, g, g.getCurrentState(), 0);
-        w.explore(10);
-        size = w.getGameTreeSize(10);
+        w.explore(30);
+        size = w.getGameTreeSize(30);
         totalSize += size;
 
-        System.out.println("Tablut 9: " + size + " at " + size / 10d + "/sec");
+        System.out.println("Tablut 9: " + size + " at " + size / 30d + "/sec");
 
         g = new Game(copenhagen, null);
         w = new AiWorkspace(null, g, g.getCurrentState(), 0);
-        w.explore(20);
-        size = w.getGameTreeSize(10);
+        w.explore(60);
+        size = w.getGameTreeSize(30);
         totalSize += size;
 
-        System.out.println("Copenhagen 11: " + size + " at " + size / 20d + "/sec");
+        System.out.println("Copenhagen 11: " + size + " at " + size / 60d + "/sec");
 
         g = new Game(tablut15, null);
         w = new AiWorkspace(null, g, g.getCurrentState(), 0);
-        w.explore(20);
-        size = w.getGameTreeSize(10);
+        w.explore(60);
+        size = w.getGameTreeSize(30);
         totalSize += size;
 
-        System.out.println("Tablut 15: " + size + " at " + size / 20d + "/sec");
+        System.out.println("Tablut 15: " + size + " at " + size / 60d + "/sec");
 
         System.out.println("************************");
-        System.out.println("Final results: " +totalSize + " at " + totalSize / 60d + "/sec");
+        System.out.println("Final results: " +totalSize + " at " + totalSize / 180d + "/sec");
 
         System.exit(0);
     }
