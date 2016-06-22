@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.engine.collections.FixedSizeArrayMap;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.MethodAccessor_Short;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,17 +60,17 @@ public class Coord {
         }
 
 
-        leftEdge = new FixedSizeArrayMap<>(sizes);
-        rightEdge = new FixedSizeArrayMap<>(sizes);
-        topEdge = new FixedSizeArrayMap<>(sizes);
-        bottomEdge = new FixedSizeArrayMap<>(sizes);
-        allEdges = new FixedSizeArrayMap<>(sizes);
+        leftEdge = new HashMap<>(sizes);
+        rightEdge = new HashMap<>(sizes);
+        topEdge = new HashMap<>(sizes);
+        bottomEdge = new HashMap<>(sizes);
+        allEdges = new HashMap<>(sizes);
 
         setupEdges();
 
-        diagonalCoords = new FixedSizeArrayMap<>(sizes);
-        adjacentCoords = new FixedSizeArrayMap<>(sizes);
-        rankAndFileCoords = new FixedSizeArrayMap<>(sizes);
+        diagonalCoords = new HashMap<>(sizes);
+        adjacentCoords = new HashMap<>(sizes);
+        rankAndFileCoords = new HashMap<>(sizes);
 
         setupAdjacentCoords();
     }
