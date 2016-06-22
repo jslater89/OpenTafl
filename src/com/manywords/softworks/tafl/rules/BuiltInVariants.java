@@ -41,6 +41,13 @@ public class BuiltInVariants {
             "9. Foteviken Tablut 9x9"
     ));
 
+    public static Rules rulesForNameAndDimension(String name, int dimension) {
+        for(Rules r : availableRules) {
+            if(r.getName().equals(name) && r.boardSize == dimension) return r;
+        }
+        return null;
+    }
+
     public static int indexForDescription(String description) {
         for(int i = 0; i < rulesDescriptions.size(); i++) {
             if(description.equals(rulesDescriptions.get(i))) {

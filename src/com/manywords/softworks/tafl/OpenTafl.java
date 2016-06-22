@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.network.client.HeadlessAIClient;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Coord;
+import com.manywords.softworks.tafl.test.Benchmark;
 import com.manywords.softworks.tafl.test.Test;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.RawTerminal;
@@ -28,6 +29,7 @@ public class OpenTafl {
         FALLBACK,
         SERVER,
         HEADLESS_AI,
+        BENCHMARK,
         HELP
     }
 
@@ -67,6 +69,10 @@ public class OpenTafl {
             }
             else if(arg.contains("--headless") && runMode == Mode.ADVANCED_TERMINAL) {
                 runMode = Mode.HEADLESS_AI;
+            }
+            else if(arg.contains("--benchmark") && runMode == Mode.ADVANCED_TERMINAL) {
+                logLevel = LogLevel.SILENT;
+                runMode = Mode.BENCHMARK;
             }
             else if(arg.contains("--help")) {
                 runMode = Mode.HELP;
@@ -129,6 +135,9 @@ public class OpenTafl {
             case FALLBACK:
                 RawTerminal display = new RawTerminal();
                 display.runUi();
+                break;
+            case BENCHMARK:
+                Benchmark.run();
                 break;
             case HELP:
                 printHelpMessage();

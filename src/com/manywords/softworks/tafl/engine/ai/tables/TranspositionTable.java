@@ -47,8 +47,9 @@ public class TranspositionTable {
     }
 
     public void putValue(long zobrist, short value, int searchedToDepth, int gameLength) {
-        int index = (Math.abs((int)(zobrist % mMaxSize)));
+        if(mRequestedSize == 0) return;
 
+        int index = (Math.abs((int)(zobrist % mMaxSize)));
         boolean add = false;
         if(mZobristTable[index] == 0) add = true;
 
@@ -70,6 +71,8 @@ public class TranspositionTable {
     }
 
     public short getValue(long zobrist, int minDepth, int gameLength) {
+        if(mRequestedSize == 0) return Evaluator.NO_VALUE;
+
         int index = (Math.abs((int)(zobrist % mMaxSize)));
         if(mZobristTable[index] != zobrist) return Evaluator.NO_VALUE;
 
