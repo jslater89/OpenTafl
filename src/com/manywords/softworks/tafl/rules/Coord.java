@@ -27,9 +27,12 @@ public class Coord {
     private static Coord[][] coords;
     private static final int minDimension = 7;
     private static final int maxDimension = 19;
-    private static Map<Integer, Map<Coord, List<Coord>>> adjacentCoords;
-    private static Map<Integer, Map<Coord, List<Coord>>> diagonalCoords;
-    private static Map<Integer, Map<Coord, List<List<Coord>>>> rankAndFileCoords;
+    // Map sizes to a list of lists of adjacent coords, indexed by coord index
+    private static Map<Integer, List<List<Coord>>> adjacentCoords;
+    // Map sizes to a list of lists of diagonal coords, indexed by coord index
+    private static Map<Integer, List<List<Coord>>> diagonalCoords;
+    // Map sizes to a list of lists of lists of rank/file coord, indexed by coord index
+    private static Map<Integer, List<List<List<Coord>>>> rankAndFileCoords;
     private static Map<Integer, List<Coord>> topEdge;
     private static Map<Integer, List<Coord>> bottomEdge;
     private static Map<Integer, List<Coord>> leftEdge;
@@ -102,9 +105,9 @@ public class Coord {
 
     private static void setupAdjacentCoords() {
         for(int dimension = minDimension; dimension <= maxDimension; dimension+=2) {
-            Map<Coord, List<Coord>> diagonals = new HashMap<>();
-            Map<Coord, List<Coord>> adjacents = new HashMap<>();
-            Map<Coord, List<List<Coord>>> rankAndFiles = new HashMap<>();
+            List<List<Coord>> diagonals = new ArrayList<>();
+            List<List<Coord>> adjacents = new ArrayList<>();
+            List<List<List<Coord>>> rankAndFiles = new ArrayList<>();
 
             for (int y = 0; y < dimension; y++) {
                 for (int x = 0; x < dimension; x++) {
@@ -157,7 +160,7 @@ public class Coord {
                         }
                     }
 
-                    diagonals.put(space, diagonal);
+                    diagonals.add(diagonal);
 
                     List<Coord> adjacent = new ArrayList<Coord>(4);
                     if (space.x > 0) {
@@ -173,7 +176,7 @@ public class Coord {
                         adjacent.add(Coord.get(space.x, space.y + 1));
                     }
 
-                    adjacents.put(space, adjacent);
+                    adjacents.add(adjacent);
 
                     List<Coord> eastCoords = new ArrayList<Coord>(dimension / 2);
                     for (int i = (x + 1); i < dimension; i++) {
@@ -201,7 +204,7 @@ public class Coord {
                     rankAndFileCoords.add(northCoords);
                     rankAndFileCoords.add(southCoords);
 
-                    rankAndFiles.put(space, rankAndFileCoords);
+                    rankAndFiles.add(rankAndFileCoords);
                 }
             }
 
@@ -220,14 +223,14 @@ public class Coord {
     }
 
     public static List<Coord> getAdjacentSpaces(int dimension, Coord c) {
-        return adjacentCoords.get(dimension).get(c);
+        return adjacentCoords.get(dimension).get(getIndex(dimension, c));
     }
     public static List<Coord> getDiagonalSpaces(int dimension, Coord c) {
-        return diagonalCoords.get(dimension).get(c);
+        return diagonalCoords.get(dimension).get(getIndex(dimension, c));
     }
 
     public static List<List<Coord>> getRankAndFileCoords(int dimension, Coord c) {
-        return rankAndFileCoords.get(dimension).get(c);
+        return rankAndFileCoords.get(dimension).get(getIndex(dimension, c));
     }
 
     public static List<Coord> getTopEdge(int dimension) {
