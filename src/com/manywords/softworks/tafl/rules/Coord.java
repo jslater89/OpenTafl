@@ -1,7 +1,5 @@
 package com.manywords.softworks.tafl.rules;
 
-import com.manywords.softworks.tafl.engine.collections.FixedSizeArrayMap;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +27,9 @@ public class Coord {
     private static Coord[][] coords;
     private static final int minDimension = 7;
     private static final int maxDimension = 19;
-    // Map sizes to a list of lists of adjacent coords, indexed by coord index
-    private static Map<Integer, List<List<Coord>>> adjacentCoords;
-    // Map sizes to a list of lists of diagonal coords, indexed by coord index
-    private static Map<Integer, List<List<Coord>>> diagonalCoords;
-    // Map sizes to a list of lists of lists of rank/file coord, indexed by coord index
-    private static Map<Integer, List<List<List<Coord>>>> rankAndFileCoords;
+    private static Map<Integer, Map<Coord, List<Coord>>> adjacentCoords;
+    private static Map<Integer, Map<Coord, List<Coord>>> diagonalCoords;
+    private static Map<Integer, Map<Coord, List<List<Coord>>>> rankAndFileCoords;
     private static Map<Integer, List<Coord>> topEdge;
     private static Map<Integer, List<Coord>> bottomEdge;
     private static Map<Integer, List<Coord>> leftEdge;
@@ -53,23 +48,18 @@ public class Coord {
             }
         }
 
-        int sizes = 0;
-        for(int i = minDimension; i <= maxDimension; i += 2) {
-            sizes++;
-        }
 
-
-        leftEdge = new FixedSizeArrayMap<>(sizes);
-        rightEdge = new FixedSizeArrayMap<>(sizes);
-        topEdge = new FixedSizeArrayMap<>(sizes);
-        bottomEdge = new FixedSizeArrayMap<>(sizes);
-        allEdges = new FixedSizeArrayMap<>(sizes);
+        leftEdge = new HashMap<>();
+        rightEdge = new HashMap<>();
+        topEdge = new HashMap<>();
+        bottomEdge = new HashMap<>();
+        allEdges = new HashMap<>();
 
         setupEdges();
 
-        diagonalCoords = new FixedSizeArrayMap<>(sizes);
-        adjacentCoords = new FixedSizeArrayMap<>(sizes);
-        rankAndFileCoords = new FixedSizeArrayMap<>(sizes);
+        diagonalCoords = new HashMap<>(maxDimension * maxDimension);
+        adjacentCoords = new HashMap<>(maxDimension * maxDimension);
+        rankAndFileCoords = new HashMap<>(maxDimension * maxDimension);
 
         setupAdjacentCoords();
     }
@@ -94,6 +84,7 @@ public class Coord {
             }
             leftEdge.put(dimension, edge);
 
+
             edge = new ArrayList<>(dimension);
             for (int i = 0; i < dimension; i++) {
                 edge.add(Coord.get(dimension - 1, i));
@@ -111,9 +102,9 @@ public class Coord {
 
     private static void setupAdjacentCoords() {
         for(int dimension = minDimension; dimension <= maxDimension; dimension+=2) {
-            List<List<Coord>> diagonals = new ArrayList<>();
-            List<List<Coord>> adjacents = new ArrayList<>();
-            List<List<List<Coord>>> rankAndFiles = new ArrayList<>();
+            Map<Coord, List<Coord>> diagonals = new HashMap<>();
+            Map<Coord, List<Coord>> adjacents = new HashMap<>();
+            Map<Coord, List<List<Coord>>> rankAndFiles = new HashMap<>();
 
             for (int y = 0; y < dimension; y++) {
                 for (int x = 0; x < dimension; x++) {
@@ -166,7 +157,7 @@ public class Coord {
                         }
                     }
 
-                    diagonals.add(diagonal);
+                    diagonals.put(space, diagonal);
 
                     List<Coord> adjacent = new ArrayList<Coord>(4);
                     if (space.x > 0) {
@@ -182,7 +173,7 @@ public class Coord {
                         adjacent.add(Coord.get(space.x, space.y + 1));
                     }
 
-                    adjacents.add(adjacent);
+                    adjacents.put(space, adjacent);
 
                     List<Coord> eastCoords = new ArrayList<Coord>(dimension / 2);
                     for (int i = (x + 1); i < dimension; i++) {
@@ -210,7 +201,7 @@ public class Coord {
                     rankAndFileCoords.add(northCoords);
                     rankAndFileCoords.add(southCoords);
 
-                    rankAndFiles.add(rankAndFileCoords);
+                    rankAndFiles.put(space, rankAndFileCoords);
                 }
             }
 
@@ -229,14 +220,14 @@ public class Coord {
     }
 
     public static List<Coord> getAdjacentSpaces(int dimension, Coord c) {
-        return adjacentCoords.get(dimension).get(getIndex(dimension, c));
+        return adjacentCoords.get(dimension).get(c);
     }
     public static List<Coord> getDiagonalSpaces(int dimension, Coord c) {
-        return diagonalCoords.get(dimension).get(getIndex(dimension, c));
+        return diagonalCoords.get(dimension).get(c);
     }
 
     public static List<List<Coord>> getRankAndFileCoords(int dimension, Coord c) {
-        return rankAndFileCoords.get(dimension).get(getIndex(dimension, c));
+        return rankAndFileCoords.get(dimension).get(c);
     }
 
     public static List<Coord> getTopEdge(int dimension) {
