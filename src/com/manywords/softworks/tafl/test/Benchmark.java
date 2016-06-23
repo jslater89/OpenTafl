@@ -21,7 +21,9 @@ public class Benchmark {
         AiWorkspace w;
         int size, totalSize = 0;
 
-        assert tablut15 != null;
+        if(tablut15 == null) {
+            throw new IllegalStateException("No tablut 15");
+        }
 
         g = new Game(brandub, null);
         w = new AiWorkspace(null, g, g.getCurrentState(), 0);
