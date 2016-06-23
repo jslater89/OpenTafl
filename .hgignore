@@ -9,6 +9,7 @@ bin*
 profile*
 debug-positions*
 out*
+external-rules.conf
 tournament-results*
 selfplay-results*
 engines/opentafl-debug-2.ini
