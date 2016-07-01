@@ -1,0 +1,5 @@
+ini4j 0.5.4
+jline-2.1.3
+lanterna-3.0.0-beta3
+
+(See build.gradle for the always-up-to-date list of dependencies)

@@ -2,12 +2,13 @@ package com.manywords.softworks.tafl.ui;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.bundle.LanternaThemes;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.TerminalResizeListener;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
@@ -46,12 +47,9 @@ public class AdvancedTerminal<T extends Terminal> {
             stf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             stf.setVisible(true);
         }
-        mTerminal.addResizeListener(new ResizeListener() {
-            @Override
-            public void onResized(Terminal terminal, TerminalSize terminalSize) {
-                if(mActiveScreen != null) {
-                    mActiveScreen.onResized(terminal, terminalSize);
-                }
+        mTerminal.addResizeListener((resizedTerminal, terminalSize) -> {
+            if(mActiveScreen != null) {
+                mActiveScreen.onResized(resizedTerminal, terminalSize);
             }
         });
 
@@ -73,10 +71,9 @@ public class AdvancedTerminal<T extends Terminal> {
         }
         */
 
-        TerminalSettings.loadFromFile();
-
-        mGui = new MultiWindowTextGUI(s, new DefaultWindowManager(new TerminalWindowDecorationRenderer()), new TerminalWindowPostRenderer(), new EmptySpace(TextColor.ANSI.BLACK));
-        mGui.setTheme(new TerminalTheme());
+        mGui = new MultiWindowTextGUI(s, new DefaultWindowManager(), new TerminalWindowPostRenderer(), new EmptySpace(TextColor.ANSI.BLACK));
+        mGui.setTheme(new TerminalTheme(new TerminalWindowPostRenderer(), new TerminalWindowDecorationRenderer()));
+        //mGui.setTheme(LanternaThemes.getRegisteredTheme(LanternaThemes.getRegisteredThemes().iterator().next()));
 
         changeActiveScreen(new MainMenuScreen());
     }

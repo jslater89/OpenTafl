@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.swing.*;
 import com.manywords.softworks.tafl.network.client.HeadlessAIClient;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
@@ -12,10 +13,14 @@ import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
 import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
+import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
+import java.awt.*;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,6 +97,7 @@ public class OpenTafl {
         directoryCheck();
         Coord.initialize();
         BuiltInVariants.loadExternalRules(new File("external-rules.conf"));
+        TerminalSettings.loadFromFile();
 
         switch(runMode) {
             case SERVER:
@@ -117,9 +123,21 @@ public class OpenTafl {
                 break;
             case ADVANCED_TERMINAL:
                 DefaultTerminalFactory factory = new DefaultTerminalFactory();
-                Terminal t = null;
 
-                t = factory.createSwingTerminal();
+                Font[] preferredFonts = new Font[5];
+                preferredFonts[0] = new Font("Monospace", Font.PLAIN, TerminalSettings.fontSize);
+                preferredFonts[1] = new Font("Monaco", Font.PLAIN, TerminalSettings.fontSize);
+                preferredFonts[2] = new Font("Courier New", Font.PLAIN, TerminalSettings.fontSize);
+                preferredFonts[3] = new Font("Courier", Font.PLAIN, TerminalSettings.fontSize);
+                preferredFonts[4] = new Font("Courier New", Font.PLAIN, TerminalSettings.fontSize);
+
+                preferredFonts = AWTTerminalFontConfiguration.filterMonospaced(preferredFonts);
+                if(preferredFonts.length == 0) throw new IllegalStateException("No monospaced fonts available");
+
+                SwingTerminalFontConfiguration font = SwingTerminalFontConfiguration.newInstance(preferredFonts);
+
+                factory.setTerminalEmulatorFontConfiguration(font);
+                Terminal t = factory.createSwingTerminal();
 
                 AdvancedTerminal<? extends Terminal> th = new AdvancedTerminal<>(t);
                 break;

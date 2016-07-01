@@ -33,6 +33,7 @@ public class OptionsMenuWindow extends BasicWindow {
     private Label mAnalysisConfigLabel;
     private Label mThinkTimeLabel;
     private Label mShrinkLabel;
+    private Label mFontSizeLabel;
     private Label mNetworkAddressLabel;
 
     private Interactable mLastFocused;
@@ -60,35 +61,20 @@ public class OptionsMenuWindow extends BasicWindow {
         Panel optionsPanel = new Panel();
         optionsPanel.setLayoutManager(new GridLayout(3));
 
-        Button variantSelect = new Button("Variant", new Runnable() {
-            @Override
-            public void run() {
-                showVariantSelectDialog();
-            }
-        });
+        Button variantSelect = new Button("Variant", this::showVariantSelectDialog);
         mVariantLabel = new Label(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
         optionsPanel.addComponent(variantSelect);
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(mVariantLabel);
 
 
-        Button clockSettingSelect = new Button("Clock setting", new Runnable() {
-            @Override
-            public void run() {
-                showTimeSpecDialog();
-            }
-        });
+        Button clockSettingSelect = new Button("Clock setting", this::showTimeSpecDialog);
         mClockLabel = new Label(TerminalSettings.timeSpec.toString());
         optionsPanel.addComponent(clockSettingSelect);
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(mClockLabel);
 
-        Button aiDepthSelect = new Button("AI think time", new Runnable() {
-            @Override
-            public void run() {
-                showAiDepthEntryDialog();
-            }
-        });
+        Button aiDepthSelect = new Button("AI think time", this::showAiDepthEntryDialog);
         mThinkTimeLabel = new Label("" + TerminalSettings.aiThinkTime);
         optionsPanel.addComponent(aiDepthSelect);
         optionsPanel.addComponent(newSpacer());
@@ -99,12 +85,7 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(newSpacer());
 
-        Button attackerSelect = new Button("Attackers", new Runnable() {
-            @Override
-            public void run() {
-                showPlayerSelectDialog(true);
-            }
-        });
+        Button attackerSelect = new Button("Attackers", () -> showPlayerSelectDialog(true));
         mAttackerLabel = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
         optionsPanel.addComponent(attackerSelect);
         optionsPanel.addComponent(newSpacer());
@@ -130,12 +111,7 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(newSpacer());
 
-        Button defenderSelect = new Button("Defenders", new Runnable() {
-            @Override
-            public void run() {
-                showPlayerSelectDialog(false);
-            }
-        });
+        Button defenderSelect = new Button("Defenders", () -> showPlayerSelectDialog(false));
         mDefenderLabel = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.defenders));
         optionsPanel.addComponent(defenderSelect);
         optionsPanel.addComponent(newSpacer());
@@ -161,12 +137,9 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(newSpacer());
 
-        Button analysisButton = new Button("Analysis engine", new Runnable() {
-            @Override
-            public void run() {
-                TerminalSettings.analysisEngine = !TerminalSettings.analysisEngine;
-                refreshSettings();
-            }
+        Button analysisButton = new Button("Analysis engine", () -> {
+            TerminalSettings.analysisEngine = !TerminalSettings.analysisEngine;
+            refreshSettings();
         });
         mAnalysisLabel = new Label(TerminalSettings.analysisEngine ? "On" : "Off");
 
@@ -194,18 +167,22 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(newSpacer());
 
-        Button shrinkLargeBoardsButton = new Button("Shrink large boards", new Runnable() {
-            @Override
-            public void run() {
-                TerminalSettings.shrinkLargeBoards = !TerminalSettings.shrinkLargeBoards;
-                refreshSettings();
-            }
+        Button shrinkLargeBoardsButton = new Button("Shrink large boards", () -> {
+            TerminalSettings.shrinkLargeBoards = !TerminalSettings.shrinkLargeBoards;
+            refreshSettings();
         });
         mShrinkLabel = new Label(TerminalSettings.shrinkLargeBoards ? "On" : "Off");
 
         optionsPanel.addComponent(shrinkLargeBoardsButton);
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(mShrinkLabel);
+
+        Button fontSizeButton = new Button("Font size", this::showFontSizeDialog);
+        mFontSizeLabel = new Label(TerminalSettings.fontSize + "pt");
+
+        optionsPanel.addComponent(fontSizeButton);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mFontSizeLabel);
 
         // Blank line
         optionsPanel.addComponent(newSpacer());
@@ -222,12 +199,9 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(mNetworkAddressLabel);
 
-        Button backButton = new Button("Back", new Runnable() {
-            @Override
-            public void run() {
-                TerminalSettings.saveToFile();
-                mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
-            }
+        Button backButton = new Button("Back", () -> {
+            TerminalSettings.saveToFile();
+            mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
         });
         optionsPanel.addComponent(backButton);
 
@@ -272,6 +246,7 @@ public class OptionsMenuWindow extends BasicWindow {
         mThinkTimeLabel.setText("" + TerminalSettings.aiThinkTime);
 
         mShrinkLabel.setText(TerminalSettings.shrinkLargeBoards ? "On" : "Off");
+        mFontSizeLabel.setText(TerminalSettings.fontSize + "pt");
 
         mNetworkAddressLabel.setText(TerminalSettings.onlineServerHost);
     }
@@ -335,6 +310,23 @@ public class OptionsMenuWindow extends BasicWindow {
                 "" + TerminalSettings.aiThinkTime);
         int intDepth = searchdepth.intValue();
         TerminalSettings.aiThinkTime = intDepth;
+
+        refreshSettings();
+    }
+
+    private void showFontSizeDialog() {
+        List<String> lines = TerminalTextUtils.getWordWrappedText(50,
+                "The terminal font size. (Setting takes effect only after restart.)");
+        String descriptionString = "";
+        for(String s : lines) {
+            descriptionString += s + "\n";
+        }
+        BigInteger fontSize = TextInputDialog.showNumberDialog(
+                getTextGUI(),
+                "Font size (pt):",
+                descriptionString,
+                "" + TerminalSettings.fontSize);
+        TerminalSettings.fontSize = fontSize.intValue();
 
         refreshSettings();
     }

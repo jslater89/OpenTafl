@@ -21,8 +21,9 @@ public class TerminalSettings {
     public static final int ENGINE = 3;
 
     public static boolean shrinkLargeBoards = true;
+    public static int fontSize = 14;
 
-    public static String onlinePlayerName = "Fishbreath";
+    public static String onlinePlayerName = "";
     public static String onlineServerHost = "intersect.manywords.press";
     public static int onlineServerPort = 11541;
 
@@ -82,6 +83,7 @@ public class TerminalSettings {
             File defenderEngineFile = (defenderEngineSpec == null ? null : defenderEngineSpec.specFile);
             File analysisEngineFile = (analysisEngineSpec == null ? null : analysisEngineSpec.specFile);
             ini.put("display", "shrinklarge", shrinkLargeBoards);
+            ini.put("display", "fontsize", fontSize);
             ini.put("config", "attacker", attackers + 1);
             ini.put("config", "attackerfile", (attackerEngineFile != null ? attackerEngineFile.getCanonicalPath() : ""));
             ini.put("config", "defender", defenders + 1);
@@ -144,6 +146,8 @@ public class TerminalSettings {
             long incrementTime = ini.get("clock", "increment", long.class);
 
             shrinkLargeBoards = ini.get("display", "shrinklarge", boolean.class);
+            fontSize = ini.get("display", "fontsize", int.class);
+            if(fontSize == 0) fontSize = 14;
 
             String onlineHost = ini.get("network", "host", String.class);
             if(onlineHost != null) onlineServerHost = onlineHost;

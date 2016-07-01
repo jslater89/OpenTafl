@@ -27,6 +27,7 @@ package/*
 
 syntax: regexp
 
+^lib/.*\.jar
 ^saved-games/.*
 ^engines/.*
 ^build/.*

@@ -17,7 +17,7 @@ public class TerminalWindowDecorationRenderer extends DefaultWindowDecorationRen
             title = "";
         }
 
-        ThemeDefinition themeDefinition = graphics.getThemeDefinition(DefaultWindowDecorationRenderer.class);
+        ThemeDefinition themeDefinition = window.getComponent().getThemeDefinition();
         char horizontalLine = themeDefinition.getCharacter("HORIZONTAL_LINE", '─');
         char verticalLine = themeDefinition.getCharacter("VERTICAL_LINE", '│');
         char bottomLeftCorner = themeDefinition.getCharacter("BOTTOM_LEFT_CORNER", '└');

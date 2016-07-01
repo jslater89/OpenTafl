@@ -69,15 +69,9 @@ public class Debug {
                     e.printStackTrace();
                 }
             }
-            else {
-                t = factory.createSwingTerminal();
-            }
 
             if (t != null) {
                 AdvancedTerminal<? extends Terminal> th = new AdvancedTerminal<>(t);
-            }
-            else {
-                System.out.println("Exiting: no terminal built");
             }
         }
     }
