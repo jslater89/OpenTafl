@@ -17,17 +17,16 @@ import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class OpenTafl {
     private static enum Mode {
         WINDOW,
-        ADVANCED_TERMINAL,
+        GRAPHICAL_TERMINAL,
         DEBUG,
         TEST,
         EXTERNAL_ENGINE,
@@ -52,30 +51,30 @@ public class OpenTafl {
 
     public static void main(String[] args) {
         Map<String, String> mapArgs = getArgs(args);
-        Mode runMode = Mode.ADVANCED_TERMINAL;
+        Mode runMode = Mode.GRAPHICAL_TERMINAL;
 
         //System.out.println(mapArgs);
 
         for (String arg : args) {
-            if (arg.contains("--server") && runMode == Mode.ADVANCED_TERMINAL) {
+            if (arg.contains("--server") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.SERVER;
             }
-            else if (arg.contains("--engine") && runMode == Mode.ADVANCED_TERMINAL) {
+            else if (arg.contains("--engine") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.EXTERNAL_ENGINE;
             }
-            else if (arg.contains("--test") && runMode == Mode.ADVANCED_TERMINAL) {
+            else if (arg.contains("--test") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.TEST;
             }
-            else if (arg.contains("--window") && runMode == Mode.ADVANCED_TERMINAL) {
+            else if (arg.contains("--window") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.WINDOW;
             }
-            else if(arg.contains("--fallback") && runMode == Mode.ADVANCED_TERMINAL) {
+            else if(arg.contains("--fallback") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.FALLBACK;
             }
-            else if(arg.contains("--headless") && runMode == Mode.ADVANCED_TERMINAL) {
+            else if(arg.contains("--headless") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.HEADLESS_AI;
             }
-            else if(arg.contains("--benchmark") && runMode == Mode.ADVANCED_TERMINAL) {
+            else if(arg.contains("--benchmark") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 logLevel = LogLevel.SILENT;
                 runMode = Mode.BENCHMARK;
             }
@@ -121,7 +120,7 @@ public class OpenTafl {
             case WINDOW:
                 SwingWindow w = new SwingWindow();
                 break;
-            case ADVANCED_TERMINAL:
+            case GRAPHICAL_TERMINAL:
                 DefaultTerminalFactory factory = new DefaultTerminalFactory();
 
                 Font[] preferredFonts = new Font[5];
@@ -137,8 +136,8 @@ public class OpenTafl {
                 SwingTerminalFontConfiguration font = SwingTerminalFontConfiguration.newInstance(preferredFonts);
 
                 factory.setTerminalEmulatorFontConfiguration(font);
-                Terminal t = factory.createSwingTerminal();
 
+                Terminal t = factory.createSwingTerminal();
                 AdvancedTerminal<? extends Terminal> th = new AdvancedTerminal<>(t);
                 break;
             case DEBUG:
@@ -151,8 +150,17 @@ public class OpenTafl {
                 ExternalEngineClient.run();
                 break;
             case FALLBACK:
-                RawTerminal display = new RawTerminal();
-                display.runUi();
+                factory = new DefaultTerminalFactory();
+                factory.setForceTextTerminal(true);
+                try {
+                    t = factory.createTerminal();
+                    th = new AdvancedTerminal<>(t);
+                } catch (IOException e) {
+                    OpenTafl.logPrint(LogLevel.SILENT, "Failed to start text terminal.");
+                }
+
+                //RawTerminal display = new RawTerminal();
+                //display.runUi();
                 break;
             case BENCHMARK:
                 Benchmark.run();

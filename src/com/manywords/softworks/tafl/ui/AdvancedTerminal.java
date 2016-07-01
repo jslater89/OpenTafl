@@ -47,6 +47,11 @@ public class AdvancedTerminal<T extends Terminal> {
             stf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             stf.setVisible(true);
         }
+        else {
+            // No terminal output for on-the-terminal mode
+            OpenTafl.logLevel = OpenTafl.LogLevel.SILENT;
+        }
+
         mTerminal.addResizeListener((resizedTerminal, terminalSize) -> {
             if(mActiveScreen != null) {
                 mActiveScreen.onResized(resizedTerminal, terminalSize);
@@ -59,23 +64,24 @@ public class AdvancedTerminal<T extends Terminal> {
             s.startScreen();
         }
         catch(IOException e) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Failed to start: " + e);
+            System.out.println("Failed to start: " + e);
             System.exit(0);
         }
-
-        /* crashes bash?
-        try {
-            mTerminal.enterPrivateMode();
-        } catch (IOException e) {
-            // Best effort
-        }
-        */
 
         mGui = new MultiWindowTextGUI(s, new DefaultWindowManager(), new TerminalWindowPostRenderer(), new EmptySpace(TextColor.ANSI.BLACK));
         mGui.setTheme(new TerminalTheme(new TerminalWindowPostRenderer(), new TerminalWindowDecorationRenderer()));
         //mGui.setTheme(LanternaThemes.getRegisteredTheme(LanternaThemes.getRegisteredThemes().iterator().next()));
 
+        // Blocks
         changeActiveScreen(new MainMenuScreen());
+
+
+        try {
+            terminal.exitPrivateMode();
+        } catch (IOException e) {
+            System.out.println("Failed to exit private mode.");
+            System.exit(0);
+        }
     }
 
     public void changeActiveScreen(LogicalScreen screen) {
