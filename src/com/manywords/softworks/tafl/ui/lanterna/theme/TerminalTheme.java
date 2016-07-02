@@ -10,10 +10,15 @@ import com.googlecode.lanterna.gui2.WindowPostRenderer;
  * Created by jay on 2/15/16.
  */
 public class TerminalTheme extends AbstractTheme {
-    private final ThemeDefinition definition = new TerminalThemeDefinition();
+    private final ThemeDefinition definition;
 
     public TerminalTheme(WindowPostRenderer postRenderer, WindowDecorationRenderer decorationRenderer) {
+        this(postRenderer, decorationRenderer, false);
+    }
+
+    public TerminalTheme(WindowPostRenderer postRenderer, WindowDecorationRenderer decorationRenderer, boolean rawMode) {
         super(postRenderer, decorationRenderer);
+        definition = new TerminalThemeDefinition(rawMode);
     }
 
     @Override

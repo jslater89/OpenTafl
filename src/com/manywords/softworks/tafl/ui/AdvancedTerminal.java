@@ -28,6 +28,7 @@ import java.io.IOException;
 public class AdvancedTerminal<T extends Terminal> {
 
     private T mTerminal;
+    private boolean mRawMode;
 
     private MultiWindowTextGUI mGui;
     private LogicalScreen mActiveScreen;
@@ -46,10 +47,12 @@ public class AdvancedTerminal<T extends Terminal> {
             stf.setLocationRelativeTo(null);
             stf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             stf.setVisible(true);
+            mRawMode = false;
         }
         else {
             // No terminal output for on-the-terminal mode
             OpenTafl.logLevel = OpenTafl.LogLevel.SILENT;
+            mRawMode = true;
         }
 
         mTerminal.addResizeListener((resizedTerminal, terminalSize) -> {
@@ -69,7 +72,7 @@ public class AdvancedTerminal<T extends Terminal> {
         }
 
         mGui = new MultiWindowTextGUI(s, new DefaultWindowManager(), new TerminalWindowPostRenderer(), new EmptySpace(TextColor.ANSI.BLACK));
-        mGui.setTheme(new TerminalTheme(new TerminalWindowPostRenderer(), new TerminalWindowDecorationRenderer()));
+        mGui.setTheme(new TerminalTheme(new TerminalWindowPostRenderer(), new TerminalWindowDecorationRenderer(), mRawMode));
         //mGui.setTheme(LanternaThemes.getRegisteredTheme(LanternaThemes.getRegisteredThemes().iterator().next()));
 
         // Blocks

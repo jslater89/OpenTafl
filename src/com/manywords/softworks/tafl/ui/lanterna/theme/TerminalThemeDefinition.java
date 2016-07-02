@@ -14,6 +14,11 @@ import java.util.EnumSet;
  * Created by jay on 2/15/16.
  */
 public class TerminalThemeDefinition implements ThemeDefinition {
+    private boolean mRawMode;
+
+    public TerminalThemeDefinition(boolean rawMode) {
+        mRawMode = rawMode;
+    }
     @Override
     public ThemeStyle getNormal() {
         return new ThemeStyle() {
@@ -146,7 +151,7 @@ public class TerminalThemeDefinition implements ThemeDefinition {
 
     @Override
     public boolean isCursorVisible() {
-        return false;
+        return mRawMode;
     }
 
     @Override
