@@ -77,8 +77,9 @@ public class BuiltInVariants {
             String line = "";
             while((line = r.readLine()) != null) {
                 Rules rules = RulesSerializer.loadRulesRecord(line);
-                String description = rulesDescriptions.size() + 1 + ". " + rules.getName() + " " + rules.boardSize + "x" + rules.boardSize;
+                if(rules == null) continue;
 
+                String description = rulesDescriptions.size() + 1 + ". " + rules.getName() + " " + rules.boardSize + "x" + rules.boardSize;
                 availableRules.add(rules);
                 rulesDescriptions.add(description);
             }
