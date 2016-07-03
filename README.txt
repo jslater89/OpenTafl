@@ -153,13 +153,15 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 10. Version history
 
-v0.3.2.1b (released 07/xx/16):
+v0.3.2.1b (released 07/02/16):
 - Performance improvements (v0.3.x caused some slowdowns; v0.3.2.1b returns
   OpenTafl to performance levels as of about v0.2.5.3b)
 - Some stability improvements for loading rules from external-rules.conf
 - Alea Evangelii added via external rules
 - Fixed bug where only first character of row index would be displayed when
   'shrink large boards' option was enabled and in effect
+- OpenTafl wil now function in headless terminal environments, thanks to the
+  latest release by the Lanterna developer
 - (For developers) Fixes/improvements for building on Windows
 
 v0.3.2.0b (released 06/17/16):
