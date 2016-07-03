@@ -34,6 +34,9 @@ java -version
 
 If you see '64-bit' in the output from that command, you have 64-bit Java.
 
+OpenTafl should run in most non-graphical terminal environments. Use the
+--fallback flag to enable old-school terminal mode.
+
 3. The game clock
 Since there are no conventions for how to time tafl games, I've invented a few
 of my own. The game clock in OpenTafl comprises a sudden-death main time, go-
@@ -149,6 +152,13 @@ http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt (engine
 http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network protocol specification)
 
 10. Version history
+
+v0.3.2.1b (released 07/xx/16):
+- Performance improvements (v0.3.x caused some slowdowns; v0.3.2.1b returns
+  OpenTafl to performance levels as of about v0.2.5.3b)
+- Some stability improvements for loading rules from external-rules.conf
+- Alea Evangelii added via external rules
+- (For developers) Fixes/improvements for building on Windows
 
 v0.3.2.0b (released 06/17/16):
 - Headless AI mode
