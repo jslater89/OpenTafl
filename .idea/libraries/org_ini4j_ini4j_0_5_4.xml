@@ -1,5 +1,6 @@
 <component name="libraryTable">
-  <library name="ini4j-0.5.4">
+  <library name="org.ini4j:ini4j:0.5.4" type="repository">
+    <properties maven-id="org.ini4j:ini4j:0.5.4" />
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/ini4j-0.5.4.jar!/" />
     </CLASSES>
