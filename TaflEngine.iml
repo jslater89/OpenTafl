@@ -16,8 +16,8 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="org.ini4j:ini4j:0.5.4" level="project" />
-    <orderEntry type="library" name="jline:jline:2.14.2" level="project" />
-    <orderEntry type="library" name="com.googlecode.lanterna:lanterna:3.0.0-beta3" level="project" />
+    <orderEntry type="library" exported="" name="org.ini4j:ini4j:0.5.4" level="project" />
+    <orderEntry type="library" exported="" name="jline:jline:2.14.2" level="project" />
+    <orderEntry type="library" exported="" name="com.googlecode.lanterna:lanterna:3.0.0-beta3" level="project" />
   </component>
 </module>
