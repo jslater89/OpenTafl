@@ -315,7 +315,8 @@ public class FishyEvaluator implements Evaluator {
         int attackersLost = startingAttackingTaflmenCount - attackingTaflmenCount;
 
         double attackerValue = MATERIAL_VALUE / startingAttackingTaflmenCount;
-        double defenderValue = MATERIAL_VALUE / (startingDefendingTaflmenCount - 1); // Don't count the king
+        // Don't count the king unless there's no other choice
+        double defenderValue = MATERIAL_VALUE / Math.max(1, startingDefendingTaflmenCount - 1);
 
         value += attackersLost * attackerValue * GameTreeState.DEFENDER;
         value += defendersLost * defenderValue * GameTreeState.ATTACKER;
