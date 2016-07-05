@@ -153,6 +153,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 10. Version history
 
+v0.3.2.2b (released 07/05/16):
+- Fix bad 3.2.1b release package
+- Fix occasional crash when the king is the only defending piece
+
 v0.3.2.1b (released 07/02/16):
 - Performance improvements (v0.3.x caused some slowdowns; v0.3.2.1b returns
   OpenTafl to performance levels as of about v0.2.5.3b)
