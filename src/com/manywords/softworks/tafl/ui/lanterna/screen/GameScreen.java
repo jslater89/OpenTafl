@@ -28,6 +28,7 @@ import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.command.Command;
 import com.manywords.softworks.tafl.command.CommandEngine;
@@ -220,7 +221,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             statusText(result.message);
         }
         else {
-            statusText("Last move: " + move);
+            statusText(Ansi.UNDERLINE + "Last move" + Ansi.UNDERLINE_OFF + ": " + move);
             int repeats = mGame.getCurrentState().countPositionOccurrences();
             if(repeats > 1) {
                 statusText("This position has repeated " + repeats + " times!");
@@ -697,7 +698,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     tryStartingComments(mReplay);
                 }
                 else {
-                    statusText("Last move: " + m);
+                    statusText(Ansi.UNDERLINE + "Last move" + Ansi.UNDERLINE_OFF + ": " + m);
                     if(!m.getComment().trim().isEmpty()) {
                         statusText(m.getComment());
                     }
