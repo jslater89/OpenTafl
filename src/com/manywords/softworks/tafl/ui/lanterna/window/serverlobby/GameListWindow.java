@@ -9,6 +9,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.SpectateGamePacket;
+import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
@@ -63,7 +64,7 @@ public class GameListWindow extends BasicWindow {
 
     public void notifyFocus(boolean focused) {
         if(focused) {
-            setTitle("**GAME LIST**");
+            setTitle(Ansi.UNDERLINE + "GAME LIST" + Ansi.UNDERLINE_OFF);
         }
         else {
             setTitle("Game List");

@@ -63,7 +63,7 @@ public class ChatWindow extends BasicWindow {
 
     public void notifyFocus(boolean focused) {
         if(focused) {
-            setTitle("**CHAT**");
+            setTitle(Ansi.UNDERLINE + "CHAT" + Ansi.UNDERLINE_OFF);
         }
         else {
             setTitle("Chat");
