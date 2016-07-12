@@ -11,7 +11,7 @@ import com.googlecode.lanterna.gui2.WindowPostRenderer;
  */
 public class TerminalWindowPostRenderer implements WindowPostRenderer {
     @Override
-    public void postRender(TextGraphics textGraphics, TextGUI textGUI, Window window) {
+    public void postRender(ThemedTextGraphics themedTextGraphics, TextGUI textGUI, Window window) {
 
     }
 }
