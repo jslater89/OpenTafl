@@ -70,7 +70,7 @@ public class MainMenuScreen extends LogicalScreen {
 
         @Override
         public void changeActiveScreen(LogicalScreen screen) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Changing screen");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Changing screen");
             mTerminal.changeActiveScreen(screen);
         }
     }

@@ -322,7 +322,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void onHistoryReceived(List<MoveRecord> moves) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "History delivered to server lobby screen");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "History delivered to server lobby screen");
         }
 
         @Override

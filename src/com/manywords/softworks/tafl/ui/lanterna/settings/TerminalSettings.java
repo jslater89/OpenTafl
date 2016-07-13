@@ -101,7 +101,7 @@ public class TerminalSettings {
         }
         catch(IOException e) {
             // Unable to save everything, so delete the file and return null;
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "IOException saving settings: " + e);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "IOException saving settings: " + e);
             f.delete();
             return null;
         }
@@ -113,7 +113,7 @@ public class TerminalSettings {
         File f = new File(SETTINGS_PATH);
         try {
             if(!f.exists()) {
-                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "No settings file exists");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "No settings file exists");
                 return;
             }
             Wini ini = new Wini(f);
@@ -156,7 +156,7 @@ public class TerminalSettings {
             timeSpec = ts;
         }
         catch(IOException e) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "IOException: " + e);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "IOException: " + e);
             // Don't really care if we can't load everything.
             // Use defaults otherwise.
         }

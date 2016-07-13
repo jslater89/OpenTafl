@@ -75,7 +75,7 @@ public class ClientCommandParser {
             // Do nothing
         }
         else {
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Unknown packet! " + data);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Unknown packet! " + data);
         }
     }
 }

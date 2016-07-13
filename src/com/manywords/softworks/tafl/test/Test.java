@@ -71,15 +71,15 @@ public class Test {
             try {
                 OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, test.getClass().getSimpleName() + ": ");
                 test.run();
-                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "passed");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "passed");
             } catch (AssertionError e) {
-                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "FAILED");
-                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Assertion: " + e);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "FAILED");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Assertion: " + e);
                 OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
                 System.exit(0);
             } catch (Exception e) {
-                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "CRASHED");
-                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Exception: " + e);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "CRASHED");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Exception: " + e);
                 OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
                 System.exit(0);
             }

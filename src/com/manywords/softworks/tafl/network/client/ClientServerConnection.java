@@ -94,11 +94,11 @@ public class ClientServerConnection {
     }
 
     void chattyPrint(String message) {
-        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, message);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, message);
     }
 
     void standardPrint(String message) {
-        OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, message);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, message);
     }
 
     /**/

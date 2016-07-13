@@ -277,23 +277,23 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         if(mSelfplayWindow != null) {
             // Run this stuff on the UI thread.
             mGui.getGUIThread().invokeLater(() -> {
-                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Leaving game, entering selfplay window");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Leaving game, entering selfplay window");
                 mSelfplayWindow.notifyGameFinished(mGame);
 
                 // Shut down the players so they don't clutter us
                 mCommandEngine.shutdown();
 
-                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removing windows");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Removing windows");
                 mBoardWindow.close();
-                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removed board");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Removed board");
                 mStatusWindow.close();
-                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removed status");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Removed status");
                 mCommandWindow.close();
-                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removed command");
-                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Removed windows");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Removed command");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Removed windows");
             });
 
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Started selfplay window thread");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Started selfplay window thread");
         }
     }
 
@@ -317,7 +317,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         public void onEnteringGameScreen(Game g, String title) {
             // Set up a game thread
             blockUntilCommandEngineReady(g);
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Command engine ready");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Command engine ready");
 
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
                 createWindows(g, g.getRules().getName());
@@ -366,19 +366,19 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 mCommandEngine = null;
             }
 
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Starting command engine thread");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Starting command engine thread");
             startCommandEngineThread(g);
 
             while(mCommandEngine == null) {
                 try {
-                    OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Waiting...");
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Waiting...");
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
                 }
             }
 
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Command engine ready");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Command engine ready");
         }
 
         private void startCommandEngineThread(Game g) {
@@ -399,12 +399,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                         Player attacker, defender;
 
-                        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Network player role: " + networkPlayer.getGameRole());
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Network player role: " + networkPlayer.getGameRole());
 
                         // Wait for the game joining to finish.
                         while(networkPlayer.getGameRole() == GameRole.OUT_OF_GAME) {
                             try {
-                                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Waiting for other player role");
+                                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Waiting for other player role");
                                 Thread.sleep(100);
                             } catch (InterruptedException e) {
                                 // doesn't matter
@@ -430,7 +430,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             }
 
                             if(mPregameHistory != null) {
-                                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Game screen consuming history");
+                                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game screen consuming history");
                                 for(MoveRecord m : mPregameHistory) {
                                     g.getCurrentState().makeMove(m);
                                 }
@@ -835,7 +835,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onHistoryReceived(List<MoveRecord> moves) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Game screen received history");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game screen received history");
             Rules r = mGame.getRules();
             Game g = new Game(r, GameScreen.this);
 
@@ -851,7 +851,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onServerMoveReceived(MoveRecord move) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Game screen received spectator move: " + move);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Game screen received spectator move: " + move);
             mCommandEngine.getCurrentPlayer().onMoveDecided(move);
             TerminalUtils.runOnUiThread(mGui, () -> mBoardWindow.rerenderBoard());
         }

@@ -1,14 +1,10 @@
 package com.manywords.softworks.tafl.network.server;
 
 import com.manywords.softworks.tafl.OpenTafl;
-import com.manywords.softworks.tafl.network.server.task.HandleClientCommunicationTask;
-import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jay on 6/14/16.
@@ -35,7 +31,7 @@ public class DummyTestServer {
                 mReadThread.start();
             }
         } catch (IOException e) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, e);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, e);
         } finally {
             try {
                 mServerSocket.close();
