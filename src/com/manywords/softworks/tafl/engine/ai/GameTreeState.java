@@ -528,7 +528,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                         evaluation = workspace.evaluator.evaluate(GameTreeState.this);
                     }
                     setValue(evaluation);
-                    OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
                 }
                 MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
                 if (mParent != null) {

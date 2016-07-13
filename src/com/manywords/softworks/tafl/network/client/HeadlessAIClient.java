@@ -267,10 +267,10 @@ public class HeadlessAIClient {
         @Override
         public void onErrorReceived(String message) {
             mLastServerError = message;
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Received error: " + message);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Received error: " + message);
 
             if(mJoinGame && mCommandEngine == null) {
-                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Error joining game: quitting");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Error joining game: quitting");
             }
         }
 
@@ -279,14 +279,14 @@ public class HeadlessAIClient {
             if(mJoinGame && mCommandEngine == null) {
                 boolean foundOpponent = false;
                 for(GameInformation game : games) {
-                    OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, mOpponentUsername + "-" + game.attackerUsername);
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, mOpponentUsername + "-" + game.attackerUsername);
                     if(mOpponentUsername.equals(game.attackerUsername) || mOpponentUsername.equals(game.defenderUsername)) {
                         foundOpponent = true;
                         mAttackingSide = game.freeSideAttackers();
                         mClockSetting = game.clockSetting;
 
                         if(mClockSetting == null) {
-                            OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Headless client can only play timed games.");
+                            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Headless client can only play timed games.");
                             mConnection.disconnect();
                         }
 

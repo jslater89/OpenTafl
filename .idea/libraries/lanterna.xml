@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="lanterna">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/lanterna.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

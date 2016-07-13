@@ -3,9 +3,9 @@
     <output-path>$PROJECT_DIR$/out/artifacts/TaflEngine_jar</output-path>
     <root id="archive" name="OpenTafl.jar">
       <element id="module-output" name="TaflEngine" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lanterna-3.0.0-beta3.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jline-2.14.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/ini4j-0.5.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lanterna.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

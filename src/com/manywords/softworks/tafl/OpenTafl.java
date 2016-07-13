@@ -10,16 +10,12 @@ import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.test.Benchmark;
 import com.manywords.softworks.tafl.test.Test;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
 import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,11 +39,14 @@ public class OpenTafl {
         SILENT
     }
 
-    public static final String CURRENT_VERSION = "v0.3.2.2b";
+    public static final String CURRENT_VERSION = "v0.3.2.3b";
     public static final int NETWORK_PROTOCOL_VERSION = 4;
 
     public static boolean devMode = false;
     public static LogLevel logLevel = LogLevel.NORMAL;
+    private static final int LOG_BUFFER_SIZE = 1024 * 1024;
+    private static final StringBuilder logBuffer = new StringBuilder(LOG_BUFFER_SIZE);
+    private static File logFile;
 
     public static void main(String[] args) {
         Map<String, String> mapArgs = getArgs(args);
@@ -94,6 +93,7 @@ public class OpenTafl {
         }
 
         directoryCheck();
+        setupLogging();
         Coord.initialize();
         BuiltInVariants.loadExternalRules(new File("external-rules.conf"));
         TerminalSettings.loadFromFile();
@@ -113,7 +113,7 @@ public class OpenTafl {
                     HeadlessAIClient client = HeadlessAIClient.startFromArgs(mapArgs);
                 }
                 catch(Exception e) {
-                    OpenTafl.logPrint(LogLevel.SILENT, "Failed to start headless AI client with error: " + e);
+                    OpenTafl.logPrintln(LogLevel.SILENT, "Failed to start headless AI client with error: " + e);
                     OpenTafl.logStackTrace(LogLevel.SILENT, e);
                 }
                 break;
@@ -156,7 +156,7 @@ public class OpenTafl {
                     t = factory.createTerminal();
                     th = new AdvancedTerminal<>(t);
                 } catch (IOException e) {
-                    OpenTafl.logPrint(LogLevel.SILENT, "Failed to start text terminal.");
+                    OpenTafl.logPrintln(LogLevel.SILENT, "Failed to start text terminal.");
                 }
 
                 //RawTerminal display = new RawTerminal();
@@ -171,7 +171,7 @@ public class OpenTafl {
         }
     }
 
-    public static Map<String, String> getArgs(String[] args) {
+    private static Map<String, String> getArgs(String[] args) {
         Map<String, String> mapArgs = new HashMap<String, String>();
 
         String argName = "";
@@ -202,18 +202,37 @@ public class OpenTafl {
         return mapArgs;
     }
 
+    public static void logPrintln(LogLevel messageLevel, Object o) {
+        synchronized (logBuffer) {
+            internalLogPrint(messageLevel, o.toString());
+            internalLogPrint(messageLevel, "\n");
+        }
+    }
+
     public static void logPrint(LogLevel messageLevel, Object o) {
-        if(logLevel == LogLevel.CHATTY) {
+        synchronized (logBuffer) {
+            internalLogPrint(messageLevel, o.toString());
+        }
+    }
+
+    private static void internalLogPrint(LogLevel messageLevel, String s) {
+        if (logLevel == LogLevel.CHATTY) {
             // Incidental messages
-            System.out.println(o.toString());
-        }
-        else if(logLevel == LogLevel.NORMAL && messageLevel != LogLevel.CHATTY) {
+            System.out.print(s);
+            logBuffer.append(s);
+        } else if (logLevel == LogLevel.NORMAL && messageLevel != LogLevel.CHATTY) {
             // Normal messages
-            System.out.println(o.toString());
-        }
-        else if(messageLevel == LogLevel.SILENT) {
+            System.out.print(s);
+            logBuffer.append(s);
+        } else if (messageLevel == LogLevel.SILENT) {
             // Critical errors which should always be displayed
-            System.out.println(o.toString());
+            System.out.print(s);
+            logBuffer.append(s);
+        }
+
+
+        if(logBuffer.length() > (LOG_BUFFER_SIZE - 1024)) {
+            flushLog();
         }
     }
 
@@ -221,7 +240,26 @@ public class OpenTafl {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
-        logPrint(messageLevel, sw.toString());
+        logPrintln(messageLevel, sw.toString());
+    }
+
+    private static void flushLog() {
+        synchronized (logBuffer) {
+            unsafeFlushLog();
+        }
+    }
+
+    private static void unsafeFlushLog() {
+        if(logFile.exists() && logFile.canWrite()) {
+            try {
+                BufferedWriter bw = new BufferedWriter(new FileWriter(logFile));
+                bw.append(logBuffer.toString());
+                bw.flush();
+                logBuffer.delete(0, logBuffer.length());
+            } catch (IOException e) {
+                logPrintln(LogLevel.NORMAL, "Failed to write to log file: " + e);
+            }
+        }
     }
 
     private static void directoryCheck() {
@@ -236,6 +274,35 @@ public class OpenTafl {
 
         if(!new File("engines").exists()) {
             new File("engines").mkdirs();
+        }
+
+        if(!new File("log").exists()) {
+            new File("log").mkdirs();
+        }
+    }
+
+    private static void setupLogging() {
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            logPrintln(LogLevel.SILENT, "Uncaught exception in thread " + t.getName());
+            logPrintln(LogLevel.SILENT, "Exception: " + e);
+            logStackTrace(LogLevel.SILENT, e);
+            flushLog();
+        });
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                unsafeFlushLog();
+            }
+        });
+
+        logFile = new File("log", "lastrun.log");
+        if(logFile.exists()) { logFile.delete(); }
+
+        try {
+            logFile.createNewFile();
+        } catch (IOException e) {
+            logPrintln(LogLevel.NORMAL, "Failed to create log file:" + e);
         }
     }
 

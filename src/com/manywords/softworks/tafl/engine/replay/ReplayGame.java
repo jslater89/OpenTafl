@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.engine.replay;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ public class ReplayGame {
             for(int i = 1; i < components.length; i++) {
                 statePosition++;
                 if(statePosition > mStatePosition && !modified) {
-                    components[i] = "*" + components[i];
+                    components[i] = Ansi.UNDERLINE + components[i] + Ansi.UNDERLINE_OFF;
                     modified = true;
                 }
             }

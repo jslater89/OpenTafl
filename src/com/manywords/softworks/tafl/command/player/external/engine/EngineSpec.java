@@ -59,7 +59,7 @@ public class EngineSpec {
             String args = ini.get("engine", "arguments", String.class);
 
             if(dir == null || dir.equals("") || command == null || command.equals("") || filename == null || filename.equals("")) {
-                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Missing elements");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Missing elements");
                 return false;
             }
 
@@ -67,8 +67,8 @@ public class EngineSpec {
             File engineDir = new File(engineFileDir, dir);
             File engineFile = new File(engineDir, filename);
             if(!engineFile.exists()) {
-                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "File does not exist: " + engineFile);
-                OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, engineFile.getAbsolutePath());
+                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "File does not exist: " + engineFile);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, engineFile.getAbsolutePath());
                 return false;
             }
 

@@ -38,7 +38,7 @@ public class ExternalEngineHost {
             mOutboundPipe = new BufferedOutputStream(new PipedOutputStream(connectToOutput));
         }
         catch(IOException e) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Could not connect input streams");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Could not connect input streams");
             OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
             System.exit(-1);
         }
@@ -60,7 +60,7 @@ public class ExternalEngineHost {
         ProcessBuilder b = new ProcessBuilder();
         b.directory(absoluteDirectory);
         b.command(commandLine);
-        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, b.command());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, b.command());
 
         try {
             mExternalEngine = b.start();
@@ -71,7 +71,7 @@ public class ExternalEngineHost {
             mCommThread.start();
 
         } catch (IOException e) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Failed to start: " + e);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to start: " + e);
             OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
             System.exit(1);
         }
@@ -340,7 +340,7 @@ public class ExternalEngineHost {
             String[] commands = strCommand.split("\n");
 
             for(String cmd : commands) {
-                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Host received: " + cmd);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Host received: " + cmd);
 
                 if (cmd.startsWith("hello")) {
                     mConnected = true;

@@ -63,7 +63,7 @@ public class ChatWindow extends BasicWindow {
 
     public void notifyFocus(boolean focused) {
         if(focused) {
-            setTitle("**CHAT**");
+            setTitle(Ansi.UNDERLINE + "CHAT" + Ansi.UNDERLINE_OFF);
         }
         else {
             setTitle("Chat");
@@ -72,7 +72,7 @@ public class ChatWindow extends BasicWindow {
 
     public void onChatMessageReceived(String sender, String message) {
         if(!message.trim().isEmpty()) {
-            mChatText.addLine("**" + sender + "**" + ": " + message);
+            mChatText.addLine(Ansi.UNDERLINE + sender + Ansi.UNDERLINE_OFF + ": " + message);
         }
     }
 

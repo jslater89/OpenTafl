@@ -9,6 +9,7 @@ import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
+import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
@@ -141,10 +142,9 @@ public class ServerDetailWindow extends BasicWindow {
 
     public void notifyFocus(boolean focused) {
         if(focused) {
-            setTitle("**GAME DETAILS**");
-        }
+            setTitle(Ansi.UNDERLINE + "SERVER DETAILS" + Ansi.UNDERLINE_OFF);        }
         else {
-            setTitle("Game Details");
+            setTitle("Server Details");
         }
     }
 

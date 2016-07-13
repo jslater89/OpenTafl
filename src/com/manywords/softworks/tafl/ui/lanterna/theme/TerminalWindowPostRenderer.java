@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.ui.lanterna.theme;
 
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.graphics.ThemedTextGraphics;
 import com.googlecode.lanterna.gui2.TextGUI;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowPostRenderer;
@@ -10,7 +11,7 @@ import com.googlecode.lanterna.gui2.WindowPostRenderer;
  */
 public class TerminalWindowPostRenderer implements WindowPostRenderer {
     @Override
-    public void postRender(TextGraphics textGraphics, TextGUI textGUI, Window window) {
-        // Do nothing
+    public void postRender(ThemedTextGraphics themedTextGraphics, TextGUI textGUI, Window window) {
+
     }
 }

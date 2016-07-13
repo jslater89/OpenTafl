@@ -26,7 +26,7 @@ public class LoginTask implements Runnable {
     public void run() {
         // if login good
         if (OpenTafl.NETWORK_PROTOCOL_VERSION != packet.networkProtocolVersion) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Client version mismatch! Server version: " + OpenTafl.NETWORK_PROTOCOL_VERSION + " Client version: " + packet.networkProtocolVersion);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Client version mismatch! Server version: " + OpenTafl.NETWORK_PROTOCOL_VERSION + " Client version: " + packet.networkProtocolVersion);
             server.sendPacketToClient(client, new ErrorPacket(ErrorPacket.VERSION_MISMATCH), PriorityTaskQueue.Priority.LOW);
         }
         else if (server.getPlayerDatabase().allowLoginFor(packet.username, packet.password)) {

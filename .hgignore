@@ -21,6 +21,9 @@ engines/opentafl-debug-2.ini
 .idea/vcs.xml
 
 package/*
+log/*
+rules-dump.otr
+server/*
 
 **~
 **local.properties
