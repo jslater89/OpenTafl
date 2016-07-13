@@ -153,6 +153,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 10. Version history
 
+v0.3.2.3b (released 07/13/16):
+- Further improvements for loading rules/saved games from previous versions
+- Integrate new Lanterna feature: ANSI underlining for highlighting text
+- Logging now logs to a file for easier debug attachment
+
 v0.3.2.2b (released 07/05/16):
 - Fix bad 3.2.1b release package
 - Fix occasional crash when the king is the only defending piece
