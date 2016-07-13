@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.test;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.test.ai.*;
 import com.manywords.softworks.tafl.test.consistency.*;
 import com.manywords.softworks.tafl.test.mechanics.ExternalEngineHostTest;
@@ -68,16 +69,18 @@ public class Test {
 
         for (TaflTest test : tests) {
             try {
-                System.out.print(test.getClass().getSimpleName() + ": ");
+                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, test.getClass().getSimpleName() + ": ");
                 test.run();
-                System.out.println("passed");
+                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "passed");
             } catch (AssertionError e) {
-                System.out.println("FAILED");
-                e.printStackTrace(System.out);
+                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "FAILED");
+                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Assertion: " + e);
+                OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
                 System.exit(0);
             } catch (Exception e) {
-                System.out.println("CRASHED");
-                e.printStackTrace(System.out);
+                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "CRASHED");
+                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Exception: " + e);
+                OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
                 System.exit(0);
             }
         }
