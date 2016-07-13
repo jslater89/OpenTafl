@@ -251,8 +251,7 @@ public class OpenTafl {
 
     private static void unsafeFlushLog() {
         if(logFile.exists() && logFile.canWrite()) {
-            try {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(logFile));
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(logFile))) {
                 bw.append(logBuffer.toString());
                 bw.flush();
                 logBuffer.delete(0, logBuffer.length());
