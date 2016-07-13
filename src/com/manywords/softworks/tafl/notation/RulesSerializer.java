@@ -241,9 +241,12 @@ public class RulesSerializer {
         List<List<Side.TaflmanHolder>> startingTaflmen;
 
         Map<String, String> config = getRulesMap(otnrString);
-        if(config.get("dim") == null || config.get("name") == null || config.get("start") == null) {
+        if(config.get("dim") == null || config.get("start") == null) {
             return null;
         }
+
+        config.putIfAbsent("name", "Unknown Tafl");
+
         int boardDimension = Integer.parseInt(config.get("dim"));
         String startPosition = config.get("start");
         startingTaflmen = PositionSerializer.parseTaflmenFromPosition(startPosition);
