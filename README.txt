@@ -205,7 +205,7 @@ v0.2.5.2b (released 05/27/16):
 v0.2.5.1b (released 05/02/16):
 - Add missing 15x15 variant (lost in the build)
 
-v0.2.5b (released 05/01/16):
+v0.2.5.0b (released 05/01/16):
 - Add 15x15 Tablut variant, layout courtesy of the forum at aagenielsen.dk
 - Add option to render large boards (15x15 and up) using an alternate, smaller
   representation
@@ -250,7 +250,7 @@ v0.2.4.2b (released 04/10/16):
 v0.2.4.1b (released 04/10/16):
 - Foteviken tablut: king is strong everywhere, not just near the center
 
-v0.2.4b
+v0.2.4.0b
 - Implementation of 'rules' command in the UI
 - Scrolling message dialog fixes and improvements
 - Add Tablut variants (Foteviken, with attacker camps, and standard)
@@ -268,7 +268,7 @@ v0.2.3.2b (released 04/07/16):
 v0.2.3.1b (released 04/02/16);
 - Hotfix for crash when saving a game after the game has ended
 
-v0.2.3b (released 04/02/16):
+v0.2.3.0b (released 04/02/16):
 - Finish implementation of external engine mode
     - Implement engine-initiated errors
     - Improve OpenTafl's handling of engines which fail to start
@@ -300,7 +300,7 @@ v0.2.3b (released 04/02/16):
     - Player may start a new game rooted at any point in a replay
 
 
-v0.2.2b (released 03/28/16):
+v0.2.2.0b (released 03/28/16):
 - Improvements to OpenTafl AI's time control handling
 - Fix for OpenTafl incorrectly using the opponent's clock when playing as an
   engine
@@ -311,7 +311,7 @@ v0.2.2b (released 03/28/16):
 - Remaining:
     - Handling of engine-initiated errors
 
-v0.2.1b (released 03/20/16):
+v0.2.1.0b (released 03/20/16):
 - Ongoing implementation of external engine mode
 - Newly implemented:
     - OpenTafl-initiated errors and error codes
@@ -325,7 +325,7 @@ v0.2.1b (released 03/20/16):
 - Remaining:
     - Handling of engine-initiated error codes
 
-v0.2.0b (released 03/14/16):
+v0.2.0.0b (released 03/14/16):
 - Functional but incomplete implementation of external engine mode
 - Not yet implemented:
     - Tests
@@ -343,7 +343,7 @@ v0.1.9.1b (released 03/11/16):
 - Text fixes, which you, as a user, can't see
 - Updated license
 
-v0.1.9b (released 02/23/16):
+v0.1.9.0b (released 02/23/16):
 - Implement game clock, along with AI time usage features
 - Save settings between runs (OpenTafl creates settings.ini in the working
   directory)
@@ -352,7 +352,7 @@ v0.1.9b (released 02/23/16):
   terminal, and for portability, Lanterna's Swing terminal emulator remains
   the default)
 
-v0.1.8b (released 02/20/16):
+v0.1.8.0b (released 02/20/16):
 - Speed and memory usage improvements
 - AI difficulty set by thinking time instead of search depth
 - If insufficient time to search to the next depth, stop at the current
@@ -363,7 +363,7 @@ v0.1.7.1b (released 02/19/16):
 - Fixes for game UI layout for narrow screen sizes
 - Implement threefold repetition rules, plus rules serializer support
 
-v0.1.7b (released 02/17/16):
+v0.1.7.0b (released 02/17/16):
 - Prep work for external engine support: split work into additional threads to
   avoid blocking certain other pieces, e.g. the game clock and the engine->
   host communication
@@ -378,7 +378,7 @@ v0.1.6.1b (released 02/09/16):
   capture
 - Fix bug where taflman move cache would be re-allocated for every state
 
-v0.1.6b (released 02/08/16):
+v0.1.6.0b (released 02/08/16):
 - Further reductions in memory use (fixed minification of game tree states)
 - Fixed bug in piece-type determination functions, where certain pieces
   were treated as several types of pieces for the purposes of some rules
@@ -388,26 +388,26 @@ v0.1.6b (released 02/08/16):
 - Foundational work for OpenTafl Notation engine mode: implement rules string 
   generation and parsing
 
-v0.1.5b (released 01/11/16):
+v0.1.5.0b (released 01/11/16):
 - Memory usage reduced to about 1/3 of 0.1.4b
 - Added readme and license file
 
-v0.1.4b (released 01/07/16):
+v0.1.4.0b (released 01/07/16):
 - Serious memory optimizations, which will nevertheless need further work
 
-v0.1.3b (released 01/06/16):
+v0.1.3.0b (released 01/06/16):
 - Fix Windows 32-bit memory size arguments (32-bit Windows can manage only
   about 1.5gb)
 - Add license and readme files
 - Add Tawlbwrdd, using the Bell layout given at Cyningstan.
 
-v0.1.2b (released 12/31/15):
+v0.1.2.0b (released 12/31/15):
 - Turn off evaluation function debug output
 
-v0.1.1b (released 12/31/15):
+v0.1.1.0b (released 12/31/15):
 - Fix huge memory leak
 - Remove deepening table in favor of dual-purpose transposition table
 - Clean up debug printing
 
-v0.1b (12/29/15):
+v0.1.0.0b (12/29/15):
 - Initial public release
