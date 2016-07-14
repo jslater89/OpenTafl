@@ -12,6 +12,8 @@ public class GameInformation {
     public final String defenderUsername;
     public final boolean password;
     public final boolean started;
+    public final boolean combinedChat = true;
+    public final boolean replayAllowed = true;
     public final int spectators;
     public final TimeSpec clockSetting;
 
