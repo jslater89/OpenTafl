@@ -332,7 +332,7 @@ public class ClientServerConnection {
             else if(message.equals(ErrorPacket.VERSION_MISMATCH) || message.equals(ErrorPacket.LOGIN_FAILED)) {
                 mExternalCallback.onErrorReceived(message);
                 disconnect();
-                
+
                 return;
             }
             // These errors don't break anything, they just mean we can't do stuff.
