@@ -329,15 +329,10 @@ public class ClientServerConnection {
             if(message.equals(ErrorPacket.GAME_CANCELED)) {
                 requestGameUpdate();
             }
-            else if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
+            else if(message.equals(ErrorPacket.VERSION_MISMATCH) || message.equals(ErrorPacket.LOGIN_FAILED)) {
                 mExternalCallback.onErrorReceived(message);
-                try {
-                    mServer.close();
-                } catch (IOException e) {
-                    // Best effort
-                }
-                setState(State.DISCONNECTED);
-
+                disconnect();
+                
                 return;
             }
             // These errors don't break anything, they just mean we can't do stuff.
