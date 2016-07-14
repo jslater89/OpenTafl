@@ -245,7 +245,12 @@ public class OpenTafl {
 
     private static void flushLog() {
         synchronized (logBuffer) {
-            unsafeFlushLog();
+            new Thread("LogSaveThread") {
+                @Override
+                public void run() {
+                    unsafeFlushLog();
+                }
+            }.start();
         }
     }
 
