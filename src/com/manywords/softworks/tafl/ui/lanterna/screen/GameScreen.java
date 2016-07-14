@@ -413,6 +413,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                         // TODO: on loading a saved game for a network game, send a history record on game creation.
                         // TODO: on game start, consume history regardless of role.
+
                         if(networkPlayer.getGameRole() == GameRole.ATTACKER) {
                             attacker = networkPlayer;
                             defender = localPlayer;
@@ -425,19 +426,19 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             attacker = new SpectatorPlayer(mServerConnection);
                             defender = new SpectatorPlayer(mServerConnection);
 
-                            if(mServerConnection.hasHistory()) {
-                                mPregameHistory = mServerConnection.consumeHistory();
-                            }
-
-                            if(mPregameHistory != null) {
-                                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game screen consuming history");
-                                for(MoveRecord m : mPregameHistory) {
-                                    g.getCurrentState().makeMove(m);
-                                }
-                            }
-
                             // Doesn't matter which one
                             mServerConnection.setNetworkPlayer((SpectatorPlayer) attacker);
+                        }
+
+                        if(mServerConnection.hasHistory()) {
+                            mPregameHistory = mServerConnection.consumeHistory();
+                        }
+
+                        if(mPregameHistory != null) {
+                            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game screen consuming history");
+                            for(MoveRecord m : mPregameHistory) {
+                                g.getCurrentState().makeMove(m);
+                            }
                         }
 
                         mCommandEngine = new CommandEngine(g, GameScreen.this, attacker, defender);

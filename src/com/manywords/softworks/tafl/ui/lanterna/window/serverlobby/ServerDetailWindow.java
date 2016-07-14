@@ -8,6 +8,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
+import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
@@ -24,6 +25,7 @@ public class ServerDetailWindow extends BasicWindow {
     public interface GameDetailHost {
         public void requestGameUpdate();
         public void createGame(CreateGamePacket packet);
+        public void loadGame(HistoryPacket packet);
         public void leaveGame();
         public void disconnect();
     }
@@ -119,6 +121,10 @@ public class ServerDetailWindow extends BasicWindow {
                     if(d.hashedPassword.equals("")) d.hashedPassword = "none";
                     mCreatePacket = new CreateGamePacket(UUID.randomUUID(), d.attackingSide, d.hashedPassword, d.rules.getOTRString(), d.timeSpec);
                     mHost.createGame(mCreatePacket);
+
+                    if(d.history != null) {
+                        mHost.loadGame(new HistoryPacket(d.history, d.rules.boardSize));
+                    }
                 }
             }
             else if(mButton.isCanceling()) {

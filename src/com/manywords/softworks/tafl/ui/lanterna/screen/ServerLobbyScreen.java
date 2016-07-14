@@ -16,6 +16,7 @@ import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
+import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
@@ -241,6 +242,11 @@ public class ServerLobbyScreen extends LogicalScreen {
         @Override
         public void createGame(CreateGamePacket packet) {
             mConnection.sendCreateGameMessage(packet);
+        }
+
+        @Override
+        public void loadGame(HistoryPacket packet) {
+            mConnection.sendHistory(packet.moves, packet.boardSize);
         }
 
         public void leaveGame() {
