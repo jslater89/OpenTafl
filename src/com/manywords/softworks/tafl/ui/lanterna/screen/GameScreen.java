@@ -411,9 +411,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             }
                         }
 
-                        // TODO: on loading a saved game for a network game, send a history record on game creation.
-                        // TODO: on game start, consume history regardless of role.
-
                         if(networkPlayer.getGameRole() == GameRole.ATTACKER) {
                             attacker = networkPlayer;
                             defender = localPlayer;

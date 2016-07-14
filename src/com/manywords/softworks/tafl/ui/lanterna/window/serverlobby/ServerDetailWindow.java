@@ -119,7 +119,7 @@ public class ServerDetailWindow extends BasicWindow {
 
                 if (!d.canceled) {
                     if(d.hashedPassword.equals("")) d.hashedPassword = "none";
-                    mCreatePacket = new CreateGamePacket(UUID.randomUUID(), d.attackingSide, d.hashedPassword, d.rules.getOTRString(), d.timeSpec);
+                    mCreatePacket = new CreateGamePacket(UUID.randomUUID(), d.attackingSide, d.hashedPassword, d.rules.getOTRString(), d.timeSpec, true, true);
                     mHost.createGame(mCreatePacket);
 
                     if(d.history != null) {

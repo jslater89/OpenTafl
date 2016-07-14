@@ -32,7 +32,7 @@ public class LoadServerGameTest extends ServerTest {
 
         setupServer();
 
-        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", container.game.getRules().getOTRString(), new TimeSpec(0, 0, 0, 0)));
+        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", container.game.getRules().getOTRString(), new TimeSpec(0, 0, 0, 0), true, true));
         mPlayer1.sendHistory(moves, 11);
 
         sleep(500);

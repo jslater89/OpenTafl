@@ -186,7 +186,7 @@ public class HeadlessAIClient {
         if(mConnection.getCurrentState() == ClientServerConnection.State.LOGGED_IN) {
             mCreatingGame = true;
             String password = (mGamePassword.equals(PasswordHasher.NO_PASSWORD) ? mGamePassword : PasswordHasher.hashPassword("", mGamePassword));
-            CreateGamePacket packet = new CreateGamePacket(UUID.randomUUID(), mAttackingSide, password, mRules.getOTRString(), mClockSetting);
+            CreateGamePacket packet = new CreateGamePacket(UUID.randomUUID(), mAttackingSide, password, mRules.getOTRString(), mClockSetting, true, true);
             mConnection.sendCreateGameMessage(packet);
         }
     }

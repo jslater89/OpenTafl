@@ -60,6 +60,8 @@ public class ServerGame {
     private final List<ServerClient> mSpectators = new ArrayList<>();
 
     private boolean mHasStarted;
+    private boolean mChatCombined = true;
+    private boolean mReplayAllowed = true;
 
     private String mBase64HashedPassword = "";
 
@@ -70,6 +72,22 @@ public class ServerGame {
     public ServerGame(NetworkServer server, UUID uuid) {
         this.uuid = uuid;
         mServer = server;
+    }
+
+    public void setChatCombined(boolean combined) {
+        mChatCombined = combined;
+    }
+
+    public void setReplayAllowed(boolean allowed) {
+        mReplayAllowed = allowed;
+    }
+
+    public boolean isChatCombined() {
+        return mChatCombined;
+    }
+
+    public boolean isReplayAllowed() {
+        return mReplayAllowed;
     }
 
     public synchronized void setClock(TimeSpec clockSetting) {
