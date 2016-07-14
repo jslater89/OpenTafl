@@ -168,6 +168,15 @@ public class ClientServerConnection {
         mServerWriter.println(packet);
     }
 
+    public void sendHistoryRequest() {
+        mServerWriter.println(HistoryPacket.PREFIX);
+    }
+
+    public void sendHistory(List<MoveRecord> history, int dimension) {
+        HistoryPacket packet = new HistoryPacket(history, dimension);
+        mServerWriter.println(packet);
+    }
+
     public void sendLeaveGameMessage() {
         if(mServerGameUUID != null) {
             mServerWriter.println(new LeaveGamePacket(mServerGameUUID));
@@ -190,10 +199,6 @@ public class ClientServerConnection {
             return mLastJoinedGame.clockSetting;
         }
         else return null;
-    }
-
-    public void sendHistoryRequest() {
-        mServerWriter.println(HistoryPacket.PREFIX);
     }
 
     public void sendRegistrationMessage(String username, String hashedPassword) {

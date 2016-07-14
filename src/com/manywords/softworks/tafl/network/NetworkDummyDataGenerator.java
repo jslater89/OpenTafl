@@ -24,13 +24,13 @@ public class NetworkDummyDataGenerator {
         for(int i = 0; i < count; i++) {
             switch(new Random().nextInt(3)) {
                 case 0:
-                    games.add(new GameInformation(UUID.randomUUID().toString(), "Brandub 7x7", "Fishbreath", "otherguy", true, true, 0, new TimeSpec(0, 0, 0, 0).toMachineReadableString()));
+                    games.add(new GameInformation(UUID.randomUUID().toString(), "Brandub 7x7", "Fishbreath", "otherguy", true, true, true, 0, new TimeSpec(0, 0, 0, 0).toMachineReadableString()));
                     break;
                 case 1:
-                    games.add(new GameInformation(UUID.randomUUID().toString(), "Tablut 15x15", "Shenmage", "parvusimperator", false, true, 2, new TimeSpec(0, 0, 0, 0).toMachineReadableString()));
+                    games.add(new GameInformation(UUID.randomUUID().toString(), "Tablut 15x15", "Shenmage", "parvusimperator", false, true, false, 2, new TimeSpec(0, 0, 0, 0).toMachineReadableString()));
                     break;
                 case 2:
-                    games.add(new GameInformation(UUID.randomUUID().toString(), "Foteviken Tablut 9x9", "Nasa", "OpenTafl AI", false, false, 28, new TimeSpec(0, 0, 0, 0).toMachineReadableString()));
+                    games.add(new GameInformation(UUID.randomUUID().toString(), "Foteviken Tablut 9x9", "Nasa", "OpenTafl AI", false, false, true, 28, new TimeSpec(0, 0, 0, 0).toMachineReadableString()));
                     break;
             }
         }

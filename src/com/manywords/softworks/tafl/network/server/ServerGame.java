@@ -12,9 +12,11 @@ import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.network.packet.ingame.ClockUpdatePacket;
 import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
+import com.manywords.softworks.tafl.network.server.task.SendPacketTask;
 import com.manywords.softworks.tafl.network.server.task.StartGameTask;
 import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
@@ -48,6 +50,8 @@ public class ServerGame {
     private ServerUiCallback mUiCallback = new ServerUiCallback();
     private TimeSpec mClockSetting;
     private ClockUpdateTask mClockUpdateTask = new ClockUpdateTask();
+    private List<MoveRecord> mPregameHistory = null;
+    private boolean mPregameHistoryLoaded = false;
 
     private ServerClient mAttackerClient;
     private NetworkServerPlayer mAttackerPlayer;
@@ -76,7 +80,6 @@ public class ServerGame {
             mGame.setClock(new GameClock(mGame, clockSetting));
             mGame.getClock().setServerMode(true);
         }
-
     }
 
     public synchronized void setRules(Rules r) {
@@ -92,8 +95,26 @@ public class ServerGame {
         mCommandEngine = new CommandEngine(mGame, mUiCallback, mAttackerPlayer, mDefenderPlayer);
     }
 
+    public synchronized void loadGame(List<MoveRecord> moves) {
+        mPregameHistory = moves;
+        if(mGame == null) {
+            mPregameHistoryLoaded = false;
+        }
+        else {
+            for(MoveRecord m : moves) {
+                // TODO: error tolerance here
+                // TODO: on fail, return to game start.
+                mGame.getCurrentState().makeMove(m);
+            }
+            mPregameHistoryLoaded = true;
+        }
+    }
+
     public void startGame() {
         mHasStarted = true;
+        if(mPregameHistory != null && !mPregameHistoryLoaded) {
+            loadGame(mPregameHistory);
+        }
         mCommandEngine.startGame();
     }
 
@@ -104,6 +125,8 @@ public class ServerGame {
     public boolean hasGameStarted() {
         return mHasStarted;
     }
+
+    public boolean hasLoadedGame() { return mPregameHistoryLoaded; }
 
     public Rules getRules() {
         if(mGame != null) return mGame.getRules();
@@ -154,6 +177,9 @@ public class ServerGame {
 
         if(mAttackerClient != null && mDefenderClient != null) {
             mServer.getTaskQueue().pushTask(new StartGameTask(mServer, this, getAllClients(), new StartGamePacket(mGame.getRules())));
+            if(mPregameHistoryLoaded) {
+                mServer.sendPacketToClients(getAllClients(), new HistoryPacket(mPregameHistory, getRules().boardSize), PriorityTaskQueue.Priority.STANDARD);
+            }
         }
 
         return retval;

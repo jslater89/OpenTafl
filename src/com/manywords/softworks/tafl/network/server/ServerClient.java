@@ -86,7 +86,9 @@ public class ServerClient {
     }
 
     public void writePacket(NetworkPacket packet) {
-        mClientWriter.println(packet.toString());
+        if(!mClientSocket.isClosed()) {
+            mClientWriter.println(packet.toString());
+        }
     }
 
     public void onRegistered(String username) {

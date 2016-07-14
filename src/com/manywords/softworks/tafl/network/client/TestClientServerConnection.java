@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.client;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.engine.Game;
@@ -51,6 +52,7 @@ public class TestClientServerConnection extends ClientServerConnection {
     public GameChatPacket lastGameChat;
     public List<ClientInformation> lastClientUpdate;
     public List<GameInformation> lastGameUpdate;
+    public List<MoveRecord> lastHistory;
     public MoveRecord lastMove;
     public boolean gameEnded = false;
     public VictoryPacket.Victory victory;
@@ -105,11 +107,26 @@ public class TestClientServerConnection extends ClientServerConnection {
         public void onStartGame(Rules r, List<MoveRecord> history) {
             gameEnded = false;
             game = new Game(r, null);
+
+            if(lastHistory != null) {
+                for (MoveRecord m : lastHistory) {
+                    int result = game.getCurrentState().makeMove(m);
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Move result: " + result);
+                }
+            }
         }
 
         @Override
         public void onHistoryReceived(List<MoveRecord> moves) {
+            lastHistory = moves;
 
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Moves: " + moves);
+            if(game != null) {
+                for (MoveRecord m : moves) {
+                    int result = game.getCurrentState().makeMove(m);
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Move result: " + result);
+                }
+            }
         }
 
         @Override

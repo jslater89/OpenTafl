@@ -22,21 +22,19 @@ import java.util.UUID;
  * Created by jay on 6/2/16.
  */
 public class ServerTest extends TaflTest {
-    private Thread mServerThread;
-    private NetworkServer mServer;
+    protected NetworkServer mServer;
 
-    private TestClientServerConnection mPlayer1;
-    private TestClientServerConnection mPlayer2;
+    TestClientServerConnection mPlayer1;
+    TestClientServerConnection mPlayer2;
 
     private static final String player1Username = "asdf";
     private static final String player1Password = PasswordHasher.hashPassword(player1Username, "asdf");
 
     private static final String player2Username = "fdsa";
     private static final String player2Password = PasswordHasher.hashPassword(player2Username, "fdsa");
-    @Override
-    public void run() {
 
-        mServerThread = new Thread(() -> {
+    void setupServer() {
+        Thread mServerThread = new Thread(() -> {
             // Server running
             //System.out.println("Starting server");
             mServer = new NetworkServer(4, false);
@@ -60,6 +58,23 @@ public class ServerTest extends TaflTest {
 
         assert mPlayer1.state == ClientServerConnection.State.LOGGED_IN;
         assert mPlayer2.state == ClientServerConnection.State.LOGGED_IN;
+    }
+
+    void stopServer() {
+        mPlayer1.disconnect();
+        mPlayer2.disconnect();
+
+        mServer.stop();
+
+        sleep(1000);
+
+        assert mPlayer1.state == ClientServerConnection.State.DISCONNECTED;
+        assert mPlayer2.state == ClientServerConnection.State.DISCONNECTED;
+    }
+
+    @Override
+    public void run() {
+        setupServer();
 
         mPlayer1.sendChatMessage(ClientServerConnection.ChatType.LOBBY, "player1", "chatmessage");
         mPlayer2.requestGameUpdate();
@@ -126,14 +141,6 @@ public class ServerTest extends TaflTest {
 
         assert mPlayer2.lastGameUpdate.size() == 0;
 
-        mPlayer1.disconnect();
-        mPlayer2.disconnect();
-
-        mServer.stop();
-
-        sleep(1000);
-
-        assert mPlayer1.state == ClientServerConnection.State.DISCONNECTED;
-        assert mPlayer2.state == ClientServerConnection.State.DISCONNECTED;
+        stopServer();
     }
 }
