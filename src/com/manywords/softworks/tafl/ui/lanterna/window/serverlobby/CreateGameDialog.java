@@ -32,6 +32,8 @@ public class CreateGameDialog extends DialogWindow {
     private int settingsRulesIndex = -1;
     public boolean attackingSide;
     public boolean canceled;
+    public boolean allowReplay;
+    public boolean combineChat;
     public TimeSpec timeSpec = new TimeSpec(0, 0, 0, 0);
 
     private TerminalSize mCachedSize = new TerminalSize(0, 0);
@@ -104,8 +106,15 @@ public class CreateGameDialog extends DialogWindow {
         sideChooser.addItem("Defenders");
         sideChooser.setCheckedItemIndex(0);
 
+        final Label otherOptionsLabel = new Label("Other options");
+        final CheckBoxList<String> optionsChooser = new CheckBoxList<>();
+        optionsChooser.addItem("Combine spectator+player chat", true);
+        optionsChooser.addItem("Allow replays and analysis", true);
+
         final Button finishButton = new Button("Create", () -> {
             if(sideChooser.getCheckedItem().equals("Attackers")) attackingSide = true;
+            if(optionsChooser.isChecked(0)) combineChat = true;
+            if(optionsChooser.isChecked(1)) allowReplay = true;
             hashedPassword = mPasswordInput.getText();
             hashedPassword = (hashedPassword.isEmpty() ? PasswordHasher.NO_PASSWORD : hashedPassword);
             if(!hashedPassword.equals(PasswordHasher.NO_PASSWORD)) {
@@ -156,6 +165,11 @@ public class CreateGameDialog extends DialogWindow {
 
         p.addComponent(sideLabel);
         p.addComponent(sideChooser);
+
+        p.addComponent(newSpacer());
+
+        p.addComponent(otherOptionsLabel);
+        p.addComponent(optionsChooser);
 
         Panel bottomGridPanel = new Panel();
         bottomGridPanel.setLayoutManager(new GridLayout(3));

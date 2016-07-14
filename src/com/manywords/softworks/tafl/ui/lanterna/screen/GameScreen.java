@@ -743,6 +743,16 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(Command.Type.QUIT);
             }
 
+            if(mServerConnection != null) {
+                GameInformation info = mServerConnection.getLastJoinedGameInfo();
+                if(info != null) {
+                    if(!info.allowReplay) {
+                        types.remove(Command.Type.ANALYZE);
+                        types.remove(Command.Type.REPLAY_ENTER);
+                    }
+                }
+            }
+
             return types;
         }
 
