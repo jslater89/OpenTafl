@@ -431,6 +431,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             mPregameHistory = mServerConnection.consumeHistory();
                         }
 
+                        if(mServerConnection.getLastClockSetting() != null) {
+                            mServerConnection.sendClockUpdateRequest();
+                        }
+
                         if(mPregameHistory != null) {
                             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game screen consuming history");
                             for(MoveRecord m : mPregameHistory) {

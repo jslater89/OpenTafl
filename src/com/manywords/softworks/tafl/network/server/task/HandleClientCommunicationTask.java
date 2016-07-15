@@ -65,6 +65,7 @@ public class HandleClientCommunicationTask implements Runnable {
         else if(data.startsWith(ClockUpdatePacket.PREFIX)) {
             if(data.trim().equals(ClockUpdatePacket.PREFIX)) {
                 // request
+                mServer.getTaskQueue().pushTask(new UnscheduledClockUpdateTask(mServer, mClient));
             }
             else {
                 mServer.getTaskQueue().pushTask(new InitialTimeSettingTask(mServer, mClient, ClockUpdatePacket.parse(data)));
