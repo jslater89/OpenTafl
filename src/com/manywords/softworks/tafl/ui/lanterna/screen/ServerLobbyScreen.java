@@ -293,6 +293,9 @@ public class ServerLobbyScreen extends LogicalScreen {
             else if(message.equals(ErrorPacket.GAME_ENDED)) {
                 showDialogOnUiThread("Game over", "Cannot spectate ended games.", false);
             }
+            else if(message.equals(ErrorPacket.BAD_SAVE)) {
+                showDialogOnUiThread("Corrupt save", "Server could not load saved game.", false);
+            }
             else {
                 showDialogOnUiThread("Unhandled error", "Error packet message:\n" + message, false);
             }

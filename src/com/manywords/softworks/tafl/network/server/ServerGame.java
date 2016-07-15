@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.NetworkServerPlayer;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -111,6 +112,10 @@ public class ServerGame {
         mAttackerPlayer = new NetworkServerPlayer(mServer);
         mDefenderPlayer = new NetworkServerPlayer(mServer);
         mCommandEngine = new CommandEngine(mGame, mUiCallback, mAttackerPlayer, mDefenderPlayer);
+
+        if(mPregameHistory != null && !mPregameHistoryLoaded) {
+            loadGame(mPregameHistory);
+        }
     }
 
     public synchronized void loadGame(List<MoveRecord> moves) {
@@ -119,20 +124,29 @@ public class ServerGame {
             mPregameHistoryLoaded = false;
         }
         else {
+            boolean good = true;
             for(MoveRecord m : moves) {
-                // TODO: error tolerance here
-                // TODO: on fail, return to game start.
-                mGame.getCurrentState().makeMove(m);
+                int result = mGame.getCurrentState().makeMove(m);
+
+                if(result != GameState.GOOD_MOVE) {
+                    good = false;
+                    break;
+                }
             }
-            mPregameHistoryLoaded = true;
+            if(good) {
+                mPregameHistoryLoaded = true;
+            }
+            else {
+                mServer.sendPacketToClients(getAllClients(), new ErrorPacket(ErrorPacket.BAD_SAVE), PriorityTaskQueue.Priority.HIGH);
+                for(ServerClient client : getAllClients()) {
+                    removeClient(client);
+                }
+            }
         }
     }
 
     public void startGame() {
         mHasStarted = true;
-        if(mPregameHistory != null && !mPregameHistoryLoaded) {
-            loadGame(mPregameHistory);
-        }
         mCommandEngine.startGame();
     }
 

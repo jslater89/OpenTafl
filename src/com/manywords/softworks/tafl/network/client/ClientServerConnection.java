@@ -336,9 +336,21 @@ public class ClientServerConnection {
                 return;
             }
             // These errors don't break anything, they just mean we can't do stuff.
-            else if(message.equals(ErrorPacket.ALREADY_HOSTING) || message.equals(ErrorPacket.GAME_ENDED) || message.equals(ErrorPacket.OPPONENT_LEFT)) {
+            else if(message.equals(ErrorPacket.ALREADY_HOSTING)
+                    || message.equals(ErrorPacket.GAME_ENDED)
+                    || message.equals(ErrorPacket.OPPONENT_LEFT)) {
                 // A joining player goes back to loggged in, a hosting player stays as host
                 if(mCurrentState == State.JOINING_GAME) {
+                    setState(State.LOGGED_IN);
+                }
+                mExternalCallback.onErrorReceived(message);
+                return;
+            }
+            else if(message.equals(ErrorPacket.BAD_SAVE)) {
+                // A player joining, hosting, or in pregame should go back to logged in.
+                if(mCurrentState == State.JOINING_GAME
+                        || mCurrentState == State.CREATING_GAME
+                        || mCurrentState == State.IN_PREGAME) {
                     setState(State.LOGGED_IN);
                 }
                 mExternalCallback.onErrorReceived(message);
