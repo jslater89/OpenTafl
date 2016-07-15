@@ -23,7 +23,7 @@ import java.util.UUID;
 public class LoadServerGameTest extends ServerTest {
     @Override
     public void run() {
-        GameSerializer.GameContainer container = GameSerializer.loadGameRecordFile(new File("unbuilt/saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
+        GameSerializer.GameContainer container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
         List<MoveRecord> moves = new ArrayList<>(10);
 
         long startZobrist = container.game.getCurrentState().mZobristHash;
