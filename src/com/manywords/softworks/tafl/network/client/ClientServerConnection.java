@@ -178,7 +178,7 @@ public class ClientServerConnection {
     }
 
     public void sendClockUpdateRequest() {
-        mServerWriter.print(ClockUpdatePacket.PREFIX);
+        mServerWriter.println(ClockUpdatePacket.PREFIX);
     }
 
     public void sendClockUpdate(TimeSpec attackerClock, TimeSpec defenderClock) {
