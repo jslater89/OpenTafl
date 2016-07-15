@@ -35,8 +35,9 @@ public class LoadServerGameTest extends ServerTest {
 
         setupServer();
 
-        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", container.game.getRules().getOTRString(), new TimeSpec(0, 0, 0, 0), true, true));
+        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", container.game.getRules().getOTRString(), new TimeSpec(300000, 30000, 3, 1000), true, true));
         mPlayer1.sendHistory(moves, 11);
+        mPlayer1.sendClockUpdate(new TimeSpec(200000, 30000, 2, 0), new TimeSpec(100000, 12000, 2, 0));
 
         sleep(500);
 
@@ -56,6 +57,9 @@ public class LoadServerGameTest extends ServerTest {
 
         assert mPlayer1.game.getCurrentState().mZobristHash != startZobrist;
         assert mPlayer1.game.getCurrentState().mZobristHash == mPlayer2.game.getCurrentState().mZobristHash;
+
+        assert mPlayer1.lastDefenderTime.mainTime <= 101000; // increments
+        assert mPlayer2.lastAttackerTime.mainTime <= 201000;
 
         mPlayer1.sendLeaveGameMessage();
         mPlayer2.sendLeaveGameMessage();

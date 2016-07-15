@@ -53,6 +53,8 @@ public class TestClientServerConnection extends ClientServerConnection {
     public List<ClientInformation> lastClientUpdate;
     public List<GameInformation> lastGameUpdate;
     public List<MoveRecord> lastHistory;
+    public TimeSpec lastAttackerTime;
+    public TimeSpec lastDefenderTime;
     public MoveRecord lastMove;
     public boolean gameEnded = false;
     public VictoryPacket.Victory victory;
@@ -115,6 +117,8 @@ public class TestClientServerConnection extends ClientServerConnection {
                     OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Move result: " + result);
                 }
             }
+
+            sendClockUpdateRequest();
         }
 
         @Override
@@ -137,7 +141,8 @@ public class TestClientServerConnection extends ClientServerConnection {
 
         @Override
         public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock) {
-
+            lastAttackerTime = attackerClock;
+            lastDefenderTime = defenderClock;
         }
 
         @Override
