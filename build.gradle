@@ -19,7 +19,7 @@ dependencies {
 
 jar {
     baseName = 'OpenTafl'
-    version =  'v0.3.2.3b'
+    version =  'v0.3.3.0b'
     manifest {
         attributes ('Main-Class': mainClassName, "Class-Path": configurations.compile.collect { it.getName() }.join(' '))
     }
