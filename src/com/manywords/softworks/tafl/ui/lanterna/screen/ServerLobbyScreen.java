@@ -245,8 +245,11 @@ public class ServerLobbyScreen extends LogicalScreen {
         }
 
         @Override
-        public void loadGame(HistoryPacket packet) {
+        public void loadGame(HistoryPacket packet, TimeSpec attackerClock, TimeSpec defenderClock) {
             mConnection.sendHistory(packet.moves, packet.boardSize);
+            if(attackerClock != null && defenderClock != null) {
+                mConnection.sendClockUpdate(attackerClock, defenderClock);
+            }
         }
 
         public void leaveGame() {

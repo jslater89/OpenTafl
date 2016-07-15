@@ -177,6 +177,11 @@ public class ClientServerConnection {
         mServerWriter.println(packet);
     }
 
+    public void sendClockUpdate(TimeSpec attackerClock, TimeSpec defenderClock) {
+        ClockUpdatePacket packet = new ClockUpdatePacket(attackerClock, defenderClock);
+        mServerWriter.println(packet);
+    }
+
     public void sendLeaveGameMessage() {
         if(mServerGameUUID != null) {
             mServerWriter.println(new LeaveGamePacket(mServerGameUUID));

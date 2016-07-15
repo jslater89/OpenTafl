@@ -19,6 +19,7 @@ import com.manywords.softworks.tafl.ui.lanterna.window.mainmenu.TimeEntryDialog;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -35,6 +36,10 @@ public class CreateGameDialog extends DialogWindow {
     public boolean allowReplay;
     public boolean combineChat;
     public TimeSpec timeSpec = new TimeSpec(0, 0, 0, 0);
+
+    // Used for loading games: time remaining
+    public TimeSpec attackerClock = null;
+    public TimeSpec defenderClock = null;
 
     private TerminalSize mCachedSize = new TerminalSize(0, 0);
     private TextBox mPasswordInput;
@@ -71,6 +76,36 @@ public class CreateGameDialog extends DialogWindow {
             GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
             rules = g.game.getRules();
             history = new ArrayList<>(g.moves);
+
+            Map<String, String> tagMap = g.game.getTagMap();
+
+            if(tagMap.containsKey("time-control")) {
+                String timeControl = tagMap.get("time-control");
+
+                // TODO: refactor this block to a method in GameSerializer
+                timeControl = timeControl.trim();
+                if(timeControl.split(" ").length == 2) timeControl += " 0";
+                else timeControl = timeControl.replaceAll("i", "");
+
+                timeSpec = TimeSpec.parseMachineReadableString(timeControl, " ", 1000);
+            }
+
+            if(tagMap.containsKey("time-remaining")) {
+                String[] clockRecords = tagMap.get("time-remaining").split(",");
+
+                clockRecords[0] = clockRecords[0].trim();
+                clockRecords[1] = clockRecords[1].trim();
+
+                if(clockRecords[0].split(" ").length == 2) clockRecords[0] += " 0";
+                else clockRecords[0] = clockRecords[0].replaceAll("i", "");
+
+                if(clockRecords[1].split(" ").length == 2) clockRecords[1] += " 0";
+                else clockRecords[1] = clockRecords[1].replaceAll("i", "");
+
+                attackerClock = TimeSpec.parseMachineReadableString(clockRecords[0], " ", 1000);
+                defenderClock = TimeSpec.parseMachineReadableString(clockRecords[1], " ", 1000);
+            }
+
             rulesLabel.setText("Rules: loaded " + rules.toString());
         });
 

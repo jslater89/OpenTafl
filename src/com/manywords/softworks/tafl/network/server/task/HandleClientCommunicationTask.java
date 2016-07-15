@@ -1,9 +1,6 @@
 package com.manywords.softworks.tafl.network.server.task;
 
-import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
-import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
-import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
-import com.manywords.softworks.tafl.network.packet.ingame.MovePacket;
+import com.manywords.softworks.tafl.network.packet.ingame.*;
 import com.manywords.softworks.tafl.network.packet.pregame.*;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
@@ -63,6 +60,14 @@ public class HandleClientCommunicationTask implements Runnable {
             else {
                 // The client has loaded a game
                 mServer.getTaskQueue().pushTask(new LoadGameTask(mServer, mClient, HistoryPacket.parse(data)));
+            }
+        }
+        else if(data.startsWith(ClockUpdatePacket.PREFIX)) {
+            if(data.trim().equals(ClockUpdatePacket.PREFIX)) {
+                // request
+            }
+            else {
+                mServer.getTaskQueue().pushTask(new InitialTimeSettingTask(mServer, mClient, ClockUpdatePacket.parse(data)));
             }
         }
         else if(data.startsWith(GameEndedPacket.PREFIX)) {

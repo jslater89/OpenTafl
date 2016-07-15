@@ -51,8 +51,13 @@ public class ServerGame {
     private ServerUiCallback mUiCallback = new ServerUiCallback();
     private TimeSpec mClockSetting;
     private ClockUpdateTask mClockUpdateTask = new ClockUpdateTask();
+
+    // These variables are used for loading network games
     private List<MoveRecord> mPregameHistory = null;
     private boolean mPregameHistoryLoaded = false;
+    private TimeSpec mInitialAttackerClock = null;
+    private TimeSpec mInitialDefenderClock = null;
+    private boolean mInitialClocksLoaded = false;
 
     private ServerClient mAttackerClient;
     private NetworkServerPlayer mAttackerPlayer;
@@ -107,6 +112,10 @@ public class ServerGame {
         if(mClockSetting != null) {
             mGame.setClock(new GameClock(mGame, mClockSetting));
             mGame.getClock().setServerMode(true);
+
+            if(!mInitialClocksLoaded && mInitialAttackerClock != null && mInitialDefenderClock != null) {
+                mGame.getClock().handleNetworkTimeUpdate(mInitialAttackerClock, mInitialDefenderClock);
+            }
         }
 
         mAttackerPlayer = new NetworkServerPlayer(mServer);
@@ -142,6 +151,19 @@ public class ServerGame {
                     removeClient(client);
                 }
             }
+        }
+    }
+
+    public synchronized void setInitialTime(TimeSpec attackerClock, TimeSpec defenderClock) {
+        mInitialAttackerClock = attackerClock;
+        mInitialDefenderClock = defenderClock;
+
+        if(mGame == null) {
+            mInitialClocksLoaded = false;
+        }
+        else {
+            mGame.getClock().handleNetworkTimeUpdate(attackerClock, defenderClock);
+            mInitialClocksLoaded = true;
         }
     }
 
