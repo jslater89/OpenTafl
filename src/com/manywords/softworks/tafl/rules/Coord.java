@@ -230,6 +230,7 @@ public class Coord {
     }
 
     public static List<List<Coord>> getRankAndFileCoords(int dimension, Coord c) {
+        if(c == null) throw new IllegalStateException();
         return rankAndFileCoords.get(dimension).get(getIndex(dimension, c));
     }
 

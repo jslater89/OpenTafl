@@ -3,10 +3,13 @@ package com.manywords.softworks.tafl.test.network;
 
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
+import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.notation.GameSerializer;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 
 import java.io.File;
@@ -53,6 +56,22 @@ public class LoadServerGameTest extends ServerTest {
 
         assert mPlayer1.game.getCurrentState().mZobristHash != startZobrist;
         assert mPlayer1.game.getCurrentState().mZobristHash == mPlayer2.game.getCurrentState().mZobristHash;
+
+        mPlayer1.sendLeaveGameMessage();
+        mPlayer2.sendLeaveGameMessage();
+
+        sleep(500);
+
+        assert mPlayer1.state == mPlayer2.state && mPlayer2.state == ClientServerConnection.State.LOGGED_IN;
+
+        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", container.game.getRules().getOTRString(), new TimeSpec(0, 0, 0, 0), true, true));
+        moves.clear();
+        moves.add(new MoveRecord(Coord.get(3, 3), Coord.get(2, 2)));
+        mPlayer1.sendHistory(moves, 11);
+
+        sleep(500);
+
+        assert mPlayer1.lastError.equals(ErrorPacket.BAD_SAVE);
 
         stopServer();
     }

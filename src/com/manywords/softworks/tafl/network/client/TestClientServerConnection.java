@@ -56,6 +56,7 @@ public class TestClientServerConnection extends ClientServerConnection {
     public MoveRecord lastMove;
     public boolean gameEnded = false;
     public VictoryPacket.Victory victory;
+    public String lastError = "";
 
     class TestClientServerCallback implements ClientServerConnection.ClientServerCallback {
         @Override
@@ -80,7 +81,7 @@ public class TestClientServerConnection extends ClientServerConnection {
 
         @Override
         public void onErrorReceived(String message) {
-
+            lastError = message;
         }
 
         @Override
