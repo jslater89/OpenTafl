@@ -23,7 +23,6 @@ engines/opentafl-debug-2.ini
 package/*
 log/*
 rules-dump.otr
-server/*
 
 **~
 **local.properties
@@ -35,3 +34,4 @@ syntax: regexp
 ^engines/.*
 ^build/.*
 ^\.gradle.*
+^server/.*

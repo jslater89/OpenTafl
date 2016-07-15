@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.test.mechanics.GameClockTest;
 import com.manywords.softworks.tafl.test.mechanics.KingMissingPositionRecordTest;
 import com.manywords.softworks.tafl.test.mechanics.ServerTickThreadTest;
 import com.manywords.softworks.tafl.test.network.HeadlessAITest;
+import com.manywords.softworks.tafl.test.network.LoadServerGameTest;
 import com.manywords.softworks.tafl.test.network.ServerTest;
 import com.manywords.softworks.tafl.test.rules.*;
 
@@ -52,6 +53,7 @@ public class Test {
 
         // Network tests
         tests.add(new ServerTest());
+        tests.add(new LoadServerGameTest());
         tests.add(new HeadlessAITest()); // also tests client connection somewhat
 
         // Mechanics tests

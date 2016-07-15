@@ -411,8 +411,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             }
                         }
 
-                        // TODO: on loading a saved game for a network game, send a history record on game creation.
-                        // TODO: on game start, consume history regardless of role.
                         if(networkPlayer.getGameRole() == GameRole.ATTACKER) {
                             attacker = networkPlayer;
                             defender = localPlayer;
@@ -425,19 +423,23 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             attacker = new SpectatorPlayer(mServerConnection);
                             defender = new SpectatorPlayer(mServerConnection);
 
-                            if(mServerConnection.hasHistory()) {
-                                mPregameHistory = mServerConnection.consumeHistory();
-                            }
-
-                            if(mPregameHistory != null) {
-                                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game screen consuming history");
-                                for(MoveRecord m : mPregameHistory) {
-                                    g.getCurrentState().makeMove(m);
-                                }
-                            }
-
                             // Doesn't matter which one
                             mServerConnection.setNetworkPlayer((SpectatorPlayer) attacker);
+                        }
+
+                        if(mServerConnection.hasHistory()) {
+                            mPregameHistory = mServerConnection.consumeHistory();
+                        }
+
+                        if(mServerConnection.getLastClockSetting() != null) {
+                            mServerConnection.sendClockUpdateRequest();
+                        }
+
+                        if(mPregameHistory != null) {
+                            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game screen consuming history");
+                            for(MoveRecord m : mPregameHistory) {
+                                g.getCurrentState().makeMove(m);
+                            }
                         }
 
                         mCommandEngine = new CommandEngine(g, GameScreen.this, attacker, defender);
@@ -743,6 +745,16 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(Command.Type.RULES);
                 types.add(Command.Type.SAVE);
                 types.add(Command.Type.QUIT);
+            }
+
+            if(mServerConnection != null) {
+                GameInformation info = mServerConnection.getLastJoinedGameInfo();
+                if(info != null) {
+                    if(!info.allowReplay) {
+                        types.remove(Command.Type.ANALYZE);
+                        types.remove(Command.Type.REPLAY_ENTER);
+                    }
+                }
             }
 
             return types;

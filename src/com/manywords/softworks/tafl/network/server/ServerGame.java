@@ -6,15 +6,18 @@ import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.NetworkServerPlayer;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.network.packet.ingame.ClockUpdatePacket;
 import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
+import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
+import com.manywords.softworks.tafl.network.server.task.SendPacketTask;
 import com.manywords.softworks.tafl.network.server.task.StartGameTask;
 import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
@@ -49,6 +52,13 @@ public class ServerGame {
     private TimeSpec mClockSetting;
     private ClockUpdateTask mClockUpdateTask = new ClockUpdateTask();
 
+    // These variables are used for loading network games
+    private List<MoveRecord> mPregameHistory = null;
+    private boolean mPregameHistoryLoaded = false;
+    private TimeSpec mInitialAttackerClock = null;
+    private TimeSpec mInitialDefenderClock = null;
+    private boolean mInitialClocksLoaded = false;
+
     private ServerClient mAttackerClient;
     private NetworkServerPlayer mAttackerPlayer;
     private ServerClient mDefenderClient;
@@ -56,6 +66,8 @@ public class ServerGame {
     private final List<ServerClient> mSpectators = new ArrayList<>();
 
     private boolean mHasStarted;
+    private boolean mChatCombined = true;
+    private boolean mReplayAllowed = true;
 
     private String mBase64HashedPassword = "";
 
@@ -68,6 +80,22 @@ public class ServerGame {
         mServer = server;
     }
 
+    public void setChatCombined(boolean combined) {
+        mChatCombined = combined;
+    }
+
+    public void setReplayAllowed(boolean allowed) {
+        mReplayAllowed = allowed;
+    }
+
+    public boolean isChatCombined() {
+        return mChatCombined;
+    }
+
+    public boolean isReplayAllowed() {
+        return mReplayAllowed;
+    }
+
     public synchronized void setClock(TimeSpec clockSetting) {
         mClockSetting = clockSetting;
 
@@ -76,7 +104,6 @@ public class ServerGame {
             mGame.setClock(new GameClock(mGame, clockSetting));
             mGame.getClock().setServerMode(true);
         }
-
     }
 
     public synchronized void setRules(Rules r) {
@@ -85,11 +112,59 @@ public class ServerGame {
         if(mClockSetting != null) {
             mGame.setClock(new GameClock(mGame, mClockSetting));
             mGame.getClock().setServerMode(true);
+
+            if(!mInitialClocksLoaded && mInitialAttackerClock != null && mInitialDefenderClock != null) {
+                mGame.getClock().handleNetworkTimeUpdate(mInitialAttackerClock, mInitialDefenderClock);
+            }
         }
 
         mAttackerPlayer = new NetworkServerPlayer(mServer);
         mDefenderPlayer = new NetworkServerPlayer(mServer);
         mCommandEngine = new CommandEngine(mGame, mUiCallback, mAttackerPlayer, mDefenderPlayer);
+
+        if(mPregameHistory != null && !mPregameHistoryLoaded) {
+            loadGame(mPregameHistory);
+        }
+    }
+
+    public synchronized void loadGame(List<MoveRecord> moves) {
+        mPregameHistory = moves;
+        if(mGame == null) {
+            mPregameHistoryLoaded = false;
+        }
+        else {
+            boolean good = true;
+            for(MoveRecord m : moves) {
+                int result = mGame.getCurrentState().makeMove(m);
+
+                if(result != GameState.GOOD_MOVE) {
+                    good = false;
+                    break;
+                }
+            }
+            if(good) {
+                mPregameHistoryLoaded = true;
+            }
+            else {
+                mServer.sendPacketToClients(getAllClients(), new ErrorPacket(ErrorPacket.BAD_SAVE), PriorityTaskQueue.Priority.HIGH);
+                for(ServerClient client : getAllClients()) {
+                    removeClient(client);
+                }
+            }
+        }
+    }
+
+    public synchronized void setInitialTime(TimeSpec attackerClock, TimeSpec defenderClock) {
+        mInitialAttackerClock = attackerClock;
+        mInitialDefenderClock = defenderClock;
+
+        if(mGame == null) {
+            mInitialClocksLoaded = false;
+        }
+        else {
+            mGame.getClock().handleNetworkTimeUpdate(attackerClock, defenderClock);
+            mInitialClocksLoaded = true;
+        }
     }
 
     public void startGame() {
@@ -104,6 +179,8 @@ public class ServerGame {
     public boolean hasGameStarted() {
         return mHasStarted;
     }
+
+    public boolean hasLoadedGame() { return mPregameHistoryLoaded; }
 
     public Rules getRules() {
         if(mGame != null) return mGame.getRules();
@@ -154,6 +231,9 @@ public class ServerGame {
 
         if(mAttackerClient != null && mDefenderClient != null) {
             mServer.getTaskQueue().pushTask(new StartGameTask(mServer, this, getAllClients(), new StartGamePacket(mGame.getRules())));
+            if(mPregameHistoryLoaded) {
+                mServer.sendPacketToClients(getAllClients(), new HistoryPacket(mPregameHistory, getRules().boardSize), PriorityTaskQueue.Priority.STANDARD);
+            }
         }
 
         return retval;

@@ -16,6 +16,7 @@ import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
+import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
@@ -243,6 +244,14 @@ public class ServerLobbyScreen extends LogicalScreen {
             mConnection.sendCreateGameMessage(packet);
         }
 
+        @Override
+        public void loadGame(HistoryPacket packet, TimeSpec attackerClock, TimeSpec defenderClock) {
+            mConnection.sendHistory(packet.moves, packet.boardSize);
+            if(attackerClock != null && defenderClock != null) {
+                mConnection.sendClockUpdate(attackerClock, defenderClock);
+            }
+        }
+
         public void leaveGame() {
             mConnection.sendLeaveGameMessage();
         }
@@ -286,6 +295,9 @@ public class ServerLobbyScreen extends LogicalScreen {
             }
             else if(message.equals(ErrorPacket.GAME_ENDED)) {
                 showDialogOnUiThread("Game over", "Cannot spectate ended games.", false);
+            }
+            else if(message.equals(ErrorPacket.BAD_SAVE)) {
+                showDialogOnUiThread("Corrupt save", "Server could not load saved game.", false);
             }
             else {
                 showDialogOnUiThread("Unhandled error", "Error packet message:\n" + message, false);

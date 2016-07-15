@@ -34,11 +34,14 @@ public class GameListPacket extends NetworkPacket {
 
             boolean password = unquotedElements[0].contains("password:true");
             boolean started = unquotedElements[1].contains("started:true");
-            int spectators = Integer.parseInt(unquotedElements[2].replaceAll("[a-z]|\\s|:", ""));
+            boolean loaded = unquotedElements[2].contains("loaded:true");
+            boolean combinedChat = unquotedElements[3].contains("combinechat:true");
+            boolean replayAllowed = unquotedElements[4].contains("allowreplay:true");
+            int spectators = Integer.parseInt(unquotedElements[5].replaceAll("[a-z]|\\s|:", ""));
 
-            TimeSpec ts = TimeSpec.parseMachineReadableString(unquotedElements[3]);
+            TimeSpec ts = TimeSpec.parseMachineReadableString(unquotedElements[6]);
 
-            games.add(new GameInformation(uuid, rulesName, attackerName, defenderName, password, started, spectators, ts.toMachineReadableString()));
+            games.add(new GameInformation(uuid, rulesName, attackerName, defenderName, password, started, loaded, combinedChat, replayAllowed, spectators, ts.toMachineReadableString()));
         }
 
         return new GameListPacket(games);
@@ -54,6 +57,9 @@ public class GameListPacket extends NetworkPacket {
             String defenderUsername = g.getDefenderClient() == null ? "<none>" :g.getDefenderClient().getUsername();
             boolean password = g.isPassworded();
             boolean started = g.hasGameStarted();
+            boolean loaded = g.hasLoadedGame();
+            boolean combinedChat = g.isChatCombined();
+            boolean replayAllowed = g.isReplayAllowed();
             int spectators = g.getSpectators().size();
             TimeSpec ts;
             if(g.getGame().getClock() != null) {
@@ -63,7 +69,7 @@ public class GameListPacket extends NetworkPacket {
                 ts = new TimeSpec(0, 0, 0, 0);
             }
 
-            games.add(new GameInformation(uuidString, rulesName, attackerUsername, defenderUsername, password, started, spectators, ts.toMachineReadableString()));
+            games.add(new GameInformation(uuidString, rulesName, attackerUsername, defenderUsername, password, started, loaded, combinedChat, replayAllowed, spectators, ts.toMachineReadableString()));
         }
 
         return new GameListPacket(games);

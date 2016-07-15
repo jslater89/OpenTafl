@@ -168,6 +168,24 @@ public class ClientServerConnection {
         mServerWriter.println(packet);
     }
 
+    public void sendHistoryRequest() {
+        mServerWriter.println(HistoryPacket.PREFIX);
+    }
+
+    public void sendHistory(List<MoveRecord> history, int dimension) {
+        HistoryPacket packet = new HistoryPacket(history, dimension);
+        mServerWriter.println(packet);
+    }
+
+    public void sendClockUpdateRequest() {
+        mServerWriter.println(ClockUpdatePacket.PREFIX);
+    }
+
+    public void sendClockUpdate(TimeSpec attackerClock, TimeSpec defenderClock) {
+        ClockUpdatePacket packet = new ClockUpdatePacket(attackerClock, defenderClock);
+        mServerWriter.println(packet);
+    }
+
     public void sendLeaveGameMessage() {
         if(mServerGameUUID != null) {
             mServerWriter.println(new LeaveGamePacket(mServerGameUUID));
@@ -190,10 +208,6 @@ public class ClientServerConnection {
             return mLastJoinedGame.clockSetting;
         }
         else return null;
-    }
-
-    public void sendHistoryRequest() {
-        mServerWriter.println(HistoryPacket.PREFIX);
     }
 
     public void sendRegistrationMessage(String username, String hashedPassword) {
@@ -324,21 +338,28 @@ public class ClientServerConnection {
             if(message.equals(ErrorPacket.GAME_CANCELED)) {
                 requestGameUpdate();
             }
-            else if(message.equals(ErrorPacket.VERSION_MISMATCH)) {
+            else if(message.equals(ErrorPacket.VERSION_MISMATCH) || message.equals(ErrorPacket.LOGIN_FAILED)) {
                 mExternalCallback.onErrorReceived(message);
-                try {
-                    mServer.close();
-                } catch (IOException e) {
-                    // Best effort
-                }
-                setState(State.DISCONNECTED);
+                disconnect();
 
                 return;
             }
             // These errors don't break anything, they just mean we can't do stuff.
-            else if(message.equals(ErrorPacket.ALREADY_HOSTING) || message.equals(ErrorPacket.GAME_ENDED) || message.equals(ErrorPacket.OPPONENT_LEFT)) {
+            else if(message.equals(ErrorPacket.ALREADY_HOSTING)
+                    || message.equals(ErrorPacket.GAME_ENDED)
+                    || message.equals(ErrorPacket.OPPONENT_LEFT)) {
                 // A joining player goes back to loggged in, a hosting player stays as host
                 if(mCurrentState == State.JOINING_GAME) {
+                    setState(State.LOGGED_IN);
+                }
+                mExternalCallback.onErrorReceived(message);
+                return;
+            }
+            else if(message.equals(ErrorPacket.BAD_SAVE)) {
+                // A player joining, hosting, or in pregame should go back to logged in.
+                if(mCurrentState == State.JOINING_GAME
+                        || mCurrentState == State.CREATING_GAME
+                        || mCurrentState == State.IN_PREGAME) {
                     setState(State.LOGGED_IN);
                 }
                 mExternalCallback.onErrorReceived(message);

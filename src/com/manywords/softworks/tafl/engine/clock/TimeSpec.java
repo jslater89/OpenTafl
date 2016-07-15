@@ -21,17 +21,22 @@ public class TimeSpec {
     }
 
     public static TimeSpec parseMachineReadableString(String timeSpec, String componentSeparator) {
+        return parseMachineReadableString(timeSpec, componentSeparator, 1);
+    }
+
+    public static TimeSpec parseMachineReadableString(String timeSpec, String componentSeparator, long multiplier) {
         String[] parts = timeSpec.split(componentSeparator);
-        long mainTime = Long.parseLong(parts[0]);
+        long mainTime = Long.parseLong(parts[0]) * multiplier;
 
         String[] overtimeParts = parts[1].split("/");
-        long overtimeTime = Long.parseLong(overtimeParts[0]);
+        long overtimeTime = Long.parseLong(overtimeParts[0]) * multiplier;
         int overtimeCount = Integer.parseInt(overtimeParts[1]);
 
-        long incrementTime = Long.parseLong(parts[2]);
+        long incrementTime = Long.parseLong(parts[2]) * multiplier;
 
         return new TimeSpec(mainTime, overtimeTime, overtimeCount, incrementTime);
     }
+
 
     public boolean isEnabled() {
         // Clock is enabled if we have either main time or overtime time.

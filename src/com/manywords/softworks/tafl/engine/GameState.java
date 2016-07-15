@@ -611,6 +611,8 @@ public class GameState {
     }
 
     public int makeMove(MoveRecord nextMove) {
+        if(getPieceAt(nextMove.start.x, nextMove.start.y) == Taflman.EMPTY) return ILLEGAL_MOVE;
+
         return moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end).getLastMoveResult();
     }
 

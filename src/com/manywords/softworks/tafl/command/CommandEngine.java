@@ -101,7 +101,9 @@ public class CommandEngine {
         }
         if(mGame.getClock() != null) {
             mGame.getClock().setCallback(mClockCallback);
+            mGame.getClock().updateClients();
         }
+
 
         mThinkTime = TerminalSettings.aiThinkTime;
         mAttacker.setCallback(mPlayerCallback);

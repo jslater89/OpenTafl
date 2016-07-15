@@ -27,8 +27,8 @@ OpenTafl32.bat (Windows, 32-bit java)
 OpenTafl64.bat (Windows, 64-bit java)
 OpenTafl.sh (Linux and Mac)
 
-To determine if you have 32-bit or 64-bit Java installed, run this command in
-a command prompt window:
+To determine whether you have 32-bit or 64-bit Java installed, run this command
+in a command prompt window:
 
 java -version
 
@@ -103,27 +103,25 @@ Detailed results, including game records for every game, will be saved in the
 'selfplay-results' subdirectory under the main OpenTafl directory.
 
 7. Network play
-OpenTafl can be played with humans and AIs (not yet implemented) from around
-the world, using its tafl server functionality. Anyone may run an OpenTafl
-server by running the OpenTafl command with the --server flag. An OpenTafl
-server is provided by Many Words Softworks at intersect.manywords.press. The
-currently-selected server may be changed in the options menu. Servers run on
-port 11541.
+OpenTafl can be played with humans and AIs from around the world, using its
+tafl server functionality. Anyone may run an OpenTafl server by running the
+OpenTafl command with the --server flag. An OpenTafl server is provided by
+Many Words Softworks at intersect.manywords.press. The currently-selected
+server may be changed in the options menu. Servers run on port 11541.
 
 On connecting to a server, clients will be presented with a server login
 dialog. Enter your credentials to log in or register a new account. Inactive
 accounts are pruned weekly. (This interval is subject to change.)
 
 After joining a server, clients will be presented with the server lobby screen,
-comprising three windows. The focused window will be indicated by asterisks
-surrounding its title, which will also be rendered in capital letters. Press
-Tab to cycle window focus clockwise, or Shift-Tab to cycle focus
-counterclockwise.
+comprising three windows. The focused window will be indicated by an underlined
+title, which will also be rendered in capital letters. Press Tab to cycle 
+window focus clockwise, or Shift-Tab to cycle focus counterclockwise.
 
 The initially-focused window is the game list window. Use the arrow keys to
 scroll, or press enter to select a game to join.
 
-The second window, the Server Information window, provides buttons to create
+The second window, the Server Detail window, provides buttons to create
 games, refresh the game list (the game list is automatically refreshed every
 few seconds), and leave the server. The Server Information window also contains
 a list of all players currently connected to the server.
@@ -132,9 +130,31 @@ The third window, the Lobby Chat window, shows the lobby chat. Use Page Up and
 Page Down to scroll through the chat history. Type your messages in the text
 entry box, and press Enter to send them.
 
+On creating a game, clients will be presented with a dialog box providing
+several options for the game to be created. Using the 'Rules' button, the
+player may select a rules variant to play. Using the 'Load game' button, the
+player may instead select a saved game to load. When loading a saved game,
+OpenTafl attempts to restore the full state of the game, including its history,
+as well as any time control settings. The 'Clock settings' label will display
+the time control settings used in the saved game. When loading the game, if the
+saved game contains information on the time remaining on the clocks, OpenTafl
+will set the clocks according to that information. To disable time control in a
+loaded game, use the clock settings window to set main time and overtime time
+to 0.
+
+The 'Other options' section of the game creation dialog allows the player to
+define options which may be of use in competitive play. 'Combine spectator+
+player chat', when checked, means that players can see spectator chat, and
+spectators can see player chat. When unchecked, it means that players will not
+be able to see spectator chat, though spectators can still see player chat.
+
+'Allow replays and analysis', when checked, allows players in the game to use
+the 'replay' and 'analyze' commands. When unchecked, 'replay' and 'analyze' are
+disabled for players. Spectators can still use the commands.
+
 Upon entering a game, the interface functions as it does during single-player
 games. The 'chat' command may be used to interact with your opponent during a
-game.
+game, according to the restrictions given above.
 
 8. Headless AI mode
 OpenTafl can be started in headless AI mode, connecting an external engine to a
@@ -152,6 +172,13 @@ http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt (engine
 http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network protocol specification)
 
 10. Version history
+
+v0.3.3.0b
+- Fix leaking resources when writing to the log file
+- Allow network clients to load saved games
+- Implement optional restrictions on in-game chat and use of replays/analysis
+- Update clock immediately when entering a network game
+- Network protocol version 5
 
 v0.3.2.3b (released 07/13/16):
 - Further improvements for loading rules/saved games from previous versions
@@ -180,20 +207,24 @@ v0.3.2.0b (released 06/17/16):
     - Spectator mode should work more reliably
     - No longer able to use replay mode to start a new game during a network
       game
+- Network protocol version 4
 
 v0.3.1.0b (released 06/12/16):
 - Spectator mode
 - Minor networking bugfixes
+- Network protocol version 3
 
 v0.3.0.1b (released 06/08/16):
 - Hotfix for server-side bug with multiple games of different dimensions in
   progress
+- Network protocol version 2
 
 v0.3.0.0b (released 06/02/16):
 - Add network play initial operational capabilities
     - Server mode and client-server interface
     - Server lobby UI
     - Multiplayer games
+- Network protocol version 1
 
 v0.2.5.3b (released 05/31/16):
 - Fix bug in taflman location list, which led to missing king in position

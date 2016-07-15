@@ -29,7 +29,7 @@ public class ServerThread extends Thread {
                     task.run();
                 }
                 catch(Exception e) {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Encountered exception reading from client: ");
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Encountered exception running task: " + task);
                     OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
                 }
             }

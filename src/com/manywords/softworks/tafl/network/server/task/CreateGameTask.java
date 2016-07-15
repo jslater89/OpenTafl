@@ -27,10 +27,10 @@ public class CreateGameTask implements Runnable {
     public void run() {
         boolean result;
         if(mPacket.timeSpec.isEnabled()) {
-            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide, mPacket.timeSpec);
+            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide, mPacket.combineChat, mPacket.allowReplay, mPacket.timeSpec);
         }
         else {
-            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide);
+            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide, mPacket.combineChat, mPacket.allowReplay);
         }
 
         if(result) {

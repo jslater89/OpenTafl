@@ -6,17 +6,19 @@ import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 /**
  * Created by jay on 5/23/16.
  */
-public class SendPacketTask implements Runnable{
-    private final NetworkPacket mTask;
+public class SendPacketTask implements Runnable {
+    private final NetworkPacket mPacket;
     private final ServerClient mDestination;
 
-    public SendPacketTask(NetworkPacket task, ServerClient destination) {
-        mTask = task;
+    public SendPacketTask(NetworkPacket packet, ServerClient destination) {
+        mPacket = packet;
         mDestination = destination;
     }
 
     @Override
     public void run() {
-        mDestination.writePacket(mTask);
+        if(mDestination != null) {
+            mDestination.writePacket(mPacket);
+        }
     }
 }

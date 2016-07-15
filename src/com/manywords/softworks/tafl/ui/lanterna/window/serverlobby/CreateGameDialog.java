@@ -5,13 +5,21 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialog;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.network.PasswordHasher;
+import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Rules;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.window.mainmenu.TimeEntryDialog;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -21,10 +29,17 @@ public class CreateGameDialog extends DialogWindow {
     
     public String hashedPassword;
     public Rules rules;
+    public List<MoveRecord> history;
     private int settingsRulesIndex = -1;
     public boolean attackingSide;
     public boolean canceled;
+    public boolean allowReplay;
+    public boolean combineChat;
     public TimeSpec timeSpec = new TimeSpec(0, 0, 0, 0);
+
+    // Used for loading games: time remaining
+    public TimeSpec attackerClock = null;
+    public TimeSpec defenderClock = null;
 
     private TerminalSize mCachedSize = new TerminalSize(0, 0);
     private TextBox mPasswordInput;
@@ -35,7 +50,7 @@ public class CreateGameDialog extends DialogWindow {
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
 
-        final Label rulesLabel = new Label(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        final Label rulesLabel = new Label("Rules: " + BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
         final Button rulesButton = new Button("Rules", () -> {
             String[] rulesTextArray = new String[BuiltInVariants.rulesDescriptions.size()];
 
@@ -47,9 +62,53 @@ public class CreateGameDialog extends DialogWindow {
             if(rulesDescription != null) {
                 settingsRulesIndex = BuiltInVariants.indexForDescription(rulesDescription);
                 rules = BuiltInVariants.availableRules.get(settingsRulesIndex);
-                rulesLabel.setText(rules.toString());
+                rulesLabel.setText("Rules: " + rules.toString());
             }
         });
+
+        final Button loadButton = new Button("Load game", () -> {
+            File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved game", "Open", new File("saved-games"));
+
+            if(gameFile == null) {
+                return;
+            }
+
+            GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
+            rules = g.game.getRules();
+            history = new ArrayList<>(g.moves);
+
+            Map<String, String> tagMap = g.game.getTagMap();
+
+            if(tagMap.containsKey("time-control")) {
+                String timeControl = tagMap.get("time-control");
+
+                // TODO: refactor this block to a method in GameSerializer
+                timeControl = timeControl.trim();
+                if(timeControl.split(" ").length == 2) timeControl += " 0";
+                else timeControl = timeControl.replaceAll("i", "");
+
+                timeSpec = TimeSpec.parseMachineReadableString(timeControl, " ", 1000);
+            }
+
+            if(tagMap.containsKey("time-remaining")) {
+                String[] clockRecords = tagMap.get("time-remaining").split(",");
+
+                clockRecords[0] = clockRecords[0].trim();
+                clockRecords[1] = clockRecords[1].trim();
+
+                if(clockRecords[0].split(" ").length == 2) clockRecords[0] += " 0";
+                else clockRecords[0] = clockRecords[0].replaceAll("i", "");
+
+                if(clockRecords[1].split(" ").length == 2) clockRecords[1] += " 0";
+                else clockRecords[1] = clockRecords[1].replaceAll("i", "");
+
+                attackerClock = TimeSpec.parseMachineReadableString(clockRecords[0], " ", 1000);
+                defenderClock = TimeSpec.parseMachineReadableString(clockRecords[1], " ", 1000);
+            }
+
+            rulesLabel.setText("Rules: loaded " + rules.toString());
+        });
+
         rules = BuiltInVariants.availableRules.get(TerminalSettings.variant);
 
         timeSpec = TerminalSettings.timeSpec;
@@ -82,8 +141,15 @@ public class CreateGameDialog extends DialogWindow {
         sideChooser.addItem("Defenders");
         sideChooser.setCheckedItemIndex(0);
 
+        final Label otherOptionsLabel = new Label("Other options");
+        final CheckBoxList<String> optionsChooser = new CheckBoxList<>();
+        optionsChooser.addItem("Combine spectator+player chat", true);
+        optionsChooser.addItem("Allow replays and analysis", true);
+
         final Button finishButton = new Button("Create", () -> {
             if(sideChooser.getCheckedItem().equals("Attackers")) attackingSide = true;
+            if(optionsChooser.isChecked(0)) combineChat = true;
+            if(optionsChooser.isChecked(1)) allowReplay = true;
             hashedPassword = mPasswordInput.getText();
             hashedPassword = (hashedPassword.isEmpty() ? PasswordHasher.NO_PASSWORD : hashedPassword);
             if(!hashedPassword.equals(PasswordHasher.NO_PASSWORD)) {
@@ -107,9 +173,17 @@ public class CreateGameDialog extends DialogWindow {
         Panel topGridPanel = new Panel();
         topGridPanel.setLayoutManager(new GridLayout(3));
 
-        topGridPanel.addComponent(rulesButton);
-        topGridPanel.addComponent(newSpacer());
-        topGridPanel.addComponent(rulesLabel);
+        p.addComponent(rulesLabel);
+
+        Panel rulesButtonPanel = new Panel();
+        rulesButtonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+
+        rulesButtonPanel.addComponent(rulesButton);
+        rulesButtonPanel.addComponent(loadButton);
+
+        p.addComponent(rulesButtonPanel);
+
+        p.addComponent(newSpacer());
 
         topGridPanel.addComponent(timeButton);
         topGridPanel.addComponent(newSpacer());
@@ -117,11 +191,20 @@ public class CreateGameDialog extends DialogWindow {
 
         p.addComponent(topGridPanel);
 
+        p.addComponent(newSpacer());
+
         p.addComponent(passwordLabel);
         p.addComponent(mPasswordInput);
 
+        p.addComponent(newSpacer());
+
         p.addComponent(sideLabel);
         p.addComponent(sideChooser);
+
+        p.addComponent(newSpacer());
+
+        p.addComponent(otherOptionsLabel);
+        p.addComponent(optionsChooser);
 
         Panel bottomGridPanel = new Panel();
         bottomGridPanel.setLayoutManager(new GridLayout(3));

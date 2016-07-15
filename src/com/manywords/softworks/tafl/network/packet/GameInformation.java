@@ -12,12 +12,13 @@ public class GameInformation {
     public final String defenderUsername;
     public final boolean password;
     public final boolean started;
-    public final boolean combinedChat = true;
-    public final boolean replayAllowed = true;
+    public final boolean combineChat;
+    public final boolean allowReplay;
+    public final boolean loaded;
     public final int spectators;
     public final TimeSpec clockSetting;
 
-    public GameInformation(String uuid, String rulesName, String attackerUsername, String defenderUsername, boolean password, boolean started, int spectators, String clockSetting) {
+    public GameInformation(String uuid, String rulesName, String attackerUsername, String defenderUsername, boolean password, boolean started, boolean loaded, boolean combineChat, boolean allowReplay, int spectators, String clockSetting) {
         this.uuid = uuid;
         this.rulesName = rulesName;
         this.attackerUsername = attackerUsername;
@@ -25,7 +26,10 @@ public class GameInformation {
         this.password = password;
         this.started = started;
         this.spectators = spectators;
+        this.loaded = loaded;
         this.clockSetting = TimeSpec.parseMachineReadableString(clockSetting);
+        this.combineChat = combineChat;
+        this.allowReplay = allowReplay;
     }
 
     public boolean hasFreeSide() {
@@ -37,6 +41,6 @@ public class GameInformation {
     }
 
     public String toString() {
-        return uuid + " \"" + rulesName + "\" " + " \"" + attackerUsername + "\" " + " \"" + defenderUsername + "\" " + "password:" + password + " started:" + started + " spectators:" + spectators + " " + clockSetting.toMachineReadableString();
+        return uuid + " \"" + rulesName + "\" " + " \"" + attackerUsername + "\" " + " \"" + defenderUsername + "\" " + "password:" + password + " started:" + started + " loaded:" + loaded + " combinechat:" + combineChat + " allowreplay:" + allowReplay + " spectators:" + spectators + " " + clockSetting.toMachineReadableString();
     }
 }

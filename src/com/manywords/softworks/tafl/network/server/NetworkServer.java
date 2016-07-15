@@ -191,17 +191,19 @@ public class NetworkServer {
         return g;
     }
 
-    public boolean createGame(ServerClient client, UUID gameUUID, String password, Rules rules, boolean attackingSide) {
-        return createGame(client, gameUUID, password, rules, attackingSide, null);
+    public boolean createGame(ServerClient client, UUID gameUUID, String password, Rules rules, boolean attackingSide, boolean combineChat, boolean allowReplay) {
+        return createGame(client, gameUUID, password, rules, attackingSide, combineChat, allowReplay, null);
     }
 
-    public boolean createGame(ServerClient client, UUID gameUUID, String password, Rules rules, boolean attackingSide, TimeSpec clockSetting) {
+    public boolean createGame(ServerClient client, UUID gameUUID, String password, Rules rules, boolean attackingSide, boolean combineChat, boolean allowReplay, TimeSpec clockSetting) {
         if(client.getGame() != null) {
             return false;
         }
 
         ServerGame g = new ServerGame(this, gameUUID);
         g.setRules(rules);
+        g.setChatCombined(combineChat);
+        g.setReplayAllowed(allowReplay);
         if(!password.equals(PasswordHasher.NO_PASSWORD)) {
             g.setPassword(password);
         }

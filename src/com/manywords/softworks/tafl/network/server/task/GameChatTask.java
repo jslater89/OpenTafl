@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.network.server.task;
 
 import com.manywords.softworks.tafl.network.packet.ingame.GameChatPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
+import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
@@ -23,8 +24,16 @@ public class GameChatTask implements Runnable {
     @Override
     public void run() {
         if(mClient.getGame() != null) {
-            for(ServerClient client : mClient.getGame().getAllClients()) {
-                mServer.sendPacketToClient(client, mPacket, PriorityTaskQueue.Priority.LOW);
+            if(mClient.getGame().isChatCombined()) {
+                mServer.sendPacketToClients(mClient.getGame().getAllClients(), mPacket, PriorityTaskQueue.Priority.LOW);
+            }
+            else {
+                if(mClient.getGameRole() == GameRole.KIBBITZER) {
+                    mServer.sendPacketToClients(mClient.getGame().getSpectators(), mPacket, PriorityTaskQueue.Priority.LOW);
+                }
+                else {
+                    mServer.sendPacketToClients(mClient.getGame().getAllClients(), mPacket, PriorityTaskQueue.Priority.LOW);
+                }
             }
         }
     }
