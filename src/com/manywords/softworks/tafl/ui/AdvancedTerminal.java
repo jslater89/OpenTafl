@@ -42,7 +42,7 @@ public class AdvancedTerminal<T extends Terminal> {
         if(terminal instanceof SwingTerminalFrame) {
             SwingTerminalFrame stf = (SwingTerminalFrame) terminal;
             stf.setTitle("OpenTafl");
-            stf.setSize(1024, 768);
+            stf.setSize(1280, 800);
             stf.setResizable(true);
             stf.setLocationRelativeTo(null);
             stf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
