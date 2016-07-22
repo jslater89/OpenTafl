@@ -173,7 +173,12 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 10. Version history
 
-v0.3.3.0b
+v0.3.3.1b (released 07/xx/16):
+- Render rank and file names on both sides of the board
+- Add advanced destination rendering mode: when enabled, 'info' command will
+  show space names for allowable moves and captures, to help with mistyping
+
+v0.3.3.0b (released 07/15/16):
 - Fix leaking resources when writing to the log file
 - Allow network clients to load saved games
 - Implement optional restrictions on in-game chat and use of replays/analysis
