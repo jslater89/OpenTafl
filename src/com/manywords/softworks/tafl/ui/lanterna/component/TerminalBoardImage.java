@@ -1,18 +1,22 @@
 package com.manywords.softworks.tafl.ui.lanterna.component;
 
+import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.BasicTextImage;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -67,8 +71,8 @@ public class TerminalBoardImage extends BasicTextImage {
 
         // Render in order of most spaces to fewest, for maximum information preservation
         if(allowableMoves != null) renderAllowableMoves(allowableMoves);
-        if(allowableDestinations != null) renderAllowableDestinations(allowableDestinations);
-        if(captureSpaces != null) renderCapturingMoves(captureSpaces);
+        if(allowableDestinations != null) renderAllowableDestinations(highlight, allowableDestinations);
+        if(captureSpaces != null) renderCapturingMoves(highlight, captureSpaces);
         if(highlight != null) renderHighlight(highlight);
 
         renderTaflmen(state.getBoard());
@@ -159,9 +163,29 @@ public class TerminalBoardImage extends BasicTextImage {
         }
     }
 
-    private void renderAllowableDestinations(List<Coord> coords) {
+    private void renderAllowableDestinations(Coord start, List<Coord> coords) {
         TextCharacter dot = new TextCharacter('.', TerminalThemeConstants.GREEN, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
-        fillCoords(dot, coords);
+        if(TerminalSettings.advancedDestinationRendering) {
+            for(Coord c : coords) {
+                if(c.toString().length() <= mSpaceWidth) {
+                    fillCoord(c.toString(), TerminalThemeConstants.GREEN, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS, dot, c);
+                }
+                else if(c.x == start.x) {
+                    // Render number
+                    String row = "" + (c.y + 1);
+                    fillCoord(row, TerminalThemeConstants.GREEN, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS, dot, c);
+                }
+                else {
+                    // Render letter
+                    char file = (char) ('a' + c.x);
+                    String fileString = "" + file;
+                    fillCoord(fileString, TerminalThemeConstants.GREEN, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS, dot, c);
+                }
+            }
+        }
+        else {
+            fillCoords(dot, coords);
+        }
     }
 
     private void renderAllowableMoves(List<Coord> coords) {
@@ -169,9 +193,29 @@ public class TerminalBoardImage extends BasicTextImage {
         fillCoords(dash, coords);
     }
 
-    private void renderCapturingMoves(List<Coord> coords) {
+    private void renderCapturingMoves(Coord start, List<Coord> coords) {
         TextCharacter slash = new TextCharacter('/', TerminalThemeConstants.YELLOW, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
-        fillCoords(slash, coords);
+        if(TerminalSettings.advancedDestinationRendering) {
+            for(Coord c : coords) {
+                if(c.toString().length() <= mSpaceWidth) {
+                    fillCoord(c.toString(), TerminalThemeConstants.YELLOW, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS, slash, c);
+                }
+                else if(c.x == start.x) {
+                    // Render number
+                    String row = "" + (c.y + 1);
+                    fillCoord(row, TerminalThemeConstants.YELLOW, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS, slash, c);
+                }
+                else {
+                    // Render letter
+                    char file = (char) ('a' + c.x);
+                    String fileString = "" + file;
+                    fillCoord(fileString, TerminalThemeConstants.YELLOW, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS, slash, c);
+                }
+            }
+        }
+        else {
+            fillCoords(slash, coords);
+        }
     }
 
     private void renderHighlight(Coord highlight) {
@@ -182,6 +226,51 @@ public class TerminalBoardImage extends BasicTextImage {
     private void fillCoords(TextCharacter character, Collection<Coord> coords) {
         for(Coord c : coords) {
             fillCoord(character, c);
+        }
+    }
+
+    private void fillCoord(CharSequence string, TextColor fg, TextColor bg, EnumSet<SGR> sgrs, TextCharacter pad, Coord coord) {
+        if(string.length() > mSpaceWidth) throw new IllegalArgumentException("Expecting wrapping? Who do you think I am?");
+
+        TerminalPosition spaceLoc = getSpaceTopLeftForCoord(coord);
+        int xStart = spaceLoc.getColumn() + mLeftPad;
+        int yStart = spaceLoc.getRow();
+        int xEnd = xStart + mSpaceWidth;
+        int yEnd = yStart + mSpaceHeight;
+
+        int yStringLoc = (yStart + yEnd) / 2;
+        int xStringCenter = (xStart + xEnd) / 2;
+        int xStringStart = xStringCenter - (string.length() / 2);
+        int xStringEnd = xStringStart + string.length();
+
+        // Prefer space at the end of the cell over space at the start
+        if(xStringEnd == xEnd && xStringStart > xStart) {
+            xStringStart--;
+            xStringEnd--;
+        }
+
+        // Prefer space at the bottom of the cell over space at the top
+        if(yStringLoc == yEnd - 1 && yStringLoc > yStart) {
+            yStringLoc--;
+        }
+
+        for(int y = yStart; y < yEnd; y++) {
+            for(int x = xStart; x < xEnd; x++) {
+                if(y != yStringLoc) {
+                    setCharacterAt(x, y, pad);
+                }
+                else {
+                    if(x >= xStringStart && x < xStringEnd) {
+                        int stringIndex = x - xStringStart;
+                        char toPut = string.charAt(stringIndex);
+                        TextCharacter textChar = new TextCharacter(toPut, fg, bg, sgrs);
+                        setCharacterAt(x, y, textChar);
+                    }
+                    else {
+                        setCharacterAt(x, y, pad);
+                    }
+                }
+            }
         }
     }
 
