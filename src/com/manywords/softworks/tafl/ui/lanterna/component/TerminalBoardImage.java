@@ -46,8 +46,8 @@ public class TerminalBoardImage extends BasicTextImage {
         // |
         // |
         //  per column, + extra
-        // If row height is 2, add an extra column for the row index labels
-        super(boardDimension * colWidth + (rowHeight == 2 ? 2 : 1), boardDimension * rowHeight + 1);
+        // If row height is 2, add an extra two columns for the row index labels
+        super(boardDimension * colWidth + (rowHeight == 2 ? 3 : 1), boardDimension * rowHeight + 1);
 
         mLeftPad = (rowHeight == 2 ? 1 : 0);
         mRowHeight = rowHeight;
@@ -80,7 +80,10 @@ public class TerminalBoardImage extends BasicTextImage {
         TextCharacter pipe = new TextCharacter('|', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
         TextCharacter space = new TextCharacter(' ', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
 
+        int yFarTop = 0;
+        int yFarBottom = boardDimension * mRowHeight;
         int xFarLeft = mLeftPad;
+        int xFarRight = mLeftPad + boardDimension * mColWidth;
 
         for (int row = 0; row < boardDimension; row++) {
             int yTop = row * mRowHeight;
@@ -96,7 +99,10 @@ public class TerminalBoardImage extends BasicTextImage {
                     for (int x = xLeft; x < xRight + 1; x++) {
                         // Draw the top or bottom of a space
                         if (y % mRowHeight == 0) {
-                            if (y == 0 && x == colLabelIdx) {
+                            if (y == yFarTop && x == colLabelIdx) {
+                                setCharacterAt(x, y, new TextCharacter((char) ('a' + col)));
+                            }
+                            else if(y == yFarBottom && x == colLabelIdx) {
                                 setCharacterAt(x, y, new TextCharacter((char) ('a' + col)));
                             }
                             else if (x % mColWidth == mLeftPad) setCharacterAt(x, y, plus);
@@ -118,6 +124,21 @@ public class TerminalBoardImage extends BasicTextImage {
                                 }
                             }
                             else if (x == xFarLeft && y == rowLabelIdx + 1 && rowLabel.length() > 1) {
+                                setCharacterAt(x, y, new TextCharacter(rowLabel.charAt(1)));
+                            }
+                            else if (x == xFarRight && y == rowLabelIdx) {
+                                if (mRowHeight == 2 && rowLabel.length() > 1) {
+                                    setCharacterAt(xRight, y, new TextCharacter(rowLabel.charAt(0)));
+                                    setCharacterAt(xRight + 1, y, new TextCharacter(rowLabel.charAt(1)));
+                                }
+                                else if (rowLabel.length() == 1) {
+                                    setCharacterAt(x, y, new TextCharacter(rowLabel.charAt(0)));
+                                }
+                                else {
+                                    setCharacterAt(x, y, new TextCharacter(rowLabel.charAt(0)));
+                                }
+                            }
+                            else if (x == xFarRight && y == rowLabelIdx + 1 && rowLabel.length() > 1) {
                                 setCharacterAt(x, y, new TextCharacter(rowLabel.charAt(1)));
                             }
                             else if (x % mColWidth == mLeftPad) setCharacterAt(x, y, pipe);
