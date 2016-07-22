@@ -21,6 +21,7 @@ public class TerminalSettings {
     public static final int ENGINE = 3;
 
     public static boolean shrinkLargeBoards = true;
+    public static boolean advancedDestinationRendering = true;
     public static int fontSize = 14;
 
     public static String onlinePlayerName = "";
@@ -84,6 +85,7 @@ public class TerminalSettings {
             File analysisEngineFile = (analysisEngineSpec == null ? null : analysisEngineSpec.specFile);
             ini.put("display", "shrinklarge", shrinkLargeBoards);
             ini.put("display", "fontsize", fontSize);
+            ini.put("display", "destinationcoord", advancedDestinationRendering);
             ini.put("config", "attacker", attackers + 1);
             ini.put("config", "attackerfile", (attackerEngineFile != null ? attackerEngineFile.getCanonicalPath() : ""));
             ini.put("config", "defender", defenders + 1);
@@ -146,6 +148,7 @@ public class TerminalSettings {
             long incrementTime = ini.get("clock", "increment", long.class);
 
             shrinkLargeBoards = ini.get("display", "shrinklarge", boolean.class);
+            advancedDestinationRendering = ini.get("display", "destinationcoord", boolean.class);
             fontSize = ini.get("display", "fontsize", int.class);
             if(fontSize == 0) fontSize = 14;
 

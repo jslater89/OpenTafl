@@ -33,6 +33,7 @@ public class OptionsMenuWindow extends BasicWindow {
     private Label mAnalysisConfigLabel;
     private Label mThinkTimeLabel;
     private Label mShrinkLabel;
+    private Label mDestinationLabel;
     private Label mFontSizeLabel;
     private Label mNetworkAddressLabel;
 
@@ -177,6 +178,16 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(newSpacer());
         optionsPanel.addComponent(mShrinkLabel);
 
+        Button destinationButton = new Button("Show destination name", () -> {
+            TerminalSettings.advancedDestinationRendering = !TerminalSettings.advancedDestinationRendering;
+            refreshSettings();
+        });
+        mDestinationLabel = new Label(TerminalSettings.advancedDestinationRendering ? "On" : "Off");
+
+        optionsPanel.addComponent(destinationButton);
+        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(mDestinationLabel);
+
         Button fontSizeButton = new Button("Font size", this::showFontSizeDialog);
         mFontSizeLabel = new Label(TerminalSettings.fontSize + "pt");
 
@@ -246,6 +257,7 @@ public class OptionsMenuWindow extends BasicWindow {
         mThinkTimeLabel.setText("" + TerminalSettings.aiThinkTime);
 
         mShrinkLabel.setText(TerminalSettings.shrinkLargeBoards ? "On" : "Off");
+        mDestinationLabel.setText(TerminalSettings.advancedDestinationRendering ? "On" : "Off");
         mFontSizeLabel.setText(TerminalSettings.fontSize + "pt");
 
         mNetworkAddressLabel.setText(TerminalSettings.onlineServerHost);
