@@ -80,4 +80,27 @@ public class TimeSpec {
     public String toMachineReadableString() {
         return mainTime + "|" + overtimeTime + "/" + overtimeCount + "|" + incrementTime;
     }
+
+    private static final TimeSpec EMPTY = new TimeSpec(-1, -1, 0, -1);
+    public static TimeSpec emptyTimeSpec() {
+        return EMPTY;
+    }
+
+    /**
+     * A clock equals another clock if main time, overtime time, and overtime count are the same.
+     * @param timeSpec
+     * @return
+     */
+    public boolean clockEquals(TimeSpec timeSpec) {
+        return this.mainTime == timeSpec.mainTime && this.overtimeTime == timeSpec.overtimeTime && this.overtimeCount == timeSpec.overtimeCount;
+    }
+
+    /**
+     * A setting equals another setting if their clocks are the same, and increment time is also the same.
+     * @param timeSpec
+     * @return
+     */
+    public boolean settingEquals(TimeSpec timeSpec) {
+        return clockEquals(timeSpec) && this.incrementTime == timeSpec.incrementTime;
+    }
 }

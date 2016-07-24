@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.ui.lanterna;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
@@ -62,7 +63,7 @@ public class TerminalUtils {
             ClientServerConnection connection,
             Rules rules,
             TimeSpec timeSpec,
-            List<MoveRecord> history) {
+            List<DetailedMoveRecord> history) {
 
         Game g;
         if(timeSpec == null || timeSpec.mainTime == 0 && (timeSpec.overtimeTime == 0 || timeSpec.overtimeCount == 0)) {

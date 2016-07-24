@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.network.client;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.command.player.Player;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -52,7 +53,7 @@ public class TestClientServerConnection extends ClientServerConnection {
     public GameChatPacket lastGameChat;
     public List<ClientInformation> lastClientUpdate;
     public List<GameInformation> lastGameUpdate;
-    public List<MoveRecord> lastHistory;
+    public List<DetailedMoveRecord> lastHistory;
     public TimeSpec lastAttackerTime;
     public TimeSpec lastDefenderTime;
     public MoveRecord lastMove;
@@ -107,7 +108,7 @@ public class TestClientServerConnection extends ClientServerConnection {
         }
 
         @Override
-        public void onStartGame(Rules r, List<MoveRecord> history) {
+        public void onStartGame(Rules r, List<DetailedMoveRecord> history) {
             gameEnded = false;
             game = new Game(r, null);
 
@@ -122,7 +123,7 @@ public class TestClientServerConnection extends ClientServerConnection {
         }
 
         @Override
-        public void onHistoryReceived(List<MoveRecord> moves) {
+        public void onHistoryReceived(List<DetailedMoveRecord> moves) {
             lastHistory = moves;
 
             OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Moves: " + moves);

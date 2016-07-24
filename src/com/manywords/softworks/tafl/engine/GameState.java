@@ -66,6 +66,7 @@ public class GameState {
         mGame = copyState.mGame;
         mCurrentSide = (copyState.getCurrentSide().isAttackingSide() ? mAttackers : mDefenders);
         mExitingMove = copyState.getExitingMove();
+        mDetailedExitingMove = copyState.mDetailedExitingMove;
         mEnteringMove = copyState.getEnteringMove();
         mBerserkingTaflman = copyState.getBerserkingTaflman();
         mTaflmanMoveCache = new TaflmanMoveCache(getBoard().getBoardDimension(), mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
@@ -150,6 +151,7 @@ public class GameState {
      * This move object is a concise representation of what we moved to where.
      */
     protected MoveRecord mExitingMove;
+    protected DetailedMoveRecord mDetailedExitingMove;
     protected MoveRecord mEnteringMove;
 
     public MoveRecord getExitingMove() {
@@ -294,6 +296,10 @@ public class GameState {
 
             nextState.mEnteringMove = move;
             mExitingMove = move;
+
+            if(detailed) {
+                mDetailedExitingMove = (DetailedMoveRecord) mExitingMove;
+            }
 
             if (captures.size() > 0 && getBoard().getRules().getBerserkMode() > 0) {
                 nextState.setBerserkingTaflman(taflman);
@@ -614,6 +620,15 @@ public class GameState {
         if(getPieceAt(nextMove.start.x, nextMove.start.y) == Taflman.EMPTY) return ILLEGAL_MOVE;
 
         return moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end).getLastMoveResult();
+    }
+
+    public int makeMove(DetailedMoveRecord nextMove) {
+        if(getPieceAt(nextMove.start.x, nextMove.start.y) == Taflman.EMPTY) return ILLEGAL_MOVE;
+
+        GameState nextState = moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end);
+        mDetailedExitingMove.setTimeRemaining(nextMove.getTimeRemaining());
+
+        return nextState.getLastMoveResult();
     }
 
     public void setExitingMove(DetailedMoveRecord exitingMove) {

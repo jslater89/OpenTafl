@@ -57,7 +57,8 @@ public class ClientCommandParser {
         }
         else if(data.startsWith(HistoryPacket.PREFIX)) {
             // History packet in game: refresh based on state.
-            callback.onHistoryReceived(HistoryPacket.parse(data).moves);
+            HistoryPacket h = HistoryPacket.parse(data);
+            callback.onHistoryReceived(h.moves);
         }
         else if(data.startsWith(GameChatPacket.PREFIX)) {
             GameChatPacket packet = GameChatPacket.parse(data);

@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.command.CommandEngine;
 import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.NetworkServerPlayer;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -17,7 +18,6 @@ import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
-import com.manywords.softworks.tafl.network.server.task.SendPacketTask;
 import com.manywords.softworks.tafl.network.server.task.StartGameTask;
 import com.manywords.softworks.tafl.network.server.task.interval.IntervalTask;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
@@ -53,8 +53,12 @@ public class ServerGame {
     private ClockUpdateTask mClockUpdateTask = new ClockUpdateTask();
 
     // These variables are used for loading network games
-    private List<MoveRecord> mPregameHistory = null;
+    private List<DetailedMoveRecord> mPregameHistory = null;
     private boolean mPregameHistoryLoaded = false;
+
+    // These variables are used for loading the clock for network games.
+    // PregameTimeSpecs is informational, and holds data on past turns.
+    private List<TimeSpec> mPregameTimeSpecs;
     private TimeSpec mInitialAttackerClock = null;
     private TimeSpec mInitialDefenderClock = null;
     private boolean mInitialClocksLoaded = false;
@@ -127,14 +131,14 @@ public class ServerGame {
         }
     }
 
-    public synchronized void loadGame(List<MoveRecord> moves) {
+    public synchronized void loadGame(List<DetailedMoveRecord> moves) {
         mPregameHistory = moves;
         if(mGame == null) {
             mPregameHistoryLoaded = false;
         }
         else {
             boolean good = true;
-            for(MoveRecord m : moves) {
+            for(DetailedMoveRecord m : moves) {
                 int result = mGame.getCurrentState().makeMove(m);
 
                 if(result != GameState.GOOD_MOVE) {

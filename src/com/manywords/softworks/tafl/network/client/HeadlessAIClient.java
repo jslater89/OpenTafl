@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.ExternalEnginePlayer;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
@@ -191,7 +192,7 @@ public class HeadlessAIClient {
         }
     }
 
-    private void createGameLocally(Rules r, List<MoveRecord> history) {
+    private void createGameLocally(Rules r, List<DetailedMoveRecord> history) {
         mGame = new Game(r, mUiCallback);
         GameClock clock = new GameClock(mGame, mClockSetting);
         mGame.setClock(clock);
@@ -317,12 +318,12 @@ public class HeadlessAIClient {
         }
 
         @Override
-        public void onStartGame(Rules r, List<MoveRecord> history) {
+        public void onStartGame(Rules r, List<DetailedMoveRecord> history) {
             createGameLocally(r, history);
         }
 
         @Override
-        public void onHistoryReceived(List<MoveRecord> moves) {
+        public void onHistoryReceived(List<DetailedMoveRecord> moves) {
 
         }
 

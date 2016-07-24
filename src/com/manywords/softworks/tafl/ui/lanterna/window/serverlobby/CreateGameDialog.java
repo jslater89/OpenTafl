@@ -5,6 +5,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialog;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
@@ -29,7 +30,7 @@ public class CreateGameDialog extends DialogWindow {
     
     public String hashedPassword;
     public Rules rules;
-    public List<MoveRecord> history;
+    public List<DetailedMoveRecord> history;
     private int settingsRulesIndex = -1;
     public boolean attackingSide;
     public boolean canceled;

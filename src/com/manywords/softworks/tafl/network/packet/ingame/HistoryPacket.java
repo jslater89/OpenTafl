@@ -1,10 +1,9 @@
 package com.manywords.softworks.tafl.network.packet.ingame;
 
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.network.packet.ClientInformation;
+import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
-import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
 
 import java.util.ArrayList;
@@ -15,7 +14,7 @@ import java.util.List;
  */
 public class HistoryPacket extends NetworkPacket {
     public static final String PREFIX = "history";
-    public final List<MoveRecord> moves;
+    public final List<DetailedMoveRecord> moves;
     public final int boardSize;
 
     public static HistoryPacket parse(String data) {
@@ -23,54 +22,67 @@ public class HistoryPacket extends NetworkPacket {
         String[] parts = data.trim().split(" ");
         int dimension = Integer.parseInt(parts[0]);
 
-        List<MoveRecord> moves = new ArrayList<>();
+        data = data.replaceFirst("" + dimension, "").trim();
+
+        List<DetailedMoveRecord> moves = new ArrayList<>();
+        List<TimeSpec> timeSpecs = new ArrayList<>();
+
         if(parts.length < 2 || parts[1].trim().isEmpty()) {
             return new HistoryPacket(moves, dimension);
         }
-        String[] records = parts[1].split("\\|\\|");
 
+        String[] records = data.split("\\|\\|");
 
-        if(data.trim().isEmpty()) return new HistoryPacket(moves, dimension);
-
+        String[] recordParts;
         for(String record : records) {
-            moves.add(MoveSerializer.loadMoveRecord(dimension, record.trim()));
+            recordParts = record.split(" ");
+
+            DetailedMoveRecord move = MoveSerializer.loadMoveRecord(dimension, recordParts[0]);
+            if(recordParts.length == 2) {
+                move.setTimeRemaining(TimeSpec.parseMachineReadableString(recordParts[1]));
+            }
+
+            moves.add(move);
         }
 
         return new HistoryPacket(moves, dimension);
     }
 
     public static HistoryPacket parseHistory(List<GameState> gameHistory, int boardSize) {
-        List<MoveRecord> moves = new ArrayList<>(gameHistory.size());
+        List<DetailedMoveRecord> moves = new ArrayList<>(gameHistory.size());
+        List<TimeSpec> timeSpecs = new ArrayList<>(gameHistory.size());
 
         for(GameState state : gameHistory) {
-            if(state.getExitingMove() != null) {
-                moves.add(state.getExitingMove());
+            DetailedMoveRecord move = (DetailedMoveRecord) state.getExitingMove();
+            if(move != null) {
+                moves.add(move);
+
+                if(move.getTimeRemaining() != null) {
+                    timeSpecs.add(move.getTimeRemaining());
+                }
+                else {
+                    timeSpecs.add(TimeSpec.emptyTimeSpec());
+                }
             }
         }
 
         return new HistoryPacket(moves, boardSize);
     }
 
-    public static HistoryPacket parse(List<MoveRecord> moveRecords, int boardSize) {
-        List<MoveRecord> moves = new ArrayList<>(moveRecords.size());
+    public HistoryPacket(List<DetailedMoveRecord> moves, int boardSize) {
+        this.moves = new ArrayList<>();
+        this.moves.addAll(moves);
 
-        for(MoveRecord m : moveRecords) {
-            moves.add(m);
-        }
-
-        return new HistoryPacket(moves, boardSize);
-    }
-
-    public HistoryPacket(List<MoveRecord> moves, int boardSize) {
-        this.moves = moves;
         this.boardSize = boardSize;
     }
 
     public String toString() {
         String result = PREFIX + " ";
         result += boardSize + " ";
-        for(MoveRecord m : moves) {
-            result += m.toString() + "||";
+        for(int i = 0; i < moves.size(); i++) {
+            DetailedMoveRecord m = moves.get(i);
+            TimeSpec ts = (m.getTimeRemaining() != null ? m.getTimeRemaining() : TimeSpec.emptyTimeSpec());
+            result += m.toString() + " " + ts.toMachineReadableString() + "||";
         }
 
         return result;

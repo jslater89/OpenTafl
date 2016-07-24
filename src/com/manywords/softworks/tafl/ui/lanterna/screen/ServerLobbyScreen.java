@@ -10,6 +10,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -246,7 +247,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
         @Override
         public void loadGame(HistoryPacket packet, TimeSpec attackerClock, TimeSpec defenderClock) {
-            mConnection.sendHistory(packet.moves, packet.boardSize);
+            mConnection.sendHistoryByMoveRecords(packet.moves, packet.boardSize);
             if(attackerClock != null && defenderClock != null) {
                 mConnection.sendClockUpdate(attackerClock, defenderClock);
             }
@@ -327,13 +328,13 @@ public class ServerLobbyScreen extends LogicalScreen {
         }
 
         @Override
-        public void onStartGame(Rules r, List<MoveRecord> history) {
+        public void onStartGame(Rules r, List<DetailedMoveRecord> history) {
             final TimeSpec clockSetting = mConnection.getLastClockSetting();
             TerminalUtils.runOnUiThread(mGui, () -> TerminalUtils.startNetworkGame(mGui, mTerminalCallback, mConnection, r, clockSetting, history));
         }
 
         @Override
-        public void onHistoryReceived(List<MoveRecord> moves) {
+        public void onHistoryReceived(List<DetailedMoveRecord> moves) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "History delivered to server lobby screen");
         }
 

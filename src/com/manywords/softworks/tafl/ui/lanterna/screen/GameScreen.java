@@ -66,7 +66,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
     private ReplayGame mReplay;
     // Used for spectators to catch up to the current state.
-    private List<MoveRecord> mPregameHistory;
+    private List<DetailedMoveRecord> mPregameHistory;
+    private List<TimeSpec> mPregameTimeSpecs;
 
     private boolean mInGame;
     private boolean mInReplay;
@@ -107,7 +108,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         }
     }
 
-    public void setHistory(List<MoveRecord> history) {
+    public void setHistory(List<DetailedMoveRecord> history) {
         mPregameHistory = history;
     }
 
@@ -437,8 +438,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                         if(mPregameHistory != null) {
                             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game screen consuming history");
-                            for(MoveRecord m : mPregameHistory) {
+                            for(DetailedMoveRecord m : mPregameHistory) {
                                 g.getCurrentState().makeMove(m);
+
+
                             }
                         }
 
@@ -841,12 +844,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         }
 
         @Override
-        public void onStartGame(Rules r, List<MoveRecord> history) {
+        public void onStartGame(Rules r, List<DetailedMoveRecord> history) {
 
         }
 
         @Override
-        public void onHistoryReceived(List<MoveRecord> moves) {
+        public void onHistoryReceived(List<DetailedMoveRecord> moves) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game screen received history");
             Rules r = mGame.getRules();
             Game g = new Game(r, GameScreen.this);

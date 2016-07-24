@@ -2,7 +2,9 @@ package com.manywords.softworks.tafl.network.client;
 
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
@@ -32,8 +34,8 @@ public class ClientServerConnection {
         public void onClientListReceived(List<ClientInformation> clients);
         public void onDisconnect(boolean planned);
         public Game getGame();
-        public void onStartGame(Rules r, List<MoveRecord> history);
-        public void onHistoryReceived(List<MoveRecord> moves);
+        public void onStartGame(Rules r, List<DetailedMoveRecord> history);
+        public void onHistoryReceived(List<DetailedMoveRecord> moves);
         public void onServerMoveReceived(MoveRecord move);
         public void onClockUpdateReceived(TimeSpec attackerClock, TimeSpec defenderClock);
         public void onVictory(VictoryPacket.Victory victory);
@@ -69,7 +71,7 @@ public class ClientServerConnection {
     private GameRole mGameRole = GameRole.OUT_OF_GAME;
     private NetworkClientPlayer mNetworkPlayer;
     private GameInformation mLastJoinedGame = null;
-    private List<MoveRecord> mLastHistory = null;
+    private List<DetailedMoveRecord> mLastHistory = null;
 
     private boolean mPlannedDisconnect = false;
 
@@ -155,8 +157,9 @@ public class ClientServerConnection {
     }
 
     public boolean hasHistory() { return mLastHistory != null; }
-    public List<MoveRecord> consumeHistory() {
-        List<MoveRecord> history = mLastHistory;
+
+    public List<DetailedMoveRecord> consumeHistory() {
+        List<DetailedMoveRecord> history = mLastHistory;
         mLastHistory = null;
         return history;
     }
@@ -172,7 +175,12 @@ public class ClientServerConnection {
         mServerWriter.println(HistoryPacket.PREFIX);
     }
 
-    public void sendHistory(List<MoveRecord> history, int dimension) {
+    public void sendHistory(List<GameState> history, int dimension) {
+        HistoryPacket packet = HistoryPacket.parseHistory(history, dimension);
+        mServerWriter.println(packet);
+    }
+
+    public void sendHistoryByMoveRecords(List<DetailedMoveRecord> history, int dimension) {
         HistoryPacket packet = new HistoryPacket(history, dimension);
         mServerWriter.println(packet);
     }
@@ -408,13 +416,13 @@ public class ClientServerConnection {
         }
 
         @Override
-        public void onStartGame(Rules r, List<MoveRecord> history) {
+        public void onStartGame(Rules r, List<DetailedMoveRecord> history) {
             setState(State.IN_GAME);
             mExternalCallback.onStartGame(r, history);
         }
 
         @Override
-        public void onHistoryReceived(List<MoveRecord> moves) {
+        public void onHistoryReceived(List<DetailedMoveRecord> moves) {
             mLastHistory = moves;
             mExternalCallback.onHistoryReceived(moves);
         }
