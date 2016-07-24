@@ -96,16 +96,13 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public GameTreeNode getNthChild(int i) {
-        getBranches().sort(new Comparator<GameTreeNode>() {
-            @Override
-            public int compare(GameTreeNode o1, GameTreeNode o2) {
-                if(isMaximizingNode()) {
-                    return -(o1.getValue() - o2.getValue());
-                }
-                else {
-                    // low to high
-                    return (o1.getValue() - o2.getValue());
-                }
+        getBranches().sort((o1, o2) -> {
+            if(isMaximizingNode()) {
+                return -(o1.getValue() - o2.getValue());
+            }
+            else {
+                // low to high
+                return (o1.getValue() - o2.getValue());
             }
         });
 
