@@ -5,6 +5,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialog;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import static com.manywords.softworks.tafl.OpenTafl.LogLevel.CHATTY;
 
 /**
  * Created by jay on 5/23/16.
@@ -67,6 +70,8 @@ public class CreateGameDialog extends DialogWindow {
             }
         });
 
+        final Label timeLabel = new Label("Untimed");
+
         final Button loadButton = new Button("Load game", () -> {
             File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved game", "Open", new File("saved-games"));
 
@@ -89,6 +94,10 @@ public class CreateGameDialog extends DialogWindow {
                 else timeControl = timeControl.replaceAll("i", "");
 
                 timeSpec = TimeSpec.parseMachineReadableString(timeControl, " ", 1000);
+
+                if(timeSpec != null && timeSpec.isEnabled()) {
+                    timeLabel.setText(timeSpec.toHumanString());
+                }
             }
 
             if(tagMap.containsKey("time-remaining")) {
@@ -113,7 +122,6 @@ public class CreateGameDialog extends DialogWindow {
         rules = BuiltInVariants.availableRules.get(TerminalSettings.variant);
 
         timeSpec = TerminalSettings.timeSpec;
-        final Label timeLabel = new Label("Untimed");
         if(timeSpec != null && timeSpec.isEnabled()) {
             timeLabel.setText(timeSpec.toHumanString());
         }
