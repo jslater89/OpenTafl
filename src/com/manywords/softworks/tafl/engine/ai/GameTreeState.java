@@ -262,7 +262,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
         short cachedValue = Evaluator.NO_VALUE;
         if(!extension) {
-            cachedValue = workspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
+            cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
         }
 
         if (cachedValue != Evaluator.NO_VALUE && mDepth > 0) {
@@ -296,8 +296,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // If we're at depth 0, go explore another level, just to be safe.
             mValue = evaluate();
 
-            // Put the value in tables
-            workspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
+            AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
 
             // Replace small child
             MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);

@@ -272,17 +272,14 @@ public class AiWorkspace extends Game {
                 }
 
                 // Do an extension search on the best-known moves.
-                getTreeRoot().getBranches().sort(new Comparator<GameTreeNode>() {
-                    @Override
-                    public int compare(GameTreeNode o1, GameTreeNode o2) {
-                        // Sort by value high to low
-                        if (getTreeRoot().isMaximizingNode()) {
-                            return -(o1.getValue() - o2.getValue());
-                        }
-                        else {
-                            // low to high
-                            return (o1.getValue() - o2.getValue());
-                        }
+                getTreeRoot().getBranches().sort((o1, o2) -> {
+                    // Sort by value high to low
+                    if (getTreeRoot().isMaximizingNode()) {
+                        return -(o1.getValue() - o2.getValue());
+                    }
+                    else {
+                        // low to high
+                        return (o1.getValue() - o2.getValue());
                     }
                 });
 
