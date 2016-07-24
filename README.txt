@@ -177,6 +177,13 @@ v0.3.3.1b (released 07/xx/16):
 - Render rank and file names on both sides of the board
 - Add advanced destination rendering mode: when enabled, 'info' command will
   show space names for allowable moves and captures, to help with mistyping
+- Possible slight AI improvement
+- Fix bug where saving a game previously loaded over the network would discard
+  time-remaining information for past turns
+- Fix bug where creating a network game from a save game file would not
+  correctly update the create game dialog's clock setting text
+- Minor code cleanup
+- Network protocol version 6
 
 v0.3.3.0b (released 07/15/16):
 - Fix leaking resources when writing to the log file
