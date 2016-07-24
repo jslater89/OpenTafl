@@ -52,9 +52,7 @@ public class LoadServerGameTest extends ServerTest {
         mPlayer2.sendJoinGameMessage(info, new JoinGamePacket(UUID.fromString(info.uuid), false, "none"));
 
         sleep(500);
-
-        System.out.println(mPlayer1.lastHistory);
-
+        
         assert mPlayer1.lastHistory != null && mPlayer1.lastHistory.size() == 10;
         assert mPlayer2.lastHistory != null && mPlayer2.lastHistory.size() == 10;
 
