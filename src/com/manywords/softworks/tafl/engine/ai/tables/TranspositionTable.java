@@ -79,6 +79,12 @@ public class TranspositionTable {
         long data = mDataTable[index];
         byte entryDepth = (byte)((data & DEPTH_MASK) >>> DEPTH_SHIFT);
 
+        short age = (short)((data & AGE_MASK) >>> AGE_SHIFT);
+        if(gameLength - age > DISCARD_AFTER_PLIES) {
+            mZobristTable[index] = 0;
+            return Evaluator.NO_VALUE;
+        }
+
         if (entryDepth < minDepth) return Evaluator.NO_VALUE;
         else return (short)((data & EVAL_MASK));
     }
