@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl;
 
+import com.googlecode.lanterna.gui2.TextGUIThread;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.*;
@@ -16,6 +17,7 @@ import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.awt.*;
 import java.io.*;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +46,7 @@ public class OpenTafl {
 
     public static boolean devMode = false;
     public static LogLevel logLevel = LogLevel.NORMAL;
-    private static final int LOG_BUFFER_SIZE = 1024 * 1024;
+    private static final int LOG_BUFFER_SIZE = 1024 * 64;
     private static final StringBuilder logBuffer = new StringBuilder(LOG_BUFFER_SIZE);
     private static File logFile;
 
@@ -305,9 +307,36 @@ public class OpenTafl {
 
         try {
             logFile.createNewFile();
+            OpenTafl.logPrintln(LogLevel.SILENT, "OpenTafl log from " + new Date() + " on " + getComputerName());
+            OpenTafl.logPrintln(LogLevel.SILENT, "Java version: " + System.getProperty("java.version", "unknown version"));
         } catch (IOException e) {
             logPrintln(LogLevel.NORMAL, "Failed to create log file:" + e);
         }
+    }
+
+    private static String getComputerName() {
+        Map<String, String> env = System.getenv();
+        if (env.containsKey("COMPUTERNAME"))
+            return env.get("COMPUTERNAME");
+        else if (env.containsKey("HOSTNAME"))
+            return env.get("HOSTNAME");
+        else if (new File ("/etc/hostname").exists()) {
+            String hostname = null;
+            try (BufferedReader br = new BufferedReader(new FileReader(new File("/etc/hostname")))) {
+                hostname = br.readLine();
+
+                if(hostname != null && !hostname.isEmpty()) {
+                    return hostname;
+                }
+                else {
+                    return "Unknown Computer";
+                }
+            } catch (Exception e) {
+                return "Unknown Computer";
+            }
+        }
+        else
+            return "Unknown Computer";
     }
 
     private static void printHelpMessage() {
