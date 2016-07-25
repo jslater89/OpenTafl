@@ -173,7 +173,7 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 10. Version history
 
-v0.3.3.1b (released 07/xx/16):
+v0.3.3.1b (released 07/25/16):
 - Render rank and file names on both sides of the board
 - Add advanced destination rendering mode: when enabled, 'info' command will
   show space names for allowable moves and captures, to help with mistyping
