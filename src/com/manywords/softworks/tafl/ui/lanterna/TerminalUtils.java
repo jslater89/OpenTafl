@@ -141,4 +141,13 @@ public class TerminalUtils {
 
         return ps;
     }
+
+    public static String linesToString(List<String> wordWrappedText) {
+        String string = "";
+        for(String s : wordWrappedText) {
+            string += s + "\n";
+        }
+
+        return string;
+    }
 }

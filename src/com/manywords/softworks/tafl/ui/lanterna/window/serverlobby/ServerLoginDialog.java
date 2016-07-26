@@ -1,11 +1,14 @@
 package com.manywords.softworks.tafl.ui.lanterna.window.serverlobby;
 
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.manywords.softworks.tafl.network.PasswordHasher;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -25,7 +28,13 @@ public class ServerLoginDialog extends DialogWindow {
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
 
-        Label serverLabel = new Label(TerminalSettings.onlineServerHost + ":" + TerminalSettings.onlineServerPort);
+        Label serverLabel = new Label(TerminalUtils.linesToString(TerminalTextUtils.getWordWrappedText(40, "Connecting to: " + TerminalSettings.onlineServerHost + ":" + TerminalSettings.onlineServerPort)));
+
+        List<String> wrappedInstructions = TerminalTextUtils.getWordWrappedText(40,
+                "Enter your username and password. If the username is not in use, register a new " +
+                        "account.");
+
+        final Label instructionsLabel = new Label(TerminalUtils.linesToString(wrappedInstructions));
 
         final Label usernameLabel = new Label("Username");
         mUsernameInput = new TextBox();
@@ -51,6 +60,7 @@ public class ServerLoginDialog extends DialogWindow {
         });
 
         p.addComponent(serverLabel);
+        p.addComponent(instructionsLabel);
 
         p.addComponent(usernameLabel);
         p.addComponent(mUsernameInput);
