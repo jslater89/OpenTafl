@@ -65,8 +65,10 @@ public class JoinGameDialog extends DialogWindow {
 
         p.addComponent(usernameLabel);
 
-        p.addComponent(passwordLabel);
-        p.addComponent(mPasswordInput);
+        if(gameInfo.password) {
+            p.addComponent(passwordLabel);
+            p.addComponent(mPasswordInput);
+        }
 
         Panel buttonPanel = new Panel();
         buttonPanel.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
