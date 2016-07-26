@@ -78,12 +78,12 @@ public class Test {
                 OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "FAILED");
                 OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Assertion: " + e);
                 OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
-                System.exit(0);
+                System.exit(1);
             } catch (Exception e) {
                 OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "CRASHED");
                 OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Exception: " + e);
                 OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
-                System.exit(0);
+                System.exit(1);
             }
         }
 

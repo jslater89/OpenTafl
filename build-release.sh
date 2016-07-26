@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./gradlew build && ./package-gradle.sh
+./gradlew build && ./linux-test.sh --silent && ./package-gradle.sh
