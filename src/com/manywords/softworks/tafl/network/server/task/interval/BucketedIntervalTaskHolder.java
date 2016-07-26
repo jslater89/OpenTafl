@@ -34,14 +34,14 @@ public class BucketedIntervalTaskHolder extends IntervalTaskHolder {
         r = new XorshiftRandom();
     }
 
-    public void addBucketTask(IntervalTask task) {
+    public synchronized void addBucketTask(IntervalTask task) {
         if(!containsBucketTask(task)) {
             int bucket = r.nextInt(mBuckets.length);
             mBuckets[bucket].add(task);
         }
     }
 
-    public boolean containsBucketTask(IntervalTask task) {
+    public synchronized boolean containsBucketTask(IntervalTask task) {
         for(List<IntervalTask> bucket : mBuckets) {
             if(bucket.contains(task)) return true;
         }
@@ -49,7 +49,7 @@ public class BucketedIntervalTaskHolder extends IntervalTaskHolder {
         return false;
     }
 
-    public void removeBucketTask(IntervalTask task) {
+    public synchronized void removeBucketTask(IntervalTask task) {
         for(List<IntervalTask> bucket : mBuckets) {
             bucket.remove(task);
         }
@@ -63,7 +63,7 @@ public class BucketedIntervalTaskHolder extends IntervalTaskHolder {
         }
     }
 
-    private void pushBucketTasks() {
+    private synchronized void pushBucketTasks() {
         List<IntervalTask> taskList = mBuckets[mLastBucketRun];
         for(IntervalTask task : taskList) {
             task.reset();
