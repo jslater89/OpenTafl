@@ -173,6 +173,13 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 10. Version history
 
+v0.3.3.2b (released 07/27/16):
+- Happy birthday, Dan
+- In keeping with the sorts of things the aforementioned person is keen on,
+  this release includes two UI improvements:
+  - Network games without passwords no longer show a password entry box
+  - The server login dialog now contains instructions for login/registration
+
 v0.3.3.1b (released 07/25/16):
 - Render rank and file names on both sides of the board
 - Add advanced destination rendering mode: when enabled, 'info' command will
