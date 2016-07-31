@@ -136,7 +136,7 @@ public class GameState {
 
     private static final int VICTORY_UNCHECKED = -50;
     public Game mGame;
-    private int mLastMoveResult;
+    public int mLastMoveResult;
     protected int mVictory = VICTORY_UNCHECKED;
     public long mZobristHash;
     private Board mBoard;

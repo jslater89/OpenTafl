@@ -1,6 +1,8 @@
 package com.manywords.softworks.tafl.engine.replay;
 
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 
@@ -30,13 +32,17 @@ public class ReplayGameState extends GameState {
         return mMoveAddress;
     }
 
+    public void setMoveAddress(MoveAddress address) {
+        mMoveAddress = address;
+    }
+
     @Override
     protected GameState moveTaflman(char taflman, Coord destination) {
         GameState state = super.moveTaflman(taflman, destination);
         ReplayGameState replayState = new ReplayGameState(mReplayGame, state);
 
-        mGame.advanceState(mGame.getHistory().get(
-                mGame.getHistory().size() - 1),
+        mGame.advanceState(
+                this,
                 replayState,
                 replayState.getBerserkingTaflman() == Taflman.EMPTY,
                 replayState.getBerserkingTaflman(),
@@ -45,5 +51,17 @@ public class ReplayGameState extends GameState {
         replayState.setParent(this);
 
         return replayState;
+    }
+
+    @Override
+    public int makeMove(MoveRecord nextMove) {
+        if(getPieceAt(nextMove.start.x, nextMove.start.y) == Taflman.EMPTY) return ILLEGAL_MOVE;
+
+        GameState nextState = moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end);
+        if(nextState.getLastMoveResult() == GOOD_MOVE) {
+            nextState.mLastMoveResult = nextState.checkVictory();
+        }
+
+        return nextState.getLastMoveResult();
     }
 }

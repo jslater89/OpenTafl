@@ -34,6 +34,8 @@ public class ReplayGame {
     public ReplayGame(Game game, List<DetailedMoveRecord> movesToPlay) {
         GameState currentState = game.getCurrentState();
         ReplayGameState replayState = new ReplayGameState(this, currentState);
+        replayState.setMoveAddress(MoveAddress.newRootAddress());
+
         game.getHistory().replaceAll(gameState -> {
             if(gameState == currentState) {
                 return replayState;

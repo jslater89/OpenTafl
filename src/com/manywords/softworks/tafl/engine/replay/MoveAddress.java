@@ -35,6 +35,14 @@ public class MoveAddress {
 
             return name.toString();
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(!(obj instanceof AddressElement)) return false;
+            AddressElement other = (AddressElement) obj;
+
+            return rootIndex == other.rootIndex && moveIndexInRoot == other.moveIndexInRoot;
+        }
     }
 
     public MoveAddress() { }
@@ -130,6 +138,17 @@ public class MoveAddress {
         return other;
     }
 
+    public static MoveAddress newRootAddress() {
+        AddressElement e = new AddressElement();
+        e.rootIndex = 1;
+        e.moveIndexInRoot = 0;
+
+        MoveAddress a = new MoveAddress();
+        a.mElements.add(e);
+
+        return a;
+    }
+
     public static MoveAddress parseAddress(String address) {
         String[] elements = address.split("\\.");
         Pattern moveIndexPattern = Pattern.compile("([a-z])");
@@ -172,5 +191,23 @@ public class MoveAddress {
         }
 
         return name.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof MoveAddress)) return false;
+        MoveAddress other = (MoveAddress) obj;
+
+        if(mElements.size() != other.mElements.size()) return false;
+
+        boolean equal = true;
+        for(int i = 0; i < mElements.size(); i++) {
+            if(!mElements.get(i).equals(other.mElements.get(i))) {
+                equal = false;
+                break;
+            }
+        }
+
+        return equal;
     }
 }
