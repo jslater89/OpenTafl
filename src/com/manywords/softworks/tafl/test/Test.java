@@ -50,18 +50,20 @@ public class Test {
         tests.add(new BadFetlarCaptureTest());
         tests.add(new BadCopenhagenCaptureTest());
 
-        // Network tests
-        tests.add(new ServerTest());
-        tests.add(new LoadServerGameTest());
-        tests.add(new HeadlessAITest()); // also tests client connection somewhat
-
         // Mechanics tests
         tests.add(new ReplayGameTest());
         tests.add(new MoveAddressTest());
+        tests.add(new KingMissingPositionRecordTest());
+
+        // Long-running mechanics tests
         tests.add(new ExternalEngineHostTest());
         tests.add(new GameClockTest());
+
+        // Network tests
         tests.add(new ServerTickThreadTest());
-        tests.add(new KingMissingPositionRecordTest());
+        tests.add(new ServerTest());
+        tests.add(new LoadServerGameTest());
+        tests.add(new HeadlessAITest()); // also tests client connection somewhat
 
         // AI tests
         tests.add(new AIMatchingZobristTest());
