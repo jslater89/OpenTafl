@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.test.rules;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
@@ -21,21 +23,21 @@ public class StrictShieldwallTest extends TaflTest {
         //println "Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers())
         //println "Defender shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getDefenders())
 
-        state.moveTaflman(state.getPieceAt(2, 8), state.getSpaceAt(2, 7));
+        state.makeMove(new MoveRecord(Coord.get(2,8), Coord.get(2,7)));
         state = game.getCurrentState();
 
         //RawTerminal.renderGameState(state);
         //println "Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers())
         //println "Defender shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getDefenders())
 
-        state.moveTaflman(state.getPieceAt(5, 2), state.getSpaceAt(5, 1));
+        state.makeMove(new MoveRecord(Coord.get(5,2), Coord.get(5,1)));
         state = game.getCurrentState();
 
         //RawTerminal.renderGameState(state);
         //println "Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers())
         //println "Defender shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getDefenders())
 
-        state.moveTaflman(state.getPieceAt(2, 1), state.getSpaceAt(1, 1));
+        state.makeMove(new MoveRecord(Coord.get(2,1), Coord.get(1,1)));
         state = game.getCurrentState();
 
         //RawTerminal.renderGameState(state);

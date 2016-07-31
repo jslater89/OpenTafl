@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.test.rules;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -81,7 +82,7 @@ public class StrongKingCaptureTest extends TaflTest implements UiCallback {
         GameState state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(6, 4), state.getSpaceAt(5, 4));
+        state.makeMove(new MoveRecord(Coord.get(6,4), Coord.get(5,4)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 

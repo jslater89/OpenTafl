@@ -99,10 +99,10 @@ public class RestrictedFortReentryTest extends TaflTest implements UiCallback {
         assert dests.contains(Coord.get(1, 3));
         assert dests.contains(Coord.get(1, 5));
 
-        state.moveTaflman(taflman, Coord.get(1, 2));
+        state.makeMove(new MoveRecord(Coord.get(1,4), Coord.get(1,2)));
         state = game.getCurrentState();
 
-        state.moveTaflman(state.getPieceAt(4,3), Coord.get(1,3));
+        state.makeMove(new MoveRecord(Coord.get(4,3), Coord.get(1,3)));
         state = game.getCurrentState();
 
         taflman = state.getPieceAt(1,3);
@@ -117,7 +117,7 @@ public class RestrictedFortReentryTest extends TaflTest implements UiCallback {
         assert dests.contains(Coord.get(1, 4));
         assert moves.contains(Coord.get(1, 4));
 
-        state.moveTaflman(taflman, Coord.get(1, 4));
+        state.makeMove(new MoveRecord(Coord.get(0,4), Coord.get(1,4)));
         state = game.getCurrentState();
 
         taflman = state.getPieceAt(1,4);

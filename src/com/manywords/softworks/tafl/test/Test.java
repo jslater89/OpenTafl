@@ -3,10 +3,7 @@ package com.manywords.softworks.tafl.test;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.test.ai.*;
 import com.manywords.softworks.tafl.test.consistency.*;
-import com.manywords.softworks.tafl.test.mechanics.ExternalEngineHostTest;
-import com.manywords.softworks.tafl.test.mechanics.GameClockTest;
-import com.manywords.softworks.tafl.test.mechanics.KingMissingPositionRecordTest;
-import com.manywords.softworks.tafl.test.mechanics.ServerTickThreadTest;
+import com.manywords.softworks.tafl.test.mechanics.*;
 import com.manywords.softworks.tafl.test.network.HeadlessAITest;
 import com.manywords.softworks.tafl.test.network.LoadServerGameTest;
 import com.manywords.softworks.tafl.test.network.ServerTest;
@@ -18,6 +15,8 @@ import java.util.List;
 public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
+
+        // Initial tests (debug only)
 
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
@@ -57,6 +56,7 @@ public class Test {
         tests.add(new HeadlessAITest()); // also tests client connection somewhat
 
         // Mechanics tests
+        tests.add(new ReplayGameTest());
         tests.add(new ExternalEngineHostTest());
         tests.add(new GameClockTest());
         tests.add(new ServerTickThreadTest());

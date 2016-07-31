@@ -86,6 +86,11 @@ public class DetailedMoveRecord extends MoveRecord {
         this.captureArray = buildCaptureArray(dimension, captures, capturedTaflmen);
     }
 
+    @Override
+    public boolean isDetailed() {
+        return true;
+    }
+
     public void setTimeRemaining(TimeSpec remaining) {
         mTimeRemaining = remaining;
     }

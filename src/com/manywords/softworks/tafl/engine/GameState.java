@@ -256,7 +256,7 @@ public class GameState {
     public static final int ILLEGAL_MOVE = -3;
     public static final int ILLEGAL_MOVE_BERSERKER = -4;
 
-    public GameState moveTaflman(char taflman, Coord destination) {
+    protected GameState moveTaflman(char taflman, Coord destination) {
         if (mBerserkingTaflman != Taflman.EMPTY && Taflman.getSide(this, taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {
             return new GameState(ILLEGAL_SIDE_BERSERKER);
         }
@@ -303,13 +303,10 @@ public class GameState {
 
             if (captures.size() > 0 && getBoard().getRules().getBerserkMode() > 0) {
                 nextState.setBerserkingTaflman(taflman);
-                nextState = mGame.advanceState(this, nextState, false, taflman, true);
-                nextState.mLastMoveResult = nextState.checkVictory();
             } else {
                 nextState.setBerserkingTaflman(Taflman.EMPTY);
-                nextState = mGame.advanceState(this, nextState, true, Taflman.EMPTY, true);
-                nextState.mLastMoveResult = nextState.checkVictory();
             }
+
             return nextState;
         }
     }
@@ -619,16 +616,24 @@ public class GameState {
     public int makeMove(MoveRecord nextMove) {
         if(getPieceAt(nextMove.start.x, nextMove.start.y) == Taflman.EMPTY) return ILLEGAL_MOVE;
 
-        return moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end).getLastMoveResult();
+        GameState nextState = moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end);
+        if(nextState.getLastMoveResult() == GOOD_MOVE) {
+            char berserker = nextState.getBerserkingTaflman();
+            // Advance turn if berserker is empty
+            nextState = mGame.advanceState(this, nextState, (berserker == Taflman.EMPTY), berserker, true);
+            nextState.mLastMoveResult = nextState.checkVictory();
+        }
+
+        return nextState.getLastMoveResult();
     }
 
     public int makeMove(DetailedMoveRecord nextMove) {
-        if(getPieceAt(nextMove.start.x, nextMove.start.y) == Taflman.EMPTY) return ILLEGAL_MOVE;
+        int result = makeMove((MoveRecord) nextMove);
+        if(result >= GOOD_MOVE) {
+            mDetailedExitingMove.setTimeRemaining(nextMove.getTimeRemaining());
+        }
 
-        GameState nextState = moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end);
-        mDetailedExitingMove.setTimeRemaining(nextMove.getTimeRemaining());
-
-        return nextState.getLastMoveResult();
+        return result;
     }
 
     public void setExitingMove(DetailedMoveRecord exitingMove) {

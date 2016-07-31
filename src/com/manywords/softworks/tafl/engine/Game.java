@@ -78,6 +78,27 @@ public class Game {
         mCallback = callback;
     }
 
+    // Used for replays
+    public Game(Game copyGame) {
+        // Primitives/final variables: not changed or copied by value anyway
+        mZobristConstants = copyGame.mZobristConstants;
+        mAverageBranchingFactor = copyGame.mAverageBranchingFactor;
+        mAverageBranchingFactorCount = copyGame.mAverageBranchingFactorCount;
+
+        // Things we don't need to copy: if they exist, we want the same ones
+        mClock = copyGame.mClock;
+        mCallback = copyGame.mCallback;
+        mGameRules = copyGame.mGameRules;
+        mTagMap = copyGame.mTagMap;
+
+        // Game states: we want copies of these.
+        mHistory = new ArrayList<>();
+        for(GameState copyState : copyGame.getHistory()) {
+            mHistory.add(new GameState(copyState));
+        }
+        mCurrentState = mHistory.get(mHistory.size() - 1);
+    }
+
     public final long[][] mZobristConstants;
     public double mAverageBranchingFactor = 0;
     public int mAverageBranchingFactorCount = 0;

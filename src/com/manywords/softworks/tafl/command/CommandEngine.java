@@ -227,10 +227,7 @@ public class CommandEngine {
                 callbackMoveResult(new CommandResult(Command.Type.MOVE, CommandResult.FAIL, message, null), null);
                 return;
             }
-            int result =
-                    mGame.getCurrentState().moveTaflman(
-                            mGame.getCurrentState().getBoard().getOccupier(move.start.x, move.start.y),
-                            mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y)).getLastMoveResult();
+            int result = mGame.getCurrentState().makeMove(move);
 
             // non-error moves
             if(result >= GameState.GOOD_MOVE) {
@@ -290,7 +287,7 @@ public class CommandEngine {
             }
 
             if(replayPosition != -1) {
-                enterReplay(new ReplayGame(mGame));
+                enterReplay(ReplayGame.copyGameToReplay(mGame));
                 mReplay.setPosition(replayPosition);
             }
             waitForNextMove();
@@ -387,7 +384,7 @@ public class CommandEngine {
         }
         // 12. REPLAY START COMMAND
         else if(command instanceof HumanCommandParser.ReplayEnter) {
-            ReplayGame rg = new ReplayGame(mGame);
+            ReplayGame rg = ReplayGame.copyGameToReplay(mGame);
             enterReplay(rg);
             return new CommandResult(Command.Type.REPLAY_ENTER, CommandResult.SUCCESS, "", null);
         }

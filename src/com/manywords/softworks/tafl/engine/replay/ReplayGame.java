@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 /**
  * Created by jay on 3/31/16.
@@ -31,18 +32,30 @@ public class ReplayGame {
      * @param movesToPlay
      */
     public ReplayGame(Game game, List<DetailedMoveRecord> movesToPlay) {
+        GameState currentState = game.getCurrentState();
+        ReplayGameState replayState = new ReplayGameState(currentState);
+        game.getHistory().replaceAll(gameState -> {
+            if(gameState == currentState) {
+                return replayState;
+            }
+            else {
+                return gameState;
+            }
+        });
+        mGame = game;
+        mGame.setCurrentState(replayState);
+
         for(MoveRecord m : movesToPlay) {
-            int result = game.getCurrentState().makeMove(m);
+            int result = mGame.getCurrentState().makeMove(m);
             if(result < GameState.GOOD_MOVE) {
                 RawTerminal.renderGameState(game.getCurrentState());
                 System.out.println(m);
                 throw new IllegalStateException("Failed to make moves! Error: " + result);
             }
+
         }
 
-        mGame = game;
         mMoveHistory = movesToPlay;
-
         mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
 
         for(int i = 0; i < movesToPlay.size(); i++) {
@@ -59,19 +72,22 @@ public class ReplayGame {
      * state.
      * @param game
      */
-    public ReplayGame(Game game) {
-        mGame = game;
-        mMoveHistory = new ArrayList<DetailedMoveRecord>();
+    public static ReplayGame copyGameToReplay(Game game) {
+        Game copiedGame = new Game(game);
+        List<DetailedMoveRecord> moves = new ArrayList<>();
 
-        for(GameState state : game.getHistory()) {
+        for(GameState state : copiedGame.getHistory()) {
             if(state.getExitingMove() != null) {
-                mMoveHistory.add((DetailedMoveRecord) state.getExitingMove());
+                moves.add((DetailedMoveRecord) state.getExitingMove());
             }
         }
 
-        mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
-        setupFirstStatesList();
-        setupTimeSpecLists();
+        GameState copiedStartingState = copiedGame.getHistory().get(0);
+        copiedGame.getHistory().clear();
+        copiedGame.getHistory().add(copiedStartingState);
+        copiedGame.setCurrentState(copiedStartingState);
+
+        return new ReplayGame(copiedGame, moves);
     }
 
     public Game getGame() {

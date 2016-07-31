@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.test.rules;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
@@ -36,7 +37,7 @@ public class JumpCaptureBerserkerTest extends TaflTest {
         char berserkerCommander = state.getPieceAt(0, 6);
         assert Taflman.getCapturingMoves(state, berserkerCommander).contains(state.getSpaceAt(0, 8)) == true;
 
-        state.moveTaflman(knight, Coord.get(4, 2));
+        state.makeMove(new MoveRecord(Coord.get(4,4), Coord.get(4,2)));
         state = game.getCurrentState();
 
         // Did the knight successfully jump?
@@ -48,7 +49,7 @@ public class JumpCaptureBerserkerTest extends TaflTest {
         // Although the knight made a capture, did the turn advance correctly?
         assert state.getCurrentSide().isAttackingSide() == true;
 
-        state.moveTaflman(state.getPieceAt(0, 6), state.getSpaceAt(0, 8));
+        state.makeMove(new MoveRecord(Coord.get(0,6), Coord.get(0,8)));
         state = game.getCurrentState();
 
         // Did the commander successfully jump?
@@ -67,7 +68,7 @@ public class JumpCaptureBerserkerTest extends TaflTest {
         // Did the berserker rule correctly take effect?
         assert state.getCurrentSide().isAttackingSide() == true;
 
-        state.moveTaflman(state.getPieceAt(0, 8), state.getSpaceAt(2, 8));
+        state.makeMove(new MoveRecord(Coord.get(0,8), Coord.get(2,8)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
@@ -77,7 +78,7 @@ public class JumpCaptureBerserkerTest extends TaflTest {
         // Did the berserker capture work correctly?
         assert state.getPieceAt(2, 9) == Taflman.EMPTY;
 
-        state.moveTaflman(state.getPieceAt(5, 5), state.getSpaceAt(5, 7));
+        state.makeMove(new MoveRecord(Coord.get(5,5), Coord.get(5,7)));
         state = game.getCurrentState();
 
         // Did the king capture a piece against the restricted square it jumped out of?
