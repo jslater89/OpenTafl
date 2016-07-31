@@ -33,7 +33,7 @@ public class ReplayGame {
      */
     public ReplayGame(Game game, List<DetailedMoveRecord> movesToPlay) {
         GameState currentState = game.getCurrentState();
-        ReplayGameState replayState = new ReplayGameState(currentState);
+        ReplayGameState replayState = new ReplayGameState(this, currentState);
         game.getHistory().replaceAll(gameState -> {
             if(gameState == currentState) {
                 return replayState;
