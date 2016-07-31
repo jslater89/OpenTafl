@@ -1,0 +1,56 @@
+package com.manywords.softworks.tafl.test.mechanics;
+
+import com.manywords.softworks.tafl.engine.replay.MoveAddress;
+import com.manywords.softworks.tafl.test.TaflTest;
+
+/**
+ * Created by jay on 7/31/16.
+ */
+public class MoveAddressTest extends TaflTest {
+    @Override
+    public void run() {
+        // The first move of the 29th turn in the game.
+        String stringAddress = "29.";
+        MoveAddress moveAddress = MoveAddress.parseAddress(stringAddress);
+
+        assert moveAddress.toString().equals(stringAddress);
+
+        // The first move of the 29th turn in the game.
+        stringAddress = "29a.";
+        moveAddress = MoveAddress.parseAddress(stringAddress);
+
+        assert moveAddress.toString().equals(stringAddress);
+
+        // The second move of the 29th turn in the game.
+        stringAddress = "29b.";
+        moveAddress = MoveAddress.parseAddress(stringAddress);
+
+        assert moveAddress.toString().equals(stringAddress);
+
+        // The first move of the first variation off of the first move of the 29th turn in the game.
+        stringAddress = "29a.1.1.";
+        moveAddress = MoveAddress.parseAddress(stringAddress);
+
+        assert moveAddress.toString().equals(stringAddress);
+
+        assert moveAddress.toString().equals(stringAddress);
+
+        // The first move of the first variation off of the first move of the second turn of the third variation off of the first move of the 29th turn in the game.
+        stringAddress = "29a.3.2a.1.1.";
+        moveAddress = MoveAddress.parseAddress(stringAddress);
+
+        assert moveAddress.toString().equals(stringAddress);
+
+        // Same.
+        stringAddress = "29a.3.2a.1.1a.";
+        moveAddress = MoveAddress.parseAddress(stringAddress);
+
+        assert moveAddress.toString().equals(stringAddress);
+
+        // The third move (berserk) of the third turn of the third variation off of the second move of the fourth turn of the first variation off of the fourth move (berserk) of the 29th turn in the game.
+        stringAddress = "29d.1.4b.3.3c.";
+        moveAddress = MoveAddress.parseAddress(stringAddress);
+
+        assert moveAddress.toString().equals(stringAddress);
+    }
+}

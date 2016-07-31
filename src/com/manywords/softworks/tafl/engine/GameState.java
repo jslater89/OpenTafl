@@ -613,6 +613,7 @@ public class GameState {
         return typeIndex;
     }
 
+    // TODO: makeMove(Coord, Coord)
     public int makeMove(MoveRecord nextMove) {
         if(getPieceAt(nextMove.start.x, nextMove.start.y) == Taflman.EMPTY) return ILLEGAL_MOVE;
 

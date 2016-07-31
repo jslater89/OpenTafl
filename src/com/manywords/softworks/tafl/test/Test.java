@@ -57,6 +57,7 @@ public class Test {
 
         // Mechanics tests
         tests.add(new ReplayGameTest());
+        tests.add(new MoveAddressTest());
         tests.add(new ExternalEngineHostTest());
         tests.add(new GameClockTest());
         tests.add(new ServerTickThreadTest());

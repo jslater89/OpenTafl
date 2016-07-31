@@ -121,13 +121,6 @@ public class ReplayGame {
         return newString;
     }
 
-    public GameState getPreviousState() {
-        if(mStatePosition - 1 >= 0) {
-            return stateAtIndex(mStatePosition - 1);
-        }
-        else return null;
-    }
-
     public GameState nextState() {
         if(mStatePosition < historySize() - 1) {
             mStatePosition++;
@@ -144,7 +137,7 @@ public class ReplayGame {
         return stateAtIndex(mStatePosition);
     }
 
-    public int setPositionByState(GameState state) {
+    private int setPositionByState(GameState state) {
         int i = 0;
         for(GameState history : mGame.getHistory()) {
             if(state.equals(history)) {
@@ -202,6 +195,13 @@ public class ReplayGame {
 
     public GameState getCurrentState() {
         return mGame.getHistory().get(mStatePosition);
+    }
+
+    public GameState makeVariation(MoveRecord move) {
+        ReplayGameState state = (ReplayGameState) getCurrentState();
+        //ReplayGameState variationState = state.doVariation(move);
+
+        return state;
     }
 
     private void setupFirstStatesList() {
