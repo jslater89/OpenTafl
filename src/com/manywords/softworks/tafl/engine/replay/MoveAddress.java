@@ -74,6 +74,24 @@ public class MoveAddress {
         return elements;
     }
 
+    public MoveAddress changePrefix(MoveAddress currentPrefix, MoveAddress newPrefix) {
+        if(currentPrefix.mElements.size() > mElements.size()) return null;
+
+        for(int i = 0; i < currentPrefix.mElements.size(); i++) {
+            Element thisElement = mElements.get(i);
+            Element otherElement = currentPrefix.mElements.get(i);
+
+            if(!thisElement.equals(otherElement)) return null;
+        }
+
+        List<Element> postPrefixElements = getElementsStartingAt(currentPrefix.mElements.size());
+        MoveAddress newAddress = new MoveAddress();
+        newAddress.mElements.addAll(newPrefix.mElements);
+        newAddress.mElements.addAll(postPrefixElements);
+
+        return newAddress;
+    }
+
     public MoveAddress increment(ReplayGame game, ReplayGameState current) {
         MoveAddress other;
         Element inQuestion = mElements.get(mElements.size() - 1);
