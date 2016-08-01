@@ -331,4 +331,10 @@ public class ReplayGame {
         System.out.println();
         return result;
     }
+
+    public void dumpHistory() {
+        for(GameState state : mGame.getHistory()) {
+            ((ReplayGameState) state).dumpVariations();
+        }
+    }
 }

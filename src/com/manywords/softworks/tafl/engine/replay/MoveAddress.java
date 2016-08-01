@@ -126,19 +126,29 @@ public class MoveAddress {
             boolean otherSideWent = false;
 
             // We should increment the turn if, between the start of the turn and now, the other side has gone
-            // and we are the starting side.
+            // and we are the starting side. Since we're deep in a tree, we have to follow the tree back up to
+            // know what the history is so we can know if we should increment. Hooray for tracking parents!
 
-            // TODO: check from start of turn to end of turn, not from history - length of turn
-            int endOfTurnIndex = game.getGame().getHistory().size();
             int lengthOfTurn = inQuestion.moveIndex;
-            for (int i = endOfTurnIndex - 1 - lengthOfTurn; i < endOfTurnIndex; i++) {
-                ReplayGameState rgs = (ReplayGameState) game.getGame().getHistory().get(i);
+            List<ReplayGameState> backwardStates = new ArrayList<>(lengthOfTurn);
+
+            backwardStates.add(current);
+            ReplayGameState s = current;
+            while((s = s.getParent()) != null && backwardStates.size() <= lengthOfTurn) {
+                backwardStates.add(s);
+            }
+
+            List<ReplayGameState> states = new ArrayList<>(backwardStates.size());
+
+            for(int i = backwardStates.size() - 1; i >= 0; i--) {
+                states.add(backwardStates.get(i));
+            }
+
+            for (ReplayGameState rgs : states) {
                 if(rgs.getCurrentSide().isAttackingSide() != startingSideAttackers) {
                     otherSideWent = true;
                 }
             }
-
-            System.out.println("Other side went? " + otherSideWent);
 
             if(otherSideWent) {
                 other = increment(true);
