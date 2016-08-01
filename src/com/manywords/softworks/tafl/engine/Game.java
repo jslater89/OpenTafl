@@ -272,16 +272,22 @@ public class Game {
                 true, // update zobrist
                 berserkingTaflman);
 
-        mCurrentState = nextState;
-        mHistory.add(mCurrentState);
+        if(recordState) {
+            mCurrentState = nextState;
+            mHistory.add(mCurrentState);
 
-        if(mClock != null) {
-            mClock.slap(advanceTurn);
+            if (mClock != null) {
+                mClock.slap(advanceTurn);
+            }
+
+            // Victory
+            mCurrentState.checkVictory();
+            return mCurrentState;
         }
-
-        // Victory
-        mCurrentState.checkVictory();
-        return mCurrentState;
+        else {
+            nextState.checkVictory();
+            return nextState;
+        }
     }
 
     public boolean historyContainsHash(long zobrist) {

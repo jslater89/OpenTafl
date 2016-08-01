@@ -8,7 +8,6 @@ import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 /**
  * Created by jay on 3/31/16.
@@ -128,7 +127,7 @@ public class ReplayGame {
             mStatePosition++;
         }
 
-        return stateAtIndex(mStatePosition);
+        return goToStateAtIndex(mStatePosition);
     }
 
     public GameState previousState() {
@@ -136,7 +135,7 @@ public class ReplayGame {
             mStatePosition--;
         }
 
-        return stateAtIndex(mStatePosition);
+        return goToStateAtIndex(mStatePosition);
     }
 
     private int setPositionByState(GameState state) {
@@ -166,7 +165,7 @@ public class ReplayGame {
 
         mStatePosition = i;
 
-        return stateAtIndex(mStatePosition);
+        return goToStateAtIndex(mStatePosition);
     }
 
     public int getPosition() {
@@ -186,9 +185,13 @@ public class ReplayGame {
         mGame.getHistory().removeAll(toRemove);
     }
 
-    private GameState stateAtIndex(int i) {
+    private ReplayGameState goToStateAtIndex(int i) {
         mGame.setCurrentState(mGame.getHistory().get(i));
-        return mGame.getHistory().get(i);
+        return getStateAtIndex(i);
+    }
+
+    private ReplayGameState getStateAtIndex(int i) {
+        return (ReplayGameState) mGame.getHistory().get(i);
     }
 
     public int historySize() {
@@ -199,9 +202,9 @@ public class ReplayGame {
         return mGame.getHistory().get(mStatePosition);
     }
 
-    public GameState makeVariation(MoveRecord move) {
+    public ReplayGameState makeVariation(MoveRecord move) {
         ReplayGameState state = (ReplayGameState) getCurrentState();
-        //ReplayGameState variationState = state.doVariation(move);
+        ReplayGameState variationState = state.makeVariation(move);
 
         return state;
     }
@@ -306,5 +309,20 @@ public class ReplayGame {
         }
 
         return null;
+    }
+
+    public ReplayGameState getStateByAddress(MoveAddress moveAddress) {
+        MoveAddress.Element element = moveAddress.getRootElement();
+
+        int index = element.moveIndex + (element.rootIndex - 1) * 2;
+
+        ReplayGameState startingPoint = getStateAtIndex(index);
+
+        if(moveAddress.getNonRootElements().size() > 0) {
+            return startingPoint.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
+        }
+        else {
+            return startingPoint;
+        }
     }
 }
