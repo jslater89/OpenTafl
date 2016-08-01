@@ -51,8 +51,8 @@ public class Test {
         tests.add(new BadCopenhagenCaptureTest());
 
         // Mechanics tests
-        tests.add(new ReplayGameTest());
         tests.add(new MoveAddressTest());
+        tests.add(new ReplayGameTest());
         tests.add(new KingMissingPositionRecordTest());
 
         // Long-running mechanics tests

@@ -56,7 +56,7 @@ public class MoveAddressTest extends TaflTest {
         moveAddress = MoveAddress.parseAddress("29.");
 
         //29.1.1a
-        moveAddress = moveAddress.nextVariation();
+        moveAddress = moveAddress.nextVariationFirstState();
         assert moveAddress.toString().equals("29.1.1a.");
 
         //29.1.1b, c, d
@@ -74,7 +74,7 @@ public class MoveAddressTest extends TaflTest {
         assert moveAddress.toString().equals("29.2.1a.");
 
         //29.2.1a.1.1a
-        moveAddress = moveAddress.nextVariation();
+        moveAddress = moveAddress.nextVariationFirstState();
         assert moveAddress.toString().equals("29.2.1a.1.1a.");
 
         //29.2.1a.1.1b, 2a

@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.engine.replay;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Coord;
@@ -37,7 +38,7 @@ public class ReplayGameState extends GameState {
 
     public void setVariationParent(ReplayGameState state, Variation parentVariation) {
         mParent = state;
-        mMoveAddress = mParent.getMoveAddress().nextVariation();
+        mMoveAddress = parentVariation.getNextChildAddress(mReplayGame, this);
         mEnclosingVariation = parentVariation;
     }
 
@@ -101,6 +102,9 @@ public class ReplayGameState extends GameState {
         MoveAddress.Element e = moveAddress.getRootElement();
         int index = e.rootIndex - 1;
 
+        System.out.println("Replay state: " + mMoveAddress);
+        System.out.println("Searching for: " + moveAddress);
+
         return mVariations.get(index).findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
     }
 
@@ -138,12 +142,81 @@ public class ReplayGameState extends GameState {
                 mEnclosingVariation.addState(nextState);
             }
             else {
-                Variation v = new Variation(nextState);
+                Variation v = new Variation(mMoveAddress.nextVariation(mVariations.size() + 1), nextState);
                 mVariations.add(v);
                 nextState.setVariationParent(this, v);
             }
         }
 
         return nextState;
+    }
+
+    /**
+     * Deletes a variation from the history tree, including all of its children.
+     * @param moveAddress
+     */
+    // TODO: deleting the canonical child must move one of the variations into canonical childhood
+    // That's gonna be messy. Maybe I should back off of allowing deletion.
+    public void deleteVariation(MoveAddress moveAddress) {
+        // Remove this address from the front of the move address.
+        MoveAddress variationAddress = moveAddress.changePrefix(mMoveAddress, new MoveAddress());
+        List<MoveAddress.Element> variationElements = variationAddress.getElements();
+
+        if(variationElements.size() == 1) {
+            // Hooray! a variation!
+            int index = variationElements.get(0).rootIndex - 1;
+            mVariations.remove(index);
+
+            // Each variation now has index i+2 (because they're one-indexed, not zero-indexed).
+            // Its address is our address, plus a variation number, plus the rest of the address. For each one,
+            // the prefix is our address plus i+2. Change that prefix to our address plus i+1.
+            List<MoveAddress.Element> thisElements = mMoveAddress.getElements();
+
+            for(int i = index; i < mVariations.size(); i++) {
+                // Allocate inside the loop to avoid any trickiness with reuse
+                MoveAddress.Element oldVariation = new MoveAddress.Element(index+2, -1);
+                MoveAddress.Element newVariation = new MoveAddress.Element(index+1, -1);
+
+                mVariations.get(i).changeAddress(new MoveAddress(thisElements, oldVariation), new MoveAddress(thisElements, newVariation));
+            }
+        }
+        else if(variationElements.size() > 1) {
+            // Get the next replay state addressed by the move address and call this on that
+            MoveAddress.Element variationElement = variationElements.get(0);
+            MoveAddress.Element nextStateElement = variationElements.get(1);
+
+            ReplayGameState variationState = mVariations.get(variationElement.rootIndex).getDirectChild(nextStateElement);
+            if(variationState != null) {
+                variationState.deleteVariation(moveAddress);
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Argument to deleteVariation does not address a variation: " + moveAddress);
+        }
+    }
+
+    public void changeAddressPrefix(MoveAddress oldPrefix, MoveAddress newPrefix) {
+        MoveAddress oldAddress = mMoveAddress;
+        mMoveAddress = mMoveAddress.changePrefix(oldPrefix, newPrefix);
+
+        if(mCanonicalChild != null) {
+            mCanonicalChild.changeAddressPrefix(oldPrefix, newPrefix);
+        }
+
+        List<MoveAddress.Element> oldElements = oldAddress.getElements();
+        List<MoveAddress.Element> thisElements = mMoveAddress.getElements();
+        for(int i = 0; i < mVariations.size(); i++) {
+            Variation v = mVariations.get(i);
+            MoveAddress.Element variation = new MoveAddress.Element(i+1, -1);
+
+            v.changeAddress(new MoveAddress(oldElements, variation), new MoveAddress(thisElements, variation));
+        }
+    }
+
+    public void dumpVariations() {
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Variations for " + mMoveAddress);
+        for(int i = 0; i < mVariations.size(); i++) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, i + ": " + mVariations.get(i).getRoot().getMoveAddress());
+        }
     }
 }

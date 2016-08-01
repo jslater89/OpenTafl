@@ -206,7 +206,7 @@ public class ReplayGame {
         ReplayGameState state = (ReplayGameState) getCurrentState();
         ReplayGameState variationState = state.makeVariation(move);
 
-        return state;
+        return variationState;
     }
 
     private void setupFirstStatesList() {
@@ -314,15 +314,21 @@ public class ReplayGame {
     public ReplayGameState getStateByAddress(MoveAddress moveAddress) {
         MoveAddress.Element element = moveAddress.getRootElement();
 
+        // TODO: can't make this assumption about moveIndex, unfortunately
         int index = element.moveIndex + (element.rootIndex - 1) * 2;
 
         ReplayGameState startingPoint = getStateAtIndex(index);
 
+        ReplayGameState result = null;
         if(moveAddress.getNonRootElements().size() > 0) {
-            return startingPoint.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
+            result = startingPoint.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
         }
         else {
-            return startingPoint;
+            result = startingPoint;
         }
+
+        System.out.println("Found state: " + result.getMoveAddress());
+        System.out.println();
+        return result;
     }
 }

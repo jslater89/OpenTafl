@@ -65,8 +65,11 @@ public class ReplayGameTest extends TaflTest {
         parent = rg.getStateByAddress(MoveAddress.parseAddress("1a"));
         parent.makeVariation(new MoveRecord(Coord.get(3, 5), Coord.get(2, 5)));
 
+        //parent.dumpVariations();
+
         child = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a"));
         assert child != null;
+        assert child.getMoveAddress().equals(MoveAddress.parseAddress("1a.2.1a"));
         assert child.getParent() == parent;
 
         // Try a double-variation off of a previous child
@@ -78,5 +81,43 @@ public class ReplayGameTest extends TaflTest {
         assert child != null;
         assert child.getParent() == parent;
 
+        //  Make a third variation!
+        parent = rg.getStateByAddress(MoveAddress.parseAddress("1a"));
+        parent.makeVariation(new MoveRecord(Coord.get(4, 4), Coord.get(3, 4)));
+
+        ReplayGameState firstVariation = rg.getStateByAddress(MoveAddress.parseAddress("1a.1.1a"));
+        ReplayGameState thirdVariation = rg.getStateByAddress(MoveAddress.parseAddress("1a.3.1a"));
+        assert thirdVariation != null;
+        assert thirdVariation.getParent() == parent;
+
+        // Delete variation 1a.2, and make sure that the variation formerly known as 3 is now known as 2.
+        parent.deleteVariation(MoveAddress.parseAddress("1a.2"));
+
+        assert thirdVariation.getMoveAddress().equals(MoveAddress.parseAddress("1a.2.1a"));
+
+        // Now for the major push.
+        // 3,5 to 2,5 so far
+        parent = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a"));
+
+        // 1a.2.1a.1.1a, 1a.2.1a.2.1a, 1a.2.1a.3.1a
+        ReplayGameState state;
+        state = parent.makeVariation(new MoveRecord(Coord.get(0, 3), Coord.get(1, 3)));
+        System.out.println("Who am I? " + state.getMoveAddress());
+        state = parent.makeVariation(new MoveRecord(Coord.get(0, 4), Coord.get(1, 4)));
+        System.out.println("Who am I? " + state.getMoveAddress());
+        state = parent.makeVariation(new MoveRecord(Coord.get(10, 3), Coord.get(9, 3)));
+        System.out.println("Who am I? " + state.getMoveAddress());
+
+        parent.dumpVariations();
+
+        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b")) != null;
+        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.1.1a")) != null;
+        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.2.1a")) != null;
+
+        parent.deleteVariation(MoveAddress.parseAddress("1a.2.1a.1.1a"));
+
+        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.1.1a")) != null;
+        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.2.1a")) != null;
+        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.3.1a")) == null;
     }
 }

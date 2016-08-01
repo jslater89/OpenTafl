@@ -20,6 +20,11 @@ public class MoveAddress {
             moveIndex = other.moveIndex;
         }
 
+        public Element(int rootAddress, int moveAddress) {
+            rootIndex = rootAddress;
+            moveIndex = moveAddress;
+        }
+
         public boolean isVariation() {
             return moveIndex == -1;
         }
@@ -51,11 +56,22 @@ public class MoveAddress {
         }
     }
 
+    public MoveAddress(List<Element> rootElements, Element newTip) {
+        mElements.addAll(rootElements);
+        mElements.add(newTip);
+    }
+
     public MoveAddress(List<Element> nonRootElements) {
         mElements.addAll(nonRootElements);
     }
 
     private List<Element> mElements = new ArrayList<>();
+
+    public List<Element> getElements() {
+        List<Element> elements = new ArrayList<>(mElements.size());
+        elements.addAll(mElements);
+        return elements;
+    }
 
     public Element getRootElement() {
         return mElements.get(0);
@@ -75,13 +91,17 @@ public class MoveAddress {
     }
 
     public MoveAddress changePrefix(MoveAddress currentPrefix, MoveAddress newPrefix) {
-        if(currentPrefix.mElements.size() > mElements.size()) return null;
+        if(currentPrefix.mElements.size() > mElements.size()) {
+            return null;
+        }
 
         for(int i = 0; i < currentPrefix.mElements.size(); i++) {
             Element thisElement = mElements.get(i);
             Element otherElement = currentPrefix.mElements.get(i);
 
-            if(!thisElement.equals(otherElement)) return null;
+            if(!thisElement.equals(otherElement)) {
+                return null;
+            }
         }
 
         List<Element> postPrefixElements = getElementsStartingAt(currentPrefix.mElements.size());
@@ -108,14 +128,17 @@ public class MoveAddress {
             // We should increment the turn if, between the start of the turn and now, the other side has gone
             // and we are the starting side.
 
-            int historySize = game.getGame().getHistory().size();
+            // TODO: check from start of turn to end of turn, not from history - length of turn
+            int endOfTurnIndex = game.getGame().getHistory().size();
             int lengthOfTurn = inQuestion.moveIndex;
-            for (int i = historySize - 1 - lengthOfTurn; i < historySize; i++) {
+            for (int i = endOfTurnIndex - 1 - lengthOfTurn; i < endOfTurnIndex; i++) {
                 ReplayGameState rgs = (ReplayGameState) game.getGame().getHistory().get(i);
                 if(rgs.getCurrentSide().isAttackingSide() != startingSideAttackers) {
                     otherSideWent = true;
                 }
             }
+
+            System.out.println("Other side went? " + otherSideWent);
 
             if(otherSideWent) {
                 other = increment(true);
@@ -158,21 +181,31 @@ public class MoveAddress {
         return newSibling;
     }
 
-    // Add a new variation: add a new variation node and a new child node, set to 1 and 1a
-    public MoveAddress nextVariation() {
+    public MoveAddress nextVariation(int index) {
         MoveAddress other = new MoveAddress(this);
         Element newVariation = new Element();
-        newVariation.rootIndex = 1;
+        newVariation.rootIndex = index;
         newVariation.moveIndex = -1;
 
+        other.mElements.add(newVariation);
+        return other;
+    }
+
+    public MoveAddress firstChild() {
+        MoveAddress other = new MoveAddress(this);
         Element newChild = new Element();
         newChild.rootIndex = 1;
         newChild.moveIndex = 0;
 
-        other.mElements.add(newVariation);
         other.mElements.add(newChild);
 
         return other;
+    }
+
+    // Add a new variation: add a new variation node and a new child node, set to 1 and 1a
+    public MoveAddress nextVariationFirstState() {
+        MoveAddress other = nextVariation(1);
+        return other.firstChild();
     }
 
     public static MoveAddress newRootAddress() {
