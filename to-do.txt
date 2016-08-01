@@ -1,13 +1,17 @@
 Tafl To-Do
 
-v0.2 features, bits, and bobs:
-1. Test game serializer, replay functionality with a berserk game that includes berserk moves
-2. Write help messages
-
-General features:
-2. CommandEngine requires a start command. (UI callback and notification to player, so AIs know to start.)
+v0.4.x features:
+- GameSerializer: learn how to load/save variations
+	- Variations as a separate list to minimize impact on current functionality
+- ReplayGame: learn how to add variations from such a list
+- ReplayGame: learn how to add variations
+- UI: in replay mode, display full move address
+- UI: improve jump command to take move addresses
+- UI: improve previous command to go up the tree regardless of location
+- UI: add 'variation' command, which takes either coords to start a new variation, or a lone number to mean, 'go to the Nth variation from this state'.
 
 AI stuff:
+0. Evaluation function work: underpins all further heuristics work
 1. Aspiration windows (i.e. initial alpha-beta in a window around last iterative deepening)
 2. Killer-move heuristic (array indexed by: ply, fromindex, toindex to track counts, list of: ply, move for moves)
 3. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)
