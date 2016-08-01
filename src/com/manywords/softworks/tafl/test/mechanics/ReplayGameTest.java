@@ -36,13 +36,47 @@ public class ReplayGameTest extends TaflTest {
             }
         }
 
-        ReplayGameState rgs = rg.getStateByAddress(MoveAddress.parseAddress("4b"));
-        assert rgs != null;
+        // Try finding a state by address
+        ReplayGameState parent = rg.getStateByAddress(MoveAddress.parseAddress("4b"));
+        assert parent != null;
 
-        rgs = rg.getStateByAddress(MoveAddress.parseAddress("1a."));
-        rgs.makeVariation(new MoveRecord(Coord.get(5, 3), Coord.get(5, 2)));
+        // Try creating a new variation
+        parent = rg.getStateByAddress(MoveAddress.parseAddress("1a"));
+        parent.makeVariation(new MoveRecord(Coord.get(5, 3), Coord.get(5, 2)));
 
-        rgs = rg.getStateByAddress(MoveAddress.parseAddress("1a.1.1a"));
-        assert rgs != null;
+        ReplayGameState child = rg.getStateByAddress(MoveAddress.parseAddress("1a.1.1a"));
+        assert child != null;
+        assert child.getParent() == parent;
+
+        // Try tacking a canonical move onto the end of an existing variation
+        parent = child;
+        parent.makeVariation(new MoveRecord(Coord.get(4, 0), Coord.get(4, 3)));
+
+        child = rg.getStateByAddress(MoveAddress.parseAddress("1a.1.1b"));
+        assert child != null;
+        assert child.getParent() == parent;
+
+        // Try redoing the same move, which should return null (so ReplayGame can handle changing the state to that
+        // state)
+        ReplayGameState result = parent.makeVariation(new MoveRecord(Coord.get(4, 0), Coord.get(4, 3)));
+        assert result == null;
+
+        // Try a variation off of 1a again
+        parent = rg.getStateByAddress(MoveAddress.parseAddress("1a"));
+        parent.makeVariation(new MoveRecord(Coord.get(3, 5), Coord.get(2, 5)));
+
+        child = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a"));
+        assert child != null;
+        assert child.getParent() == parent;
+
+        // Try a double-variation off of a previous child
+        // Try tacking a canonical move onto the end of an existing variation
+        parent = rg.getStateByAddress(MoveAddress.parseAddress("1a.1.1a"));
+        parent.makeVariation(new MoveRecord(Coord.get(0, 4), Coord.get(3, 4)));
+
+        child = rg.getStateByAddress(MoveAddress.parseAddress("1a.1.1a.1.1a"));
+        assert child != null;
+        assert child.getParent() == parent;
+
     }
 }

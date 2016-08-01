@@ -1,6 +1,5 @@
 package com.manywords.softworks.tafl.engine.replay;
 
-import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Coord;
@@ -15,7 +14,9 @@ import java.util.List;
 public class ReplayGameState extends GameState {
     private ReplayGame mReplayGame;
     private ReplayGameState mParent;
+    private Variation mEnclosingVariation;
     private MoveAddress mMoveAddress;
+    private ReplayGameState mCanonicalChild;
     private List<Variation> mVariations = new ArrayList<>();
 
     public ReplayGameState(ReplayGame replayGame, GameState copyState) {
@@ -29,17 +30,23 @@ public class ReplayGameState extends GameState {
 
     public void setParent(ReplayGameState state) {
         mParent = state;
+        mParent.mCanonicalChild = this;
 
         mMoveAddress = mParent.getMoveAddress().increment(mReplayGame, this);
     }
 
-    public void setVariationParent(ReplayGameState state) {
+    public void setVariationParent(ReplayGameState state, Variation parentVariation) {
         mParent = state;
-        mMoveAddress = mParent.getMoveAddress().addVariation();
+        mMoveAddress = mParent.getMoveAddress().nextVariation();
+        mEnclosingVariation = parentVariation;
     }
 
     public MoveAddress getMoveAddress() {
         return mMoveAddress;
+    }
+
+    public ReplayGameState getParent() {
+        return mParent;
     }
 
     public void setMoveAddress(MoveAddress address) {
@@ -75,8 +82,6 @@ public class ReplayGameState extends GameState {
                 replayState.getBerserkingTaflman(),
                 false);
 
-        replayState.setVariationParent(this);
-
         return replayState;
     }
 
@@ -100,12 +105,25 @@ public class ReplayGameState extends GameState {
     }
 
     /**
-     * Create a new variation
-     * @param move
-     * @return
+     * Adds a variation to the history tree. If this state has no canonical child, the variation becomes the canonical
+     * child. If this state does have a canonical child, the variation becomes the root of a new variation off of this
+     * state. If the variation already exists, it is not re-added. Callers of this method should change the current
+     * state as desired.
+     * @param move The move to enter the variation.
+     * @return A game state containing either the next state or an error, or null, if this variation already exists.
      */
     public ReplayGameState makeVariation(MoveRecord move) {
         if(getPieceAt(move.start.x, move.start.y) == Taflman.EMPTY) return new ReplayGameState(ILLEGAL_MOVE);
+
+        if(mCanonicalChild != null && mCanonicalChild.getEnteringMove().equals(move)) {
+            return null;
+        }
+
+        for(Variation v : mVariations) {
+            if(v.getRoot().getEnteringMove().equals(move)) {
+                return null;
+            }
+        }
 
         ReplayGameState nextState = (ReplayGameState) moveTaflmanVariation(getPieceAt(move.start.x, move.start.y), move.end);
 
@@ -114,12 +132,18 @@ public class ReplayGameState extends GameState {
         }
 
         if(nextState.getLastMoveResult() >= GOOD_MOVE) {
-            Variation v = new Variation(nextState);
-            mVariations.add(v);
+            if(mCanonicalChild == null) {
+                nextState.setParent(this);
+                nextState.mEnclosingVariation = mEnclosingVariation;
+                mEnclosingVariation.addState(nextState);
+            }
+            else {
+                Variation v = new Variation(nextState);
+                mVariations.add(v);
+                nextState.setVariationParent(this, v);
+            }
         }
 
         return nextState;
     }
-
-    // TODO: method for making a move in an existing variation
 }

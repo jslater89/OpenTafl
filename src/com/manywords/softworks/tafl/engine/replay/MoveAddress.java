@@ -126,7 +126,7 @@ public class MoveAddress {
     }
 
     // Add a sibling: increment the variation node (size - 2), set the leaf node to 1a
-    public MoveAddress addSibling() {
+    public MoveAddress nextSibling() {
         MoveAddress newSibling = new MoveAddress(this);
         if(newSibling.mElements.size() < 2) throw new IllegalArgumentException("No variations to add a sibling to! " + this);
 
@@ -141,7 +141,7 @@ public class MoveAddress {
     }
 
     // Add a new variation: add a new variation node and a new child node, set to 1 and 1a
-    public MoveAddress addVariation() {
+    public MoveAddress nextVariation() {
         MoveAddress other = new MoveAddress(this);
         Element newVariation = new Element();
         newVariation.rootIndex = 1;

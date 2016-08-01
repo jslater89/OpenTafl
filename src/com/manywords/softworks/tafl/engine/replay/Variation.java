@@ -1,5 +1,7 @@
 package com.manywords.softworks.tafl.engine.replay;
 
+import com.manywords.softworks.tafl.engine.GameState;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +13,17 @@ public class Variation {
     private List<ReplayGameState> mVariationElements;
 
     public Variation(ReplayGameState nextState) {
+        mRoot = nextState;
         mVariationElements = new ArrayList<>();
         mVariationElements.add(nextState);
+    }
+
+    public ReplayGameState getRoot() {
+        return mRoot;
+    }
+
+    public void addState(ReplayGameState state) {
+        mVariationElements.add(state);
     }
 
     public ReplayGameState findVariationState(MoveAddress moveAddress) {
