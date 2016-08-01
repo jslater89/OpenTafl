@@ -67,7 +67,7 @@ public class MoveAddress {
 
     public List<Element> getElementsStartingAt(int start) {
         List<Element> elements = new ArrayList<>();
-        for(int i = 1; i < mElements.size(); i++) {
+        for(int i = start; i < mElements.size(); i++) {
             elements.add(mElements.get(i));
         }
 
