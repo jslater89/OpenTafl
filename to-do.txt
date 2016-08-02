@@ -4,7 +4,6 @@ v0.4.x features:
 - GameSerializer: learn how to load/save variations
 	- Variations as a separate list to minimize impact on current functionality
 - ReplayGame: learn how to add variations from such a list
-- ReplayGame: learn how to add variations
 - UI: in replay mode, display full move address
 - UI: improve jump command to take move addresses
 - UI: improve previous command to go up the tree regardless of location
