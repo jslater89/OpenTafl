@@ -89,7 +89,11 @@ public class MoveAddressTest extends TaflTest {
         assert moveAddress.toString().equals("29.3.1a.1.2a.");
 
         // Update prefix not present
-        moveAddress = moveAddress.changePrefix(MoveAddress.parseAddress("29.2"), MoveAddress.parseAddress("29.3"));
-        assert moveAddress == null;
+        try {
+            moveAddress = moveAddress.changePrefix(MoveAddress.parseAddress("29.2"), MoveAddress.parseAddress("29.3"));
+        }
+        catch(IllegalArgumentException e) {
+            assert e.getMessage().startsWith("Couldn't replace");
+        }
     }
 }

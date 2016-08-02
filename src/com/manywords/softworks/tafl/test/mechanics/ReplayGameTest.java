@@ -36,7 +36,7 @@ public class ReplayGameTest extends TaflTest {
             }
         }
 
-        rg.dumpHistory();
+        //rg.dumpHistory();
 
         // Try finding a state by address
         ReplayGameState parent = rg.getStateByAddress(MoveAddress.parseAddress("4b"));
@@ -67,7 +67,7 @@ public class ReplayGameTest extends TaflTest {
         parent = rg.getStateByAddress(MoveAddress.parseAddress("1a"));
         parent.makeVariation(new MoveRecord(Coord.get(3, 5), Coord.get(2, 5)));
 
-        //parent.dumpVariations();
+        //parent.dumpTree();
 
         child = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a"));
         assert child != null;
@@ -112,12 +112,17 @@ public class ReplayGameTest extends TaflTest {
         state = parent.makeVariation(new MoveRecord(Coord.get(10, 3), Coord.get(9, 3)));
         assert state.getMoveAddress().equals(MoveAddress.parseAddress("1a.2.1a.2.1a"));
 
+        state = parent.makeVariation(new MoveRecord(Coord.get(0, 6), Coord.get(1, 6)));
+        assert state.getMoveAddress().equals(MoveAddress.parseAddress("1a.2.1a.3.1a"));
+
         assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b")) != null;
         assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.1.1a")) != null;
         assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.2.1a")) != null;
+        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.3.1a")) != null;
 
-        parent.deleteVariation(MoveAddress.parseAddress("1a.2.1a.1.1a"));
+        parent.deleteVariation(MoveAddress.parseAddress("1a.2.1a.1."));
 
+        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b")) != null;
         assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.1.1a")) != null;
         assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.2.1a")) != null;
         assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.3.1a")) == null;

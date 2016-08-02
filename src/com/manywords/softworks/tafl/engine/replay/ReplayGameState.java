@@ -102,10 +102,8 @@ public class ReplayGameState extends GameState {
         MoveAddress.Element e = moveAddress.getRootElement();
         int index = e.rootIndex - 1;
 
-        System.out.println("Replay state: " + mMoveAddress);
-        System.out.println("Searching for: " + moveAddress);
-
-        return mVariations.get(index).findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
+        if(mVariations.size() <= index) return null;
+        else return mVariations.get(index).findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
     }
 
     /**
@@ -155,9 +153,12 @@ public class ReplayGameState extends GameState {
      * Deletes a variation from the history tree, including all of its children.
      * @param moveAddress
      */
-    // TODO: deleting the canonical child must move one of the variations into canonical childhood
-    // That's gonna be messy. Maybe I should back off of allowing deletion.
     public void deleteVariation(MoveAddress moveAddress) {
+        deleteVariationInternal(moveAddress);
+    }
+
+    // TODO: deleting the canonical child must move one of the variations into canonical childhood
+    private void deleteVariationInternal(MoveAddress moveAddress) {
         // Remove this address from the front of the move address.
         MoveAddress variationAddress = moveAddress.changePrefix(mMoveAddress, new MoveAddress());
         List<MoveAddress.Element> variationElements = variationAddress.getElements();
@@ -174,8 +175,8 @@ public class ReplayGameState extends GameState {
 
             for(int i = index; i < mVariations.size(); i++) {
                 // Allocate inside the loop to avoid any trickiness with reuse
-                MoveAddress.Element oldVariation = new MoveAddress.Element(index+2, -1);
-                MoveAddress.Element newVariation = new MoveAddress.Element(index+1, -1);
+                MoveAddress.Element oldVariation = new MoveAddress.Element(i+2, -1);
+                MoveAddress.Element newVariation = new MoveAddress.Element(i+1, -1);
 
                 mVariations.get(i).changeAddress(new MoveAddress(thisElements, oldVariation), new MoveAddress(thisElements, newVariation));
             }
@@ -185,7 +186,7 @@ public class ReplayGameState extends GameState {
             MoveAddress.Element variationElement = variationElements.get(0);
             MoveAddress.Element nextStateElement = variationElements.get(1);
 
-            ReplayGameState variationState = mVariations.get(variationElement.rootIndex).getDirectChild(nextStateElement);
+            ReplayGameState variationState = mVariations.get(variationElement.rootIndex - 1).getDirectChild(nextStateElement);
             if(variationState != null) {
                 variationState.deleteVariation(moveAddress);
             }
@@ -213,10 +214,10 @@ public class ReplayGameState extends GameState {
         }
     }
 
-    public void dumpVariations() {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Variations for " + mMoveAddress);
+    public void dumpTree() {
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "State: " + mMoveAddress);
         for(int i = 0; i < mVariations.size(); i++) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, i + ": " + mVariations.get(i).getRoot().getMoveAddress());
+            mVariations.get(i).dumpTree();
         }
     }
 }

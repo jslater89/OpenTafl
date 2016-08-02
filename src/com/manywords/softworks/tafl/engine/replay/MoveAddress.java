@@ -77,6 +77,10 @@ public class MoveAddress {
         return mElements.get(0);
     }
 
+    public Element getLastElement() {
+        return mElements.get(mElements.size() - 1);
+    }
+
     public List<Element> getNonRootElements() {
         return getElementsStartingAt(1);
     }
@@ -92,7 +96,7 @@ public class MoveAddress {
 
     public MoveAddress changePrefix(MoveAddress currentPrefix, MoveAddress newPrefix) {
         if(currentPrefix.mElements.size() > mElements.size()) {
-            return null;
+            throw new IllegalArgumentException("Couldn't replace " + currentPrefix + " with " + newPrefix + " in " + this + ": prefix too long");
         }
 
         for(int i = 0; i < currentPrefix.mElements.size(); i++) {
@@ -100,7 +104,7 @@ public class MoveAddress {
             Element otherElement = currentPrefix.mElements.get(i);
 
             if(!thisElement.equals(otherElement)) {
-                return null;
+                throw new IllegalArgumentException("Couldn't replace " + currentPrefix + " with " + newPrefix + " in " + this + ": prefix doesn't match");
             }
         }
 

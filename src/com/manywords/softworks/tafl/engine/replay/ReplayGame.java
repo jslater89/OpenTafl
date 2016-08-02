@@ -314,27 +314,29 @@ public class ReplayGame {
     public ReplayGameState getStateByAddress(MoveAddress moveAddress) {
         MoveAddress.Element element = moveAddress.getRootElement();
 
-        // TODO: can't make this assumption about moveIndex, unfortunately
-        int index = element.moveIndex + (element.rootIndex - 1) * 2;
-
-        ReplayGameState startingPoint = getStateAtIndex(index);
+        ReplayGameState startingPoint = null;
+        for(GameState state : mGame.getHistory()) {
+            ReplayGameState rgs = (ReplayGameState) state;
+            if(rgs.getMoveAddress().getRootElement().equals(element)) {
+                startingPoint = rgs;
+                break;
+            }
+        }
 
         ReplayGameState result = null;
-        if(moveAddress.getNonRootElements().size() > 0) {
+        if(startingPoint != null && moveAddress.getNonRootElements().size() > 0) {
             result = startingPoint.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
         }
         else {
             result = startingPoint;
         }
 
-        System.out.println("Found state: " + result.getMoveAddress());
-        System.out.println();
         return result;
     }
 
     public void dumpHistory() {
         for(GameState state : mGame.getHistory()) {
-            ((ReplayGameState) state).dumpVariations();
+            ((ReplayGameState) state).dumpTree();
         }
     }
 }

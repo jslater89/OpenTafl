@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.engine.replay;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 
 import java.util.ArrayList;
@@ -35,9 +36,6 @@ public class Variation {
 
         ReplayGameState replayState = mVariationElements.get(index);
 
-        System.out.println("Variation " + mAddress);
-        System.out.println("Searching for " + moveAddress);
-
         if(moveAddress.getNonRootElements().size() > 0) {
             return replayState.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
         }
@@ -47,7 +45,7 @@ public class Variation {
     }
 
     public void changeAddress(MoveAddress oldAddress, MoveAddress newAddress) {
-        mAddress = newAddress;
+        mAddress = mAddress.changePrefix(oldAddress, newAddress);
         for(ReplayGameState rgs : mVariationElements) {
             rgs.changeAddressPrefix(oldAddress, newAddress);
         }
@@ -55,9 +53,13 @@ public class Variation {
 
     public ReplayGameState getDirectChild(MoveAddress.Element e) {
         // TODO: these will have to search because of possible berserker turns
-        int index = e.moveIndex + (e.rootIndex - 1) * 2;
+        for(ReplayGameState rgs : mVariationElements) {
+            if(rgs.getMoveAddress().getLastElement().equals(e)) {
+                return rgs;
+            }
+        }
 
-        return mVariationElements.get(index);
+        return null;
     }
 
     // TODO: this isn't returning the right value
@@ -67,6 +69,13 @@ public class Variation {
         }
         else {
             return mVariationElements.get(mVariationElements.size() - 2).getMoveAddress().increment(game, state);
+        }
+    }
+
+    public void dumpTree() {
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Vtion: " + mAddress);
+        for(ReplayGameState rgs : mVariationElements) {
+            rgs.dumpTree();
         }
     }
 }
