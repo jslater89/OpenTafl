@@ -54,7 +54,6 @@ public class Variation {
     }
 
     public ReplayGameState getDirectChild(MoveAddress.Element e) {
-        // TODO: these will have to search because of possible berserker turns
         for(ReplayGameState rgs : mVariationElements) {
             if(rgs.getMoveAddress().getLastElement().equals(e)) {
                 return rgs;
@@ -67,7 +66,7 @@ public class Variation {
     // TODO: this isn't returning the right value
     public MoveAddress getNextChildAddress(ReplayGame game, ReplayGameState state) {
         if(mVariationElements.size() == 1) {
-            return mAddress.firstChild();
+            return mAddress.firstChild(game, state);
         }
         else {
             return mVariationElements.get(mVariationElements.size() - 2).getMoveAddress().increment(game, state);

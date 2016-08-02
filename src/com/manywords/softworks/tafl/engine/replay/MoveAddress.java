@@ -218,11 +218,16 @@ public class MoveAddress {
         return other;
     }
 
-    public MoveAddress firstChild() {
+    public MoveAddress firstChild(ReplayGame game, ReplayGameState state) {
+        MoveAddress address = state.getParent().getMoveAddress().increment(game, state);
+        return firstChild(address.getLastElement().moveIndex);
+    }
+
+    public MoveAddress firstChild(int moveIndex) {
         MoveAddress other = new MoveAddress(this);
         Element newChild = new Element();
         newChild.rootIndex = 1;
-        newChild.moveIndex = 0;
+        newChild.moveIndex = moveIndex;
 
         other.mElements.add(newChild);
 
@@ -232,7 +237,7 @@ public class MoveAddress {
     // Add a new variation: add a new variation node and a new child node, set to 1 and 1a
     public MoveAddress nextVariationFirstState() {
         MoveAddress other = nextVariation(1);
-        return other.firstChild();
+        return other.firstChild(0);
     }
 
     public static MoveAddress newRootAddress() {
