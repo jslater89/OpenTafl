@@ -94,6 +94,19 @@ public class MoveAddress {
         return elements;
     }
 
+    public List<Element> getAllRootElements() {
+        return getElementsBefore(mElements.size() - 1);
+    }
+
+    public List<Element> getElementsBefore(int end) {
+        List<Element> elements = new ArrayList<>();
+        for(int i = 0; i < Math.min(end, mElements.size()); i++) {
+            elements.add(mElements.get(i));
+        }
+
+        return elements;
+    }
+
     public MoveAddress changePrefix(MoveAddress currentPrefix, MoveAddress newPrefix) {
         if(currentPrefix.mElements.size() > mElements.size()) {
             throw new IllegalArgumentException("Couldn't replace " + currentPrefix + " with " + newPrefix + " in " + this + ": prefix too long");

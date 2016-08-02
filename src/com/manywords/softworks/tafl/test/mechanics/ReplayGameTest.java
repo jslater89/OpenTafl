@@ -115,16 +115,42 @@ public class ReplayGameTest extends TaflTest {
         state = parent.makeVariation(new MoveRecord(Coord.get(0, 6), Coord.get(1, 6)));
         assert state.getMoveAddress().equals(MoveAddress.parseAddress("1a.2.1a.3.1a"));
 
-        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b")) != null;
-        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.1.1a")) != null;
-        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.2.1a")) != null;
-        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.3.1a")) != null;
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b"))) != null;
+        //System.out.println(state.getEnteringMove());
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.1.1a"))) != null;
+        //System.out.println(state.getEnteringMove());
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.2.1a"))) != null;
+        //System.out.println(state.getEnteringMove());
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.3.1a"))) != null;
+        //System.out.println(state.getEnteringMove());
+
+        //System.out.println();
 
         parent.deleteVariation(MoveAddress.parseAddress("1a.2.1a.1."));
 
-        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b")) != null;
-        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.1.1a")) != null;
-        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.2.1a")) != null;
-        assert rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.3.1a")) == null;
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b"))) != null;
+        //System.out.println(state.getEnteringMove());
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.1.1a"))) != null;
+        //System.out.println(state.getEnteringMove());
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.2.1a"))) != null;
+        //System.out.println(state.getEnteringMove());
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.3.1a"))) == null;
+
+        //System.out.println();
+
+        parent.deleteVariation(MoveAddress.parseAddress("1a.2.1b"));
+
+        state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a"));
+        //System.out.println(state.getCanonicalChild().getMoveAddress());
+        //System.out.println(state.getCanonicalChild().getEnteringMove());
+
+        //rg.dumpHistory();
+
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b"))) != null;
+        //System.out.println(state.getEnteringMove());
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.1.1a"))) != null;
+        //System.out.println(state.getEnteringMove());
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.2.1a"))) == null;
+        assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a.3.1a"))) == null;
     }
 }

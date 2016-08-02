@@ -31,12 +31,14 @@ public class Variation {
 
     public ReplayGameState findVariationState(MoveAddress moveAddress) {
         MoveAddress.Element e = moveAddress.getRootElement();
-        // TODO: these will have to search because of possible berserker turns
-        int index = e.moveIndex + (e.rootIndex - 1) * 2;
+        ReplayGameState replayState = null;
+        for(ReplayGameState rgs : mVariationElements) {
+            if(rgs.getMoveAddress().getLastElement().equals(e)) {
+                replayState = rgs;
+            }
+        }
 
-        ReplayGameState replayState = mVariationElements.get(index);
-
-        if(moveAddress.getNonRootElements().size() > 0) {
+        if(replayState != null && moveAddress.getNonRootElements().size() > 0) {
             return replayState.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
         }
         else {
@@ -44,7 +46,7 @@ public class Variation {
         }
     }
 
-    public void changeAddress(MoveAddress oldAddress, MoveAddress newAddress) {
+    public void changeAddressPrefix(MoveAddress oldAddress, MoveAddress newAddress) {
         mAddress = mAddress.changePrefix(oldAddress, newAddress);
         for(ReplayGameState rgs : mVariationElements) {
             rgs.changeAddressPrefix(oldAddress, newAddress);
@@ -76,6 +78,23 @@ public class Variation {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Vtion: " + mAddress);
         for(ReplayGameState rgs : mVariationElements) {
             rgs.dumpTree();
+        }
+    }
+
+    public MoveAddress getAddress() {
+        return mAddress;
+    }
+
+    public List<ReplayGameState> getStates() {
+        return mVariationElements;
+    }
+
+    public void removeState(ReplayGameState canonicalChild) {
+        int index = mVariationElements.indexOf(canonicalChild);
+        if(index != -1) {
+            for(int i = index; i < mVariationElements.size(); i++) {
+                mVariationElements.remove(i);
+            }
         }
     }
 }

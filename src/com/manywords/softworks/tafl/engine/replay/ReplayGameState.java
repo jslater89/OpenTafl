@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.engine.replay;
 
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Coord;
@@ -102,7 +103,8 @@ public class ReplayGameState extends GameState {
         MoveAddress.Element e = moveAddress.getRootElement();
         int index = e.rootIndex - 1;
 
-        if(mVariations.size() <= index) return null;
+        if(mCanonicalChild.getMoveAddress().equals(moveAddress)) return mCanonicalChild;
+        else if(mVariations.size() <= index) return null;
         else return mVariations.get(index).findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
     }
 
@@ -154,10 +156,87 @@ public class ReplayGameState extends GameState {
      * @param moveAddress
      */
     public void deleteVariation(MoveAddress moveAddress) {
-        deleteVariationInternal(moveAddress);
+        if(moveAddress.getLastElement().isVariation()) {
+            deleteVariationInternal(moveAddress);
+        }
+        // TODO Else if: moveAddress refers to the root member of a variation (for convenience)
+        else {
+            deleteCanonicalChild(moveAddress);
+        }
     }
 
-    // TODO: deleting the canonical child must move one of the variations into canonical childhood
+    private void deleteCanonicalChild(MoveAddress moveAddress) {
+        // e.g. 1a.1.1b and this is 1a.1.1a. Non-root filtering means (1a.1.)1b.
+        MoveAddress childAddress = moveAddress.changePrefix(new MoveAddress(mMoveAddress.getAllRootElements()), new MoveAddress());
+        List<MoveAddress.Element> childElements = childAddress.getElements();
+
+        if(childElements.size() == 1) {
+            // This is (probably) our canonical child, or a canonical child from somewhere in our tree.
+            if(mCanonicalChild != null && mCanonicalChild.getMoveAddress().equals(moveAddress)) {
+                if(mEnclosingVariation != null) {
+                    mEnclosingVariation.removeState(mCanonicalChild);
+                }
+                mCanonicalChild = null; // This is the easy part.
+
+                if(mVariations.size() > 0) {
+                    // Keep the old variation around; we'll want the move list.
+                    Variation toRelocate = mVariations.get(0);
+                    deleteVariationInternal(toRelocate.getAddress());
+
+                    for(ReplayGameState rgs : toRelocate.getStates()) {
+                        rgs.mEnclosingVariation = null;
+                    }
+
+                    mCanonicalChild = toRelocate.getRoot();
+                    setExitingMove((DetailedMoveRecord) mCanonicalChild.getEnteringMove());
+
+                    // At this point, this variation subtree is now correctly relocated, but incorrectly
+                    // addressed.
+                    mCanonicalChild.changeParent(this);
+                }
+            }
+            else if (mCanonicalChild != null) {
+                // If it isn't our canonical child, it may be our child's child, &c. TODO: test this
+                mCanonicalChild.deleteCanonicalChild(moveAddress);
+            }
+        }
+        else if(childElements.size() > 2) {
+            // e.g 5a.1.1a.1.1b is our target, and this is 51.1.1a. Filter becomes 1a.1.1b, so variation element is 1 and target is 2. // TODO: test this
+            MoveAddress.Element variationElement = childElements.get(1);
+            MoveAddress.Element nextStateElement = childElements.get(2);
+
+            ReplayGameState variationState = mVariations.get(variationElement.rootIndex - 1).getDirectChild(nextStateElement);
+            if(variationState != null) {
+                variationState.deleteVariation(moveAddress);
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Argument to deleteCanonicalChild does not address a canonical child: " + moveAddress);
+        }
+    }
+
+    private void changeParent(ReplayGameState newParent) {
+        // Keep this around. We'll need it to re-prefix things.
+        MoveAddress oldAddress = mMoveAddress;
+
+        // This changes my move address and my parent's canonical child.
+        setParent(newParent);
+
+        mEnclosingVariation = mParent.mEnclosingVariation;
+        mEnclosingVariation.addState(this);
+
+        // Variations are as simple as re-prefixing. This method recurses
+        // to take care of the rest.
+        for(Variation v : mVariations) {
+            v.changeAddressPrefix(oldAddress, mMoveAddress);
+        }
+
+        // This is slight overkill, but it does take care of everything and is the simplest.
+        if(mCanonicalChild != null) {
+            mCanonicalChild.changeParent(this);
+        }
+    }
+
     private void deleteVariationInternal(MoveAddress moveAddress) {
         // Remove this address from the front of the move address.
         MoveAddress variationAddress = moveAddress.changePrefix(mMoveAddress, new MoveAddress());
@@ -178,7 +257,7 @@ public class ReplayGameState extends GameState {
                 MoveAddress.Element oldVariation = new MoveAddress.Element(i+2, -1);
                 MoveAddress.Element newVariation = new MoveAddress.Element(i+1, -1);
 
-                mVariations.get(i).changeAddress(new MoveAddress(thisElements, oldVariation), new MoveAddress(thisElements, newVariation));
+                mVariations.get(i).changeAddressPrefix(new MoveAddress(thisElements, oldVariation), new MoveAddress(thisElements, newVariation));
             }
         }
         else if(variationElements.size() > 1) {
@@ -210,14 +289,18 @@ public class ReplayGameState extends GameState {
             Variation v = mVariations.get(i);
             MoveAddress.Element variation = new MoveAddress.Element(i+1, -1);
 
-            v.changeAddress(new MoveAddress(oldElements, variation), new MoveAddress(thisElements, variation));
+            v.changeAddressPrefix(new MoveAddress(oldElements, variation), new MoveAddress(thisElements, variation));
         }
     }
 
     public void dumpTree() {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "State: " + mMoveAddress);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "State: " + mMoveAddress + " " + getEnteringMove());
         for(int i = 0; i < mVariations.size(); i++) {
             mVariations.get(i).dumpTree();
         }
+    }
+
+    public ReplayGameState getCanonicalChild() {
+        return mCanonicalChild;
     }
 }
