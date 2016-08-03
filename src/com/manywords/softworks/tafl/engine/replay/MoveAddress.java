@@ -219,7 +219,7 @@ public class MoveAddress {
     }
 
     public MoveAddress firstChild(ReplayGame game, ReplayGameState state) {
-        MoveAddress address = state.getParent().getMoveAddress().increment(game, state);
+        MoveAddress address = state.getParent().getMoveAddress();
         return firstChild(address.getLastElement().moveIndex);
     }
 

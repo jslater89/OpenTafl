@@ -1,7 +1,6 @@
 package com.manywords.softworks.tafl.engine.replay;
 
 import com.manywords.softworks.tafl.OpenTafl;
-import com.manywords.softworks.tafl.engine.GameState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +9,16 @@ import java.util.List;
  * Created by jay on 7/31/16.
  */
 public class Variation {
+    private ReplayGameState mParent;
     private ReplayGameState mRoot;
-    private List<ReplayGameState> mVariationElements;
+    private List<ReplayGameState> mVariationStates;
     private MoveAddress mAddress;
 
-    public Variation(MoveAddress address, ReplayGameState nextState) {
+    public Variation(ReplayGameState parent, MoveAddress address, ReplayGameState nextState) {
+        mParent = parent;
         mRoot = nextState;
-        mVariationElements = new ArrayList<>();
-        mVariationElements.add(nextState);
+        mVariationStates = new ArrayList<>();
+        mVariationStates.add(nextState);
         mAddress = address;
     }
 
@@ -25,14 +26,14 @@ public class Variation {
         return mRoot;
     }
 
-    public void addState(ReplayGameState state) {
-        mVariationElements.add(state);
+    public void addState(ReplayGameState newRoot) {
+        mVariationStates.add(newRoot);
     }
 
     public ReplayGameState findVariationState(MoveAddress moveAddress) {
         MoveAddress.Element e = moveAddress.getRootElement();
         ReplayGameState replayState = null;
-        for(ReplayGameState rgs : mVariationElements) {
+        for(ReplayGameState rgs : mVariationStates) {
             if(rgs.getMoveAddress().getLastElement().equals(e)) {
                 replayState = rgs;
             }
@@ -48,13 +49,13 @@ public class Variation {
 
     public void changeAddressPrefix(MoveAddress oldAddress, MoveAddress newAddress) {
         mAddress = mAddress.changePrefix(oldAddress, newAddress);
-        for(ReplayGameState rgs : mVariationElements) {
-            rgs.changeAddressPrefix(oldAddress, newAddress);
-        }
+
+        // RGS changes addresses for each child already
+        mRoot.changeAddressPrefix(oldAddress, newAddress);
     }
 
     public ReplayGameState getDirectChild(MoveAddress.Element e) {
-        for(ReplayGameState rgs : mVariationElements) {
+        for(ReplayGameState rgs : mVariationStates) {
             if(rgs.getMoveAddress().getLastElement().equals(e)) {
                 return rgs;
             }
@@ -65,17 +66,17 @@ public class Variation {
 
     // TODO: this isn't returning the right value
     public MoveAddress getNextChildAddress(ReplayGame game, ReplayGameState state) {
-        if(mVariationElements.size() == 1) {
+        if(mVariationStates.size() == 1) {
             return mAddress.firstChild(game, state);
         }
         else {
-            return mVariationElements.get(mVariationElements.size() - 2).getMoveAddress().increment(game, state);
+            return mVariationStates.get(mVariationStates.size() - 2).getMoveAddress().increment(game, state);
         }
     }
 
     public void dumpTree() {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Vtion: " + mAddress);
-        for(ReplayGameState rgs : mVariationElements) {
+        for(ReplayGameState rgs : mVariationStates) {
             rgs.dumpTree();
         }
     }
@@ -85,15 +86,20 @@ public class Variation {
     }
 
     public List<ReplayGameState> getStates() {
-        return mVariationElements;
+        return mVariationStates;
     }
 
     public void removeState(ReplayGameState canonicalChild) {
-        int index = mVariationElements.indexOf(canonicalChild);
+        int index = mVariationStates.indexOf(canonicalChild);
         if(index != -1) {
-            for(int i = index; i < mVariationElements.size(); i++) {
-                mVariationElements.remove(i);
+            for(int i = index; i < mVariationStates.size(); i++) {
+                mVariationStates.remove(i);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Variation: " + mAddress;
     }
 }

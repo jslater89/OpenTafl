@@ -142,7 +142,7 @@ public class ReplayGameState extends GameState {
                 mEnclosingVariation.addState(nextState);
             }
             else {
-                Variation v = new Variation(mMoveAddress.nextVariation(mVariations.size() + 1), nextState);
+                Variation v = new Variation(this, mMoveAddress.nextVariation(mVariations.size() + 1), nextState);
                 mVariations.add(v);
                 nextState.setVariationParent(this, v);
             }
@@ -173,6 +173,7 @@ public class ReplayGameState extends GameState {
         if(childElements.size() == 1) {
             // This is (probably) our canonical child, or a canonical child from somewhere in our tree.
             if(mCanonicalChild != null && mCanonicalChild.getMoveAddress().equals(moveAddress)) {
+                //System.out.println("Old child: " + mCanonicalChild.getMoveAddress() + " " + mCanonicalChild.getEnteringMove());
                 if(mEnclosingVariation != null) {
                     mEnclosingVariation.removeState(mCanonicalChild);
                 }
@@ -194,10 +195,14 @@ public class ReplayGameState extends GameState {
                     // addressed.
                     mCanonicalChild.changeParent(this);
                 }
+                //System.out.println("New child: " + mCanonicalChild.getMoveAddress() + " " + mCanonicalChild.getEnteringMove());
             }
             else if (mCanonicalChild != null) {
                 // If it isn't our canonical child, it may be our child's child, &c. TODO: test this
                 mCanonicalChild.deleteCanonicalChild(moveAddress);
+            }
+            else {
+                return; // false
             }
         }
         else if(childElements.size() > 2) {
@@ -207,7 +212,7 @@ public class ReplayGameState extends GameState {
 
             ReplayGameState variationState = mVariations.get(variationElement.rootIndex - 1).getDirectChild(nextStateElement);
             if(variationState != null) {
-                variationState.deleteVariation(moveAddress);
+                variationState.deleteVariationInternal(moveAddress);
             }
         }
         else {
@@ -245,7 +250,13 @@ public class ReplayGameState extends GameState {
         if(variationElements.size() == 1) {
             // Hooray! a variation!
             int index = variationElements.get(0).rootIndex - 1;
-            mVariations.remove(index);
+
+            // No such variation exists
+            if(index > mVariations.size()) {
+                return; // false
+            }
+
+            MoveAddress m = mVariations.remove(index).getAddress();
 
             // Each variation now has index i+2 (because they're one-indexed, not zero-indexed).
             // Its address is our address, plus a variation number, plus the rest of the address. For each one,
@@ -302,5 +313,14 @@ public class ReplayGameState extends GameState {
 
     public ReplayGameState getCanonicalChild() {
         return mCanonicalChild;
+    }
+
+    @Override
+    public String toString() {
+        return getMoveAddress().toString();
+    }
+
+    public List<Variation> getVariations() {
+        return mVariations;
     }
 }
