@@ -135,44 +135,38 @@ public class MoveAddress {
 
         boolean startingSideAttackers = game.getGame().getRules().getStartingSide().isAttackingSide();
 
-        // The turn number never increments if the
-        if(current.getCurrentSide().isAttackingSide() != startingSideAttackers) {
-            other = increment(false);
+        boolean otherSideWent = false;
+
+        // We should increment the turn if, between the start of the turn and now, the other side has gone
+        // and we are the starting side. Since we're deep in a tree, we have to follow the tree back up to
+        // know what the history is so we can know if we should increment. Hooray for tracking parents!
+
+        int lengthOfTurn = inQuestion.moveIndex;
+        List<ReplayGameState> backwardStates = new ArrayList<>(lengthOfTurn);
+
+        backwardStates.add(current);
+        ReplayGameState s = current;
+        while((s = s.getParent()) != null && backwardStates.size() <= lengthOfTurn) {
+            backwardStates.add(s);
+        }
+
+        List<ReplayGameState> states = new ArrayList<>(backwardStates.size());
+
+        for(int i = backwardStates.size() - 1; i >= 0; i--) {
+            states.add(backwardStates.get(i));
+        }
+
+        for (ReplayGameState rgs : states) {
+            if(rgs.getCurrentSide().isAttackingSide() != startingSideAttackers) {
+                otherSideWent = true;
+            }
+        }
+
+        if(otherSideWent) {
+            other = increment(true);
         }
         else {
-            boolean otherSideWent = false;
-
-            // We should increment the turn if, between the start of the turn and now, the other side has gone
-            // and we are the starting side. Since we're deep in a tree, we have to follow the tree back up to
-            // know what the history is so we can know if we should increment. Hooray for tracking parents!
-
-            int lengthOfTurn = inQuestion.moveIndex;
-            List<ReplayGameState> backwardStates = new ArrayList<>(lengthOfTurn);
-
-            backwardStates.add(current);
-            ReplayGameState s = current;
-            while((s = s.getParent()) != null && backwardStates.size() <= lengthOfTurn) {
-                backwardStates.add(s);
-            }
-
-            List<ReplayGameState> states = new ArrayList<>(backwardStates.size());
-
-            for(int i = backwardStates.size() - 1; i >= 0; i--) {
-                states.add(backwardStates.get(i));
-            }
-
-            for (ReplayGameState rgs : states) {
-                if(rgs.getCurrentSide().isAttackingSide() != startingSideAttackers) {
-                    otherSideWent = true;
-                }
-            }
-
-            if(otherSideWent) {
-                other = increment(true);
-            }
-            else {
-                other = increment(false);
-            }
+            other = increment(false);
         }
 
         return other;
@@ -218,15 +212,25 @@ public class MoveAddress {
         return other;
     }
 
+    // TODO: change both branches to increment to make state numbering absolute in variations
+    // e.g. 1a.1.1b.1.2a.1.2b...
     public MoveAddress firstChild(ReplayGame game, ReplayGameState state) {
         MoveAddress address = state.getParent().getMoveAddress();
-        return firstChild(address.getLastElement().moveIndex);
+        if(address.getElements().size() == 1) {
+            return firstChild(1, address.getLastElement().moveIndex);
+        }
+        else {
+            MoveAddress lastElement = new MoveAddress();
+            lastElement.mElements.add(address.getLastElement());
+            MoveAddress incremented = lastElement.increment(game, state);
+            return firstChild(1, incremented.getLastElement().moveIndex);
+        }
     }
 
-    public MoveAddress firstChild(int moveIndex) {
+    public MoveAddress firstChild(int rootIndex, int moveIndex) {
         MoveAddress other = new MoveAddress(this);
         Element newChild = new Element();
-        newChild.rootIndex = 1;
+        newChild.rootIndex = rootIndex;
         newChild.moveIndex = moveIndex;
 
         other.mElements.add(newChild);
@@ -237,7 +241,7 @@ public class MoveAddress {
     // Add a new variation: add a new variation node and a new child node, set to 1 and 1a
     public MoveAddress nextVariationFirstState() {
         MoveAddress other = nextVariation(1);
-        return other.firstChild(0);
+        return other.firstChild(1, 0);
     }
 
     public static MoveAddress newRootAddress() {

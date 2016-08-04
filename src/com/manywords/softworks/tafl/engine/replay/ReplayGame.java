@@ -334,6 +334,10 @@ public class ReplayGame {
         return result;
     }
 
+    public ReplayGameState getStateByAddress(String s) {
+        return getStateByAddress(MoveAddress.parseAddress(s));
+    }
+
     public void dumpHistory() {
         for(GameState state : mGame.getHistory()) {
             ((ReplayGameState) state).dumpTree();

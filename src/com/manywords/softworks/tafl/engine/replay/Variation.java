@@ -92,8 +92,9 @@ public class Variation {
     public void removeState(ReplayGameState canonicalChild) {
         int index = mVariationStates.indexOf(canonicalChild);
         if(index != -1) {
-            for(int i = index; i < mVariationStates.size(); i++) {
-                mVariationStates.remove(i);
+            int initialSize = mVariationStates.size();
+            for(int i = index; i < initialSize; i++) {
+                mVariationStates.remove(index);
             }
         }
     }
