@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.engine.replay;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -49,20 +50,22 @@ public class ReplayGame {
         for(MoveRecord m : movesToPlay) {
             int result = mGame.getCurrentState().makeMove(m);
             if(result < GameState.GOOD_MOVE) {
-                RawTerminal.renderGameState(game.getCurrentState());
-                System.out.println(m);
-                throw new IllegalStateException("Failed to make moves! Error: " + result);
+                throw new IllegalStateException("Failed to make move " + m + "! Error: " + result);
             }
 
         }
 
         mMoveHistory = movesToPlay;
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Loaded game with moves: " + mMoveHistory);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game history after load: " + mGame.getHistory());
         mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
 
+        /*
         for(int i = 0; i < movesToPlay.size(); i++) {
             mGame.getHistory().get(i).setExitingMove(movesToPlay.get(i));
             mGame.getHistory().get(i+1).setEnteringMove(movesToPlay.get(i));
         }
+        */
 
         setupFirstStatesList();
         setupTimeSpecLists();
@@ -237,7 +240,6 @@ public class ReplayGame {
         mDefenderTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
 
         // The last state doesn't have an exiting move
-        System.out.println(historySize());
         for(int i = 1; i < historySize() - 1; i++) {
             GameState current = mGame.getHistory().get(i);
 

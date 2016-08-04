@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,8 @@ public class ReplayGameState extends GameState {
 
     public ReplayGameState(ReplayGame replayGame, GameState copyState) {
         super(copyState);
+        mExitingMove = null;
+        mDetailedExitingMove = null;
         mReplayGame = replayGame;
     }
 
@@ -58,6 +61,10 @@ public class ReplayGameState extends GameState {
     @Override
     protected GameState moveTaflman(char taflman, Coord destination) {
         GameState state = super.moveTaflman(taflman, destination);
+
+        if(state.getLastMoveResult() < GOOD_MOVE) {
+            return new ReplayGameState(state.getLastMoveResult());
+        }
         ReplayGameState replayState = new ReplayGameState(mReplayGame, state);
 
         mGame.advanceState(
@@ -335,7 +342,7 @@ public class ReplayGameState extends GameState {
 
     @Override
     public String toString() {
-        return getMoveAddress().toString();
+        return getMoveAddress().toString() + " " + getEnteringMove() + " " + getExitingMove();
     }
 
     public List<Variation> getVariations() {

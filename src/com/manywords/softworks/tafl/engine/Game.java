@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.*;
@@ -94,7 +95,9 @@ public class Game {
         // Game states: we want copies of these.
         mHistory = new ArrayList<>();
         for(GameState copyState : copyGame.getHistory()) {
-            mHistory.add(new GameState(copyState));
+            GameState copied = new GameState(copyState);
+            copied.mGame = this;
+            mHistory.add(copied);
         }
         mCurrentState = mHistory.get(mHistory.size() - 1);
     }
