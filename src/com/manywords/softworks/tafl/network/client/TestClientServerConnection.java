@@ -112,6 +112,10 @@ public class TestClientServerConnection extends ClientServerConnection {
             gameEnded = false;
             game = new Game(r, null);
 
+            if(history != null) {
+                lastHistory = history;
+            }
+
             if(lastHistory != null) {
                 for (MoveRecord m : lastHistory) {
                     int result = game.getCurrentState().makeMove(m);
