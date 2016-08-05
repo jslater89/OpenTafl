@@ -41,8 +41,8 @@ public class OpenTafl {
         SILENT
     }
 
-    public static final String CURRENT_VERSION = "v0.3.3.2b";
-    public static final int NETWORK_PROTOCOL_VERSION = 6;
+    public static final String CURRENT_VERSION = "v0.3.3.3b";
+    public static final int NETWORK_PROTOCOL_VERSION = 7;
 
     public static boolean devMode = false;
     public static LogLevel logLevel = LogLevel.NORMAL;
