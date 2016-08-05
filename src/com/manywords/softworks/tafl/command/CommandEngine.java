@@ -478,6 +478,8 @@ public class CommandEngine {
             int moveResult = result.getLastMoveResult();
 
             if(moveResult < GameState.GOOD_MOVE) {
+                // TODO: more errors here
+                // TODO: GameState.getErrorStringFor(int resultCode)
                 return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, "Invalid move", record);
             }
             else {

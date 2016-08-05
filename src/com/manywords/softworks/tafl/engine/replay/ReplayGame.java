@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.engine.replay;
 
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.command.HumanCommandParser;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -96,31 +97,33 @@ public class ReplayGame {
     }
 
     public String getHistoryStringWithPositionMarker() {
-        String historyString = mGame.getHistoryString();
-        String[] lines = historyString.split("\n");
+        return getHistoryCommandString(mGame.getHistory());
 
-        String newString = "";
-        int statePosition = 0;
-        boolean modified = false;
-        for (String line : lines) {
-            String[] components = line.split(" ");
-
-            for(int i = 1; i < components.length; i++) {
-                statePosition++;
-                /*
-                if(statePosition > mStatePosition && !modified) {
-                    components[i] = Ansi.UNDERLINE + components[i] + Ansi.UNDERLINE_OFF;
-                    modified = true;
-                }*/
-            }
-
-            for(String s : components) {
-                newString += s + " ";
-            }
-            newString += "\n";
-        }
-
-        return newString;
+//        String historyString = mGame.getHistoryString();
+//        String[] lines = historyString.split("\n");
+//
+//        String newString = "";
+//        int statePosition = 0;
+//        boolean modified = false;
+//        for (String line : lines) {
+//            String[] components = line.split(" ");
+//
+//            for(int i = 1; i < components.length; i++) {
+//                statePosition++;
+//                /*
+//                if(statePosition > mStatePosition && !modified) {
+//                    components[i] = Ansi.UNDERLINE + components[i] + Ansi.UNDERLINE_OFF;
+//                    modified = true;
+//                }*/
+//            }
+//
+//            for(String s : components) {
+//                newString += s + " ";
+//            }
+//            newString += "\n";
+//        }
+//
+//        return newString;
     }
 
     public ReplayGameState nextState() {
@@ -136,6 +139,9 @@ public class ReplayGame {
     }
 
     public GameState setPositionByAddress(MoveAddress address) {
+        // TODO: try some common variations on state names:
+        // 12. means 12a.
+        // 12a.1.1a where there is no 1a means 12a.1.1b
         ReplayGameState state = getStateByAddress(address);
         setCurrentState(state);
         return getCurrentState();
@@ -196,7 +202,11 @@ public class ReplayGame {
     public ReplayGameState makeVariation(MoveRecord move) {
         ReplayGameState state = (ReplayGameState) getCurrentState();
         ReplayGameState variationState = state.makeVariation(move);
-        setCurrentState(variationState);
+
+        if(state.getLastMoveResult() >= GameState.GOOD_MOVE) {
+            // Don't set errors into current state, oy.
+            setCurrentState(variationState);
+        }
 
         return getCurrentState();
     }
@@ -339,6 +349,82 @@ public class ReplayGame {
 
     public ReplayGameState getStateByAddress(String s) {
         return getStateByAddress(MoveAddress.parseAddress(s));
+    }
+
+    public static String getHistoryCommandString(List<GameState> history) {
+        StringBuilder resultString = new StringBuilder();
+        int historyPosition = 0;
+        ReplayGameState state = (ReplayGameState) history.get(historyPosition);
+        List<ReplayGameState> currentTurn = new ArrayList<>();
+        List<Variation> currentTurnVariations = new ArrayList<>();
+        int currentTurnIndex = 1;
+
+        while(state != null) {
+            // Get all states in a given turn.
+            if(state.getMoveAddress().getLastElement().rootIndex == currentTurnIndex) {
+                currentTurn.add(state);
+                currentTurnVariations.addAll(state.getVariations());
+            }
+            else {
+                finishHistoryTurn(currentTurn, currentTurnVariations, resultString);
+
+                currentTurn.clear();
+                currentTurnVariations.clear();
+                currentTurnIndex = state.getMoveAddress().getLastElement().rootIndex;
+                currentTurn.add(state);
+                currentTurnVariations.addAll(state.getVariations());
+            }
+
+            historyPosition += 1;
+            if(historyPosition == history.size()) {
+                finishHistoryTurn(currentTurn, currentTurnVariations, resultString);
+                break;
+            }
+            state = (ReplayGameState) history.get(historyPosition);
+        }
+
+        // Print the turn header.
+
+        // For each state, get all variations and place in list.
+
+        // For each variation, do this method.
+
+        return resultString.toString();
+    }
+
+    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, StringBuilder resultString) {
+        boolean first = true;
+        for(ReplayGameState turnState : currentTurn) {
+            if(first) {
+                first = false;
+
+                int paddingCount = turnState.getMoveAddress().getLastElement().moveIndex;
+                MoveAddress a = new MoveAddress(turnState.getMoveAddress());
+                a.getLastElement().moveIndex = 0;
+
+                resultString.append(a);
+                for(int i = 0; i < paddingCount; i++) {
+                    resultString.append(" .....");
+                }
+                resultString.append(" ");
+            }
+            // else append b., c., etc.
+
+            if(turnState.getMoveAddress().getElements().size() == 1) {
+                if (turnState.getExitingMove() != null) resultString.append(turnState.getExitingMove());
+            }
+            else {
+                if (turnState.getEnteringMove() != null) resultString.append(turnState.getEnteringMove());
+            }
+            resultString.append(" ");
+        }
+        resultString.append("\n");
+
+        for(Variation v : currentTurnVariations) {
+            List<GameState> variationStates = new ArrayList<>();
+            variationStates.addAll(v.getStates());
+            resultString.append(getHistoryCommandString(variationStates));
+        }
     }
 
     public void dumpHistory() {
