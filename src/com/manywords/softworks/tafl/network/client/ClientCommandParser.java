@@ -39,7 +39,7 @@ public class ClientCommandParser {
         }
         else if(data.startsWith(StartGamePacket.PREFIX)) {
             StartGamePacket packet = StartGamePacket.parse(data);
-            callback.onStartGame(packet.rules, null);
+            callback.onStartGame(packet.rules, packet.history);
         }
         else if(data.startsWith(MoveResultPacket.PREFIX)) {
             MoveResultPacket packet = MoveResultPacket.parse(data);

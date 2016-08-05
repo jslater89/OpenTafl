@@ -63,8 +63,7 @@ public class JoinGameTask implements Runnable {
 
                     // Alert the client if the game has started.
                     if(g.isGameInProgress()) {
-                        mServer.sendPacketToClient(mClient, new StartGamePacket(g.getRules()), PriorityTaskQueue.Priority.LOW);
-                        mServer.sendPacketToClient(mClient, HistoryPacket.parseHistory(g.getGame().getHistory(), g.getGame().getRules().boardSize), PriorityTaskQueue.Priority.LOW);
+                        mServer.sendPacketToClient(mClient, new StartGamePacket(g.getRules(), g.getGame().getMoveHistory()), PriorityTaskQueue.Priority.LOW);
                     }
                 }
             }

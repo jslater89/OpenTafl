@@ -318,7 +318,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         public void onEnteringGameScreen(Game g, String title) {
             // Set up a game thread
             blockUntilCommandEngineReady(g);
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Command engine ready");
 
             if(mBoardWindow == null || mStatusWindow == null || mCommandWindow == null) {
                 createWindows(g, g.getRules().getName());
