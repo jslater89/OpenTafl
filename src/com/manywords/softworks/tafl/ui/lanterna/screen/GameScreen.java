@@ -641,6 +641,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 updateComments();
             }
             else if(r.type == Command.Type.VARIATION) {
+                tryTimeUpdate();
+                updateComments();
                 mBoardWindow.rerenderBoard();
             }
             else if(r.type == Command.Type.CHAT) {

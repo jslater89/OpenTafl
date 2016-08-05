@@ -474,9 +474,15 @@ public class CommandEngine {
             Coord destination = mReplay.getCurrentState().getSpaceAt(v.to.x, v.to.y);
             MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mGame.getCurrentState(), piece), destination);
 
-            mReplay.makeVariation(record);
+            ReplayGameState result = mReplay.makeVariation(record);
+            int moveResult = result.getLastMoveResult();
 
-            return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", record);
+            if(moveResult < GameState.GOOD_MOVE) {
+                return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, "Invalid move", record);
+            }
+            else {
+                return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", record);
+            }
         }
         // 19. CHAT COMMAND
         else if(command instanceof HumanCommandParser.Chat) {

@@ -196,8 +196,9 @@ public class ReplayGame {
     public ReplayGameState makeVariation(MoveRecord move) {
         ReplayGameState state = (ReplayGameState) getCurrentState();
         ReplayGameState variationState = state.makeVariation(move);
+        setCurrentState(variationState);
 
-        return variationState;
+        return getCurrentState();
     }
 
     private void setupFirstStatesList() {
