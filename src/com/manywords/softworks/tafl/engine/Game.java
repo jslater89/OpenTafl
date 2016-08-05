@@ -163,6 +163,21 @@ public class Game {
         return mHistory;
     }
 
+    public List<DetailedMoveRecord> getMoveHistory() {
+        List<DetailedMoveRecord> moves = new ArrayList<>(mHistory.size());
+        for(GameState state : mHistory) {
+            DetailedMoveRecord m = state.mDetailedExitingMove;
+            if(m != null) {
+                moves.add(m);
+            }
+            else if(state.getExitingMove() != null) {
+                throw new IllegalStateException("Missing detailed exiting move");
+            }
+        }
+
+        return moves;
+    }
+
     public String getHistoryString() {
         String gameRecord = "";
         gameRecord = Pattern.compile("\\[.*?\\]", Pattern.DOTALL).matcher(getCommentedHistoryString()).replaceAll("");

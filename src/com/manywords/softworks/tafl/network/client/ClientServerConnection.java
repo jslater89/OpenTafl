@@ -418,6 +418,7 @@ public class ClientServerConnection {
         @Override
         public void onStartGame(Rules r, List<DetailedMoveRecord> history) {
             setState(State.IN_GAME);
+            mLastHistory = history;
             mExternalCallback.onStartGame(r, history);
         }
 

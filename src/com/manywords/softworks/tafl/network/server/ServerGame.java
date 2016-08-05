@@ -234,9 +234,11 @@ public class ServerGame {
         }
 
         if(mAttackerClient != null && mDefenderClient != null) {
-            mServer.getTaskQueue().pushTask(new StartGameTask(mServer, this, getAllClients(), new StartGamePacket(mGame.getRules())));
             if(mPregameHistoryLoaded) {
-                mServer.sendPacketToClients(getAllClients(), new HistoryPacket(mPregameHistory, getRules().boardSize), PriorityTaskQueue.Priority.STANDARD);
+                mServer.getTaskQueue().pushTask(new StartGameTask(mServer, this, getAllClients(), new StartGamePacket(mGame.getRules(), mPregameHistory)));
+            }
+            else {
+                mServer.getTaskQueue().pushTask(new StartGameTask(mServer, this, getAllClients(), new StartGamePacket(mGame.getRules(), null)));
             }
         }
 
