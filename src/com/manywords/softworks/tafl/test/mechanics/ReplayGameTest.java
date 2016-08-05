@@ -37,7 +37,22 @@ public class ReplayGameTest extends TaflTest {
             }
         }
 
-        //rg.dumpHistory();
+        MoveAddress a = MoveAddress.parseAddress("1a");
+        ReplayGameState eachState = rg.getStateByAddress(a);
+        assert a != null && eachState != null;
+        for(int i = 0; i < 31; i++) {
+            if(i % 2 == 0) {
+                a.increment(true);
+            }
+            else {
+                a.increment(false);
+            }
+
+            eachState = rg.getStateByAddress(a);
+            assert eachState != null;
+        }
+
+        assert rg.getStateByAddress("1b") != null;
 
         // Try finding a state by address
         ReplayGameState parent = rg.getStateByAddress(MoveAddress.parseAddress("4b"));

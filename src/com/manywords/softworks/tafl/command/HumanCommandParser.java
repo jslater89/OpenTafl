@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.command;
 
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.replay.MoveAddress;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
@@ -58,6 +59,9 @@ public class HumanCommandParser {
         else if(command.startsWith("jump")) {
             return newReplayJumpCommand(engine, command);
         }
+        else if(command.startsWith("variation")) {
+            return newVariationCommand(engine, command);
+        }
         else if(command.startsWith("chat")) {
             return newChatCommand(engine, command);
         }
@@ -81,6 +85,7 @@ public class HumanCommandParser {
     public static ReplayNext newReplayNextCommand(CommandEngine engine, String command) { return new ReplayNext(engine, command); }
     public static ReplayPrevious newReplayPreviousCommand(CommandEngine engine, String command) { return new ReplayPrevious(engine, command); }
     public static ReplayJump newReplayJumpCommand(CommandEngine engine, String command) { return new ReplayJump(engine, command); }
+    public static Variation newVariationCommand(CommandEngine engine, String command) { return new Variation(engine, command); }
     public static Chat newChatCommand(CommandEngine engine, String command) { return new Chat(engine, command); }
 
     public static class Move extends Command {
@@ -282,7 +287,7 @@ public class HumanCommandParser {
         }
     }
     public static class ReplayJump extends Command {
-        public final int turnIndex;
+        public final MoveAddress moveAddress;
 
         public ReplayJump(CommandEngine engine, String command) {
             super(Type.REPLAY_JUMP);
@@ -293,17 +298,48 @@ public class HumanCommandParser {
             String[] commandParts = command.split(" ");
             if(commandParts.length != 2) {
                 mError = "Improperly-formatted command.";
-                turnIndex = -1;
+                moveAddress = null;
             }
             else {
-                int index = -1;
-                try {
-                    index = Integer.parseInt(commandParts[1]);
+                moveAddress = MoveAddress.parseAddress(commandParts[1]);
+                if(moveAddress == null) {
+                    mError = "Argument to jump not a move address: " + commandParts[1];
                 }
-                catch(NumberFormatException e) {
-                    mError = "Argument to jump not a number: " + commandParts[1];
+            }
+        }
+    }
+    public static class Variation extends Command {
+        public final Coord from;
+        public final Coord to;
+        public Variation(CommandEngine engine, String command) {
+            super(Type.VARIATION);
+
+            if(engine.getMode() != UiCallback.Mode.REPLAY) {
+                mError = "Not in replay mode.";
+            }
+            String[] commandParts = command.split(" ");
+            if (commandParts.length != 3) {
+                mError = "Wrong command format, try variation [file+rank] [file+rank] (e.g. variation a4 a3)";
+                from = null;
+                to = null;
+                return;
+            }
+            else {
+                Game g = engine.getGame();
+                int boardSize = g.getCurrentState().getBoard().getBoardDimension();
+
+                String fromString = commandParts[1].toLowerCase();
+                String toString = commandParts[2].toLowerCase();
+
+                if (!Board.validateChessNotation(fromString, boardSize) || !Board.validateChessNotation(toString, boardSize)) {
+                    mError = "Incorrect space format: " + fromString + " " + toString;
+                    from = null;
+                    to = null;
+                    return;
                 }
-                turnIndex = index - 1;
+
+                from = Board.getCoordFromChessNotation(fromString);
+                to = Board.getCoordFromChessNotation(toString);
             }
         }
     }

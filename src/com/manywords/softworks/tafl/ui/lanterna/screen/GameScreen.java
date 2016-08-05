@@ -481,8 +481,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         public void handleInGameCommand(String command) {
 
             if(command.startsWith("dump")) {
-                if(mServerConnection != null) {
-                    mServerConnection.sendHistoryRequest();
+                if(mInReplay) {
+                    mReplay.dumpHistory();
                 }
                 return;
             }
@@ -641,6 +641,9 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 tryTimeUpdate();
                 updateComments();
             }
+            else if(r.type == Command.Type.VARIATION) {
+                mBoardWindow.rerenderBoard();
+            }
             else if(r.type == Command.Type.CHAT) {
                 if(mServerConnection != null) {
                     ClientServerConnection.ChatType type =
@@ -721,6 +724,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
 
             if(mInReplay) {
+                types.add(Command.Type.VARIATION);
                 types.add(Command.Type.REPLAY_NEXT);
                 types.add(Command.Type.REPLAY_PREVIOUS);
                 types.add(Command.Type.REPLAY_JUMP);

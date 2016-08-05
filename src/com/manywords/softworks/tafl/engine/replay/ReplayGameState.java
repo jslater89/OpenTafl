@@ -342,7 +342,7 @@ public class ReplayGameState extends GameState {
 
     @Override
     public String toString() {
-        return getMoveAddress().toString() + " " + getEnteringMove() + " " + getExitingMove();
+        return (getMoveAddress() != null ? getMoveAddress().toString() : "null address") + " " + getEnteringMove() + " " + getExitingMove();
     }
 
     public List<Variation> getVariations() {

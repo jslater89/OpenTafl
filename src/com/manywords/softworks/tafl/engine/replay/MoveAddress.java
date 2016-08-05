@@ -136,6 +136,7 @@ public class MoveAddress {
         boolean startingSideAttackers = game.getGame().getRules().getStartingSide().isAttackingSide();
 
         boolean otherSideWent = false;
+        boolean thisSideWentPreviously = false;
 
         // We should increment the turn if, between the start of the turn and now, the other side has gone
         // and we are the starting side. Since we're deep in a tree, we have to follow the tree back up to
@@ -160,9 +161,13 @@ public class MoveAddress {
             if(rgs.getCurrentSide().isAttackingSide() != startingSideAttackers) {
                 otherSideWent = true;
             }
+            else {
+                thisSideWentPreviously = true;
+            }
         }
 
-        if(otherSideWent) {
+
+        if(otherSideWent && thisSideWentPreviously) {
             other = increment(true);
         }
         else {
@@ -274,14 +279,20 @@ public class MoveAddress {
                     e.moveIndex = moveIndex.charAt(0) - 'a';
                 }
                 else {
-                    throw new IllegalArgumentException("Invalid address part: " + element);
+                    return null;
+                    //throw new IllegalArgumentException("Invalid address part: " + element);
                 }
             }
             else {
                 e.moveIndex = -1;
             }
 
-            e.rootIndex = Integer.parseInt(rootIndex);
+            try {
+                e.rootIndex = Integer.parseInt(rootIndex);
+            }
+            catch(NumberFormatException ex) {
+                return null;
+            }
 
             moveAddress.mElements.add(e);
         }
