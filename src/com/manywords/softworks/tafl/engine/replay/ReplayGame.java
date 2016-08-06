@@ -55,7 +55,7 @@ public class ReplayGame {
 
         mMoveHistory = movesToPlay;
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Loaded game with moves: " + mMoveHistory);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Game history after load: " + mGame.getHistory());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Game history after load: " + mGame.getHistory());
         setCurrentState((ReplayGameState) mGame.getHistory().get(0));
 
         /*
