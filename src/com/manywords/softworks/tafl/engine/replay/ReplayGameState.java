@@ -109,6 +109,11 @@ public class ReplayGameState extends GameState {
             nextState.mLastMoveResult = nextState.checkVictory();
         }
 
+        if(nextMove.isDetailed()) {
+            // Preserve comments
+            ((DetailedMoveRecord) getExitingMove()).setComment(((DetailedMoveRecord) nextMove).getComment());
+        }
+
         return nextState.getLastMoveResult();
     }
 
