@@ -35,6 +35,8 @@ public abstract class Command {
         REPLAY_PREVIOUS,
         REPLAY_JUMP,
         VARIATION,
+        DELETE,
+        ANNOTATE,
         CHAT,
     }
 }

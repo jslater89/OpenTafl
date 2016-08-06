@@ -174,13 +174,20 @@ public class ReplayGameState extends GameState {
      * @param moveAddress
      */
     public boolean deleteVariation(MoveAddress moveAddress) {
-        if(moveAddress.getLastElement().isVariation()) {
-            return deleteVariationInternal(moveAddress);
+        ReplayGameState state = mReplayGame.getStateByAddress(moveAddress);
+        Variation v = mReplayGame.getVariationByAddress(moveAddress);
+
+        // Since getVariation does some magic to help us find variations by multiple names (i.e. 1a.1., 1a.1.1, 1a.1.1a),
+        // we have to make sure we aren't referencing a state or, if we are referencing a state, that it's the root of
+        // the variation.
+        if(v != null && (state == null || v.getRoot().equals(state))) {
+            return deleteVariationInternal(v.getAddress());
         }
-        // TODO Else if: moveAddress refers to the root member of a variation (for convenience)
-        else {
-            return deleteCanonicalChild(moveAddress);
+        else if(state != null) {
+            return deleteCanonicalChild(state.getMoveAddress());
         }
+
+        return false;
     }
 
     private boolean deleteCanonicalChild(MoveAddress moveAddress) {

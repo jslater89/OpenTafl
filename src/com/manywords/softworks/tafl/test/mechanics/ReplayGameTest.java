@@ -285,8 +285,10 @@ public class ReplayGameTest extends TaflTest {
 
         // Let's get rid of a bunch of things after 1a.1.1a. This removes the principal branch and moves
         // the 1a.1.1a.1 variation to principality.
+        rg.dumpHistory();
         boolean deleteResult = root.deleteVariation(MoveAddress.parseAddress("1a.1.1b"));
         assert deleteResult;
+        rg.dumpHistory();
 
         // We should have no variations but canonical children.
         state = rg.getStateByAddress("1a.1.1a");

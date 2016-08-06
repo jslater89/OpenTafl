@@ -62,6 +62,12 @@ public class HumanCommandParser {
         else if(command.startsWith("variation")) {
             return newVariationCommand(engine, command);
         }
+        else if(command.startsWith("delete")) {
+            return newDeleteCommand(engine, command);
+        }
+        else if(command.startsWith("annotate")) {
+            return newAnnotateCommand(engine, command);
+        }
         else if(command.startsWith("chat")) {
             return newChatCommand(engine, command);
         }
@@ -86,6 +92,8 @@ public class HumanCommandParser {
     public static ReplayPrevious newReplayPreviousCommand(CommandEngine engine, String command) { return new ReplayPrevious(engine, command); }
     public static ReplayJump newReplayJumpCommand(CommandEngine engine, String command) { return new ReplayJump(engine, command); }
     public static Variation newVariationCommand(CommandEngine engine, String command) { return new Variation(engine, command); }
+    public static Delete newDeleteCommand(CommandEngine engine, String command) { return new Delete(engine, command); }
+    public static Annotate newAnnotateCommand(CommandEngine engine, String command) { return new Annotate(engine, command); }
     public static Chat newChatCommand(CommandEngine engine, String command) { return new Chat(engine, command); }
 
     public static class Move extends Command {
@@ -341,6 +349,34 @@ public class HumanCommandParser {
                 from = Board.getCoordFromChessNotation(fromString);
                 to = Board.getCoordFromChessNotation(toString);
             }
+        }
+    }
+    public static class Delete extends Command {
+        public final MoveAddress moveAddress;
+
+        public Delete(CommandEngine engine, String command) {
+            super(Type.DELETE);
+
+            if(engine.getMode() != UiCallback.Mode.REPLAY) {
+                mError = "Not in replay mode.";
+            }
+
+            String[] commandParts = command.split(" ");
+            if(commandParts.length != 2) {
+                mError = "Improperly-formatted command.";
+                moveAddress = null;
+            }
+            else {
+                moveAddress = MoveAddress.parseAddress(commandParts[1]);
+                if(moveAddress == null) {
+                    mError = "Argument to jump not a move address: " + commandParts[1];
+                }
+            }
+        }
+    }
+    public static class Annotate extends Command {
+        public Annotate(CommandEngine engine, String command) {
+            super(Type.ANNOTATE);
         }
     }
     public static class Chat extends Command {

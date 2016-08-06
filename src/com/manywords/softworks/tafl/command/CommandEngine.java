@@ -385,6 +385,7 @@ public class CommandEngine {
         }
         // 12. REPLAY START COMMAND
         else if(command instanceof HumanCommandParser.ReplayEnter) {
+            // TODO: if we already have an mReplay, update that off of the current game state.
             ReplayGame rg = ReplayGame.copyGameToReplay(mGame);
             enterReplay(rg);
             return new CommandResult(Command.Type.REPLAY_ENTER, CommandResult.SUCCESS, "", null);
@@ -485,6 +486,17 @@ public class CommandEngine {
             else {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", record);
             }
+        }
+        else if(command instanceof HumanCommandParser.Delete) {
+            HumanCommandParser.Delete d = (HumanCommandParser.Delete) command;
+
+            boolean deleted = mReplay.deleteVariation(d.moveAddress);
+
+            if(deleted) return new CommandResult(Command.Type.DELETE, CommandResult.SUCCESS, "", null);
+            else return new CommandResult(Command.Type.DELETE, CommandResult.FAIL, "No variation with address " + d.moveAddress + " to delete.", null);
+        }
+        else if(command instanceof HumanCommandParser.Annotate) {
+
         }
         // 19. CHAT COMMAND
         else if(command instanceof HumanCommandParser.Chat) {

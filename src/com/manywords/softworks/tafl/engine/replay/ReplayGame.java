@@ -189,15 +189,6 @@ public class ReplayGame {
         mGame.getHistory().retainAll(toRetain);
     }
 
-    private ReplayGameState goToStateAtIndex(int i) {
-        mGame.setCurrentState(mGame.getHistory().get(i));
-        return getStateAtIndex(i);
-    }
-
-    private ReplayGameState getStateAtIndex(int i) {
-        return (ReplayGameState) mGame.getHistory().get(i);
-    }
-
     public int historySize() {
         return mGame.getHistory().size();
     }
@@ -223,6 +214,35 @@ public class ReplayGame {
         }
 
         return getCurrentState();
+    }
+
+    public boolean deleteVariation(MoveAddress moveAddress) {
+        ReplayGameState rootState = getStateByAddress(new MoveAddress(new ArrayList<>(), moveAddress.getRootElement()));
+
+        if(rootState == null)  {
+            return false;
+        }
+
+        boolean deleted = rootState.deleteVariation(moveAddress);
+
+        // Is the current state deleted? If so, find the first parent that isn't.
+        if(deleted) {
+            ReplayGameState currentState = getCurrentState();
+            MoveAddress currentAddress = currentState.getMoveAddress();
+
+            while(getStateByAddress(currentAddress) == null) {
+                currentState = currentState.getParent();
+                if(currentState != null) currentAddress = currentState.getMoveAddress();
+                else break;
+            }
+
+            if(getStateByAddress(currentAddress) != null && currentState != getCurrentState()) {
+                setCurrentState(currentState);
+            }
+
+            return true;
+        }
+        return false;
     }
 
     private void setupFirstStatesList() {
