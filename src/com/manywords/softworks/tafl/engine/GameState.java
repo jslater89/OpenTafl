@@ -1,6 +1,8 @@
 package com.manywords.softworks.tafl.engine;
 
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
+import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.rules.*;
 

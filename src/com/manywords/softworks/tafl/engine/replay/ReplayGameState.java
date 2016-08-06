@@ -92,6 +92,11 @@ public class ReplayGameState extends GameState {
                 replayState.getBerserkingTaflman(),
                 false);
 
+        if(mCanonicalChild != null) {
+            mExitingMove = mCanonicalChild.getEnteringMove();
+            mDetailedExitingMove = (DetailedMoveRecord) mExitingMove;
+        }
+
         return replayState;
     }
 

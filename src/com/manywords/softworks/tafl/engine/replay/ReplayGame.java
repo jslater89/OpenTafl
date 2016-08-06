@@ -139,11 +139,23 @@ public class ReplayGame {
     }
 
     public GameState setPositionByAddress(MoveAddress address) {
-        // TODO: try some common variations on state names:
-        // 12. means 12a.
-        // 12a.1.1a where there is no 1a means 12a.1.1b
+        if(address.getElements().size() % 2 == 1) {
+            // 12. means 12a
+            if(address.getLastElement().moveIndex == -1) {
+                address.getLastElement().moveIndex = 0;
+            }
+        }
+
         ReplayGameState state = getStateByAddress(address);
-        setCurrentState(state);
+
+        if(state == null && address.getLastElement().equals(new MoveAddress.Element(1, 0))) {
+            Variation v = getVariationByAddress(new MoveAddress(address.getAllRootElements()));
+                if(v != null){
+                state = v.getRoot();
+            }
+        }
+
+        if(state != null) setCurrentState(state);
         return getCurrentState();
     }
 
@@ -191,6 +203,8 @@ public class ReplayGame {
     }
 
     private void setCurrentState(ReplayGameState replayGameState) {
+        if(replayGameState == null) throw new IllegalArgumentException("Set current state to null");
+
         mGame.setCurrentState(replayGameState);
         mCurrentState = replayGameState;
     }
@@ -324,6 +338,20 @@ public class ReplayGame {
         return ts;
     }
 
+    public Variation getVariationByAddress(MoveAddress moveAddress) {
+        MoveAddress prefix = new MoveAddress(moveAddress.getAllRootElements());
+
+        ReplayGameState state = getStateByAddress(prefix);
+
+        if(state != null) {
+            if(state.getVariations().size() > (moveAddress.getLastElement().rootIndex - 1)) {
+                return state.getVariations().get(moveAddress.getLastElement().rootIndex - 1);
+            }
+        }
+
+        return null;
+    }
+
     public ReplayGameState getStateByAddress(MoveAddress moveAddress) {
         MoveAddress.Element element = moveAddress.getRootElement();
 
@@ -340,7 +368,7 @@ public class ReplayGame {
         if(startingPoint != null && moveAddress.getNonRootElements().size() > 0) {
             result = startingPoint.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
         }
-        else {
+        if(startingPoint != null && startingPoint.getMoveAddress().equals(moveAddress)) {
             result = startingPoint;
         }
 

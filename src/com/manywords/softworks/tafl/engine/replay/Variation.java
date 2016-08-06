@@ -31,6 +31,10 @@ public class Variation {
     }
 
     public ReplayGameState findVariationState(MoveAddress moveAddress) {
+        if(moveAddress.getElements().size() == 0) {
+            return getRoot();
+        }
+
         MoveAddress.Element e = moveAddress.getRootElement();
         ReplayGameState replayState = null;
         for(ReplayGameState rgs : mVariationStates) {
