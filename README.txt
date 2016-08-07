@@ -173,6 +173,9 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 10. Version history
 
+v0.3.3.3b (released 08/07/16):
+- Fix bug where large network games would fail to load
+
 v0.3.3.2b (released 07/27/16):
 - Happy birthday, Dan
 - In keeping with the sorts of things the aforementioned person is keen on,
