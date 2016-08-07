@@ -173,8 +173,18 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network 
 
 10. Version history
 
+v0.4.0.0pre (released 08/07/16);
+- Playable variations in replay mode!
+    - This is a pre-release feature
+    - See 'help' dialog when in replay for information on variation UI
+    - Variations cannot currently be saved or loaded
+        - Coming, but I wanted to get this out
+    - Variations may cause OpenTafl to explode
+        - Please report bugs if it does!
+
 v0.3.3.3b (released 08/07/16):
 - Fix bug where large network games would fail to load
+- Network protocol version 7
 
 v0.3.3.2b (released 07/27/16):
 - Happy birthday, Dan
