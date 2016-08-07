@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.test.rules;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
@@ -26,23 +28,23 @@ public class DoubleCaptureTest extends TaflTest {
 		 * 3 8 -> 3 2
 		 */
 
-        state.moveTaflman(state.getPieceAt(1, 4), state.getSpaceAt(1, 2));
+        state.makeMove(new MoveRecord(Coord.get(1,4), Coord.get(1,2)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(3, 4), state.getSpaceAt(3, 1));
+        state.makeMove(new MoveRecord(Coord.get(3,4), Coord.get(3,1)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(8, 3), state.getSpaceAt(8, 2));
+        state.makeMove(new MoveRecord(Coord.get(8,3), Coord.get(8,2)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(4, 2), state.getSpaceAt(2, 2));
+        state.makeMove(new MoveRecord(Coord.get(4,2), Coord.get(2,2)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(3, 8), state.getSpaceAt(3, 2));
+        state.makeMove(new MoveRecord(Coord.get(3,8), Coord.get(3,2)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 

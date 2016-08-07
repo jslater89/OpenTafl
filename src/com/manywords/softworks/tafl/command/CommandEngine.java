@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
+import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Side;
@@ -215,9 +216,9 @@ public class CommandEngine {
         public void onMoveDecided(Player player, MoveRecord move) {
             if(player == mDummyAnalysisPlayer) return;
 
-            int replayPosition = -1;
+            ReplayGameState replayState = null;
             if(getMode() == UiCallback.Mode.REPLAY) {
-                replayPosition = mReplay.getPosition();
+                replayState = mReplay.getCurrentState();
                 leaveReplay();
             }
 
@@ -227,10 +228,7 @@ public class CommandEngine {
                 callbackMoveResult(new CommandResult(Command.Type.MOVE, CommandResult.FAIL, message, null), null);
                 return;
             }
-            int result =
-                    mGame.getCurrentState().moveTaflman(
-                            mGame.getCurrentState().getBoard().getOccupier(move.start.x, move.start.y),
-                            mGame.getCurrentState().getSpaceAt(move.end.x, move.end.y)).getLastMoveResult();
+            int result = mGame.getCurrentState().makeMove(move);
 
             // non-error moves
             if(result >= GameState.GOOD_MOVE) {
@@ -289,9 +287,9 @@ public class CommandEngine {
                 callbackMoveResult(new CommandResult(Command.Type.MOVE, CommandResult.FAIL, message, null), move);
             }
 
-            if(replayPosition != -1) {
-                enterReplay(new ReplayGame(mGame));
-                mReplay.setPosition(replayPosition);
+            if(replayState != null) {
+                enterReplay(ReplayGame.copyGameToReplay(mGame));
+                mReplay.setPositionByAddress(replayState.getMoveAddress());
             }
             waitForNextMove();
         }
@@ -387,7 +385,8 @@ public class CommandEngine {
         }
         // 12. REPLAY START COMMAND
         else if(command instanceof HumanCommandParser.ReplayEnter) {
-            ReplayGame rg = new ReplayGame(mGame);
+            // TODO: if we already have an mReplay, update that off of the current game state.
+            ReplayGame rg = ReplayGame.copyGameToReplay(mGame);
             enterReplay(rg);
             return new CommandResult(Command.Type.REPLAY_ENTER, CommandResult.SUCCESS, "", null);
         }
@@ -398,7 +397,7 @@ public class CommandEngine {
             }
 
             Game g = mReplay.getGame();
-            mReplay.prepareForGameStart(mReplay.getPosition());
+            mReplay.prepareForGameStart(mReplay.getCurrentState().getMoveAddress());
 
             if(g.getClock() != null) {
                 TimeSpec attackerClock = mReplay.getTimeGuess(true);
@@ -445,15 +444,61 @@ public class CommandEngine {
         // 17. REPLAY JUMP COMMAND
         else if(command instanceof HumanCommandParser.ReplayJump) {
             HumanCommandParser.ReplayJump j = (HumanCommandParser.ReplayJump) command;
-            GameState state = mReplay.setTurnIndex(j.turnIndex);
+            if(j.moveAddress != null) {
+                GameState state = mReplay.setPositionByAddress(j.moveAddress);
+                mAttacker.positionChanged(state);
+                mDefender.positionChanged(state);
 
-            mAttacker.positionChanged(state);
-            mDefender.positionChanged(state);
+                if(state != null) {
+                    return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.SUCCESS, "", null);
+                }
+            }
 
-            if(state != null) return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.SUCCESS, "", null);
-            else return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.FAIL, "Turn index " + j + " out of bounds.", null);
+            return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.FAIL, "Move address " + j.moveAddress + " out of bounds.", null);
         }
-        // 18. CHAT COMMAND
+        // 18. VARIATION COMMAND
+        else if(command instanceof HumanCommandParser.Variation) {
+            HumanCommandParser.Variation v = (HumanCommandParser.Variation) command;
+
+            if(v.from == null || v.to == null) {
+                return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, "Invalid coords", null);
+            }
+
+            String message = "";
+
+            char piece = mReplay.getCurrentState().getPieceAt(v.from.x, v.from.y);
+            if (piece == Taflman.EMPTY) {
+                message = "No taflman at " + v.from;
+                return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, message, null);
+            }
+
+            Coord destination = mReplay.getCurrentState().getSpaceAt(v.to.x, v.to.y);
+            MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mGame.getCurrentState(), piece), destination);
+
+            ReplayGameState result = mReplay.makeVariation(record);
+            int moveResult = result.getLastMoveResult();
+
+            if(moveResult < GameState.GOOD_MOVE) {
+                // TODO: more errors here
+                // TODO: GameState.getErrorStringFor(int resultCode)
+                return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, "Invalid move", record);
+            }
+            else {
+                return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", record);
+            }
+        }
+        else if(command instanceof HumanCommandParser.Delete) {
+            HumanCommandParser.Delete d = (HumanCommandParser.Delete) command;
+
+            boolean deleted = mReplay.deleteVariation(d.moveAddress);
+
+            if(deleted) return new CommandResult(Command.Type.DELETE, CommandResult.SUCCESS, "", null);
+            else return new CommandResult(Command.Type.DELETE, CommandResult.FAIL, "No variation with address " + d.moveAddress + " to delete.", null);
+        }
+        else if(command instanceof HumanCommandParser.Annotate) {
+
+        }
+        // 19. CHAT COMMAND
         else if(command instanceof HumanCommandParser.Chat) {
             HumanCommandParser.Chat c = (HumanCommandParser.Chat) command;
             return new CommandResult(Command.Type.CHAT, CommandResult.SUCCESS, c.message, null);

@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.manywords.softworks.tafl.OpenTafl.LogLevel.SILENT;
+
 public class OpenTafl {
     private static enum Mode {
         WINDOW,
@@ -65,6 +67,7 @@ public class OpenTafl {
             }
             else if (arg.contains("--test") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.TEST;
+                logLevel = SILENT;
             }
             else if (arg.contains("--window") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.WINDOW;
@@ -76,7 +79,7 @@ public class OpenTafl {
                 runMode = Mode.HEADLESS_AI;
             }
             else if(arg.contains("--benchmark") && runMode == Mode.GRAPHICAL_TERMINAL) {
-                logLevel = LogLevel.SILENT;
+                logLevel = SILENT;
                 runMode = Mode.BENCHMARK;
             }
             else if(arg.contains("--help")) {
@@ -90,7 +93,7 @@ public class OpenTafl {
                 logLevel = LogLevel.CHATTY;
             }
             else if (arg.contains("--silent")) {
-                logLevel = LogLevel.SILENT;
+                logLevel = SILENT;
             }
         }
 
@@ -115,8 +118,8 @@ public class OpenTafl {
                     HeadlessAIClient client = HeadlessAIClient.startFromArgs(mapArgs);
                 }
                 catch(Exception e) {
-                    OpenTafl.logPrintln(LogLevel.SILENT, "Failed to start headless AI client with error: " + e);
-                    OpenTafl.logStackTrace(LogLevel.SILENT, e);
+                    OpenTafl.logPrintln(SILENT, "Failed to start headless AI client with error: " + e);
+                    OpenTafl.logStackTrace(SILENT, e);
                 }
                 break;
             case WINDOW:
@@ -158,7 +161,7 @@ public class OpenTafl {
                     t = factory.createTerminal();
                     th = new AdvancedTerminal<>(t);
                 } catch (IOException e) {
-                    OpenTafl.logPrintln(LogLevel.SILENT, "Failed to start text terminal.");
+                    OpenTafl.logPrintln(SILENT, "Failed to start text terminal.");
                 }
 
                 //RawTerminal display = new RawTerminal();
@@ -226,7 +229,7 @@ public class OpenTafl {
             // Normal messages
             System.out.print(s);
             logBuffer.append(s);
-        } else if (messageLevel == LogLevel.SILENT) {
+        } else if (messageLevel == SILENT) {
             // Critical errors which should always be displayed
             System.out.print(s);
             logBuffer.append(s);
@@ -289,9 +292,9 @@ public class OpenTafl {
 
     private static void setupLogging() {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-            logPrintln(LogLevel.SILENT, "Uncaught exception in thread " + t.getName());
-            logPrintln(LogLevel.SILENT, "Exception: " + e);
-            logStackTrace(LogLevel.SILENT, e);
+            logPrintln(SILENT, "Uncaught exception in thread " + t.getName());
+            logPrintln(SILENT, "Exception: " + e);
+            logStackTrace(SILENT, e);
             flushLog();
         });
 
@@ -307,8 +310,8 @@ public class OpenTafl {
 
         try {
             logFile.createNewFile();
-            OpenTafl.logPrintln(LogLevel.SILENT, "OpenTafl log from " + new Date() + " on " + getComputerName());
-            OpenTafl.logPrintln(LogLevel.SILENT, "Java version: " + System.getProperty("java.version", "unknown version"));
+            OpenTafl.logPrintln(SILENT, "OpenTafl log from " + new Date() + " on " + getComputerName());
+            OpenTafl.logPrintln(SILENT, "Java version: " + System.getProperty("java.version", "unknown version"));
         } catch (IOException e) {
             logPrintln(LogLevel.NORMAL, "Failed to create log file:" + e);
         }

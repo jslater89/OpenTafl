@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.*;
@@ -76,6 +77,29 @@ public class Game {
         mHistory.add(mCurrentState);
 
         mCallback = callback;
+    }
+
+    // Used for replays
+    public Game(Game copyGame) {
+        // Primitives/final variables: not changed or copied by value anyway
+        mZobristConstants = copyGame.mZobristConstants;
+        mAverageBranchingFactor = copyGame.mAverageBranchingFactor;
+        mAverageBranchingFactorCount = copyGame.mAverageBranchingFactorCount;
+
+        // Things we don't need to copy: if they exist, we want the same ones
+        mClock = copyGame.mClock;
+        mCallback = copyGame.mCallback;
+        mGameRules = copyGame.mGameRules;
+        mTagMap = copyGame.mTagMap;
+
+        // Game states: we want copies of these.
+        mHistory = new ArrayList<>();
+        for(GameState copyState : copyGame.getHistory()) {
+            GameState copied = new GameState(copyState);
+            copied.mGame = this;
+            mHistory.add(copied);
+        }
+        mCurrentState = mHistory.get(mHistory.size() - 1);
     }
 
     public final long[][] mZobristConstants;
@@ -266,16 +290,22 @@ public class Game {
                 true, // update zobrist
                 berserkingTaflman);
 
-        mCurrentState = nextState;
-        mHistory.add(mCurrentState);
+        if(recordState) {
+            mCurrentState = nextState;
+            mHistory.add(mCurrentState);
 
-        if(mClock != null) {
-            mClock.slap(advanceTurn);
+            if (mClock != null) {
+                mClock.slap(advanceTurn);
+            }
+
+            // Victory
+            mCurrentState.checkVictory();
+            return mCurrentState;
         }
-
-        // Victory
-        mCurrentState.checkVictory();
-        return mCurrentState;
+        else {
+            nextState.checkVictory();
+            return nextState;
+        }
     }
 
     public boolean historyContainsHash(long zobrist) {

@@ -81,8 +81,7 @@ public class BadFetlarCaptureTest extends TaflTest implements UiCallback {
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
 
-        char ofInterest = state.getPieceAt(3, 5);
-        state.moveTaflman(ofInterest, Coord.get(2, 5));
+        state.makeMove(new MoveRecord(Coord.get(3,5), Coord.get(2,5)));
         state = game.getCurrentState();
 
         assert state.getPieceAt(1, 5) != Taflman.EMPTY;

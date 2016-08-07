@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.manywords.softworks.tafl.rules.Taflman.EMPTY;
+
 public class GameTreeState extends GameState implements GameTreeNode {
     public static AiWorkspace workspace;
 
@@ -56,6 +58,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public GameTreeState considerMove(Coord start, Coord end) {
         char toMove = getBoard().getOccupier(start);
         GameState nextGameState = moveTaflman(toMove, end);
+        mGame.advanceState(this, nextGameState, nextGameState.getBerserkingTaflman() == EMPTY, nextGameState.getBerserkingTaflman(), true);
 
         // result should be good move except in cases like berserk,
         // where most moves on a berserk turn are illegal.

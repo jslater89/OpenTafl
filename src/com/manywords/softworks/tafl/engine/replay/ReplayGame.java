@@ -1,13 +1,12 @@
 package com.manywords.softworks.tafl.engine.replay;
 
+import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.command.HumanCommandParser;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
-import com.manywords.softworks.tafl.ui.Ansi;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by jay on 3/31/16.
@@ -16,13 +15,13 @@ public class ReplayGame {
     private Game mGame;
     private List<GameState> mFirstStatesByTurn;
     private List<DetailedMoveRecord> mMoveHistory;
-    private int mStatePosition = 0;
+    private ReplayGameState mCurrentState = null;
 
     private TimeSpec mAttackerTimeLeft;
     private TimeSpec mDefenderTimeLeft;
 
-    private List<TimeSpec> mAttackerTimeSpecByIndex;
-    private List<TimeSpec> mDefenderTimeSpecByIndex;
+    private Map<GameState, TimeSpec> mAttackerTimeSpecsByState;
+    private Map<GameState, TimeSpec> mDefenderTimeSpecsByState;
 
     /**
      * This constructor takes a game object and plays the given
@@ -31,24 +30,40 @@ public class ReplayGame {
      * @param movesToPlay
      */
     public ReplayGame(Game game, List<DetailedMoveRecord> movesToPlay) {
-        for(MoveRecord m : movesToPlay) {
-            int result = game.getCurrentState().makeMove(m);
-            if(result < GameState.GOOD_MOVE) {
-                RawTerminal.renderGameState(game.getCurrentState());
-                System.out.println(m);
-                throw new IllegalStateException("Failed to make moves! Error: " + result);
+        GameState currentState = game.getCurrentState();
+        ReplayGameState replayState = new ReplayGameState(this, currentState);
+        replayState.setMoveAddress(MoveAddress.newRootAddress());
+
+        game.getHistory().replaceAll(gameState -> {
+            if(gameState == currentState) {
+                return replayState;
             }
+            else {
+                return gameState;
+            }
+        });
+        mGame = game;
+        mGame.setCurrentState(replayState);
+
+        for(MoveRecord m : movesToPlay) {
+            int result = mGame.getCurrentState().makeMove(m);
+            if(result < GameState.GOOD_MOVE) {
+                throw new IllegalStateException("Failed to make move " + m + "! Error: " + result);
+            }
+
         }
 
-        mGame = game;
         mMoveHistory = movesToPlay;
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Loaded game with moves: " + mMoveHistory);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Game history after load: " + mGame.getHistory());
+        setCurrentState((ReplayGameState) mGame.getHistory().get(0));
 
-        mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
-
+        /*
         for(int i = 0; i < movesToPlay.size(); i++) {
             mGame.getHistory().get(i).setExitingMove(movesToPlay.get(i));
             mGame.getHistory().get(i+1).setEnteringMove(movesToPlay.get(i));
         }
+        */
 
         setupFirstStatesList();
         setupTimeSpecLists();
@@ -59,19 +74,22 @@ public class ReplayGame {
      * state.
      * @param game
      */
-    public ReplayGame(Game game) {
-        mGame = game;
-        mMoveHistory = new ArrayList<DetailedMoveRecord>();
+    public static ReplayGame copyGameToReplay(Game game) {
+        Game copiedGame = new Game(game);
+        List<DetailedMoveRecord> moves = new ArrayList<>();
 
-        for(GameState state : game.getHistory()) {
+        for(GameState state : copiedGame.getHistory()) {
             if(state.getExitingMove() != null) {
-                mMoveHistory.add((DetailedMoveRecord) state.getExitingMove());
+                moves.add((DetailedMoveRecord) state.getExitingMove());
             }
         }
 
-        mGame.setCurrentState(mGame.getHistory().get(mStatePosition));
-        setupFirstStatesList();
-        setupTimeSpecLists();
+        GameState copiedStartingState = copiedGame.getHistory().get(0);
+        copiedGame.getHistory().clear();
+        copiedGame.getHistory().add(copiedStartingState);
+        copiedGame.setCurrentState(copiedStartingState);
+
+        return new ReplayGame(copiedGame, moves);
     }
 
     public Game getGame() {
@@ -79,113 +97,152 @@ public class ReplayGame {
     }
 
     public String getHistoryStringWithPositionMarker() {
-        String historyString = mGame.getHistoryString();
-        String[] lines = historyString.split("\n");
+        return getHistoryCommandString(mGame.getHistory());
 
-        String newString = "";
-        int statePosition = 0;
-        boolean modified = false;
-        for (String line : lines) {
-            String[] components = line.split(" ");
-
-            for(int i = 1; i < components.length; i++) {
-                statePosition++;
-                if(statePosition > mStatePosition && !modified) {
-                    components[i] = Ansi.UNDERLINE + components[i] + Ansi.UNDERLINE_OFF;
-                    modified = true;
-                }
-            }
-
-            for(String s : components) {
-                newString += s + " ";
-            }
-            newString += "\n";
-        }
-
-        return newString;
+//        String historyString = mGame.getHistoryString();
+//        String[] lines = historyString.split("\n");
+//
+//        String newString = "";
+//        int statePosition = 0;
+//        boolean modified = false;
+//        for (String line : lines) {
+//            String[] components = line.split(" ");
+//
+//            for(int i = 1; i < components.length; i++) {
+//                statePosition++;
+//                /*
+//                if(statePosition > mStatePosition && !modified) {
+//                    components[i] = Ansi.UNDERLINE + components[i] + Ansi.UNDERLINE_OFF;
+//                    modified = true;
+//                }*/
+//            }
+//
+//            for(String s : components) {
+//                newString += s + " ";
+//            }
+//            newString += "\n";
+//        }
+//
+//        return newString;
     }
 
-    public GameState getPreviousState() {
-        if(mStatePosition - 1 >= 0) {
-            return stateAtIndex(mStatePosition - 1);
-        }
-        else return null;
-    }
-
-    public GameState nextState() {
-        if(mStatePosition < historySize() - 1) {
-            mStatePosition++;
-        }
-
-        return stateAtIndex(mStatePosition);
-    }
-
-    public GameState previousState() {
-        if(mStatePosition > 0) {
-            mStatePosition--;
-        }
-
-        return stateAtIndex(mStatePosition);
-    }
-
-    public int setPositionByState(GameState state) {
-        int i = 0;
-        for(GameState history : mGame.getHistory()) {
-            if(state.equals(history)) {
-                setPosition(i);
-                return i;
-            }
-            else {
-                i++;
-            }
-        }
-
-        return -1;
-    }
-
-    public GameState setTurnIndex(int turn) {
-        setPositionByState(mFirstStatesByTurn.get(turn));
+    public ReplayGameState nextState() {
+        ReplayGameState state = getCurrentState();
+        if(state.getCanonicalChild() != null) setCurrentState(state.getCanonicalChild());
         return getCurrentState();
     }
 
-    public GameState setPosition(int i) {
-        if(i >= historySize() || i < 0) {
-            return null;
-        }
-
-        mStatePosition = i;
-
-        return stateAtIndex(mStatePosition);
+    public GameState previousState() {
+        ReplayGameState state = getCurrentState();
+        if(state.getParent() != null) setCurrentState(state.getParent());
+        return getCurrentState();
     }
 
-    public int getPosition() {
-        return mStatePosition;
+    public GameState setPositionByAddress(MoveAddress address) {
+        if(address.getElements().size() % 2 == 1) {
+            // 12. means 12a
+            if(address.getLastElement().moveIndex == -1) {
+                address.getLastElement().moveIndex = 0;
+            }
+        }
+
+        ReplayGameState state = getStateByAddress(address);
+
+        if(state == null && address.getLastElement().equals(new MoveAddress.Element(1, 0))) {
+            Variation v = getVariationByAddress(new MoveAddress(address.getAllRootElements()));
+                if(v != null){
+                state = v.getRoot();
+            }
+        }
+
+        if(state != null) setCurrentState(state);
+        return getCurrentState();
     }
 
     public void prepareForGameStart() {
-        prepareForGameStart(historySize() - 1);
-    }
+        ReplayGameState state = getStateByAddress("1a");
+        if(state == null) throw new IllegalStateException("Can't start a game from a zero-length replay");
 
-    public void prepareForGameStart(int index) {
-        setPosition(index);
-        List<GameState> toRemove = new ArrayList<>(historySize() - index);
-        for(int i = index + 1; i < historySize(); i++) {
-            toRemove.add(mGame.getHistory().get(i));
+        ReplayGameState nextState = null;
+        while((nextState = state.getCanonicalChild()) != null) {
+            state = nextState;
         }
-        mGame.getHistory().removeAll(toRemove);
+
+        prepareForGameStart(state.getMoveAddress());
     }
 
-    private GameState stateAtIndex(int i) {
-        mGame.setCurrentState(mGame.getHistory().get(i));
-        return mGame.getHistory().get(i);
+    public void prepareForGameStart(MoveAddress address) {
+        setCurrentState(getStateByAddress(address));
+        List<GameState> toRetain = new ArrayList<>(historySize());
+        for(GameState state : mGame.getHistory()) {
+            ReplayGameState replayState = (ReplayGameState) state;
+
+            if(replayState.getMoveAddress().equals(address)) {
+                toRetain.add(replayState);
+                break;
+            }
+            else {
+                toRetain.add(replayState);
+            }
+        }
+
+        mGame.getHistory().retainAll(toRetain);
     }
 
     public int historySize() {
         return mGame.getHistory().size();
     }
 
-    public GameState getCurrentState() {
-        return mGame.getHistory().get(mStatePosition);
+    private void setCurrentState(ReplayGameState replayGameState) {
+        if(replayGameState == null) throw new IllegalArgumentException("Set current state to null");
+
+        mGame.setCurrentState(replayGameState);
+        mCurrentState = replayGameState;
+    }
+
+    public ReplayGameState getCurrentState() {
+        return mCurrentState;
+    }
+
+    public ReplayGameState makeVariation(MoveRecord move) {
+        ReplayGameState state = (ReplayGameState) getCurrentState();
+        ReplayGameState variationState = state.makeVariation(move);
+
+        if(state.getLastMoveResult() >= GameState.GOOD_MOVE) {
+            // Don't set errors into current state, oy.
+            setCurrentState(variationState);
+        }
+
+        return getCurrentState();
+    }
+
+    public boolean deleteVariation(MoveAddress moveAddress) {
+        ReplayGameState rootState = getStateByAddress(new MoveAddress(new ArrayList<>(), moveAddress.getRootElement()));
+
+        if(rootState == null)  {
+            return false;
+        }
+
+        boolean deleted = rootState.deleteVariation(moveAddress);
+
+        // Is the current state deleted? If so, find the first parent that isn't.
+        if(deleted) {
+            ReplayGameState currentState = getCurrentState();
+            MoveAddress currentAddress = currentState.getMoveAddress();
+
+            while(getStateByAddress(currentAddress) == null) {
+                currentState = currentState.getParent();
+                if(currentState != null) currentAddress = currentState.getMoveAddress();
+                else break;
+            }
+
+            if(getStateByAddress(currentAddress) != null && currentState != getCurrentState()) {
+                setCurrentState(currentState);
+            }
+
+            return true;
+        }
+        return false;
     }
 
     private void setupFirstStatesList() {
@@ -208,85 +265,219 @@ public class ReplayGame {
     }
 
     private void setupTimeSpecLists() {
-        mAttackerTimeSpecByIndex = new ArrayList<>();
-        mDefenderTimeSpecByIndex = new ArrayList<>();
+        mAttackerTimeSpecsByState = new LinkedHashMap<>();
+        mDefenderTimeSpecsByState = new LinkedHashMap<>();
         if(mGame.getClock() == null) return;
 
-        mAttackerTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
-        mDefenderTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
+        mAttackerTimeSpecsByState.put(mGame.getHistory().get(0), mGame.getClock().toTimeSpec());
+        mDefenderTimeSpecsByState.put(mGame.getHistory().get(0), mGame.getClock().toTimeSpec());
 
         // The last state doesn't have an exiting move
-        System.out.println(historySize());
         for(int i = 1; i < historySize() - 1; i++) {
+            GameState previous = mGame.getHistory().get(i - 1);
             GameState current = mGame.getHistory().get(i);
 
             if(current.getCurrentSide().isAttackingSide()) {
                 // The other side's clock doesn't count down.
-                if(mDefenderTimeSpecByIndex.size() > 0) {
-                    mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(mDefenderTimeSpecByIndex.size() - 1));
+                if(mDefenderTimeSpecsByState.size() > 0) {
+                    mDefenderTimeSpecsByState.put(current, mDefenderTimeSpecsByState.get(previous));
                 }
                 else {
-                    mDefenderTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
+                    mDefenderTimeSpecsByState.put(current, mGame.getClock().toTimeSpec());
                 }
 
                 // If we have a record, save it; otherwise, get the previous one as a best guess.
                 DetailedMoveRecord dm = mMoveHistory.get(i);
                 if(dm.getTimeRemaining() != null) {
-                    mAttackerTimeSpecByIndex.add(dm.getTimeRemaining());
+                    mAttackerTimeSpecsByState.put(current, dm.getTimeRemaining());
                 }
-                else if (mAttackerTimeSpecByIndex.size() > 0){
-                    mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(mAttackerTimeSpecByIndex.size() - 1));
+                else if (mAttackerTimeSpecsByState.size() > 0){
+                    mAttackerTimeSpecsByState.put(current, mAttackerTimeSpecsByState.get(previous));
                 }
                 else {
-                    mAttackerTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
+                    mAttackerTimeSpecsByState.put(current, mGame.getClock().toTimeSpec());
                 }
             }
             else {
-                if(mAttackerTimeSpecByIndex.size() > 0) {
-                    mAttackerTimeSpecByIndex.add(mAttackerTimeSpecByIndex.get(mAttackerTimeSpecByIndex.size() - 1));
+                if(mAttackerTimeSpecsByState.size() > 0) {
+                    mAttackerTimeSpecsByState.put(current, mAttackerTimeSpecsByState.get(previous));
                 }
                 else {
-                    mAttackerTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
+                    mAttackerTimeSpecsByState.put(current, mGame.getClock().toTimeSpec());
                 }
 
                 DetailedMoveRecord dm = mMoveHistory.get(i);
                 if(dm.getTimeRemaining() != null) {
-                    mDefenderTimeSpecByIndex.add(dm.getTimeRemaining());
+                    mDefenderTimeSpecsByState.put(current, dm.getTimeRemaining());
                 }
-                else if (mDefenderTimeSpecByIndex.size() > 0){
-                    mDefenderTimeSpecByIndex.add(mDefenderTimeSpecByIndex.get(mDefenderTimeSpecByIndex.size() - 1));
+                else if (mDefenderTimeSpecsByState.size() > 0){
+                    mDefenderTimeSpecsByState.put(current, mDefenderTimeSpecsByState.get(previous));
                 }
                 else {
-                    mDefenderTimeSpecByIndex.add(mGame.getClock().toTimeSpec());
+                    mDefenderTimeSpecsByState.put(current, mGame.getClock().toTimeSpec());
                 }
             }
         }
 
         String remainingTimeString = mGame.getTagMap().get("time-remaining");
         if(remainingTimeString != null) {
+            GameState state = getGame().getHistory().get(getGame().getHistory().size() - 1);
             String[] remainingTimes = remainingTimeString.split(",");
             mAttackerTimeLeft = GameClock.getTimeSpecForGameNotationString(remainingTimes[0]);
             mDefenderTimeLeft = GameClock.getTimeSpecForGameNotationString(remainingTimes[1]);
 
-            mAttackerTimeSpecByIndex.add(mAttackerTimeLeft);
-            mDefenderTimeSpecByIndex.add(mDefenderTimeLeft);
+            mAttackerTimeSpecsByState.put(state, mAttackerTimeLeft);
+            mDefenderTimeSpecsByState.put(state, mDefenderTimeLeft);
         }
     }
 
     public TimeSpec getTimeGuess(boolean isAttackingSide) {
-        if(isAttackingSide && mAttackerTimeSpecByIndex.size() > mStatePosition) {
-            return mAttackerTimeSpecByIndex.get(mStatePosition);
+        GameState currentState = getCurrentState();
+        if(isAttackingSide && mAttackerTimeSpecsByState.containsKey(currentState)) {
+            return mAttackerTimeSpecsByState.get(currentState);
         }
-        else if(isAttackingSide && mAttackerTimeSpecByIndex.size() > 0) {
-            return mAttackerTimeSpecByIndex.get(mAttackerTimeSpecByIndex.size() - 1);
+        else if(isAttackingSide && mAttackerTimeSpecsByState.size() > 0) {
+            return getLastTimeSpec(mAttackerTimeSpecsByState);
         }
-        else if (!isAttackingSide && mDefenderTimeSpecByIndex.size() > mStatePosition) {
-            return mDefenderTimeSpecByIndex.get(mStatePosition);
+        else if (!isAttackingSide && mDefenderTimeSpecsByState.containsKey(currentState)) {
+            return mDefenderTimeSpecsByState.get(currentState);
         }
-        else if(!isAttackingSide && mDefenderTimeSpecByIndex.size() > 0) {
-            return mDefenderTimeSpecByIndex.get(mDefenderTimeSpecByIndex.size() - 1);
+        else if(!isAttackingSide && mDefenderTimeSpecsByState.size() > 0) {
+            return getLastTimeSpec(mDefenderTimeSpecsByState);
         }
 
         return null;
+    }
+
+    private TimeSpec getLastTimeSpec(Map<?, TimeSpec> map) {
+        Iterator<TimeSpec> i = map.values().iterator();
+        TimeSpec ts = null;
+        while(i.hasNext()) {
+            ts = i.next();
+        }
+        return ts;
+    }
+
+    public Variation getVariationByAddress(MoveAddress moveAddress) {
+        MoveAddress prefix = new MoveAddress(moveAddress.getAllRootElements());
+
+        ReplayGameState state = getStateByAddress(prefix);
+
+        if(state != null) {
+            if(state.getVariations().size() > (moveAddress.getLastElement().rootIndex - 1)) {
+                return state.getVariations().get(moveAddress.getLastElement().rootIndex - 1);
+            }
+        }
+
+        return null;
+    }
+
+    public ReplayGameState getStateByAddress(MoveAddress moveAddress) {
+        MoveAddress.Element element = moveAddress.getRootElement();
+
+        ReplayGameState startingPoint = null;
+        for(GameState state : mGame.getHistory()) {
+            ReplayGameState rgs = (ReplayGameState) state;
+            if(rgs.getMoveAddress().getRootElement().equals(element)) {
+                startingPoint = rgs;
+                break;
+            }
+        }
+
+        ReplayGameState result = null;
+        if(startingPoint != null && moveAddress.getNonRootElements().size() > 0) {
+            result = startingPoint.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
+        }
+        if(startingPoint != null && startingPoint.getMoveAddress().equals(moveAddress)) {
+            result = startingPoint;
+        }
+
+        return result;
+    }
+
+    public ReplayGameState getStateByAddress(String s) {
+        return getStateByAddress(MoveAddress.parseAddress(s));
+    }
+
+    public static String getHistoryCommandString(List<GameState> history) {
+        StringBuilder resultString = new StringBuilder();
+        int historyPosition = 0;
+        ReplayGameState state = (ReplayGameState) history.get(historyPosition);
+        List<ReplayGameState> currentTurn = new ArrayList<>();
+        List<Variation> currentTurnVariations = new ArrayList<>();
+        int currentTurnIndex = 1;
+
+        while(state != null) {
+            // Get all states in a given turn.
+            if(state.getMoveAddress().getLastElement().rootIndex == currentTurnIndex) {
+                currentTurn.add(state);
+                currentTurnVariations.addAll(state.getVariations());
+            }
+            else {
+                finishHistoryTurn(currentTurn, currentTurnVariations, resultString);
+
+                currentTurn.clear();
+                currentTurnVariations.clear();
+                currentTurnIndex = state.getMoveAddress().getLastElement().rootIndex;
+                currentTurn.add(state);
+                currentTurnVariations.addAll(state.getVariations());
+            }
+
+            historyPosition += 1;
+            if(historyPosition == history.size()) {
+                finishHistoryTurn(currentTurn, currentTurnVariations, resultString);
+                break;
+            }
+            state = (ReplayGameState) history.get(historyPosition);
+        }
+
+        // Print the turn header.
+
+        // For each state, get all variations and place in list.
+
+        // For each variation, do this method.
+
+        return resultString.toString();
+    }
+
+    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, StringBuilder resultString) {
+        boolean first = true;
+        for(ReplayGameState turnState : currentTurn) {
+            if(first) {
+                first = false;
+
+                int paddingCount = turnState.getMoveAddress().getLastElement().moveIndex;
+                MoveAddress a = new MoveAddress(turnState.getMoveAddress());
+                a.getLastElement().moveIndex = 0;
+
+                resultString.append(a);
+                for(int i = 0; i < paddingCount; i++) {
+                    resultString.append(" .....");
+                }
+                resultString.append(" ");
+            }
+            // else append b., c., etc.
+
+            if(turnState.getMoveAddress().getElements().size() == 1) {
+                if (turnState.getExitingMove() != null) resultString.append(turnState.getExitingMove());
+            }
+            else {
+                if (turnState.getEnteringMove() != null) resultString.append(turnState.getEnteringMove());
+            }
+            resultString.append(" ");
+        }
+        resultString.append("\n");
+
+        for(Variation v : currentTurnVariations) {
+            List<GameState> variationStates = new ArrayList<>();
+            variationStates.addAll(v.getStates());
+            resultString.append(getHistoryCommandString(variationStates));
+        }
+    }
+
+    public void dumpHistory() {
+        for(GameState state : mGame.getHistory()) {
+            ((ReplayGameState) state).dumpTree();
+        }
     }
 }

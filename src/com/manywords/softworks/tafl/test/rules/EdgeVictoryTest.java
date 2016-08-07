@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.test.rules;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -80,16 +81,16 @@ public class EdgeVictoryTest extends TaflTest implements UiCallback {
         Game game = new Game(rules, null);
 
         GameState state = game.getCurrentState();
-        state.moveTaflman(state.getPieceAt(4, 5), state.getSpaceAt(4, 8));
+        state.makeMove(new MoveRecord(Coord.get(4,5), Coord.get(4,8)));
 
         state = game.getCurrentState();
-        state.moveTaflman(state.getPieceAt(4, 4), state.getSpaceAt(4, 7));
+        state.makeMove(new MoveRecord(Coord.get(4,4), Coord.get(4,7)));
 
         state = game.getCurrentState();
-        state.moveTaflman(state.getPieceAt(4, 8), state.getSpaceAt(5, 8));
+        state.makeMove(new MoveRecord(Coord.get(4,8), Coord.get(5,8)));
 
         state = game.getCurrentState();
-        state.moveTaflman(state.getPieceAt(4, 7), state.getSpaceAt(0, 7));
+        state.makeMove(new MoveRecord(Coord.get(4,7), Coord.get(0,7)));
 
         state = game.getCurrentState();
         assert state.checkVictory() == GameState.DEFENDER_WIN;

@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.test.rules;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
@@ -18,16 +20,16 @@ public class CaptureTest extends TaflTest {
 
         RawTerminal display = new RawTerminal();
 
-        state.moveTaflman(state.getPieceAt(4, 5), state.getSpaceAt(1, 5));
+        state.makeMove(new MoveRecord(Coord.get(4,5), Coord.get(1,5)));
         state = game.getCurrentState();
-        state.moveTaflman(state.getPieceAt(3, 4), state.getSpaceAt(3, 1));
+        state.makeMove(new MoveRecord(Coord.get(3,4), Coord.get(3,1)));
         state = game.getCurrentState();
         //display.renderGameState(state);
 
         //8,5 and 3,8
-        state.moveTaflman(state.getPieceAt(3, 8), state.getSpaceAt(3, 2));
+        state.makeMove(new MoveRecord(Coord.get(3,8), Coord.get(3,2)));
         state = game.getCurrentState();
-        state.moveTaflman(state.getPieceAt(8, 5), state.getSpaceAt(2, 5));
+        state.makeMove(new MoveRecord(Coord.get(8,5), Coord.get(2,5)));
         state = game.getCurrentState();
 
         assert state.getPieceAt(3, 1) == Taflman.EMPTY;
