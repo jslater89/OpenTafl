@@ -4,10 +4,7 @@ v0.4.x features:
 - GameSerializer: learn how to load/save variations
 	- Variations as a separate list to minimize impact on current functionality
 - ReplayGame: learn how to add variations from such a list
-- UI: in replay mode, display full move address
-- UI: improve jump command to take move addresses
-- UI: improve previous command to go up the tree regardless of location
-- UI: add 'variation' command, which takes either coords to start a new variation, or a lone number to mean, 'go to the Nth variation from this state'.
+- UI: add 'go to nth variation' functionality
 
 AI stuff:
 0. Evaluation function work: underpins all further heuristics work
