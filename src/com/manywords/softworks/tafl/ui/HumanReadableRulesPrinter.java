@@ -153,7 +153,7 @@ public class HumanReadableRulesPrinter {
             }
 
             if(!moveEntryString.contains("no taflmen")) {
-                rules += "The following taflmen may freely move through the throne: " + moveEntryString + ". ";
+                rules += "The following taflmen may freely move through the throne, but may not stop on it: " + moveEntryString + ". ";
             }
 
             if(!moveNoEntryString.contains("no taflmen")) {
@@ -300,7 +300,7 @@ public class HumanReadableRulesPrinter {
             }
 
             if(!moveEntryString.contains("no taflmen")) {
-                rules += "The following taflmen may freely move through the attacker forts: " + moveEntryString + ". ";
+                rules += "The following taflmen may freely move through the attacker forts, but may not stop on them: " + moveEntryString + ". ";
             }
 
             if(!moveNoEntryString.contains("no taflmen")) {
@@ -430,7 +430,7 @@ public class HumanReadableRulesPrinter {
             }
 
             if(!moveEntryString.contains("no taflmen")) {
-                rules += "The following taflmen may freely move through the defender forts: " + moveEntryString + ". ";
+                rules += "The following taflmen may freely move through the defender forts, but may not stop on them: " + moveEntryString + ". ";
             }
 
             if(!moveNoEntryString.contains("no taflmen")) {
