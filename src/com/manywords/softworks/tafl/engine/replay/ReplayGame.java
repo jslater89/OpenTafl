@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.command.HumanCommandParser;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.ui.Ansi;
 
 import java.util.*;
 
@@ -97,7 +98,7 @@ public class ReplayGame {
     }
 
     public String getHistoryStringWithPositionMarker() {
-        return getHistoryCommandString(mGame.getHistory());
+        return getHistoryCommandString(mGame.getHistory(), getCurrentState().getMoveAddress());
 
 //        String historyString = mGame.getHistoryString();
 //        String[] lines = historyString.split("\n");
@@ -193,7 +194,7 @@ public class ReplayGame {
         return mGame.getHistory().size();
     }
 
-    private void setCurrentState(ReplayGameState replayGameState) {
+    public void setCurrentState(ReplayGameState replayGameState) {
         if(replayGameState == null) throw new IllegalArgumentException("Set current state to null");
 
         mGame.setCurrentState(replayGameState);
@@ -400,6 +401,10 @@ public class ReplayGame {
     }
 
     public static String getHistoryCommandString(List<GameState> history) {
+        return getHistoryCommandString(history, null);
+    }
+
+    public static String getHistoryCommandString(List<GameState> history, MoveAddress highlightAddress) {
         StringBuilder resultString = new StringBuilder();
         int historyPosition = 0;
         ReplayGameState state = (ReplayGameState) history.get(historyPosition);
@@ -414,7 +419,7 @@ public class ReplayGame {
                 currentTurnVariations.addAll(state.getVariations());
             }
             else {
-                finishHistoryTurn(currentTurn, currentTurnVariations, resultString);
+                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString);
 
                 currentTurn.clear();
                 currentTurnVariations.clear();
@@ -425,7 +430,7 @@ public class ReplayGame {
 
             historyPosition += 1;
             if(historyPosition == history.size()) {
-                finishHistoryTurn(currentTurn, currentTurnVariations, resultString);
+                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString);
                 break;
             }
             state = (ReplayGameState) history.get(historyPosition);
@@ -440,7 +445,7 @@ public class ReplayGame {
         return resultString.toString();
     }
 
-    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, StringBuilder resultString) {
+    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, MoveAddress highlightAddress, StringBuilder resultString) {
         boolean first = true;
         for(ReplayGameState turnState : currentTurn) {
             if(first) {
@@ -458,11 +463,19 @@ public class ReplayGame {
             }
             // else append b., c., etc.
 
+            if(turnState.getMoveAddress().equals(highlightAddress)) {
+                resultString.append(Ansi.UNDERLINE);
+            }
+
             if(turnState.getMoveAddress().getElements().size() == 1) {
                 if (turnState.getExitingMove() != null) resultString.append(turnState.getExitingMove());
             }
             else {
                 if (turnState.getEnteringMove() != null) resultString.append(turnState.getEnteringMove());
+            }
+
+            if(turnState.getMoveAddress().equals(highlightAddress)) {
+                resultString.append(Ansi.UNDERLINE_OFF);
             }
             resultString.append(" ");
         }
@@ -471,7 +484,7 @@ public class ReplayGame {
         for(Variation v : currentTurnVariations) {
             List<GameState> variationStates = new ArrayList<>();
             variationStates.addAll(v.getStates());
-            resultString.append(getHistoryCommandString(variationStates));
+            resultString.append(getHistoryCommandString(variationStates, highlightAddress));
         }
     }
 
