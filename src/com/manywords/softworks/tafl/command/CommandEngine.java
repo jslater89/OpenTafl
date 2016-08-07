@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
+import com.manywords.softworks.tafl.engine.replay.Variation;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Side;
@@ -423,7 +424,23 @@ public class CommandEngine {
         }
         // 15. REPLAY NEXT COMMAND
         else if(command instanceof HumanCommandParser.ReplayNext) {
-            GameState state = mReplay.nextState();
+            HumanCommandParser.ReplayNext n = ((HumanCommandParser.ReplayNext) command);
+            if(n.nextVariation == -1) {
+                return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Argument is not a variation index", null);
+            }
+
+            ReplayGameState state = null;
+            if(n.nextVariation == -2) {
+                state = mReplay.nextState();
+            }
+            else {
+                state = mReplay.getCurrentState();
+                List<Variation> variations = state.getVariations();
+                if(variations.size() > n.nextVariation - 1) {
+                    state = variations.get(n.nextVariation - 1).getRoot();
+                    mReplay.setCurrentState(state);
+                }
+            }
 
             mAttacker.positionChanged(state);
             mDefender.positionChanged(state);

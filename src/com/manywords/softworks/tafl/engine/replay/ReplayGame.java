@@ -193,7 +193,7 @@ public class ReplayGame {
         return mGame.getHistory().size();
     }
 
-    private void setCurrentState(ReplayGameState replayGameState) {
+    public void setCurrentState(ReplayGameState replayGameState) {
         if(replayGameState == null) throw new IllegalArgumentException("Set current state to null");
 
         mGame.setCurrentState(replayGameState);

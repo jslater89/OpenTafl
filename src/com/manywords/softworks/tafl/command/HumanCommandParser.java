@@ -279,10 +279,37 @@ public class HumanCommandParser {
         }
     }
     public static class ReplayNext extends Command {
+        public final int nextVariation;
+
         public ReplayNext(CommandEngine engine, String command) {
             super(Type.REPLAY_NEXT);
             if(engine.getMode() != UiCallback.Mode.REPLAY) {
                 mError = "Not in replay mode.";
+            }
+
+            String[] elements = command.split(" ");
+            if(elements.length > 2) {
+                nextVariation = -1;
+            }
+            else if(elements.length == 2) {
+                int test = -1;
+                try {
+                    test = Integer.parseInt(elements[1]);
+                }
+                catch (NumberFormatException e) {
+                }
+
+                if(test == 0) {
+                    test = -1;
+                }
+                nextVariation = test;
+            }
+            else {
+                nextVariation = -2;
+            }
+
+            if(nextVariation == -1) {
+                mError = "Improperly-formatted command.";
             }
         }
     }
