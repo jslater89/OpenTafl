@@ -447,7 +447,9 @@ public class HumanCommandParser {
             case HISTORY:
                 return
                         "history\n" +
-                                "Show the game history so far.\n\n";
+                                "Show the game history so far. Displays turn indices in game, and move addresses in replay mode. " +
+                                "In replay mode, only the first move address per turn is given, e.g. '1a'. Later moves in the turn " +
+                                "are addressed by increasing the letter code: the move immediately after '1a' is '1b'.\n\n";
             case ANALYZE:
                 return
                         "analyze [moves-to-return] [seconds]\n" +
@@ -483,15 +485,24 @@ public class HumanCommandParser {
             case REPLAY_NEXT:
                 return
                         "next\n" +
-                                "Move forward in the replay one step.\n\n";
+                                "Move forward in the replay one step.\n\n" +
+                                "next [number]\n" +
+                                "Move to the variation from the current state indexed by the number given.\n\n";
             case REPLAY_PREVIOUS:
                 return
                         "previous\n" +
                                 "Move backward in the replay one step.\n\n";
             case REPLAY_JUMP:
                 return
-                        "jump [turn-number]\n" +
-                                "Jump to the beginning of the given turn in the replay.\n\n";
+                        "jump [move-address]\n" +
+                                "Jump to the given move address in the replay.\n\n";
+            case VARIATION:
+                return "variation [space-notation] [space-notation]\n" +
+                                "Make a variation from the current state, moving the taflman at the first location to the space at the second location.\n\n";
+            case DELETE:
+                return "delete [move-address]\n" +
+                        "Delete the variation addressed by the given move, as well as all of its children. Be careful when deleting states in the principal variation! " +
+                        "Doing so will destroy the rest of the game record.\n\n";
 
             case CHAT:
                 return
