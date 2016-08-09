@@ -157,7 +157,11 @@ public class ReplayGameState extends GameState {
             if(mCanonicalChild == null) {
                 nextState.setParent(this);
                 nextState.mEnclosingVariation = mEnclosingVariation;
-                mEnclosingVariation.addState(nextState);
+
+                // There is no enclosing variation for states in the principal variation.
+                if(mMoveAddress.getElements().size() > 1) {
+                    mEnclosingVariation.addState(nextState);
+                }
             }
             else {
                 Variation v = new Variation(this, mMoveAddress.nextVariation(mVariations.size() + 1), nextState);

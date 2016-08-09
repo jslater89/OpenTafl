@@ -460,12 +460,12 @@ public class ReplayGame {
 
         // 1. States in the current turn
         for(ReplayGameState turnState : currentTurn) {
-            if(turnState.getMoveAddress().getElements().size() == 1 && turnState.getExitingMove() == null) {
-                emptyTurn = true;
-                break;
-            }
-
             if(first) {
+                if(turnState.getMoveAddress().getElements().size() == 1 && turnState.getExitingMove() == null) {
+                    emptyTurn = true;
+                    break;
+                }
+
                 first = false;
 
                 int paddingCount = turnState.getMoveAddress().getLastElement().moveIndex;
@@ -491,17 +491,27 @@ public class ReplayGame {
                 resultString.append(Ansi.UNDERLINE);
             }
 
+            boolean appended = false;
             if(turnState.getMoveAddress().getElements().size() == 1) {
-                if (turnState.getExitingMove() != null) resultString.append(turnState.getExitingMove());
+                if (turnState.getExitingMove() != null) {
+                    resultString.append(turnState.getExitingMove());
+                    appended = true;
+                }
             }
             else {
-                if (turnState.getEnteringMove() != null) resultString.append(turnState.getEnteringMove());
+                if (turnState.getEnteringMove() != null) {
+                    resultString.append(turnState.getEnteringMove());
+                    appended = true;
+                }
             }
 
             if(turnState.getMoveAddress().equals(highlightAddress)) {
                 resultString.append(Ansi.UNDERLINE_OFF);
             }
-            resultString.append(" ");
+
+            if(appended) {
+                resultString.append(" ");
+            }
         }
         resultString.append("\n");
 

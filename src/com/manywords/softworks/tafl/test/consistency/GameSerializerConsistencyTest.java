@@ -3,6 +3,8 @@ package com.manywords.softworks.tafl.test.consistency;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.XorshiftRandom;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
+import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
@@ -21,6 +23,7 @@ public class GameSerializerConsistencyTest extends TaflTest {
 
     @Override
     public void run() {
+        //1. REGULAR GAME TESTING
         Rules rules = Copenhagen.newCopenhagen11();
         Game g = new Game(rules, null);
 
@@ -44,14 +47,14 @@ public class GameSerializerConsistencyTest extends TaflTest {
 
         String record1 = GameSerializer.getGameRecord(g, true);
         //RawTerminal.renderGameState(g.getCurrentState());
-        System.out.println(record1);
+        //System.out.println(record1);
 
         g = makeMoves(GameSerializer.loadGameRecord(record1));
         String record2 = GameSerializer.getGameRecord(g, true);
         //RawTerminal.renderGameState(g.getCurrentState());
         //System.out.println(record2);
 
-        assert RulesSerializer.rulesEqual(record1, record2);
+        assert record1.equals(record2);
 
         record1 = GameSerializer.getGameRecord(g, false);
         g = makeMoves(GameSerializer.loadGameRecord(record1));
@@ -59,7 +62,73 @@ public class GameSerializerConsistencyTest extends TaflTest {
 
         //System.out.println(rules1);
         //System.out.println(rules2);
-        assert RulesSerializer.rulesEqual(record1, record2);
+        assert record1.equals(record2);
+
+        // 2. REPLAY GAME TESTING
+        rules = Copenhagen.newCopenhagen11();
+        g = new Game(rules, null);
+
+        // Build a game
+        for(int i = 0; i < 10; i++) {
+            char taflman = Taflman.EMPTY;
+            Coord destination = null;
+            List<Coord> destinations = new ArrayList<>();
+            while(destination == null) {
+                List<Character> taflmen = g.getCurrentState().getCurrentSide().getTaflmen();
+                taflman = taflmen.get(r.nextInt(taflmen.size()));
+                destinations = Taflman.getAllowableDestinations(g.getCurrentState(), taflman);
+                if(destinations.size() > 0) {
+                    destination = destinations.get(r.nextInt(destinations.size()));
+                }
+            }
+
+            MoveRecord m = new MoveRecord(Taflman.getCurrentSpace(g.getCurrentState(), taflman), destination);
+            g.getCurrentState().makeMove(m);
+        }
+
+        ReplayGame rg = ReplayGame.copyGameToReplay(g);
+
+        // Make some variations
+        for(int i = 0; i < 10; i++) {
+            ReplayGameState s = (ReplayGameState) rg.getGame().getHistory().get(r.nextInt(rg.getGame().getHistory().size()));
+            rg.setCurrentState(s);
+
+            char taflman = Taflman.EMPTY;
+            Coord destination = null;
+            List<Coord> destinations;
+            while(destination == null) {
+                List<Character> taflmen = rg.getCurrentState().getCurrentSide().getTaflmen();
+                taflman = taflmen.get(r.nextInt(taflmen.size()));
+                destinations = Taflman.getAllowableDestinations(rg.getCurrentState(), taflman);
+                if(destinations.size() > 0) {
+                    destination = destinations.get(r.nextInt(destinations.size()));
+                }
+            }
+
+            MoveRecord m = new MoveRecord(Taflman.getCurrentSpace(rg.getCurrentState(), taflman), destination);
+            rg.makeVariation(m);
+        }
+
+        record1 = GameSerializer.getReplayGameRecord(rg, true);
+
+        rg.dumpHistory();
+
+        rg = getReplay(GameSerializer.loadGameRecord(record1));
+
+        rg.dumpHistory();
+
+        record2 = GameSerializer.getReplayGameRecord(rg, true);
+
+        System.out.println(record1);
+        System.out.println();
+        System.out.println(record2);
+
+        assert record1.equals(record2);
+    }
+
+    private ReplayGame getReplay(GameSerializer.GameContainer c) {
+        ReplayGame g = new ReplayGame(c.game, c.moves, c.variations);
+        return g;
     }
 
     private Game makeMoves(GameSerializer.GameContainer c) {
