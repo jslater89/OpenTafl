@@ -38,6 +38,10 @@ public class ReplayGameTest extends TaflTest {
         assert record.contains("8a.1.1a");
         assert record.contains("8a.1.2a");
 
+        ReplayGameState replayState = rg.getStateByAddress("1a");
+        replayState = replayState.makeVariation(new MoveRecord(Coord.get(7, 5), Coord.get(6, 4)));
+        assert replayState.getLastMoveResult() < GameState.GOOD_MOVE;
+
         container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
         rg = new ReplayGame(container.game, container.moves, container.variations);
 

@@ -218,7 +218,7 @@ public class ReplayGame {
         ReplayGameState state = (ReplayGameState) getCurrentState();
         ReplayGameState variationState = state.makeVariation(move);
 
-        if(state.getLastMoveResult() >= GameState.GOOD_MOVE) {
+        if(variationState.getLastMoveResult() >= GameState.GOOD_MOVE) {
             // Don't set errors into current state, oy.
             setCurrentState(variationState);
         }

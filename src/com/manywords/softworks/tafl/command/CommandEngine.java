@@ -528,6 +528,10 @@ public class CommandEngine {
         return mGame;
     }
 
+    public ReplayGame getReplay() {
+        return mReplay;
+    }
+
     private void callbackGameStarting() {
         for(UiCallback c : mUiCallbacks) {
             c.gameStarting();
