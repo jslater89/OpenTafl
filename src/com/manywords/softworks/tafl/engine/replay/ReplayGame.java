@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.command.HumanCommandParser;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.Ansi;
 
 import java.util.*;
@@ -30,7 +31,7 @@ public class ReplayGame {
      * @param game
      * @param movesToPlay
      */
-    public ReplayGame(Game game, List<DetailedMoveRecord> movesToPlay) {
+    public ReplayGame(Game game, List<DetailedMoveRecord> movesToPlay, List<GameSerializer.VariationContainer> variationsToPlay) {
         GameState currentState = game.getCurrentState();
         ReplayGameState replayState = new ReplayGameState(this, currentState);
         replayState.setMoveAddress(MoveAddress.newRootAddress());
@@ -54,8 +55,39 @@ public class ReplayGame {
 
         }
 
+        for(GameSerializer.VariationContainer container : variationsToPlay) {
+            Variation v = getVariationByAddress(container.address);
+
+            ReplayGameState rootForVariation;
+            if(v == null) {
+                MoveAddress rootStateAddress = new MoveAddress(container.address.getElementsBefore(container.address.getElements().size() - 2));
+                rootForVariation = getStateByAddress(rootStateAddress);
+            }
+            else {
+                // make a new variation off of the last thing in this variation.
+                rootForVariation = v.getStates().get(v.getStates().size() - 1);
+            }
+
+            if(rootForVariation != null) {
+                ReplayGameState inVariation = rootForVariation;
+                for(DetailedMoveRecord m : container.moves) {
+                    ReplayGameState state = inVariation.makeVariation(m);
+                    if(state.getLastMoveResult() >= GameState.GOOD_MOVE) {
+                        inVariation = state;
+                    }
+                    else {
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to apply move: " + m);
+                    }
+                }
+            }
+            else {
+                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to find root for variation container: " + variationsToPlay);
+            }
+        }
+
         mMoveHistory = movesToPlay;
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Loaded game with moves: " + mMoveHistory);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "And variations: " + variationsToPlay);
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Game history after load: " + mGame.getHistory());
         setCurrentState((ReplayGameState) mGame.getHistory().get(0));
 
@@ -90,7 +122,7 @@ public class ReplayGame {
         copiedGame.getHistory().add(copiedStartingState);
         copiedGame.setCurrentState(copiedStartingState);
 
-        return new ReplayGame(copiedGame, moves);
+        return new ReplayGame(copiedGame, moves, new ArrayList<>());
     }
 
     public Game getGame() {

@@ -19,8 +19,26 @@ import java.io.File;
 public class ReplayGameTest extends TaflTest {
     @Override
     public void run() {
-        GameSerializer.GameContainer container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
-        ReplayGame rg = new ReplayGame(container.game, container.moves);
+        // TODO: replace with generated thingy
+        File f = new File("saved-games/replays/example-variations-replay.otg");
+        assert f.exists();
+
+        GameSerializer.GameContainer container = GameSerializer.loadGameRecordFile(f);
+        assert container != null;
+        assert container.game != null;
+        assert container.moves != null;
+        assert container.variations != null;
+
+        assert container.variations.size() == 3;
+
+        ReplayGame rg = new ReplayGame(container.game, container.moves, container.variations);
+
+        assert rg != null;
+        rg.dumpHistory();
+
+        // No new stuff beneath this
+        container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
+        rg = new ReplayGame(container.game, container.moves, container.variations);
 
         MoveAddress lastMoveAddress = null;
         for(GameState state : rg.getGame().getHistory()) {

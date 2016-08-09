@@ -12,6 +12,7 @@ import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -55,7 +56,6 @@ public class GameSerializerConsistencyTest extends TaflTest {
 
         record1 = GameSerializer.getGameRecord(g, false);
         g = makeMoves(GameSerializer.loadGameRecord(record1));
-
         record2 = GameSerializer.getGameRecord(g, false);
 
         //System.out.println(rules1);

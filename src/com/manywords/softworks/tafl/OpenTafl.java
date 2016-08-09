@@ -92,6 +92,9 @@ public class OpenTafl {
             else if (arg.contains("--chatty")) {
                 logLevel = LogLevel.CHATTY;
             }
+            else if (arg.contains("--normal")) {
+                logLevel = LogLevel.NORMAL;
+            }
             else if (arg.contains("--silent")) {
                 logLevel = SILENT;
             }
