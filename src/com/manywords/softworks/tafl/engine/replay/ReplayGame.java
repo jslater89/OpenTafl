@@ -133,7 +133,7 @@ public class ReplayGame {
     }
 
     public String getReplayModeInGameHistoryString() {
-        return getHistoryString(mGame.getHistory(), getCurrentState().getMoveAddress(), false, false);
+        return getUncommentedHistoryString(false);
     }
 
     public ReplayGameState nextState() {
