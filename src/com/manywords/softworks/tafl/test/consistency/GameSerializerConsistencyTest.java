@@ -44,8 +44,7 @@ public class GameSerializerConsistencyTest extends TaflTest {
 
         String record1 = GameSerializer.getGameRecord(g, true);
         //RawTerminal.renderGameState(g.getCurrentState());
-        //System.out.println(record1);
-
+        System.out.println(record1);
 
         g = makeMoves(GameSerializer.loadGameRecord(record1));
         String record2 = GameSerializer.getGameRecord(g, true);

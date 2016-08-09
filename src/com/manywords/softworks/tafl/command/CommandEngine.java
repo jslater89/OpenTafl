@@ -348,7 +348,7 @@ public class CommandEngine {
         else if(command instanceof HumanCommandParser.History) {
             String gameRecord;
             if(mMode == UiCallback.Mode.REPLAY) {
-                gameRecord = mReplay.getHistoryStringWithPositionMarker();
+                gameRecord = mReplay.getReplayModeInGameHistoryString();
             }
             else {
                 gameRecord = mGame.getHistoryString();

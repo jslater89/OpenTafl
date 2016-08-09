@@ -1,7 +1,6 @@
 package com.manywords.softworks.tafl.engine.replay;
 
 import com.manywords.softworks.tafl.OpenTafl;
-import com.manywords.softworks.tafl.command.HumanCommandParser;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -129,34 +128,8 @@ public class ReplayGame {
         return mGame;
     }
 
-    public String getHistoryStringWithPositionMarker() {
-        return getHistoryCommandString(mGame.getHistory(), getCurrentState().getMoveAddress());
-
-//        String historyString = mGame.getHistoryString();
-//        String[] lines = historyString.split("\n");
-//
-//        String newString = "";
-//        int statePosition = 0;
-//        boolean modified = false;
-//        for (String line : lines) {
-//            String[] components = line.split(" ");
-//
-//            for(int i = 1; i < components.length; i++) {
-//                statePosition++;
-//                /*
-//                if(statePosition > mStatePosition && !modified) {
-//                    components[i] = Ansi.UNDERLINE + components[i] + Ansi.UNDERLINE_OFF;
-//                    modified = true;
-//                }*/
-//            }
-//
-//            for(String s : components) {
-//                newString += s + " ";
-//            }
-//            newString += "\n";
-//        }
-//
-//        return newString;
+    public String getReplayModeInGameHistoryString() {
+        return getHistoryString(mGame.getHistory(), getCurrentState().getMoveAddress(), false, false);
     }
 
     public ReplayGameState nextState() {
@@ -432,11 +405,15 @@ public class ReplayGame {
         return getStateByAddress(MoveAddress.parseAddress(s));
     }
 
-    public static String getHistoryCommandString(List<GameState> history) {
-        return getHistoryCommandString(history, null);
+    public String getUncommentedHistoryString(boolean truncateRootMoves) {
+        return getHistoryString(mGame.getHistory(), null, truncateRootMoves, false);
     }
 
-    public static String getHistoryCommandString(List<GameState> history, MoveAddress highlightAddress) {
+    public String getCommentedHistoryString(boolean truncateRootMoves) {
+        return getHistoryString(mGame.getHistory(), null, truncateRootMoves, true);
+    }
+
+    public static String getHistoryString(List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments) {
         StringBuilder resultString = new StringBuilder();
         int historyPosition = 0;
         ReplayGameState state = (ReplayGameState) history.get(historyPosition);
@@ -451,7 +428,7 @@ public class ReplayGame {
                 currentTurnVariations.addAll(state.getVariations());
             }
             else {
-                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString);
+                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments);
 
                 currentTurn.clear();
                 currentTurnVariations.clear();
@@ -462,7 +439,7 @@ public class ReplayGame {
 
             historyPosition += 1;
             if(historyPosition == history.size()) {
-                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString);
+                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments);
                 break;
             }
             state = (ReplayGameState) history.get(historyPosition);
@@ -477,9 +454,17 @@ public class ReplayGame {
         return resultString.toString();
     }
 
-    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, MoveAddress highlightAddress, StringBuilder resultString) {
+    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, MoveAddress highlightAddress, StringBuilder resultString, boolean truncateRootMoves, boolean includeComments) {
         boolean first = true;
+        boolean emptyTurn = false;
+
+        // 1. States in the current turn
         for(ReplayGameState turnState : currentTurn) {
+            if(turnState.getMoveAddress().getElements().size() == 1 && turnState.getExitingMove() == null) {
+                emptyTurn = true;
+                break;
+            }
+
             if(first) {
                 first = false;
 
@@ -487,7 +472,14 @@ public class ReplayGame {
                 MoveAddress a = new MoveAddress(turnState.getMoveAddress());
                 a.getLastElement().moveIndex = 0;
 
-                resultString.append(a);
+                if(truncateRootMoves && a.getElements().size() == 1) {
+                    resultString.append(a.getLastElement().rootIndex);
+                    resultString.append(".");
+                }
+                else {
+                    resultString.append(a);
+                }
+
                 for(int i = 0; i < paddingCount; i++) {
                     resultString.append(" .....");
                 }
@@ -513,10 +505,43 @@ public class ReplayGame {
         }
         resultString.append("\n");
 
+        // 2. Comments, if necessary
+        if(includeComments && !emptyTurn) {
+            first = true;
+            resultString.append("[");
+
+            for(ReplayGameState turnState : currentTurn) {
+                DetailedMoveRecord moveOfInterest = null;
+                if (turnState.getMoveAddress().getElements().size() == 1) {
+                    if (turnState.getExitingMove() != null) moveOfInterest = (DetailedMoveRecord) turnState.getExitingMove();
+                } else {
+                    if (turnState.getEnteringMove() != null) moveOfInterest = (DetailedMoveRecord) turnState.getEnteringMove();
+                }
+
+                if(moveOfInterest != null) {
+
+                    String timeString = moveOfInterest.getTimeRemaining() != null ? moveOfInterest.getTimeRemaining().toString() + " " : "";
+                    String commentString = moveOfInterest.getComment();
+
+                    if(!first) resultString.append("|");
+                    resultString.append(timeString);
+                    resultString.append(commentString);
+                }
+
+                if(first) {
+                    first = false;
+                }
+            }
+
+            resultString.append("]");
+            resultString.append("\n\n");
+        }
+
+        // 3. Variations
         for(Variation v : currentTurnVariations) {
             List<GameState> variationStates = new ArrayList<>();
             variationStates.addAll(v.getStates());
-            resultString.append(getHistoryCommandString(variationStates, highlightAddress));
+            resultString.append(getHistoryString(variationStates, highlightAddress, truncateRootMoves, includeComments));
         }
     }
 

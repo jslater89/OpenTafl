@@ -540,14 +540,14 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
             else if (r.type == Command.Type.SAVE) {
                 String title;
-                Game game;
-                if(mInGame || mPostGame) {
-                    title = "Save game";
-                    game = mGame;
+                boolean saveReplay;
+                if(mInReplay) {
+                    title = "Save replay";
+                    saveReplay = true;
                 }
                 else {
-                    title = "Save replay";
-                    game = mReplay.getGame();
+                    title = "Save game";
+                    saveReplay = false;
                 }
 
                 File saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games"));
@@ -560,7 +560,14 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     if(result.equals(MessageDialogButton.No)) return;
                 }
 
-                boolean success = GameSerializer.writeGameToFile(game, saveFile, true);
+                boolean success;
+                if(saveReplay) {
+                    success = GameSerializer.writeReplayToFile(mReplay, saveFile, true);
+                }
+                else {
+                    success = GameSerializer.writeGameToFile(mGame, saveFile, true);
+                }
+
                 if(!success) {
                     MessageDialog.showMessageDialog(mGui, "Unable to save", "Unable to write savegame file.");
                 }

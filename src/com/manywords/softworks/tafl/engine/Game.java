@@ -3,11 +3,10 @@ package com.manywords.softworks.tafl.engine;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
-import com.manywords.softworks.tafl.rules.Coord;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.*;
@@ -203,48 +202,13 @@ public class Game {
     }
 
     public String getHistoryString() {
-        String gameRecord = "";
-        gameRecord = Pattern.compile("\\[.*?\\]", Pattern.DOTALL).matcher(getCommentedHistoryString()).replaceAll("");
-        gameRecord = Pattern.compile("\n\n").matcher(gameRecord).replaceAll("\n");
-
-        return gameRecord;
+        ReplayGame rg = ReplayGame.copyGameToReplay(this);
+        return rg.getUncommentedHistoryString(true);
     }
 
     public String getCommentedHistoryString() {
-        String gameRecord = "";
-        int turnCount = 1;
-
-        int i = 0;
-        List<GameState> thisTurn = new ArrayList<>();
-        boolean startingSideAttackers = getRules().getStartingSide().isAttackingSide();
-        boolean otherSideWent = false;
-        while(i < getHistory().size()) {
-            GameState s = getHistory().get(i++);
-            if(s.getExitingMove() == null) break;
-
-            if(!otherSideWent && s.getCurrentSide().isAttackingSide() == startingSideAttackers) {
-                thisTurn.add(s);
-            }
-            else if(s.getCurrentSide().isAttackingSide() != startingSideAttackers) {
-                thisTurn.add(s);
-                otherSideWent = true;
-            }
-            else if(otherSideWent && s.getCurrentSide().isAttackingSide() == startingSideAttackers) {
-                gameRecord += getCommentedStringForMoves(turnCount, thisTurn);
-
-                thisTurn.clear();
-                thisTurn.add(s);
-                turnCount++;
-                otherSideWent = false;
-            }
-
-        }
-
-        if(thisTurn.size() > 0) {
-            gameRecord += getCommentedStringForMoves(turnCount, thisTurn);
-        }
-
-        return gameRecord;
+        ReplayGame rg = ReplayGame.copyGameToReplay(this);
+        return rg.getCommentedHistoryString(true);
     }
 
     private String getCommentedStringForMoves(int turnNumber, List<GameState> states) {

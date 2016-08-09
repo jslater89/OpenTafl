@@ -33,8 +33,12 @@ public class ReplayGameTest extends TaflTest {
 
         ReplayGame rg = new ReplayGame(container.game, container.moves, container.variations);
 
-        assert rg != null;
-        rg.dumpHistory();
+        String record = GameSerializer.getReplayGameRecord(rg, true);
+
+        assert record.contains("8b.1.1a");
+        System.out.println(record);
+
+        System.exit(0);
 
         // No new stuff beneath this
         container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));

@@ -25,6 +25,7 @@ import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.replay.MoveAddress;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Rules;
 
 import java.io.*;
@@ -82,10 +83,18 @@ public class GameSerializer {
 
     public static boolean writeGameToFile(Game g, File f, boolean comments) {
         String gameRecord = getGameRecord(g, comments);
+        return writeGameRecordToFile(f, gameRecord);
+    }
 
+    public static boolean writeReplayToFile(ReplayGame rg, File f, boolean comments) {
+        String gameRecord = getReplayGameRecord(rg, comments);
+        return writeGameRecordToFile(f, gameRecord);
+    }
+
+    private static boolean writeGameRecordToFile(File f, String record) {
         try {
             PrintWriter pw = new PrintWriter(f);
-            pw.print(gameRecord);
+            pw.print(record);
             pw.flush();
             pw.close();
         } catch (FileNotFoundException e) {
@@ -93,8 +102,22 @@ public class GameSerializer {
         }
         return true;
     }
+
+    public static String getReplayGameRecord(ReplayGame rg, boolean comments) {
+        String tagString = getTagString(rg.getGame());
+        String movesString = (comments ? rg.getCommentedHistoryString(true) : rg.getUncommentedHistoryString(true));
+
+        return tagString + movesString;
+    }
     
     public static String getGameRecord(Game g, boolean comments) {
+        String tagString = getTagString(g);
+        String movesString = (comments ? g.getCommentedHistoryString() : g.getHistoryString());
+
+        return tagString + movesString;
+    }
+
+    private static String getTagString(Game g) {
         String tagString = "";
 
         if(g.getTagMap().containsKey("rules")) {
@@ -132,9 +155,7 @@ public class GameSerializer {
 
         }
 
-        String movesString = (comments ? g.getCommentedHistoryString() : g.getHistoryString());
-
-        return tagString + movesString;
+        return tagString;
     }
 
     public static GameContainer loadGameRecordFile(File gameFile) {
