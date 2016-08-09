@@ -216,6 +216,12 @@ public class ReplayGame {
 
     public ReplayGameState makeVariation(MoveRecord move) {
         ReplayGameState state = (ReplayGameState) getCurrentState();
+
+        // Don't allow variations after a victory
+        if(state.getLastMoveResult() > GameState.GOOD_MOVE) {
+            return state;
+        }
+
         ReplayGameState variationState = state.makeVariation(move);
 
         if(variationState.getLastMoveResult() >= GameState.GOOD_MOVE) {

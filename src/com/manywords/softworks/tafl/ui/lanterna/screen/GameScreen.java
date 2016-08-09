@@ -248,15 +248,17 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
     @Override
     public void victoryForSide(Side side) {
-        if(!mCommandEngine.isInGame()) return;
+        if(!mCommandEngine.isInGame() && !mInReplay) return;
 
         mBoardWindow.rerenderBoard();
 
-        // Notify the player if this is a victory on move repetition
-        int repeats = mGame.getCurrentState().countPositionOccurrences();
-        repeats++;
-        if(repeats > 2) {
-            statusText("This position has repeated " + repeats + " times!");
+        if(!mInReplay) {
+            // Notify the player if this is a victory on move repetition
+            int repeats = mGame.getCurrentState().countPositionOccurrences();
+            repeats++;
+            if (repeats > 2) {
+                statusText("This position has repeated " + repeats + " times!");
+            }
         }
 
         if(side == null) {
@@ -636,6 +638,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
                 updateComments();
+
+                int result = (Integer) r.extra;
+                if(result > GameState.GOOD_MOVE) {
+                    statusText(GameState.getStringForMoveResult(result));
+                }
             }
             else if(r.type == Command.Type.REPLAY_PREVIOUS) {
                 mBoardWindow.rerenderBoard();
@@ -651,6 +658,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 tryTimeUpdate();
                 updateComments();
                 mBoardWindow.rerenderBoard();
+
+                int result = (Integer) r.extra;
+                if(result > GameState.GOOD_MOVE) {
+                    statusText(GameState.getStringForMoveResult(result));
+                }
             }
             else if(r.type == Command.Type.DELETE) {
                 tryTimeUpdate();

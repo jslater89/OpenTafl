@@ -445,7 +445,7 @@ public class CommandEngine {
             mAttacker.positionChanged(state);
             mDefender.positionChanged(state);
 
-            if(state != null) return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", null);
+            if(state != null) return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", state.getLastMoveResult());
             else return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
         }
         // 16. REPLAY PREV COMMAND
@@ -496,12 +496,10 @@ public class CommandEngine {
             int moveResult = result.getLastMoveResult();
 
             if(moveResult < GameState.GOOD_MOVE) {
-                // TODO: more errors here
-                // TODO: GameState.getErrorStringFor(int resultCode)
-                return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, "Invalid move", record);
+                return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, GameState.getStringForMoveResult(moveResult), moveResult);
             }
             else {
-                return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", record);
+                return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", moveResult);
             }
         }
         else if(command instanceof HumanCommandParser.Delete) {

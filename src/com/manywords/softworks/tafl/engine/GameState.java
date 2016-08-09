@@ -249,6 +249,27 @@ public class GameState {
         return mTaflmanMoveCache.getCachedReachableSpacesForTaflman(mZobristHash, taflman);
     }
 
+    public static final String getStringForMoveResult(int result) {
+        switch (result) {
+            case DRAW:
+                return "Draw.";
+            case DEFENDER_WIN:
+                return "Defender win!";
+            case ATTACKER_WIN:
+                return "Attacker win!";
+            case ILLEGAL_SIDE:
+                return "Not your turn/taflman.";
+            case ILLEGAL_SIDE_BERSERKER:
+                return "The berserking taflman must move first.";
+            case ILLEGAL_MOVE:
+                return "Illegal move.";
+            case ILLEGAL_MOVE_BERSERKER:
+                return "The berserking taflman must make a berserk move.";
+        }
+
+        return "Unknown move result! Please report this as a bug.";
+    }
+
     public static final int DRAW = 3;
     public static final int DEFENDER_WIN = 2;
     public static final int ATTACKER_WIN = 1;
