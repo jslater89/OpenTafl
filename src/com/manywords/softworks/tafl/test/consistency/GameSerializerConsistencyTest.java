@@ -111,17 +111,9 @@ public class GameSerializerConsistencyTest extends TaflTest {
 
         record1 = GameSerializer.getReplayGameRecord(rg, true);
 
-        rg.dumpHistory();
-
         rg = getReplay(GameSerializer.loadGameRecord(record1));
 
-        rg.dumpHistory();
-
         record2 = GameSerializer.getReplayGameRecord(rg, true);
-
-        System.out.println(record1);
-        System.out.println();
-        System.out.println(record2);
 
         assert record1.equals(record2);
     }

@@ -67,7 +67,7 @@ public class GameSerializer {
 
         @Override
         public String toString() {
-            return "Variation container rooted at " + address;
+            return "V:" + address;
         }
     }
 
@@ -298,6 +298,7 @@ public class GameSerializer {
                 String[] moveStrings = moveString.split(" ");
                 lastMovesAdded = 0;
                 commentIndex = moves.size();
+                int variationStartOffset = 0;
                 for(String move : moveStrings) {
                     // If the move matches this pattern, then it's a ..... dummy move, used to make the typesetting
                     // for variations beginning on the second or later move in a turn make a little more sense.
@@ -306,9 +307,17 @@ public class GameSerializer {
                         lastTurn.add(m);
                         lastMovesAdded++;
                     }
+                    else {
+                        variationStartOffset++;
+                    }
                 }
 
-                VariationContainer v = new VariationContainer(MoveAddress.parseAddress(variationStart), new ArrayList<>(lastTurn));
+                MoveAddress a = MoveAddress.parseAddress(variationStart);
+                for(int j = 0; j < variationStartOffset; j++) {
+                    a.increment(false);
+                }
+
+                VariationContainer v = new VariationContainer(a, new ArrayList<>(lastTurn));
                 variations.add(v);
 
                 //System.out.println("Leaving variation: " + variationStart);

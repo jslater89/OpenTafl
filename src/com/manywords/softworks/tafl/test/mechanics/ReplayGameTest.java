@@ -19,7 +19,6 @@ import java.io.File;
 public class ReplayGameTest extends TaflTest {
     @Override
     public void run() {
-        // TODO: replace with generated thingy
         File f = new File("saved-games/replays/example-variations-replay.otg");
         assert f.exists();
 
@@ -37,9 +36,8 @@ public class ReplayGameTest extends TaflTest {
 
         assert record.contains("8b.1.1a");
         assert record.contains("8a.1.1a");
-        assert !record.contains("8a.1.2a");
+        assert record.contains("8a.1.2a");
 
-        // No new stuff beneath this
         container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
         rg = new ReplayGame(container.game, container.moves, container.variations);
 
@@ -204,7 +202,6 @@ public class ReplayGameTest extends TaflTest {
         state.deleteVariation(MoveAddress.parseAddress("1a.1"));
 
         // No-op: variation doesn't exist
-        // TODO: return false, probably
         state.deleteVariation(MoveAddress.parseAddress("1a.3"));
 
         assert state.getVariations().size() == 0;
@@ -294,6 +291,9 @@ public class ReplayGameTest extends TaflTest {
         state = state.makeVariation(new MoveRecord(Coord.get(10,8), Coord.get(10,10)));
         assert state.getLastMoveResult() == GameState.DEFENDER_WIN;
 
+        // We'll come back to this later.
+        String gameRecord = GameSerializer.getReplayGameRecord(rg, true);
+
         // Tree built! Now we should tear it down.
         // First, remove that 1a.2 variation. I never liked it anyway.
         root.deleteVariation(MoveAddress.parseAddress("1a.2"));
@@ -337,5 +337,22 @@ public class ReplayGameTest extends TaflTest {
         deleteResult = root.deleteVariation(MoveAddress.parseAddress("1a.1"));
         assert deleteResult;
         assert root.getVariations().size() == 0;
+
+        // Now we're back to the game record.
+        // See if the file contains the right variations...
+        assert gameRecord.contains("1a.1.1a.1.1a. .....");
+        assert gameRecord.contains("1a.2.1a");
+        assert gameRecord.contains("1a.3.6a");
+
+        // And see if the game loads them right.
+        rg = getReplay(GameSerializer.loadGameRecord(gameRecord));
+        assert rg.getStateByAddress("1a.1.1a.1.1b") != null;
+        assert rg.getStateByAddress("1a.2.1a") != null;
+        assert rg.getStateByAddress("1a.3.6a") != null;
+    }
+
+    private ReplayGame getReplay(GameSerializer.GameContainer c) {
+        ReplayGame g = new ReplayGame(c.game, c.moves, c.variations);
+        return g;
     }
 }

@@ -54,8 +54,10 @@ public class ReplayGame {
 
         }
 
+        variationsToPlay.sort((o1, o2) -> o1.address.getElements().size() - o2.address.getElements().size());
+
         for(GameSerializer.VariationContainer container : variationsToPlay) {
-            Variation v = getVariationByAddress(container.address);
+            Variation v = getVariationByAddress(new MoveAddress(container.address.getAllRootElements()));
 
             ReplayGameState rootForVariation;
             if(v == null) {
@@ -75,12 +77,14 @@ public class ReplayGame {
                         inVariation = state;
                     }
                     else {
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to apply move: " + m);
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Failed to apply move: " + m + " with result " + state.getLastMoveResult());
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Variation container address: " + container.address);
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Root state address: " + inVariation.getMoveAddress());
                     }
                 }
             }
             else {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to find root for variation container: " + variationsToPlay);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Failed to find root for variation container: " + container);
             }
         }
 
