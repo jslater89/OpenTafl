@@ -2,8 +2,6 @@ package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.notation.TaflmanCodes;
 
-import java.util.List;
-
 /**
  * Created by jay on 2/6/16.
  */
@@ -218,11 +216,6 @@ public class GenericRules extends Rules {
     }
 
     @Override
-    public int getMercenaryJumpMode() {
-        return Taflman.JUMP_NONE;
-    }
-
-    @Override
     public boolean canSideJump(Side side) {
         if(side.isAttackingSide()) return mAttackersJump;
         else return mDefendersJump;
@@ -236,6 +229,11 @@ public class GenericRules extends Rules {
     @Override
     public int howManyDefenders() {
         return mDefenders.getStartingTaflmen().size();
+    }
+
+    @Override
+    public int getTaflmanSpeedLimit(char taflman) {
+        return -1;
     }
 
     @Override

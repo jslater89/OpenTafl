@@ -211,6 +211,12 @@ public abstract class Rules {
     public static final int KING_WEAK = 2;
 
     /**
+     * The king is middleweight: all of his adjacent spaces must be hostile
+     * for him to be captured. (Confinement capture at playtaflonline)
+     */
+    public static final int KING_MIDDLEWEIGHT = 3;
+
+    /**
      * Does the king take two or four men to
      * capture?
      *
@@ -227,13 +233,18 @@ public abstract class Rules {
 
     public abstract int getCommanderJumpMode();
 
-    public abstract int getMercenaryJumpMode();
-
     public abstract boolean canSideJump(Side side);
 
     public abstract int howManyAttackers();
 
     public abstract int howManyDefenders();
+
+    /**
+     * How many spaces can the given taflman move?
+     * @param taflman The taflman in question.
+     * @return The speed for that taflman in spaces per turn, or -1 for no limit.
+     */
+    public abstract int getTaflmanSpeedLimit(char taflman);
 
     /**
      * Is the a square or group of squares currently

@@ -97,11 +97,6 @@ public class Brandub extends Rules {
     }
 
     @Override
-    public int getMercenaryJumpMode() {
-        return Taflman.JUMP_NONE;
-    }
-
-    @Override
     public boolean canSideJump(Side side) {
         return false;
     }
@@ -114,6 +109,11 @@ public class Brandub extends Rules {
     @Override
     public int howManyDefenders() {
         return mStartingDefenders.getStartingTaflmen().size();
+    }
+
+    @Override
+    public int getTaflmanSpeedLimit(char taflman) {
+        return -1;
     }
 
     @Override

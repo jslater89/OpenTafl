@@ -10,7 +10,6 @@ import com.manywords.softworks.tafl.rules.tablut.nine.test.CenterKingCaptureDefe
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
 public class FotevikenTablut extends Rules {
@@ -126,11 +125,6 @@ public class FotevikenTablut extends Rules {
     }
 
     @Override
-    public int getMercenaryJumpMode() {
-        return Taflman.JUMP_CAPTURE;
-    }
-
-    @Override
     public boolean canSideJump(Side side) {
         return false;
     }
@@ -143,6 +137,11 @@ public class FotevikenTablut extends Rules {
     @Override
     public int howManyDefenders() {
         return mStartingDefenders.getStartingTaflmen().size();
+    }
+
+    @Override
+    public int getTaflmanSpeedLimit(char taflman) {
+        return -1;
     }
 
     @Override
