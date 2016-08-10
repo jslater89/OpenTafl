@@ -1,9 +1,6 @@
 Tafl To-Do
 
 v0.4.x features:
-- GameSerializer: learn how to load/save variations
-	- Variations as a separate list to minimize impact on current functionality
-- ReplayGame: learn how to add variations from such a list
 
 AI stuff:
 0. Evaluation function work: underpins all further heuristics work
