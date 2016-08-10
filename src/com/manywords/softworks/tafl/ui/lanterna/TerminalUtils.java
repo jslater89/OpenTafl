@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.ui.lanterna;
 
+import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
@@ -17,6 +18,7 @@ import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -140,6 +142,11 @@ public class TerminalUtils {
         }));
 
         return ps;
+    }
+
+    public static List<String> wrapTextPreservingNewlines(int maxWidth, String text) {
+        String[] components = text.split("\n");
+        return TerminalTextUtils.getWordWrappedText(maxWidth, components);
     }
 
     public static String linesToString(List<String> wordWrappedText) {

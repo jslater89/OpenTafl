@@ -510,10 +510,11 @@ public class CommandEngine {
             if(deleted) return new CommandResult(Command.Type.DELETE, CommandResult.SUCCESS, "", null);
             else return new CommandResult(Command.Type.DELETE, CommandResult.FAIL, "No variation with address " + d.moveAddress + " to delete.", null);
         }
+        // 19. ANNOTATE COMMAND
         else if(command instanceof HumanCommandParser.Annotate) {
-
+            return new CommandResult(Command.Type.ANNOTATE, CommandResult.SUCCESS, "", null);
         }
-        // 19. CHAT COMMAND
+        // 20. CHAT COMMAND
         else if(command instanceof HumanCommandParser.Chat) {
             HumanCommandParser.Chat c = (HumanCommandParser.Chat) command;
             return new CommandResult(Command.Type.CHAT, CommandResult.SUCCESS, c.message, null);

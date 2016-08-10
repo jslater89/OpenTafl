@@ -39,6 +39,7 @@ import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
+import com.manywords.softworks.tafl.ui.lanterna.window.ingame.AnnotationDialog;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.BoardWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.CommandWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.StatusWindow;
@@ -669,6 +670,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 updateComments();
                 mBoardWindow.rerenderBoard();
             }
+            else if(r.type == Command.Type.ANNOTATE) {
+                AnnotationDialog d = new AnnotationDialog("Edit annotation", mTerminal.getSize(), mReplay);
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+                d.showDialog(mGui);
+
+                updateComments();
+            }
             else if(r.type == Command.Type.CHAT) {
                 if(mServerConnection != null) {
                     ClientServerConnection.ChatType type =
@@ -718,12 +726,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 if(tags.containsKey(Game.Tag.TIME_CONTROL)) {
                     statusText("Initial clock setting: " + tags.get(Game.Tag.TIME_CONTROL));
                 }
-                if(tags.containsKey(Game.Tag.START_COMMENT)) {
-                    statusText(tags.get(Game.Tag.START_COMMENT));
-                }
             }
 
             statusText("--- Start of replay ---");
+            if(tags != null && tags.containsKey(Game.Tag.START_COMMENT)) {
+                statusText(tags.get(Game.Tag.START_COMMENT));
+            }
         }
 
         private void updateComments() {
