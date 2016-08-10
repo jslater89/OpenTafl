@@ -399,6 +399,9 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
             of the fourth turn (4c; this must be a game allowing berserker moves)
             in the fifth variation (5) off of the first move in the fourth turn
             of the principal line (4a).
+
+        Note that this distinction is critical: the principal line of play must
+        not have move index letters, but variations must include them.
 	
 	move-record:
 		an OTN move record.

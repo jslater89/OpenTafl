@@ -103,7 +103,10 @@ index (e.g. 'next 2' to move to the second variation from the current state).
 The 'previous' command will always move you toward the first move of the game.
 
 You can edit annotations on any board position by using the 'annotate' command
-and typing into the box provided.
+and typing into the box provided. Due to limitations in the UI framework, the
+text box does not wrap. OpenTafl will collapse single newlines to wrapped text,
+but retain double newlines to allow for paragraph separation. This behavior
+will be improved in a future release.
 
 You can also delete branches of play (including the principal line) by using
 the 'delete' command. For further information on commands, see the in-game
@@ -229,7 +232,19 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 10. VERSION HISTORY -----------------------------------------------------------
 
-v0.4.1.0b (released 08/xx/16):
+v0.4.1.0b (released 08/10/16):
+- Support for variations in saved games
+    - Rather handily, old saved games are forward-compatible, and new saved
+      games are backward compatible
+- UI for adding annotations to replays
+    - Combined with the 'variation' command, it is now possible to use OpenTafl
+      to author annotations
+    - If you are interested in authoring annotations, or have written
+      annotations and need somewhere to host them, please get in touch with me
+- Minor bugfixes and tests to cover them
+- Apache-license MoveAddress source code for people implementing OpenTafl
+  notation
+- Update OpenTafl notation spec to include variations in saved games
 
 v0.4.0.0pre (released 08/07/16):
 - Playable variations in replay mode!
