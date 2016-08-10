@@ -28,6 +28,7 @@ public class Test {
         tests.add(new BerserkHistoryDuplicationTest());
 
         // Rules tests
+        tests.add(new SpeedLimitTest());
         tests.add(new RestrictedFortReentryTest());
         tests.add(new ThreefoldDrawTest());
         tests.add(new ThreefoldVictoryTest());
