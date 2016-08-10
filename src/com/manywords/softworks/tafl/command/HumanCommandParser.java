@@ -502,9 +502,11 @@ public class HumanCommandParser {
                                 "Make a variation from the current state, moving the taflman at the first location to the space at the second location.\n\n";
             case DELETE:
                 return "delete [move-address]\n" +
-                        "Delete the variation addressed by the given move, as well as all of its children. Be careful when deleting states in the principal variation! " +
-                        "Doing so will destroy the rest of the game record.\n\n";
-
+                                "Delete the variation addressed by the given move, as well as all of its children. Be careful when deleting states in the principal variation! " +
+                                "Doing so will destroy the rest of the game record.\n\n";
+            case ANNOTATE:
+                return "annotate\n" +
+                                "Open an editor dialog to modify the annotation displayed when this board position is displayed.\n\n";
             case CHAT:
                 return
                         "chat [text]\n" +
