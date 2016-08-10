@@ -24,6 +24,8 @@ public class ReplayGame {
     private Map<GameState, TimeSpec> mAttackerTimeSpecsByState;
     private Map<GameState, TimeSpec> mDefenderTimeSpecsByState;
 
+    private boolean mDirty = false;
+
     /**
      * This constructor takes a game object and plays the given
      * moves on top of it.
@@ -89,8 +91,8 @@ public class ReplayGame {
         }
 
         mMoveHistory = movesToPlay;
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Loaded game with moves: " + mMoveHistory);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "And variations: " + variationsToPlay);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Created replay game with moves: " + mMoveHistory);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "And variations: " + variationsToPlay);
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Game history after load: " + mGame.getHistory());
         setCurrentState((ReplayGameState) mGame.getHistory().get(0));
 
@@ -130,6 +132,18 @@ public class ReplayGame {
 
     public Game getGame() {
         return mGame;
+    }
+
+    public void markDirty() {
+        mDirty = true;
+    }
+
+    public void markClean() {
+        mDirty = false;
+    }
+
+    public boolean isDirty() {
+        return mDirty;
     }
 
     public String getReplayModeInGameHistoryString() {
@@ -227,6 +241,7 @@ public class ReplayGame {
         if(variationState.getLastMoveResult() >= GameState.GOOD_MOVE) {
             // Don't set errors into current state, oy.
             setCurrentState(variationState);
+            mDirty = true;
         }
 
         return getCurrentState();
@@ -243,6 +258,7 @@ public class ReplayGame {
 
         // Is the current state deleted? If so, find the first parent that isn't.
         if(deleted) {
+            mDirty = true;
             ReplayGameState currentState = getCurrentState();
             MoveAddress currentAddress = currentState.getMoveAddress();
 

@@ -72,6 +72,8 @@ public class CommandEngine {
     public void leaveReplay() {
         mReplay.prepareForGameStart();
         mMode = UiCallback.Mode.GAME;
+
+        callbackModeChange(UiCallback.Mode.GAME, mGame);
     }
     public void enterGame(Game g) {
         mMode = UiCallback.Mode.GAME;

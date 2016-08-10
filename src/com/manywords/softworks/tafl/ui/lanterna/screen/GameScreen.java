@@ -498,6 +498,24 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 statusText("Command not available at this time.");
                 return;
             }
+            else if(getCurrentCommands().contains(c.getType())) {
+                if (c.getType() == Command.Type.REPLAY_RETURN) {
+                    if (mCommandEngine.getReplay() != null && mCommandEngine.getReplay().isDirty()) {
+                        MessageDialogBuilder builder = new MessageDialogBuilder();
+                        builder.setTitle("Replay not saved!");
+                        builder.setText("This replay has been changed, but not yet saved.\nContinuing will exit the replay and discard\nchanges.");
+                        builder.addButton(MessageDialogButton.Continue);
+                        builder.addButton(MessageDialogButton.Cancel);
+                        MessageDialog dialog = builder.build();
+                        MessageDialogButton result = dialog.showDialog(mGui);
+
+                        if (result.equals(MessageDialogButton.Cancel)) {
+                            return;
+                        }
+                    }
+                }
+            }
+
             CommandResult r = mCommandEngine.executeCommand(c);
 
             if(r.result != CommandResult.SUCCESS) {
@@ -566,6 +584,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 boolean success;
                 if(saveReplay) {
                     success = GameSerializer.writeReplayToFile(mReplay, saveFile, true);
+                    mCommandEngine.getReplay().markClean();
                 }
                 else {
                     success = GameSerializer.writeGameToFile(mGame, saveFile, true);
@@ -596,7 +615,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                 if(mInGame) {
                     // TODO: if the player is a human playing locally, alert them that they have lost
-
                     if(mServerConnection != null) {
                         mServerConnection.sendGameEndedMessage();
 
@@ -617,6 +635,19 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     }
                 }
                 else {
+                    if(mCommandEngine.getReplay() != null && mCommandEngine.getReplay().isDirty()) {
+                        MessageDialogBuilder builder = new MessageDialogBuilder();
+                        builder.setTitle("Replay not saved!");
+                        builder.setText("This replay has been changed, but not yet saved.\nContinuing will quit and discard changes.");
+                        builder.addButton(MessageDialogButton.Continue);
+                        builder.addButton(MessageDialogButton.Cancel);
+                        MessageDialog dialog = builder.build();
+                        MessageDialogButton result = dialog.showDialog(mGui);
+
+                        if(result.equals(MessageDialogButton.Cancel)) {
+                            return;
+                        }
+                    }
                     leaveGameUi();
                 }
             }
@@ -674,6 +705,9 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 AnnotationDialog d = new AnnotationDialog("Edit annotation", mTerminal.getSize(), mReplay);
                 d.setHints(TerminalThemeConstants.CENTERED_MODAL);
                 d.showDialog(mGui);
+
+                //TODO: check to see if we changed things before marking dirty
+                mCommandEngine.getReplay().markDirty();
 
                 updateComments();
             }
