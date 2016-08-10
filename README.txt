@@ -11,7 +11,7 @@ README
 9. Links
 10. Version history
 
-1. Introduction
+1. INTRODUCTION ---------------------------------------------------------------
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
 Norse boardgame. At present, it supports local play against another human or
 the built-in AI. Other features include support for play against external AI
@@ -21,7 +21,8 @@ You can follow the development of OpenTafl at soapbox.manywords.press/tag/tafl.
 
 You can find the latest version of OpenTafl at softworks.manywords.press/opentafl.
 
-2. How-to
+
+2. HOW-TO ---------------------------------------------------------------------
 Run the OpenTafl script file corresponding to your platform:
 OpenTafl32.bat (Windows, 32-bit java)
 OpenTafl64.bat (Windows, 64-bit java)
@@ -37,7 +38,8 @@ If you see '64-bit' in the output from that command, you have 64-bit Java.
 OpenTafl should run in most non-graphical terminal environments. Use the
 --fallback flag to enable old-school terminal mode.
 
-3. The game clock
+
+3. THE GAME CLOCK -------------------------------------------------------------
 Since there are no conventions for how to time tafl games, I've invented a few
 of my own. The game clock in OpenTafl comprises a sudden-death main time, go-
 style byo-yomi overtimes, and a Fisher increment. These function as follows:
@@ -63,7 +65,8 @@ Note that the AI search time setting supersedes the AI's time usage planning—
 you can use the search time to cap the AI's thinking time, and thereby set
 its difficulty.
 
-4. External engines
+
+4. EXTERNAL ENGINES -----------------------------------------------------------
 OpenTafl supports external artificial intelligence engines, using the OpenTafl
 Engine Protocol. (You can find a link in the links section below, if you are
 interested in developing an OpenTafl-compatible AI.)
@@ -73,7 +76,8 @@ file provided by your engine to instruct OpenTafl how to start it. If your
 engine does not provide an .ini file, please contact your engine's author.
 Note that the AI think time setting only affects OpenTafl.
 
-5. Saved games and replay mode
+
+5. SAVED GAMES AND REPLAY MODE ------------------------------------------------
 Games may be saved by entering 'save' during a game, or while viewing a replay.
 Saved games may be loaded by selecting 'Load game' at the main menu, and
 replays may be loaded by selecting the 'View Replay' menu item in the main
@@ -87,7 +91,55 @@ have made beyond that point.
 Replays which do not result in a completed game are functionally identical to
 saved games, and may be loaded as such.
 
-6. AI self-play mode
+Replay mode features variations, lines of play separate from the principal line
+of play, which may be tracked, viewed, and commented upon in the same manner as
+the principal line of play. When in replay mode, you can move pieces around the
+board by using the 'variation' command. You can also jump to specific states by
+using their addresses, as displayed in the 'history' command. To navigate
+forward and backward, you can use the 'next' command with no argument to move
+to the next state in the current line, or use the 'next' command with an
+integer argument to move to the variation from the current state with the given
+index (e.g. 'next 2' to move to the second variation from the current state).
+The 'previous' command will always move you toward the first move of the game.
+
+You can edit annotations on any board position by using the 'annotate' command
+and typing into the box provided.
+
+You can also delete branches of play (including the principal line) by using
+the 'delete' command. For further information on commands, see the in-game
+help system.
+
+The following is a quick guide to OpenTafl variation addresses. In replay mode,
+each state is given a specific name. The first move of the game is 1a: that is,
+the first move (a) of the first turn (1) in the game. The second move is 1b,
+and (presuming the variant does not include the berserk rule) the third is 2a,
+followed by 2b and so on. In replay mode, the 'jump' command will accept
+either numbers, to jump to the start of the named turn, or a full state
+address, to jump to the state named.
+
+Variations are named using an extension of the following scheme. For instance,
+consider a variation off of the fourth move of the game:
+
+2b.1.1b
+
+Read variation addresses from right to left. This is a variation replacing the
+second move in the first turn of the first variation from the fourth move in
+the game. Note that OpenTafl will display this as 2b.1.1a. ..... (variation
+move), for ease of reading in the history display. 'jump' will accept either
+address as a synonym for the state properly addressed by 2b.1.1b. Let's look
+at a more complicated example:
+
+7a.2.1a.1.1b.
+
+Again reading right to left, this is the second move (b) in the first turn (1)
+of the first variation (1) off of the first move (a) in the first turn (1) of
+the second variation (2) off of the first move (a) of the seventh turn (7) of
+the game. Again, OpenTafl will display this as 7a.2.1a.1.1a. ..... (variation
+move), for readability and consistency, and 'jump' will accept either form of
+the address.
+
+
+6. AI SELF-PLAY MODE ----------------------------------------------------------
 For external AI developers, OpenTafl provides a mode by which two AIs, or two
 versions of the same AI, can be made to play each other repeatedly, to judge
 relative strength. Start OpenTafl with the '--dev' switch to enable the AI
@@ -102,7 +154,8 @@ At the end of the self-play matches, a summary will be displayed on screen.
 Detailed results, including game records for every game, will be saved in the
 'selfplay-results' subdirectory under the main OpenTafl directory.
 
-7. Network play
+
+7. NETWORK PLAY ---------------------------------------------------------------
 OpenTafl can be played with humans and AIs from around the world, using its
 tafl server functionality. Anyone may run an OpenTafl server by running the
 OpenTafl command with the --server flag. An OpenTafl server is provided by
@@ -156,24 +209,29 @@ Upon entering a game, the interface functions as it does during single-player
 games. The 'chat' command may be used to interact with your opponent during a
 game, according to the restrictions given above.
 
-8. Headless AI mode
+
+8. HEADLESS AI MODE -----------------------------------------------------------
 OpenTafl can be started in headless AI mode, connecting an external engine to a
 network server. The AI can be set to join a game already present on the server,
 or to continuously host games. Whether joining games or hosting games, the AI
 must use a game clock. The AI will save records of all games it plays in the
 saved-games/headless-ai directory under the OpenTafl directory.
 
-9. Links
+
+9. LINKS ----------------------------------------------------------------------
 http://softworks.manywords.press/opentafl (official website)
 http://soapbox.manywords.press/tag/tafl (development blog)
 https://bitbucket.org/Fishbreath/opentafl (source code, bug reports)
 http://conclave.manywords.press/forum/softworks/opentafl/ (forum)
 http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt (engine protocol specification)
-http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (network protocol specification)
+http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation specification)
 
-10. Version history
 
-v0.4.0.0pre (released 08/07/16);
+10. VERSION HISTORY -----------------------------------------------------------
+
+v0.4.1.0b (released 08/xx/16):
+
+v0.4.0.0pre (released 08/07/16):
 - Playable variations in replay mode!
     - This is a pre-release feature
     - See 'help' dialog when in replay for information on variation UI
