@@ -52,7 +52,7 @@ public class MainMenuWindow extends BasicWindow {
             }
 
             GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
-            ReplayGame rg = new ReplayGame(g.game, g.moves);
+            ReplayGame rg = new ReplayGame(g.game, g.moves, g.variations);
             TerminalUtils.startSavedGame(rg, getTextGUI(), mTerminalCallback);
 
         });
@@ -65,7 +65,7 @@ public class MainMenuWindow extends BasicWindow {
             }
 
             GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
-            ReplayGame rg = new ReplayGame(g.game, g.moves);
+            ReplayGame rg = new ReplayGame(g.game, g.moves, g.variations);
             TerminalUtils.startReplay(rg, getTextGUI(), mTerminalCallback);
 
         });

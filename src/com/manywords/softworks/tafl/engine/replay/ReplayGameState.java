@@ -137,7 +137,8 @@ public class ReplayGameState extends GameState {
     public ReplayGameState makeVariation(MoveRecord move) {
         if(getPieceAt(move.start.x, move.start.y) == Taflman.EMPTY) return new ReplayGameState(ILLEGAL_MOVE);
 
-        if(mCanonicalChild != null && mCanonicalChild.getEnteringMove().equals(move)) {
+        // We only care about the move location, not the captures (which we don't know yet)
+        if(mCanonicalChild != null && mCanonicalChild.getEnteringMove().softEquals(move)) {
             return mCanonicalChild;
         }
 
@@ -157,7 +158,15 @@ public class ReplayGameState extends GameState {
             if(mCanonicalChild == null) {
                 nextState.setParent(this);
                 nextState.mEnclosingVariation = mEnclosingVariation;
-                mEnclosingVariation.addState(nextState);
+
+                // There is no enclosing variation for states in the principal variation. Add them
+                // to the history, instead.
+                if(mMoveAddress.getElements().size() > 1) {
+                    mEnclosingVariation.addState(nextState);
+                }
+                else {
+                    mGame.getHistory().add(nextState);
+                }
             }
             else {
                 Variation v = new Variation(this, mMoveAddress.nextVariation(mVariations.size() + 1), nextState);

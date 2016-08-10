@@ -5,111 +5,70 @@
 [termination:Black resigns]
 [compiler:Jay Slater]
 [annotator:Jay Slater]
-[rules:dim:11 name:Fetlar_Defenders_First atkf:n ks:y nj:n cj:n start:/3ttttt3/5t5/11/t4T4t/t3TTT3t/tt1TTKTT1tt/t3TTT3t/t4T4t/11/5t5/3ttttt3/]
-[start-comment:This is an annotation I threw together to demo the annotation system. It isn't going to win any awards for cleverness or accuracy, but it does show you just how cool OpenTafl can be as a teaching and learning tool. I hope to see more annotations pop up. Please drop me a line at jay@manywords.press if you've produced some annotations and need somewhere to host them!]
+[rules:dim:11 name:Fetlar_Defenders_First atkf:n ks:w nj:n cj:n start:/3ttttt3/5t5/11/t4T4t/t3TTT3t/tt1TTKTT1tt/t3TTT3t/t4T4t/11/5t5/3ttttt3/]
 
-1. h6-h3 h1-h2 
+1. h6-h3 h1-h2
 [Tafl has a less complicated opening game than a lot of other abstract strategy games. The focus in the first move or two, for games on the 11x11 board, are the 3 and 9 ranks, and the c and i files. These start unoccupied, and given the mobility of tafl pieces, control of them is important.|Rather than aim for control of another of the open lanes, Nasa challenges me for control of the i3 corner, threatening a cross-board capture from h11. (I realize that my notation is upside-down from chess notation. Pretend the board is also upside-down.)]
 
-2. f4-h4 g1-j1 
+2. f4-h4 g1-j1
 [This, and the next few moves, are a little fight over the i3 corner.|]
 
-3. h3-i3 h2-i2 
+3. h3-i3 h2-i2
 [One of the ways you can tell we're amateurs is that we (certainly I, in this sequence) spend a lot of time moving the same pieces, losing tempo.|]
 
-4. h4-i4 j1-j3 
+4. h4-i4 j1-j3
 [We finish scooting over to the i file, and in playing with too much a focus on local tactics, I've basically handed control of the i3 corner to Nasa. I don't quite realize it yet, though.|]
 
-5. g6-h6 h11-h8 
+5. g6-h6 h11-h8
 [Nasa attacks i3 with j1-j3 to threaten h11-h3. I don't actually notice. My move g6-h6 had other designs, and if Nasa hadn't mentioned how I'd foiled him, I probably would have moved h6-h1 on the next turn to threaten the red taflman on i2. One of the major difficulties in tafl early games is that small formations on the board may be influenced by taflmen far away, and it's easy to miss when you're focused on reading a single position deeply.|Nasa has a fairly solid position in the i3 corner, and I assume that h11-h8 was meant to limit my options in the i9 corner.]
 
-6. g5-g1 i2-i1 
+6. g5-g1 i2-i1
 [I make a very aggressive threat toward i2.
 
 This move, taken with the last one, illustrates a central point in tafl strategy. Although you'll usually find the sides labeled the 'attacking side' (the red pieces) and the 'defending side' (white), that gets their playstyles a little backward. Nasa's aim is generally to play cautiously, taking away white's options and building a stronger and stronger cordon. Nasa starts with an advantageous position, and can afford to be more methodical. White, on the other hand, must exhibit daring and enterprise to put taflmen in place to disrupt red's cordon in the early going, so he has the resources and the board position to break through and get the king to the corner. 
 
 It's for that reason that I'll oftentimes refer to the sides as the 'besieging side' (red), and the 'escaping side' or 'king's side' (white), since those names more neatly encapsulate what's going on.|I take back a little bit of the tempo I'd lost: Nasa is forced to move his piece on i2 to save it, and nearly to secure his position in the corner. At this point, I've developed four pieces and he's developed three; a slight edge to me.]
 
-7. g1-g2 j3-j2 
+7. g1-g2 j3-j2
 [I move away from the capture. This is a subtle fork on my part. I threaten the capture of f2, which can easily be avoided by either moving f2 or bringing e1 forward. Doing so, though, would let me use my taflman on g2 to attack the i3 corner.|Sensibly, Nasa strengthens the i3 corner and sacrifices his taflman on f2. He can afford to. The besiegers have a solid material advantage over the escapees in most tafl variations. (It isn't quite the 2-1 edge it looks like—the king is much more powerful than a regular taflman.)
 
 The i3 corner is a very strong position for Nasa now—his cordon is one move from being unbreakable (k4-k3). I could contest it with i3-k3, and g2-j2 if he takes the capture, but the play after that is tricky, a cordon is still only a few moves away, and Nasa's attention is here anyway. I abandon it at this point.]
 
-8. e5-e2xf2 d1-d2 
+8. e5-e2xf2 d1-d2
 [Instead, I capture f2, and begin to wall off Nasa's pieces at the top of the board.|In a variant of 11x11 tafl called Copenhagen tafl, surrounding a line of pieces against the edge with your own line of pieces can yield a kind of capture called a shieldwall capture. That corrects a certain flaw in Fetlar—white can nearly always force a draw by playing defensively around the middle and creating a draw fort, a cordon of white pieces surrounding the king such that the king can move without being captured. (Although, in this implementation, should one side surround the other entirely, the surrounded side loses, which is a pretty sensible rule for most variants. Copenhagen introduces it explicitly.)]
 
-9. f5-f2 b6-b3 
+8a.1.1a. e5-e3 d1-d3
+[This is a variation replacing the first half of turn 8.|The 1.1. means the first variation, first move.]
+8a.1.2a. e3-e5 d3-d1
+[This is another variation on the first half of turn 8.|Note that 2.1. and 2.2. mark this as the first and second moves in the second variation.]
+
+8b.1.1a. ..... d1-d3
+[This is a variation replacing the second half of turn 8.|Note the lack of the first move. The system will have to account for that.]
+
+9. f5-f2 b6-b3
 [In Fetlar, though, a wall like this is useful mainly because it reduces the number of moves the besiegers can make.|]
 
-10. e6-e3 k4-k3 
+10. e6-e3 k4-k3
 [|The position at the top of the board is crystallizing here. Nasa secures the i3 corner, and is close to securing the c3 corner.]
 
-11. d6-d4 d11-d9 
+11. d6-d4 d11-d9
 [|A solid move from Nasa, and one which susses out my intent: now that I've opened a way for the king to move to the left side of the board, I plan to take it.]
 
-12. Kf6-c6 a8-c8 
+12. Kf6-c6 a8-c8
 [The king moves! The king's first move is usually an important moment in tafl games; it's the clearest signifier of the escapees' intent.|This is Nasa's major mistake. The c9 corner looks more tempting, because it's much more open, while the c3 corner is very crowded. However, moving to the c9 corner is harder: I have no taflmen down there to reinforce the king's attack, and would probably get bogged down in the c9 corner because d9 prevents me from moving across the board.
-
-(It turns out, on further play, that there is a line of play that wins slightly faster if Nasa doesn't block the c9 corner, but I'm not a very good tafl player, and the forced moves are (slightly) less obvious, so I missed it. There's a variation off of 12b. showing that line.)
 
 I've seen Nasa's position on c8 and d9 referred to as a 'cheval de frise', after the medieval anti-cavalry defense. Both the position and the namesake aren't intended to be permanent measures, but they will slow down an attack. Tafl's cheval de frise is faster to develop than a pure corner seal, as well.]
 
-12b.1.1a. ..... d2-c2 
-[In this variation, Nasa blocks the c3 corner instead.]
-
-12b.1.2a. Kc6-c11 b3-b11 
-[This is the right move for the defender; as usual, it's the boldest one, and it forces an immediate response.|There's only one response to be made.]
-
-12b.1.3a. Kc11-c10 a8-a10 
-[Again, a forcing move: there is only one possible reply.|]
-
-12b.1.4a. Kc10-c11xb11 f10-b10 
-[The victory is complete: the attackers have no pieces left to block with.|]
-
-12b.1.5a. Kc11-a11 
-[A victory on the start of the 16th turn: slightly faster than the principal line.
-
-When we played this game, Nasa expressed surprise that I thought the c3 attack was better. Turns out he was right all along!]
-
-13. Kc6-c1 b3-b1 
+13. Kc6-c1 b3-b1
 [I wasn't quite sure which corner I was going to attack after I'd moved the king f6-c6, but before Nasa took his move, I knew I was going for the c3 corner.|I could have played Kc6-c2 on the previous move, but Kc6-c1 leaves Nasa with only one answer, and is therefore easier to play out in my head.]
 
-14. Kc1-c2xd2 b1-b2 
+14. Kc1-c2xd2 b1-b2
 [Here, Nasa can block me with either b1-b2 or a4-a2.|He picks the right one. Since taflmen can be captured against the corner spaces, a4-a2 would have let me move e3-a3xa2, and that would have been the end of the game. This is helpful in the long run. Since tafl is an asymmetric game, and therefore not perfectly balanced, we play two-game matches, one game with each side. If we each win one game, the tiebreaker is the number of moves we took to win. Delaying actions like this one can decide a match.]
 
-15. e3-a3 e1-c1 
+15. e3-a3 e1-c1
 [The obvious followup; I could move c2-c1, but then he just moves the blocking piece back. This way, I threaten it with capture.|Nasa prevents my taking the 1-rank escape with a different move anyway. This was the right move as a delaying action: Nasa could have captured my taflman on a3, but I would have been able to move to c1 on my next turn and escape on the turn after. This way, I have to capture the blocking taflman on b2, then move my taflman out of the way, then move my king, then escape.]
 
-16. a3-a2xb2 a7-b7 
+16. a3-a2xb2
 [I capture the blocking piece, and Nasa resigns. 31 moves have been made, but it takes another 4 to win. (a4-a3xa2, Kc2-a2, this one doesn't make a difference, Ka2-a1 win). Looking back, I'm pretty sure that Nasa's fate was sealed when I moved c6-c1, but we didn't see it then, and we favor the play-it-out model of tafl anyway.
 
-Astute readers will notice that Nasa could have delayed me further with most of the pieces on the board by playing e.g. a4-b4 a2-a3 b4-b2 a3-a2xb2 a5-b5..., but this is considered poor form. It may make sense to add captures into the tiebreaking formula, rather than merely game length.|We'll carry on a little anyway, since I want some reason to demonstrate annotations on variations. At this point, Nasa's options are limited: I'm going to win by some manner anyway. It turns out that my comment on the previous move is wrong: I can force a victory. It starts here.
-
-The first move is the easy one: by setting up the repeated sacrifice I mentioned in the previous annotation, he forces me to respond.]
-
-17. Kc2-b2 c1-b1 
-[I have no choice but to block him. If I move a2-a3, then he can block my victory for literally dozens of turns, unless I move c2-b2 after yet another a3-a2xb2. Here I head him off at the pass.|This move prevents me from winning in two moves:
-
-b2-b1 ..... b1-a1
-
-Now, at the earliest, I'll have to do this...
-
-(That means move ahead in the commentary.)]
-
-17a.1.1a. a2-a3 b7-b2 
-[Let's have a look at what happens if I fail to respond to Nasa's block.|]
-
-17a.1.2a. a3-a2xb2 a6-b6 
-[Here we are, in the same place we were a turn ago.|At this point, I can make the move from the principal line of play (c2-b2), or I can persist in my ultimately pointless efforts to capture all of Nasa's pieces by moving a2-a3 again.
-
-Note that blocking the b file is the ideal for Nasa: if he doesn't do so, I can move c2-b2 and guarantee myself the game in two moves (by moving to the 1 or 11 rank).]
-
-18. a2-a3 b7-b3 
-[|]
-
-19. Kb2-a2 b1-b2 
-[|This move and Nasa's previous are inconsequential: he could do nothing about my escape.]
-
-20. Ka2-a1 
-[]
-
+Astute readers will notice that Nasa could have delayed me further with most of the pieces on the board by playing e.g. a4-b4 a2-a3 b4-b2 a3-a2xb2 a5-b5..., but this is considered poor form. It may make sense to add captures into the tiebreaking formula, rather than merely game length.]

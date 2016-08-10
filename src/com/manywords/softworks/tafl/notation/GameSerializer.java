@@ -24,11 +24,15 @@ package com.manywords.softworks.tafl.notation;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.replay.MoveAddress;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Rules;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by jay on 3/22/16.
@@ -37,19 +41,60 @@ public class GameSerializer {
     public static class GameContainer {
         public Game game;
         public List<DetailedMoveRecord> moves;
+        public List<VariationContainer> variations;
 
         public GameContainer(Game g, List<DetailedMoveRecord> m) {
             game = g;
             moves = m;
+            variations = new ArrayList<>();
+        }
+
+        public GameContainer(Game g, List<DetailedMoveRecord> m, List<VariationContainer> v) {
+            game = g;
+            moves = m;
+            variations = v;
+        }
+    }
+
+    public static class VariationContainer {
+        public MoveAddress address;
+        public List<DetailedMoveRecord> moves;
+
+        public VariationContainer(MoveAddress a, List<DetailedMoveRecord> m) {
+            address = a;
+            moves = m;
+        }
+
+        @Override
+        public String toString() {
+            return "V:" + address;
+        }
+    }
+
+    private static class MoveParseResult {
+        List<DetailedMoveRecord> moves;
+        List<VariationContainer> variations;
+
+        public MoveParseResult(List<DetailedMoveRecord> m, List<VariationContainer> v) {
+            moves = m;
+            variations = v;
         }
     }
 
     public static boolean writeGameToFile(Game g, File f, boolean comments) {
         String gameRecord = getGameRecord(g, comments);
+        return writeGameRecordToFile(f, gameRecord);
+    }
 
+    public static boolean writeReplayToFile(ReplayGame rg, File f, boolean comments) {
+        String gameRecord = getReplayGameRecord(rg, comments);
+        return writeGameRecordToFile(f, gameRecord);
+    }
+
+    private static boolean writeGameRecordToFile(File f, String record) {
         try {
             PrintWriter pw = new PrintWriter(f);
-            pw.print(gameRecord);
+            pw.print(record);
             pw.flush();
             pw.close();
         } catch (FileNotFoundException e) {
@@ -57,8 +102,22 @@ public class GameSerializer {
         }
         return true;
     }
+
+    public static String getReplayGameRecord(ReplayGame rg, boolean comments) {
+        String tagString = getTagString(rg.getGame());
+        String movesString = (comments ? rg.getCommentedHistoryString(true) : rg.getUncommentedHistoryString(true));
+
+        return tagString + movesString;
+    }
     
     public static String getGameRecord(Game g, boolean comments) {
+        String tagString = getTagString(g);
+        String movesString = (comments ? g.getCommentedHistoryString() : g.getHistoryString());
+
+        return tagString + movesString;
+    }
+
+    private static String getTagString(Game g) {
         String tagString = "";
 
         if(g.getTagMap().containsKey("rules")) {
@@ -96,9 +155,7 @@ public class GameSerializer {
 
         }
 
-        String movesString = (comments ? g.getCommentedHistoryString() : g.getHistoryString());
-
-        return tagString + movesString;
+        return tagString;
     }
 
     public static GameContainer loadGameRecordFile(File gameFile) {
@@ -128,18 +185,20 @@ public class GameSerializer {
         g.setTagMap(tagMap);
         g.loadClock();
 
-        List<DetailedMoveRecord> moves = parseMoves(r.getBoard().getBoardDimension(), gameRecord);
+        MoveParseResult result = parseMoves(r.getBoard().getBoardDimension(), gameRecord);
 
-        return new GameContainer(g, moves);
+        return new GameContainer(g, result.moves, result.variations);
     }
 
-    public static List<DetailedMoveRecord> parseMoves(int dimension, String gameRecord) {
+    public static MoveParseResult parseMoves(int dimension, String gameRecord) {
         List<DetailedMoveRecord> moves = new ArrayList<>();
+        List<VariationContainer> variations = new ArrayList<>();
         String moveStart = "1. ";
         String moveEnd = "\n";
         String commentStart = "[";
         String commentMid = "|";
         String commentEnd = "]";
+        String variationStart = "";
 
         int currentMove = 1;
         int matchIndex = -1;
@@ -148,9 +207,23 @@ public class GameSerializer {
         int commentIndex = -1;
         boolean inGame = false;
         boolean inMove = false;
+        boolean inVariation = false;
         boolean inComment = false;
+        List<DetailedMoveRecord> lastTurn = new ArrayList<>();
+        Pattern variationStartPattern = Pattern.compile("([0-9]+[a-z]\\.)([0-9]+\\.[0-9]+[a-z]\\.)+");
+
         for(int i = 0; i < gameRecord.length(); i++) {
-            if(!inComment && !inMove && gameRecord.regionMatches(i, moveStart, 0, moveStart.length())) {
+            if(inGame && !inMove && !inComment && !inVariation) {
+                String remainingRecord = gameRecord.substring(i, gameRecord.length());
+                Matcher variationMatcher = variationStartPattern.matcher(remainingRecord);
+                boolean isVariationStart = variationMatcher.lookingAt();
+
+                if (isVariationStart) {
+                    variationStart = variationMatcher.group(0);
+                }
+            }
+
+            if(!inComment && !inMove && !inVariation && gameRecord.regionMatches(i, moveStart, 0, moveStart.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
@@ -158,22 +231,24 @@ public class GameSerializer {
                 inMove = true;
                 currentMove++;
                 moveStart = currentMove + ".";
+                lastTurn.clear();
             }
-            else if(inGame && !inComment && inMove && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
+            else if(inGame && !inComment && !inVariation && inMove && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
-
-                inMove = false;
 
                 String moveString = gameRecord.substring(lastMatchIndex, matchIndex).replace(currentMove - 1 + ". ", "").trim();
                 String[] moveStrings = moveString.split(" ");
                 lastMovesAdded = 0;
-                commentIndex = moves.size();
+                commentIndex = 0;
                 for(String move : moveStrings) {
                     DetailedMoveRecord m = MoveSerializer.loadMoveRecord(dimension, move);
                     moves.add(m);
+                    lastTurn.add(m);
                     lastMovesAdded++;
                 }
+
+                inMove = false;
             }
             else if(inGame && !inComment && gameRecord.regionMatches(i, commentStart, 0, commentStart.length())) {
                 lastMatchIndex = matchIndex;
@@ -186,7 +261,7 @@ public class GameSerializer {
                 matchIndex = i;
 
                 if(commentIndex < moves.size()) {
-                    DetailedMoveRecord m = moves.get(commentIndex++);
+                    DetailedMoveRecord m = lastTurn.get(commentIndex++);
 
                     // last match index + 1 to skip the opening brace
                     m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
@@ -198,7 +273,7 @@ public class GameSerializer {
                 matchIndex = i;
 
                 if(commentIndex < moves.size()) {
-                    DetailedMoveRecord m = moves.get(commentIndex++);
+                    DetailedMoveRecord m = lastTurn.get(commentIndex++);
 
                     // last match index + 1 to skip the separator pipe
                     m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
@@ -206,10 +281,53 @@ public class GameSerializer {
 
                 inComment = false;
             }
+            else if(inGame && !inComment && !inVariation && !variationStart.isEmpty() && gameRecord.regionMatches(i, variationStart, 0, variationStart.length())) {
+                lastMatchIndex = matchIndex;
+                matchIndex = i;
+
+                //variationStart is set by the regex at the top
+                //System.out.println("Entering variation: " + variationStart);
+                inVariation = true;
+                lastTurn.clear();
+            }
+            else if(inGame && !inComment && !inMove && inVariation && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
+                lastMatchIndex = matchIndex;
+                matchIndex = i;
+
+                String moveString = gameRecord.substring(lastMatchIndex, matchIndex).replace(variationStart, "").trim();
+                String[] moveStrings = moveString.split(" ");
+                lastMovesAdded = 0;
+                commentIndex = moves.size();
+                int variationStartOffset = 0;
+                for(String move : moveStrings) {
+                    // If the move matches this pattern, then it's a ..... dummy move, used to make the typesetting
+                    // for variations beginning on the second or later move in a turn make a little more sense.
+                    if(!move.matches("\\.+")) {
+                        DetailedMoveRecord m = MoveSerializer.loadMoveRecord(dimension, move);
+                        lastTurn.add(m);
+                        lastMovesAdded++;
+                    }
+                    else {
+                        variationStartOffset++;
+                    }
+                }
+
+                MoveAddress a = MoveAddress.parseAddress(variationStart);
+                for(int j = 0; j < variationStartOffset; j++) {
+                    a.increment(false);
+                }
+
+                VariationContainer v = new VariationContainer(a, new ArrayList<>(lastTurn));
+                variations.add(v);
+
+                //System.out.println("Leaving variation: " + variationStart);
+
+                inVariation = false;
+            }
         }
 
         //System.out.println(moves);
-        return moves;
+        return new MoveParseResult(moves, variations);
     }
 
     public static Map<String, String> parseTags(String gameRecord) {

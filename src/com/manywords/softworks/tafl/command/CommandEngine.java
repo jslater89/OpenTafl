@@ -72,6 +72,8 @@ public class CommandEngine {
     public void leaveReplay() {
         mReplay.prepareForGameStart();
         mMode = UiCallback.Mode.GAME;
+
+        callbackModeChange(UiCallback.Mode.GAME, mGame);
     }
     public void enterGame(Game g) {
         mMode = UiCallback.Mode.GAME;
@@ -348,7 +350,7 @@ public class CommandEngine {
         else if(command instanceof HumanCommandParser.History) {
             String gameRecord;
             if(mMode == UiCallback.Mode.REPLAY) {
-                gameRecord = mReplay.getHistoryStringWithPositionMarker();
+                gameRecord = mReplay.getReplayModeInGameHistoryString();
             }
             else {
                 gameRecord = mGame.getHistoryString();
@@ -445,7 +447,7 @@ public class CommandEngine {
             mAttacker.positionChanged(state);
             mDefender.positionChanged(state);
 
-            if(state != null) return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", null);
+            if(state != null) return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", state.getLastMoveResult());
             else return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
         }
         // 16. REPLAY PREV COMMAND
@@ -496,12 +498,10 @@ public class CommandEngine {
             int moveResult = result.getLastMoveResult();
 
             if(moveResult < GameState.GOOD_MOVE) {
-                // TODO: more errors here
-                // TODO: GameState.getErrorStringFor(int resultCode)
-                return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, "Invalid move", record);
+                return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, GameState.getStringForMoveResult(moveResult), moveResult);
             }
             else {
-                return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", record);
+                return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", moveResult);
             }
         }
         else if(command instanceof HumanCommandParser.Delete) {
@@ -512,10 +512,11 @@ public class CommandEngine {
             if(deleted) return new CommandResult(Command.Type.DELETE, CommandResult.SUCCESS, "", null);
             else return new CommandResult(Command.Type.DELETE, CommandResult.FAIL, "No variation with address " + d.moveAddress + " to delete.", null);
         }
+        // 19. ANNOTATE COMMAND
         else if(command instanceof HumanCommandParser.Annotate) {
-
+            return new CommandResult(Command.Type.ANNOTATE, CommandResult.SUCCESS, "", null);
         }
-        // 19. CHAT COMMAND
+        // 20. CHAT COMMAND
         else if(command instanceof HumanCommandParser.Chat) {
             HumanCommandParser.Chat c = (HumanCommandParser.Chat) command;
             return new CommandResult(Command.Type.CHAT, CommandResult.SUCCESS, c.message, null);
@@ -526,6 +527,10 @@ public class CommandEngine {
 
     public Game getGame() {
         return mGame;
+    }
+
+    public ReplayGame getReplay() {
+        return mReplay;
     }
 
     private void callbackGameStarting() {

@@ -39,6 +39,7 @@ import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
+import com.manywords.softworks.tafl.ui.lanterna.window.ingame.AnnotationDialog;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.BoardWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.CommandWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.StatusWindow;
@@ -248,15 +249,17 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
     @Override
     public void victoryForSide(Side side) {
-        if(!mCommandEngine.isInGame()) return;
+        if(!mCommandEngine.isInGame() && !mInReplay) return;
 
         mBoardWindow.rerenderBoard();
 
-        // Notify the player if this is a victory on move repetition
-        int repeats = mGame.getCurrentState().countPositionOccurrences();
-        repeats++;
-        if(repeats > 2) {
-            statusText("This position has repeated " + repeats + " times!");
+        if(!mInReplay) {
+            // Notify the player if this is a victory on move repetition
+            int repeats = mGame.getCurrentState().countPositionOccurrences();
+            repeats++;
+            if (repeats > 2) {
+                statusText("This position has repeated " + repeats + " times!");
+            }
         }
 
         if(side == null) {
@@ -495,6 +498,24 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 statusText("Command not available at this time.");
                 return;
             }
+            else if(getCurrentCommands().contains(c.getType())) {
+                if (c.getType() == Command.Type.REPLAY_RETURN) {
+                    if (mCommandEngine.getReplay() != null && mCommandEngine.getReplay().isDirty()) {
+                        MessageDialogBuilder builder = new MessageDialogBuilder();
+                        builder.setTitle("Replay not saved!");
+                        builder.setText("This replay has been changed, but not yet saved.\nContinuing will exit the replay and discard\nchanges.");
+                        builder.addButton(MessageDialogButton.Continue);
+                        builder.addButton(MessageDialogButton.Cancel);
+                        MessageDialog dialog = builder.build();
+                        MessageDialogButton result = dialog.showDialog(mGui);
+
+                        if (result.equals(MessageDialogButton.Cancel)) {
+                            return;
+                        }
+                    }
+                }
+            }
+
             CommandResult r = mCommandEngine.executeCommand(c);
 
             if(r.result != CommandResult.SUCCESS) {
@@ -540,14 +561,14 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
             else if (r.type == Command.Type.SAVE) {
                 String title;
-                Game game;
-                if(mInGame || mPostGame) {
-                    title = "Save game";
-                    game = mGame;
+                boolean saveReplay;
+                if(mInReplay) {
+                    title = "Save replay";
+                    saveReplay = true;
                 }
                 else {
-                    title = "Save replay";
-                    game = mReplay.getGame();
+                    title = "Save game";
+                    saveReplay = false;
                 }
 
                 File saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games"));
@@ -560,7 +581,15 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     if(result.equals(MessageDialogButton.No)) return;
                 }
 
-                boolean success = GameSerializer.writeGameToFile(game, saveFile, true);
+                boolean success;
+                if(saveReplay) {
+                    success = GameSerializer.writeReplayToFile(mReplay, saveFile, true);
+                    mCommandEngine.getReplay().markClean();
+                }
+                else {
+                    success = GameSerializer.writeGameToFile(mGame, saveFile, true);
+                }
+
                 if(!success) {
                     MessageDialog.showMessageDialog(mGui, "Unable to save", "Unable to write savegame file.");
                 }
@@ -586,7 +615,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                 if(mInGame) {
                     // TODO: if the player is a human playing locally, alert them that they have lost
-
                     if(mServerConnection != null) {
                         mServerConnection.sendGameEndedMessage();
 
@@ -607,6 +635,19 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     }
                 }
                 else {
+                    if(mCommandEngine.getReplay() != null && mCommandEngine.getReplay().isDirty()) {
+                        MessageDialogBuilder builder = new MessageDialogBuilder();
+                        builder.setTitle("Replay not saved!");
+                        builder.setText("This replay has been changed, but not yet saved.\nContinuing will quit and discard changes.");
+                        builder.addButton(MessageDialogButton.Continue);
+                        builder.addButton(MessageDialogButton.Cancel);
+                        MessageDialog dialog = builder.build();
+                        MessageDialogButton result = dialog.showDialog(mGui);
+
+                        if(result.equals(MessageDialogButton.Cancel)) {
+                            return;
+                        }
+                    }
                     leaveGameUi();
                 }
             }
@@ -629,6 +670,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 mBoardWindow.rerenderBoard();
                 tryTimeUpdate();
                 updateComments();
+
+                int result = (Integer) r.extra;
+                if(result > GameState.GOOD_MOVE) {
+                    statusText(GameState.getStringForMoveResult(result));
+                }
             }
             else if(r.type == Command.Type.REPLAY_PREVIOUS) {
                 mBoardWindow.rerenderBoard();
@@ -644,11 +690,26 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 tryTimeUpdate();
                 updateComments();
                 mBoardWindow.rerenderBoard();
+
+                int result = (Integer) r.extra;
+                if(result > GameState.GOOD_MOVE) {
+                    statusText(GameState.getStringForMoveResult(result));
+                }
             }
             else if(r.type == Command.Type.DELETE) {
                 tryTimeUpdate();
                 updateComments();
                 mBoardWindow.rerenderBoard();
+            }
+            else if(r.type == Command.Type.ANNOTATE) {
+                AnnotationDialog d = new AnnotationDialog("Edit annotation", mTerminal.getSize(), mReplay);
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+                d.showDialog(mGui);
+
+                //TODO: check to see if we changed things before marking dirty
+                mCommandEngine.getReplay().markDirty();
+
+                updateComments();
             }
             else if(r.type == Command.Type.CHAT) {
                 if(mServerConnection != null) {
@@ -699,12 +760,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 if(tags.containsKey(Game.Tag.TIME_CONTROL)) {
                     statusText("Initial clock setting: " + tags.get(Game.Tag.TIME_CONTROL));
                 }
-                if(tags.containsKey(Game.Tag.START_COMMENT)) {
-                    statusText(tags.get(Game.Tag.START_COMMENT));
-                }
             }
 
             statusText("--- Start of replay ---");
+            if(tags != null && tags.containsKey(Game.Tag.START_COMMENT)) {
+                statusText(tags.get(Game.Tag.START_COMMENT));
+            }
         }
 
         private void updateComments() {

@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.command;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.replay.MoveAddress;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
@@ -360,7 +361,7 @@ public class HumanCommandParser {
                 return;
             }
             else {
-                Game g = engine.getGame();
+                ReplayGame g = engine.getReplay();
                 int boardSize = g.getCurrentState().getBoard().getBoardDimension();
 
                 String fromString = commandParts[1].toLowerCase();
