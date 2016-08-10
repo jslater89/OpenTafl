@@ -46,6 +46,8 @@ public class RulesSerializer {
         map.put("afor", "");
         map.put("dfor", "");
 
+        map.put("spd", "-1");
+
         map.put("corh", "tcnkTCNK");
         map.put("cenh", "tcnk");
         map.put("cenhe", "tcnkTCNK");
@@ -165,6 +167,11 @@ public class RulesSerializer {
             otnrString += fortString + " ";
         }
 
+        String spd = getStringForTaflmanSpeeds(rules);
+        if(!spd.equals(defaults.get("spd"))) {
+            otnrString += "spd:" + spd + " ";
+        }
+
         String corp = getStringForTaflmanTypeList(rules.cornerPassableFor);
         if(!corp.equals(defaults.get("corp"))) otnrString += "corp:" + corp + " ";
 
@@ -272,6 +279,7 @@ public class RulesSerializer {
         if(config.containsKey("swf")) rules.setShieldwallFlankingRequired(getBooleanForString(config.get("swf")));
         if(config.containsKey("efe")) rules.setEdgeFortEscape(getBooleanForString(config.get("efe")));
         if(config.containsKey("ber")) rules.setBerserkMode(getBerserkModeForString(config.get("ber")));
+        if(config.containsKey("spd")) rules.setSpeedLimits(getTaflmanSpeedsForString(config.get("spd")));
 
         if(config.containsKey("cor")) rules.setCornerSpaces(getCoordListForString(config.get("cor")));
         if(config.containsKey("cen")) rules.setCenterSpaces(getCoordListForString(config.get("cen")));
@@ -435,6 +443,81 @@ public class RulesSerializer {
         Set<Coord> defaultCenter = new HashSet<Coord>(2);
         defaultCenter.add(Coord.get(center, center));
         return defaultCenter;
+    }
+
+    public static String getStringForTaflmanSpeeds(Rules rules) {
+        int[] speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length];
+        for(char prototypeTaflman : Taflman.ALL_TAFLMAN_TYPES) {
+            int i = TaflmanCodes.getIndexForTaflmanChar(prototypeTaflman);
+            speeds[i] = rules.getTaflmanSpeedLimit(prototypeTaflman);
+        }
+
+        boolean allSpeedsIdentical = true;
+        boolean attackerSpeedsIdentical = true;
+        boolean defenderSpeedsIdentical = true;
+
+        int defenderSpeed = -2;
+        int attackerSpeed = -2;
+        for(int i = 0; i < speeds.length / 2; i++) {
+            if(defenderSpeed == -2) {
+                defenderSpeed = speeds[i];
+            }
+            else if(defenderSpeed != speeds[i]) {
+                defenderSpeedsIdentical = false;
+            }
+        }
+
+        for(int i = speeds.length / 2; i < speeds.length; i++) {
+            if(attackerSpeed == -2) {
+                attackerSpeed = speeds[i];
+            }
+            else if(attackerSpeed != speeds[i]) {
+                attackerSpeedsIdentical = false;
+            }
+        }
+
+        if(attackerSpeed != defenderSpeed) allSpeedsIdentical = false;
+
+        if(allSpeedsIdentical) {
+            return "" + speeds[0];
+        }
+        else if(attackerSpeedsIdentical && defenderSpeedsIdentical) {
+            return speeds[TaflmanCodes.getIndexForChar('t')] + "," + speeds[TaflmanCodes.getIndexForChar('T')] + ",";
+        }
+        else {
+            String toReturn = "";
+            for (int speed : speeds) {
+                toReturn += speed + ",";
+            }
+            return toReturn;
+        }
+    }
+
+    public static int[] getTaflmanSpeedsForString(String speedString) {
+        String[] speedStrings = speedString.split(",");
+        int[] speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length];
+
+        if(speedStrings.length == 0) {
+            Arrays.fill(speeds, -1);
+        }
+        if(speedStrings.length == 1) {
+            int speed = Integer.parseInt(speedStrings[0]);
+            Arrays.fill(speeds, speed);
+        }
+        else if(speedStrings.length == 2) {
+            Arrays.fill(speeds, 0, speeds.length / 2, -1);
+            Arrays.fill(speeds, speeds.length / 2, speeds.length, -1);
+        }
+        else if(speedStrings.length == speeds.length) {
+            for(int i = 0; i < speeds.length; i++) {
+                int speed = Integer.parseInt(speedStrings[i]);
+                speeds[i] = speed;
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Invalid speed limit string: " + speedString);
+        }
+        return speeds;
     }
 
     public static String getStringForTaflmanTypeList(boolean[] typeList) {

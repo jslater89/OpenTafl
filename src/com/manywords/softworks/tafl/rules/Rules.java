@@ -5,7 +5,7 @@ import com.manywords.softworks.tafl.notation.RulesSerializer;
 import java.util.*;
 
 public abstract class Rules {
-    public static final int TAFLMAN_TYPE_COUNT = Taflman.COUNT_TYPES * 2;
+    public static final int TAFLMAN_TYPE_COUNT = Taflman.ALL_TAFLMAN_TYPES.length;
 
     public final int boardSize;
     private Set<Coord> mCenterSpaces = new LinkedHashSet<Coord>();

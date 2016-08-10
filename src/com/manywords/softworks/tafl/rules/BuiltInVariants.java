@@ -4,6 +4,7 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
+import com.manywords.softworks.tafl.rules.brandub.Magpie;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
@@ -26,7 +27,8 @@ public class BuiltInVariants {
             Brandub.newBrandub7(),
             Tawlbwrdd.newTawlbwrdd11(),
             Tablut.newTablut9(),
-            FotevikenTablut.newFotevikenTablut9()
+            FotevikenTablut.newFotevikenTablut9(),
+            Magpie.newMagpie7()
     ));
 
     public static List<String> rulesDescriptions = new ArrayList<>(Arrays.asList(
@@ -38,7 +40,8 @@ public class BuiltInVariants {
             "6. Brandub 7x7",
             "7. Tawlbwrdd 11x11",
             "8. Tablut 9x9",
-            "9. Foteviken Tablut 9x9"
+            "9. Foteviken Tablut 9x9",
+            "10. Magpie 7x7"
     ));
 
     public static Rules rulesForNameAndDimension(String name, int dimension) {

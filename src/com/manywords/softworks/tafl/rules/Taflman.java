@@ -31,6 +31,17 @@ public class Taflman {
     public static final char DEVELOPED = 4096;
     public static final char UNDEVELOPED = 0;
 
+    public static final char[] ALL_TAFLMAN_TYPES = new char[] {
+            TYPE_TAFLMAN | SIDE_ATTACKERS,
+            TYPE_TAFLMAN | SIDE_DEFENDERS,
+            TYPE_COMMANDER | SIDE_ATTACKERS,
+            TYPE_COMMANDER | SIDE_DEFENDERS,
+            TYPE_KNIGHT | SIDE_ATTACKERS,
+            TYPE_KNIGHT | SIDE_DEFENDERS,
+            TYPE_KING | SIDE_ATTACKERS,
+            TYPE_KING | SIDE_DEFENDERS
+    };
+
     public static char encode(TaflmanImpl taflman) {
         char packedTaflman = 0;
         packedTaflman = (char) (packedTaflman | (char) taflman.getImplId());
@@ -145,13 +156,20 @@ public class Taflman {
 //        int y = space.y;
 //        int boardSize = getBoard(state).getBoardDimension();
 
+        int speedLimit = getBoard(state).getRules().getTaflmanSpeedLimit(taflman);
         for(List<Coord> direction : Coord.getRankAndFileCoords(b.getBoardDimension(), space)) {
+            int distance = 1;
             for(Coord potentialMove : direction) {
                 boolean canPass = rules.canTaflmanMoveThrough(getBoard(state), taflman, potentialMove);
                 if (getBoard(state).getOccupier(potentialMove) != EMPTY || !canPass) {
                     break;
-                } else {
+                }
+                else if (speedLimit > 0 && distance > speedLimit) {
+                    break;
+                }
+                else {
                     allowableMoves.add(potentialMove);
+                    distance++;
                 }
             }
         }

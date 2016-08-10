@@ -59,10 +59,10 @@ public class Game {
         }
 
         int boardSquares = rules.getBoard().getBoardDimension() * rules.getBoard().getBoardDimension();
-        mZobristConstants = new long[boardSquares][Taflman.COUNT_TYPES * 2];
+        mZobristConstants = new long[boardSquares][Taflman.ALL_TAFLMAN_TYPES.length];
         Random r = new XorshiftRandom(10201989);
         for (int i = 0; i < boardSquares; i++) {
-            for (int j = 0; j < Taflman.COUNT_TYPES * 2; j++) {
+            for (int j = 0; j < Taflman.ALL_TAFLMAN_TYPES.length; j++) {
                 mZobristConstants[i][j] = r.nextLong();
             }
         }
