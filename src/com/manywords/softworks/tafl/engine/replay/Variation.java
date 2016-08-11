@@ -68,7 +68,6 @@ public class Variation {
         return null;
     }
 
-    // TODO: this isn't returning the right value
     public MoveAddress getNextChildAddress(ReplayGame game, ReplayGameState state) {
         if(mVariationStates.size() == 1) {
             return mAddress.firstChild(game, state);

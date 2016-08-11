@@ -614,7 +614,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 }
 
                 if(mInGame) {
-                    // TODO: if the player is a human playing locally, alert them that they have lost
                     if(mServerConnection != null) {
                         mServerConnection.sendGameEndedMessage();
 

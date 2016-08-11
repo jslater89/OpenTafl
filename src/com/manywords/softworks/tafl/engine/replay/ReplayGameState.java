@@ -241,7 +241,6 @@ public class ReplayGameState extends GameState {
                 return true;
             }
             else if (mCanonicalChild != null) {
-                // If it isn't our canonical child, it may be our child's child, &c. TODO: test this
                 return mCanonicalChild.deleteCanonicalChild(moveAddress);
             }
             else {
