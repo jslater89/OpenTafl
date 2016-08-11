@@ -209,6 +209,7 @@ public class GameSerializer {
         boolean inMove = false;
         boolean inVariation = false;
         boolean inComment = false;
+        boolean lastMoveWasVariation = false;
         List<DetailedMoveRecord> lastTurn = new ArrayList<>();
         Pattern variationStartPattern = Pattern.compile("([0-9]+[a-z]\\.)([0-9]+\\.[0-9]+[a-z]\\.)+");
 
@@ -218,11 +219,12 @@ public class GameSerializer {
                 Matcher variationMatcher = variationStartPattern.matcher(remainingRecord);
                 boolean isVariationStart = variationMatcher.lookingAt();
 
-                if (isVariationStart) {
+                if(isVariationStart) {
                     variationStart = variationMatcher.group(0);
                 }
             }
 
+            // If not in anything, and now in a move
             if(!inComment && !inMove && !inVariation && gameRecord.regionMatches(i, moveStart, 0, moveStart.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
@@ -233,6 +235,7 @@ public class GameSerializer {
                 moveStart = currentMove + ".";
                 lastTurn.clear();
             }
+            // If in a move and leaving
             else if(inGame && !inComment && !inVariation && inMove && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
@@ -248,32 +251,52 @@ public class GameSerializer {
                     lastMovesAdded++;
                 }
 
+                lastMoveWasVariation = false;
                 inMove = false;
             }
+            // If nowhere and entering a comment
             else if(inGame && !inComment && gameRecord.regionMatches(i, commentStart, 0, commentStart.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
                 inComment = true;
             }
+            // If in a comment and encountering a comment separator
             else if(inGame && inComment && gameRecord.regionMatches(i, commentMid, 0, commentMid.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
-                if(commentIndex < moves.size()) {
-                    DetailedMoveRecord m = lastTurn.get(commentIndex++);
+                List<DetailedMoveRecord> commentMoves;
+                if(lastMoveWasVariation) {
+                    commentMoves = variations.get(variations.size() - 1).moves;
+                }
+                else {
+                    commentMoves = lastTurn;
+                }
+
+                if(commentIndex < commentMoves.size()) {
+                    DetailedMoveRecord m = commentMoves.get(commentIndex++);
 
                     // last match index + 1 to skip the opening brace
                     m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
                 }
 
             }
+            // If in a comment and finishing a comment
             else if(inGame && inComment && gameRecord.regionMatches(i, commentEnd, 0, commentEnd.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
-                if(commentIndex < moves.size()) {
-                    DetailedMoveRecord m = lastTurn.get(commentIndex++);
+                List<DetailedMoveRecord> commentMoves;
+                if(lastMoveWasVariation) {
+                    commentMoves = variations.get(variations.size() - 1).moves;
+                }
+                else {
+                    commentMoves = lastTurn;
+                }
+
+                if(commentIndex < commentMoves.size()) {
+                    DetailedMoveRecord m = commentMoves.get(commentIndex++);
 
                     // last match index + 1 to skip the separator pipe
                     m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
@@ -281,15 +304,16 @@ public class GameSerializer {
 
                 inComment = false;
             }
+            // If nowhere and entering a variation
             else if(inGame && !inComment && !inVariation && !variationStart.isEmpty() && gameRecord.regionMatches(i, variationStart, 0, variationStart.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
 
                 //variationStart is set by the regex at the top
-                //System.out.println("Entering variation: " + variationStart);
                 inVariation = true;
                 lastTurn.clear();
             }
+            // If in a variation and leaving
             else if(inGame && !inComment && !inMove && inVariation && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
                 lastMatchIndex = matchIndex;
                 matchIndex = i;
@@ -297,7 +321,7 @@ public class GameSerializer {
                 String moveString = gameRecord.substring(lastMatchIndex, matchIndex).replace(variationStart, "").trim();
                 String[] moveStrings = moveString.split(" ");
                 lastMovesAdded = 0;
-                commentIndex = moves.size();
+                commentIndex = 0;
                 int variationStartOffset = 0;
                 for(String move : moveStrings) {
                     // If the move matches this pattern, then it's a ..... dummy move, used to make the typesetting
@@ -320,8 +344,7 @@ public class GameSerializer {
                 VariationContainer v = new VariationContainer(a, new ArrayList<>(lastTurn));
                 variations.add(v);
 
-                //System.out.println("Leaving variation: " + variationStart);
-
+                lastMoveWasVariation = true;
                 inVariation = false;
             }
         }

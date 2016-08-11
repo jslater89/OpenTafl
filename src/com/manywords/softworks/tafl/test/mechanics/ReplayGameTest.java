@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.test.mechanics;
 
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.replay.MoveAddress;
@@ -19,7 +20,7 @@ import java.io.File;
 public class ReplayGameTest extends TaflTest {
     @Override
     public void run() {
-        File f = new File("saved-games/replays/example-variations-replay.otg");
+        File f = new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg");
         assert f.exists();
 
         GameSerializer.GameContainer container = GameSerializer.loadGameRecordFile(f);
@@ -28,19 +29,24 @@ public class ReplayGameTest extends TaflTest {
         assert container.moves != null;
         assert container.variations != null;
 
-        assert container.variations.size() == 3;
+        assert container.variations.size() == 7;
 
         ReplayGame rg = new ReplayGame(container.game, container.moves, container.variations);
 
         String record = GameSerializer.getReplayGameRecord(rg, true);
 
-        assert record.contains("8b.1.1a");
-        assert record.contains("8a.1.1a");
-        assert record.contains("8a.1.2a");
+        assert record.contains("12b.1.1a");
+        assert record.contains("17a.1.1a");
+        assert record.contains("12b.1.5a");
 
         ReplayGameState replayState = rg.getStateByAddress("1a");
         replayState = replayState.makeVariation(new MoveRecord(Coord.get(7, 5), Coord.get(6, 4)));
         assert replayState.getLastMoveResult() < GameState.GOOD_MOVE;
+
+        replayState = rg.getStateByAddress("12b.1.1b");
+        assert replayState != null;
+        assert replayState.getEnteringMove().isDetailed();
+        assert !((DetailedMoveRecord) replayState.getEnteringMove()).getComment().isEmpty();
 
         container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
         rg = new ReplayGame(container.game, container.moves, container.variations);

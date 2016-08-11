@@ -175,6 +175,12 @@ public class ReplayGameState extends GameState {
             }
         }
 
+
+        if(move.isDetailed()) {
+            // Preserve comments
+            ((DetailedMoveRecord) nextState.getEnteringMove()).setComment(((DetailedMoveRecord) move).getComment());
+        }
+
         return nextState;
     }
 
