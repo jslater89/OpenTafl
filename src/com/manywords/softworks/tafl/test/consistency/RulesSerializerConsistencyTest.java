@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.test.consistency;
 
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
+import com.manywords.softworks.tafl.rules.berserk.Berserk;
 import com.manywords.softworks.tafl.rules.brandub.Magpie;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.test.TaflTest;
@@ -28,6 +29,15 @@ public class RulesSerializerConsistencyTest extends TaflTest {
 
         //System.out.println(rules1);
         //System.out.println(rules2);
+        assert RulesSerializer.rulesEqual(rules1, rules2);
+
+        rules = Berserk.newBerserk11();
+        rules1 = rules.getOTRString();
+        rules1 += " ks:m";
+
+        rules = RulesSerializer.loadRulesRecord(rules1);
+        rules2 = rules.getOTRString();
+
         assert RulesSerializer.rulesEqual(rules1, rules2);
     }
 

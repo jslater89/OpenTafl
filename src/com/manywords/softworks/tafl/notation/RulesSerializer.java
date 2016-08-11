@@ -392,6 +392,7 @@ public class RulesSerializer {
         switch(kingMode) {
             case Rules.KING_STRONG: return "s";
             case Rules.KING_STRONG_CENTER: return "c";
+            case Rules.KING_MIDDLEWEIGHT: return "m";
             case Rules.KING_WEAK: return "w";
             default: return "s";
         }
@@ -400,6 +401,7 @@ public class RulesSerializer {
     private static int getKingModeForString(String kingMode) {
         if(kingMode.equals("s")) return Rules.KING_STRONG;
         if(kingMode.equals("c")) return Rules.KING_STRONG_CENTER;
+        if(kingMode.equals("m")) return Rules.KING_MIDDLEWEIGHT;
         if(kingMode.equals("w")) return Rules.KING_WEAK;
 
         return Rules.KING_STRONG;
