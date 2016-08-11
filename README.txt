@@ -238,6 +238,8 @@ v0.4.2.0b (released 08/11/16):
     - Speed limits: pieces are limited in the number of spaces they can move
 - Add Magpie tafl, brandub with 1-speed movement
 - Fix a bug where saving an old replay would yield the incorrect king strength
+- Fixed a bug where loading a replay with commentary on variations would fail
+  to load said variation commentary
 
 v0.4.1.0b (released 08/10/16):
 - Support for variations in saved games
