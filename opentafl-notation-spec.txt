@@ -171,6 +171,8 @@ are present only for organizational purposes.
 			[<space><",">]...
 		piece-type-list:
 			[<taflman-symbol>]...
+
+			Preferred order is 'tcnkTCNK'.
 		shieldwall-mode:
 			"n": no shieldwall capture
 			"w": weak shieldwalls, corners may not close a shieldwall position
@@ -195,7 +197,7 @@ Explanatory notes:
 		(attackers first) should the attacking side go first? Defaults to "y" (yes).
 		If "n", the defenders move first.
 	tfr:
-	    (threefold repetition) what should happen in the case of a threefold repetition?
+		(threefold repetition) what should happen in the case of a threefold repetition?
 		if "w", the player forced to respond wins. If "l", the player forced to respond
 		loses. If "d", the game is a draw (default). If "i", threefold repetitions are
 		ignored.
@@ -423,7 +425,8 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
         not have move index letters, but variations must include them.
 	
 	move-record:
-		an OTN move record.
+		an OTN move record. For variations which start on the second or later
+		move of a turn, may be '.....'.
 
 	first-half-commentary:
 		comment on the first move of this turn. By convention, if the commentary
