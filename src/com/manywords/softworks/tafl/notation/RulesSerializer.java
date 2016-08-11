@@ -403,10 +403,10 @@ public class RulesSerializer {
     }
 
     private static int getKingModeForString(String kingMode) {
-        if(kingMode.equals("s")) return Rules.KING_STRONG;
+        if(kingMode.equals("s") || kingMode.equals("y")) return Rules.KING_STRONG;
         if(kingMode.equals("c")) return Rules.KING_STRONG_CENTER;
         if(kingMode.equals("m")) return Rules.KING_MIDDLEWEIGHT;
-        if(kingMode.equals("w")) return Rules.KING_WEAK;
+        if(kingMode.equals("w") || kingMode.equals("n")) return Rules.KING_WEAK;
 
         return Rules.KING_STRONG;
     }
