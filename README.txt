@@ -232,6 +232,13 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 10. VERSION HISTORY -----------------------------------------------------------
 
+v0.4.2.0b (released 08/11/16):
+- Implement some new rules
+    - Middleweight king: the king is strong, but can be captured aginst an edge
+    - Speed limits: pieces are limited in the number of spaces they can move
+- Add Magpie tafl, brandub with 1-speed movement
+- Fix a bug where saving an old replay would yield the incorrect king strength
+
 v0.4.1.0b (released 08/10/16):
 - Support for variations in saved games
     - Rather handily, old saved games are forward-compatible, and new saved
