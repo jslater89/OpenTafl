@@ -104,4 +104,31 @@ public class TaflmanCodes {
 
         return index;
     }
+
+    public static String getTaflmanNameForTaflman(char taflman, boolean plural) {
+        String taflmanType = "taflman";
+
+        char typeFlag = Taflman.getPackedType(taflman);
+
+        switch(Taflman.getPackedType(taflman)) {
+            // TYPE_TAFLMAN: index += 0
+            case Taflman.TYPE_COMMANDER:
+                taflmanType = "commander";
+                break;
+            case Taflman.TYPE_KNIGHT:
+                taflmanType = "knight";
+                break;
+            case Taflman.TYPE_KING:
+                taflmanType = "king";
+                break;
+        }
+
+        if(plural) {
+            taflmanType += "s";
+
+            if(taflmanType.equals("taflmans")) taflmanType = "taflmen";
+        }
+
+        return taflmanType;
+    }
 }

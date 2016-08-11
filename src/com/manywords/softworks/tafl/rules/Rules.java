@@ -239,6 +239,12 @@ public abstract class Rules {
 
     public abstract int howManyDefenders();
 
+    public static final int SPEED_LIMITS_NONE = 0;
+    public static final int SPEED_LIMITS_IDENTICAL = 1;
+    public static final int SPEED_LIMITS_BY_SIDE = 2;
+    public static final int SPEED_LIMITS_BY_TYPE = 3;
+    public abstract int getSpeedLimitMode();
+
     /**
      * How many spaces can the given taflman move?
      * @param taflman The taflman in question.

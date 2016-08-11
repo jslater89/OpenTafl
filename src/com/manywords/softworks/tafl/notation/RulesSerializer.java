@@ -279,7 +279,11 @@ public class RulesSerializer {
         if(config.containsKey("swf")) rules.setShieldwallFlankingRequired(getBooleanForString(config.get("swf")));
         if(config.containsKey("efe")) rules.setEdgeFortEscape(getBooleanForString(config.get("efe")));
         if(config.containsKey("ber")) rules.setBerserkMode(getBerserkModeForString(config.get("ber")));
-        if(config.containsKey("spd")) rules.setSpeedLimits(getTaflmanSpeedsForString(config.get("spd")));
+
+        if(config.containsKey("spd")) {
+            TaflmanSpeedHolder holder = getTaflmanSpeedsForString(config.get("spd"));
+            rules.setSpeedLimits(holder.mode, holder.speeds);
+        }
 
         if(config.containsKey("cor")) rules.setCornerSpaces(getCoordListForString(config.get("cor")));
         if(config.containsKey("cen")) rules.setCenterSpaces(getCoordListForString(config.get("cen")));
@@ -495,31 +499,47 @@ public class RulesSerializer {
         }
     }
 
-    public static int[] getTaflmanSpeedsForString(String speedString) {
+    private static class TaflmanSpeedHolder {
+        int[] speeds;
+        int mode;
+    }
+
+    public static TaflmanSpeedHolder getTaflmanSpeedsForString(String speedString) {
         String[] speedStrings = speedString.split(",");
-        int[] speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length];
+        TaflmanSpeedHolder holder = new TaflmanSpeedHolder();
+
+        holder.speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length];
 
         if(speedStrings.length == 0) {
-            Arrays.fill(speeds, -1);
+            Arrays.fill(holder.speeds, -1);
+            holder.mode = Rules.SPEED_LIMITS_NONE;
         }
         if(speedStrings.length == 1) {
             int speed = Integer.parseInt(speedStrings[0]);
-            Arrays.fill(speeds, speed);
+
+            if(speed == -1) holder.mode = Rules.SPEED_LIMITS_NONE;
+            else holder.mode = Rules.SPEED_LIMITS_IDENTICAL;
+
+            Arrays.fill(holder.speeds, speed);
         }
         else if(speedStrings.length == 2) {
-            Arrays.fill(speeds, 0, speeds.length / 2, -1);
-            Arrays.fill(speeds, speeds.length / 2, speeds.length, -1);
+            Arrays.fill(holder.speeds, 0, holder.speeds.length / 2, -1);
+            Arrays.fill(holder.speeds, holder.speeds.length / 2, holder.speeds.length, -1);
+
+            holder.mode = Rules.SPEED_LIMITS_BY_SIDE;
         }
-        else if(speedStrings.length == speeds.length) {
-            for(int i = 0; i < speeds.length; i++) {
+        else if(speedStrings.length == holder.speeds.length) {
+            for(int i = 0; i < holder.speeds.length; i++) {
                 int speed = Integer.parseInt(speedStrings[i]);
-                speeds[i] = speed;
+                holder.speeds[i] = speed;
             }
+
+            holder.mode = Rules.SPEED_LIMITS_BY_TYPE;
         }
         else {
             throw new IllegalArgumentException("Invalid speed limit string: " + speedString);
         }
-        return speeds;
+        return holder;
     }
 
     public static String getStringForTaflmanTypeList(boolean[] typeList) {

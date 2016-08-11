@@ -112,6 +112,11 @@ public class Brandub extends Rules {
     }
 
     @Override
+    public int getSpeedLimitMode() {
+        return SPEED_LIMITS_NONE;
+    }
+
+    @Override
     public int getTaflmanSpeedLimit(char taflman) {
         return -1;
     }

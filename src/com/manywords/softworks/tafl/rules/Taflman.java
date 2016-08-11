@@ -156,7 +156,11 @@ public class Taflman {
 //        int y = space.y;
 //        int boardSize = getBoard(state).getBoardDimension();
 
-        int speedLimit = getBoard(state).getRules().getTaflmanSpeedLimit(taflman);
+        int speedLimit = -1;
+        if(rules.getSpeedLimitMode() != Rules.SPEED_LIMITS_NONE) {
+            speedLimit = getBoard(state).getRules().getTaflmanSpeedLimit(taflman);
+        }
+
         for(List<Coord> direction : Coord.getRankAndFileCoords(b.getBoardDimension(), space)) {
             int distance = 1;
             for(Coord potentialMove : direction) {

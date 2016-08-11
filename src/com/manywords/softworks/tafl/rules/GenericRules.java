@@ -60,6 +60,7 @@ public class GenericRules extends Rules {
     private boolean mShieldwallFlankingRequired = true;
     private boolean mEdgeFortEscape = false;
     private int mBerserkMode = BERSERK_NONE;
+    private int mSpeedLimitMode = SPEED_LIMITS_NONE;
     private int[] mSpeedLimits = new int[TAFLMAN_TYPE_COUNT];
 
     public void setName(String name) { mName = name; }
@@ -140,7 +141,8 @@ public class GenericRules extends Rules {
         mBerserkMode = berserkMode;
     }
 
-    public void setSpeedLimits(int[] speeds) {
+    public void setSpeedLimits(int mode, int[] speeds) {
+        mSpeedLimitMode = mode;
         mSpeedLimits = speeds;
     }
 
@@ -234,6 +236,11 @@ public class GenericRules extends Rules {
     @Override
     public int howManyDefenders() {
         return mDefenders.getStartingTaflmen().size();
+    }
+
+    @Override
+    public int getSpeedLimitMode() {
+        return mSpeedLimitMode;
     }
 
     @Override

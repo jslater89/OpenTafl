@@ -32,4 +32,9 @@ public class Magpie extends Brandub {
     public String getName() {
         return "Magpie";
     }
+
+    @Override
+    public int getSpeedLimitMode() {
+        return SPEED_LIMITS_IDENTICAL;
+    }
 }
