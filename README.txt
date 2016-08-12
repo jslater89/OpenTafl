@@ -232,6 +232,9 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 10. VERSION HISTORY -----------------------------------------------------------
 
+v0.4.2.2b (released 08/12/16):
+- Fix bug where speed limits were not correctly serialized or read
+
 v0.4.2.1b (released 08/12/16):
 - Implement king hammer-only and anvil-only armed modes
 - Change Magpie rules to match playtaflonline's Magpie rules
