@@ -107,8 +107,8 @@ public class RulesSerializer {
             otnrString += "tfr:" + getStringForThreefoldResult(rules.threefoldRepetitionResult()) + " ";
         }
 
-        if(!rules.isKingArmed()) {
-            otnrString += "ka:n ";
+        if(rules.getKingArmedMode() != Rules.KING_ARMED) {
+            otnrString += "ka:" + getStringForKingArmedMode(rules.getKingArmedMode()) + " ";
         }
 
         if(rules.getKingStrengthMode() != Rules.KING_STRONG) {
@@ -270,7 +270,7 @@ public class RulesSerializer {
         if(config.containsKey("surf")) rules.setSurroundingFatal(getBooleanForString(config.get("surf")));
         if(config.containsKey("atkf")) rules.setAttackersFirst(getBooleanForString(config.get("atkf")));
         if(config.containsKey("tfr")) rules.setThreefoldResult(getThreefoldResultForString(config.get("tfr")));
-        if(config.containsKey("ka")) rules.setKingArmed(getBooleanForString(config.get("ka")));
+        if(config.containsKey("ka")) rules.setKingArmed(getKingArmedModeForString(config.get("ka")));
         if(config.containsKey("ks")) rules.setKingStrength(getKingModeForString(config.get("ks")));
         if(config.containsKey("kj")) rules.setKingJumpMode(getJumpModeForString(config.get("kj")));
         if(config.containsKey("nj")) rules.setKnightJumpMode(getJumpModeForString(config.get("nj")));
@@ -409,6 +409,25 @@ public class RulesSerializer {
         if(kingMode.equals("w") || kingMode.equals("n")) return Rules.KING_WEAK;
 
         return Rules.KING_STRONG;
+    }
+
+    private static String getStringForKingArmedMode(int kingArmedMode) {
+        switch(kingArmedMode) {
+            case Rules.KING_ARMED: return "y";
+            case Rules.KING_HAMMER_ONLY: return "h";
+            case Rules.KING_ANVIL_ONLY: return "a";
+            case Rules.KING_UNARMED: return "n";
+            default: return "y";
+        }
+    }
+
+    private static int getKingArmedModeForString(String armedMode) {
+        if(armedMode.equals("y")) return Rules.KING_ARMED;
+        if(armedMode.equals("h")) return Rules.KING_HAMMER_ONLY;
+        if(armedMode.equals("a")) return Rules.KING_ANVIL_ONLY;
+        if(armedMode.equals("n")) return Rules.KING_UNARMED;
+
+        return Rules.KING_ARMED;
     }
 
     private static String getStringForJumpMode(int jumpMode) {

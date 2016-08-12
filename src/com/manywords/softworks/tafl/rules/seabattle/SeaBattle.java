@@ -71,9 +71,9 @@ public class SeaBattle extends Rules {
     }
 
     @Override
-    public boolean isKingArmed() {
+    public int getKingArmedMode() {
         // King does not capture
-        return false;
+        return KING_UNARMED;
     }
 
     @Override

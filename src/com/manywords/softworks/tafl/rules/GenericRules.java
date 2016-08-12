@@ -51,7 +51,7 @@ public class GenericRules extends Rules {
     private boolean mSurroundingFatal = true;
     private boolean mAttackersFirst = true;
     private int mThreefoldResult = DRAW;
-    private boolean mKingArmed = true;
+    private int mKingArmedMode = Rules.KING_ARMED;
     private int mKingMode = Rules.KING_STRONG;
     private int mKingJumpMode = Taflman.JUMP_NONE;
     private int mCommanderJumpMode = Taflman.JUMP_STANDARD;
@@ -79,8 +79,8 @@ public class GenericRules extends Rules {
 
     public void setThreefoldResult(int threefoldResult) { mThreefoldResult = threefoldResult; }
 
-    public void setKingArmed(boolean kingArmed) {
-        mKingArmed = kingArmed;
+    public void setKingArmed(int kingArmed) {
+        mKingArmedMode = kingArmed;
     }
 
     public void setKingStrength(int kingStrong) {
@@ -198,8 +198,8 @@ public class GenericRules extends Rules {
     }
 
     @Override
-    public boolean isKingArmed() {
-        return mKingArmed;
+    public int getKingArmedMode() {
+        return mKingArmedMode;
     }
 
     @Override

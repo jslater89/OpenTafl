@@ -100,8 +100,8 @@ public class FotevikenTablut extends Rules {
     }
 
     @Override
-    public boolean isKingArmed() {
-        return true;
+    public int getKingArmedMode() {
+        return KING_ARMED;
     }
 
     @Override

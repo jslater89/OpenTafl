@@ -13,67 +13,7 @@ import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.Player;
 
-public class CornerVictoryTest extends TaflTest implements UiCallback {
-
-    @Override
-    public void gameStarting() {
-
-    }
-
-    @Override
-    public void modeChanging(Mode mode, Object gameObject) {
-
-    }
-
-    @Override
-    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
-
-    }
-
-    @Override
-    public void timeUpdate(boolean currentSideAttackers) {
-
-    }
-
-    @Override
-    public void moveResult(CommandResult result, MoveRecord move) {
-
-    }
-
-    @Override
-    public void statusText(String text) {
-
-    }
-
-    @Override
-    public void modalStatus(String title, String text) {
-
-    }
-
-    @Override
-    public void gameStateAdvanced() {
-
-    }
-
-    @Override
-    public void victoryForSide(Side side) {
-
-    }
-
-    @Override
-    public void gameFinished() {
-
-    }
-
-    @Override
-    public MoveRecord waitForHumanMoveInput() {
-        return null;
-    }
-
-    @Override
-    public boolean inGame() {
-        return false;
-    }
+public class CornerVictoryTest extends TaflTest {
 
     @Override
     public void run() {

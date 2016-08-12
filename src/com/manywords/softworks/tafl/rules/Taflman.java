@@ -1,7 +1,6 @@
 package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
-import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 
@@ -517,7 +516,9 @@ public class Taflman {
 
         // If the capturing piece is an unarmed king, don't check anything
         // else.
-        if (Taflman.isKing(capturer) && !rules.isKingArmed()) {
+        if (Taflman.isKing(capturer)
+                && rules.getKingArmedMode() != Rules.KING_ARMED
+                && rules.getKingArmedMode() != Rules.KING_HAMMER_ONLY) {
             return false;
         }
 

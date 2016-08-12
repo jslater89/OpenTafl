@@ -188,11 +188,31 @@ public abstract class Rules {
     public abstract void setupSpaceGroups(int boardSize);
 
     /**
+     * The king can take part in captures as the moving piece or the static piece.
+     */
+    public static final int KING_ARMED = 0;
+
+    /**
+     * The king can take part in captures, but only as the moving piece.
+     */
+    public static final int KING_HAMMER_ONLY = 1;
+
+    /**
+     * The king can take part in captures, but only as the stationary piece.
+     */
+    public static final int KING_ANVIL_ONLY = 2;
+
+    /**
+     * The king cannot take part in captures.
+     */
+    public static final int KING_UNARMED = 3;
+
+    /**
      * Can the king participate in captures?
      *
      * @return
      */
-    public abstract boolean isKingArmed();
+    public abstract int getKingArmedMode();
 
     /**
      * The king is strong, requiring four men to capture at all times.

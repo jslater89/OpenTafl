@@ -49,9 +49,9 @@ public class Fetlar extends Rules {
     }
 
     @Override
-    public boolean isKingArmed() {
+    public int getKingArmedMode() {
         // King takes part in captures
-        return true;
+        return KING_ARMED;
     }
 
     @Override

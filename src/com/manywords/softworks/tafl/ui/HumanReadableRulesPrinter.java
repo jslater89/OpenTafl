@@ -507,8 +507,22 @@ public class HumanReadableRulesPrinter {
         rules += ruleNumber++ + ". All taflmen " + (r.getKingStrengthMode() != Rules.KING_WEAK ? "except the king " : "") + "are captured when the opposing side moves " +
                 "a taflman such that the captured taflman is surrounded on both sides, along a row or a column, by enemy taflmen or hostile spaces. " +
                 "A taflman is only captured if the opponent's move closes the trap: a taflman may therefore safely move in between two enemy taflmen, or " +
-                "an enemy taflman and a hostile space. Captured taflmen are removed from the game. " + (r.isKingArmed() ? "The king may take part in " +
-                "captures." : "The king may not take part in captures.") + "\n\n";
+                "an enemy taflman and a hostile space. Captured taflmen are removed from the game. ";
+
+        switch(r.getKingArmedMode()) {
+            case Rules.KING_ARMED:
+                rules += "The king may take part in captures.\n\n";
+                break;
+            case Rules.KING_HAMMER_ONLY:
+                rules += "The king may take part in captures, but only as the moving piece.\n\n";
+                break;
+            case Rules.KING_ANVIL_ONLY:
+                rules += "The king may take part in captures, but only as the stationary piece.\n\n";
+                break;
+            case Rules.KING_UNARMED:
+                rules += "The king may not take part in captures.\n\n";
+                break;
+        }
 
         if(r.getKingStrengthMode() == Rules.KING_STRONG || (r.getKingStrengthMode() == Rules.KING_STRONG_CENTER && centers.size() == 0)) {
             rules += ruleNumber++ + ". The king must be surrounded by enemy taflmen or hostile spaces on all four sides to be captured. ";

@@ -70,9 +70,9 @@ public class Brandub extends Rules {
     }
 
     @Override
-    public boolean isKingArmed() {
+    public int getKingArmedMode() {
         // King captures
-        return true;
+        return KING_ARMED;
     }
 
     @Override
