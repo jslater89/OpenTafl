@@ -203,6 +203,9 @@ Explanatory notes:
 		ignored.
 	ka: 
 		(king armed) does the king participate in captures? Defaults to "y" (yes).
+		If "a" (anvil-only), the king can be captured against, but cannot move to make a
+		capture. If "h" (hammer-only), the king cannot be captured against, but can move
+		to make a capture. If "n", the king never participates in captures.
 	ks: 
 		(king strong) does the king need to be surrounded on four sides to be captured? 
 		Defaults to "s" (strong). If "w", the king need only be surrounded on two sides.

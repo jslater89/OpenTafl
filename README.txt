@@ -232,6 +232,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 10. VERSION HISTORY -----------------------------------------------------------
 
+v0.4.2.1b (released 08/12/16):
+- Implement king hammer-only and anvil-only armed modes
+- Change Magpie rules to match playtaflonline's Magpie rules
+
 v0.4.2.0b (released 08/11/16):
 - Implement some new rules
     - Middleweight king: the king is strong, but can be captured aginst an edge
