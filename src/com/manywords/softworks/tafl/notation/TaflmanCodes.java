@@ -87,7 +87,7 @@ public class TaflmanCodes {
 
     public static int getIndexForTaflmanChar(char taflman) {
         boolean attacker = Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS;
-        int index = (attacker ? 4 : 0);
+        int index = (attacker ? 0 : 4);
 
         switch(Taflman.getPackedType(taflman)) {
             // TYPE_TAFLMAN: index += 0

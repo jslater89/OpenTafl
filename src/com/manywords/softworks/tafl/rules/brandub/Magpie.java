@@ -26,7 +26,7 @@ public class Magpie extends Brandub {
 
     @Override
     public int getTaflmanSpeedLimit(char taflman) {
-        if(Taflman.isKing(taflman)) return 1;
+        if(Taflman.getPackedSide(taflman) == Taflman.SIDE_DEFENDERS && Taflman.isKing(taflman)) return 1;
         else return -1;
     }
 
