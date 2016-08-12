@@ -13,6 +13,10 @@ public class GenericRules extends Rules {
         mAttackers = attackers;
         mDefenders = defenders;
 
+        for(int i = 0; i < mSpeedLimits.length; i++) {
+            mSpeedLimits[i] = -1;
+        }
+
         for(Side.TaflmanHolder holder : attackers.getStartingTaflmen()) {
             char taflman = holder.packed;
 

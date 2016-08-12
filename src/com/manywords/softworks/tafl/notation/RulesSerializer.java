@@ -500,8 +500,13 @@ public class RulesSerializer {
                 attackerSpeedsIdentical = false;
             }
         }
-
-        if(attackerSpeed != defenderSpeed) allSpeedsIdentical = false;
+        
+        // Three cases: attacker speeds are all identical and defender speeds are all identical,
+        // but each side has a different speed; or attackers/defenders (two cases) have differing
+        // speeds internally. If one or more is true, all speeds are not identical.
+        if(attackerSpeed != defenderSpeed || !attackerSpeedsIdentical || !defenderSpeedsIdentical) {
+            allSpeedsIdentical = false;
+        }
 
         if(allSpeedsIdentical) {
             return "" + speeds[0];
