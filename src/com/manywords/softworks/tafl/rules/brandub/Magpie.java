@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.rules.brandub;
 
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Side;
+import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.brandub.seven.Brandub7Attackers;
 import com.manywords.softworks.tafl.rules.brandub.seven.Brandub7Board;
 import com.manywords.softworks.tafl.rules.brandub.seven.Brandub7Defenders;
@@ -25,12 +26,23 @@ public class Magpie extends Brandub {
 
     @Override
     public int getTaflmanSpeedLimit(char taflman) {
-        return 1;
+        if(Taflman.isKing(taflman)) return 1;
+        else return -1;
+    }
+
+    @Override
+    public int getKingStrengthMode() {
+        return KING_MIDDLEWEIGHT;
     }
 
     @Override
     public String getName() {
         return "Magpie";
+    }
+
+    @Override
+    public void setupSpaceGroups(int boardSize) {
+        setDefaultSpaceGroups();
     }
 
     @Override
