@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.test.rules;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.test.TaflTest;
@@ -20,26 +22,26 @@ public class EdgeFortEscapeTest extends TaflTest {
         assert state.checkVictory() == 0;
 
         // This is not an invincible shape: the top taflman can be captured
-        state.moveTaflman(state.getPieceAt(2, 5), state.getSpaceAt(2, 6));
+        state.makeMove(new MoveRecord(Coord.get(2,5), Coord.get(2,6)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
         assert state.checkVictory() == 0;
 
-        state.moveTaflman(state.getPieceAt(2, 0), state.getSpaceAt(2, 1));
+        state.makeMove(new MoveRecord(Coord.get(2,0), Coord.get(2,1)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
         // This makes it an invincible shape.
-        state.moveTaflman(state.getPieceAt(1, 4), state.getSpaceAt(1, 6));
+        state.makeMove(new MoveRecord(Coord.get(1,4), Coord.get(1,6)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
         assert state.checkVictory() == GameState.DEFENDER_WIN;
 
-        state.moveTaflman(state.getPieceAt(2, 1), state.getSpaceAt(2, 0));
+        state.makeMove(new MoveRecord(Coord.get(2,1), Coord.get(2,0)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(2, 8), state.getSpaceAt(2, 7));
+        state.makeMove(new MoveRecord(Coord.get(2,8), Coord.get(2,7)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
         assert state.checkVictory() == GameState.DEFENDER_WIN;

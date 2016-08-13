@@ -2,10 +2,6 @@ package com.manywords.softworks.tafl.rules.tablut;
 
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
-import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Attackers;
-import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Board;
-import com.manywords.softworks.tafl.rules.seabattle.nine.SeaBattle9Defenders;
-import com.manywords.softworks.tafl.rules.seabattle.nine.test.*;
 import com.manywords.softworks.tafl.rules.tablut.nine.Tablut9Attackers;
 import com.manywords.softworks.tafl.rules.tablut.nine.Tablut9Board;
 import com.manywords.softworks.tafl.rules.tablut.nine.Tablut9Defenders;
@@ -72,8 +68,8 @@ public class Tablut extends Rules {
     }
 
     @Override
-    public boolean isKingArmed() {
-        return true;
+    public int getKingArmedMode() {
+        return KING_ARMED;
     }
 
     @Override
@@ -98,11 +94,6 @@ public class Tablut extends Rules {
     }
 
     @Override
-    public int getMercenaryJumpMode() {
-        return Taflman.JUMP_CAPTURE;
-    }
-
-    @Override
     public boolean canSideJump(Side side) {
         return false;
     }
@@ -115,6 +106,16 @@ public class Tablut extends Rules {
     @Override
     public int howManyDefenders() {
         return mStartingDefenders.getStartingTaflmen().size();
+    }
+
+    @Override
+    public int getSpeedLimitMode() {
+        return SPEED_LIMITS_NONE;
+    }
+
+    @Override
+    public int getTaflmanSpeedLimit(char taflman) {
+        return -1;
     }
 
     @Override

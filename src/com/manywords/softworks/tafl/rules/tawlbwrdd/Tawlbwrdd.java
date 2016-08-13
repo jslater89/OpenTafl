@@ -43,9 +43,9 @@ public class Tawlbwrdd extends Rules {
     }
 
     @Override
-    public boolean isKingArmed() {
+    public int getKingArmedMode() {
         // King takes part in captures
-        return true;
+        return KING_ARMED;
     }
 
     @Override
@@ -70,11 +70,6 @@ public class Tawlbwrdd extends Rules {
     }
 
     @Override
-    public int getMercenaryJumpMode() {
-        return Taflman.JUMP_NONE;
-    }
-
-    @Override
     public boolean canSideJump(Side side) {
         return false;
     }
@@ -87,6 +82,16 @@ public class Tawlbwrdd extends Rules {
     @Override
     public int howManyDefenders() {
         return mStartingDefenders.getStartingTaflmen().size();
+    }
+
+    @Override
+    public int getSpeedLimitMode() {
+        return SPEED_LIMITS_NONE;
+    }
+
+    @Override
+    public int getTaflmanSpeedLimit(char taflman) {
+        return -1;
     }
 
     @Override

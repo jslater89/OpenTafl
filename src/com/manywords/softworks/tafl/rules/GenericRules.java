@@ -2,8 +2,6 @@ package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.notation.TaflmanCodes;
 
-import java.util.List;
-
 /**
  * Created by jay on 2/6/16.
  */
@@ -14,6 +12,10 @@ public class GenericRules extends Rules {
         mBoard = board;
         mAttackers = attackers;
         mDefenders = defenders;
+
+        for(int i = 0; i < mSpeedLimits.length; i++) {
+            mSpeedLimits[i] = -1;
+        }
 
         for(Side.TaflmanHolder holder : attackers.getStartingTaflmen()) {
             char taflman = holder.packed;
@@ -53,7 +55,7 @@ public class GenericRules extends Rules {
     private boolean mSurroundingFatal = true;
     private boolean mAttackersFirst = true;
     private int mThreefoldResult = DRAW;
-    private boolean mKingArmed = true;
+    private int mKingArmedMode = Rules.KING_ARMED;
     private int mKingMode = Rules.KING_STRONG;
     private int mKingJumpMode = Taflman.JUMP_NONE;
     private int mCommanderJumpMode = Taflman.JUMP_STANDARD;
@@ -62,6 +64,8 @@ public class GenericRules extends Rules {
     private boolean mShieldwallFlankingRequired = true;
     private boolean mEdgeFortEscape = false;
     private int mBerserkMode = BERSERK_NONE;
+    private int mSpeedLimitMode = SPEED_LIMITS_NONE;
+    private int[] mSpeedLimits = new int[TAFLMAN_TYPE_COUNT];
 
     public void setName(String name) { mName = name; }
 
@@ -79,8 +83,8 @@ public class GenericRules extends Rules {
 
     public void setThreefoldResult(int threefoldResult) { mThreefoldResult = threefoldResult; }
 
-    public void setKingArmed(boolean kingArmed) {
-        mKingArmed = kingArmed;
+    public void setKingArmed(int kingArmed) {
+        mKingArmedMode = kingArmed;
     }
 
     public void setKingStrength(int kingStrong) {
@@ -141,6 +145,11 @@ public class GenericRules extends Rules {
         mBerserkMode = berserkMode;
     }
 
+    public void setSpeedLimits(int mode, int[] speeds) {
+        mSpeedLimitMode = mode;
+        mSpeedLimits = speeds;
+    }
+
     public void setCenterParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] hostileEmpty, boolean[] reenterable) {
         if(passable != null) centerPassableFor = passable;
         if(stoppable != null) centerStoppableFor = stoppable;
@@ -193,8 +202,8 @@ public class GenericRules extends Rules {
     }
 
     @Override
-    public boolean isKingArmed() {
-        return mKingArmed;
+    public int getKingArmedMode() {
+        return mKingArmedMode;
     }
 
     @Override
@@ -218,11 +227,6 @@ public class GenericRules extends Rules {
     }
 
     @Override
-    public int getMercenaryJumpMode() {
-        return Taflman.JUMP_NONE;
-    }
-
-    @Override
     public boolean canSideJump(Side side) {
         if(side.isAttackingSide()) return mAttackersJump;
         else return mDefendersJump;
@@ -236,6 +240,16 @@ public class GenericRules extends Rules {
     @Override
     public int howManyDefenders() {
         return mDefenders.getStartingTaflmen().size();
+    }
+
+    @Override
+    public int getSpeedLimitMode() {
+        return mSpeedLimitMode;
+    }
+
+    @Override
+    public int getTaflmanSpeedLimit(char taflman) {
+        return mSpeedLimits[TaflmanCodes.getIndexForTaflmanChar(taflman)];
     }
 
     @Override

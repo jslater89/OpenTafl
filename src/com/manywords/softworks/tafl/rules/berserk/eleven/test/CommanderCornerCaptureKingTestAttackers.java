@@ -1,9 +1,6 @@
 package com.manywords.softworks.tafl.rules.berserk.eleven.test;
 
-import com.manywords.softworks.tafl.rules.Board;
-import com.manywords.softworks.tafl.rules.Coord;
-import com.manywords.softworks.tafl.rules.Side;
-import com.manywords.softworks.tafl.rules.TaflmanImpl;
+import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.rules.taflmen.Commander;
 
 import java.util.ArrayList;
@@ -53,6 +50,8 @@ public class CommanderCornerCaptureKingTestAttackers extends Side {
 
         // Bottom
         taflmen.add(new Commander((byte) 3, Coord.get(6, 5), this, getBoard(), getBoard().getRules()));
+
+        taflmen.add(new TaflmanImpl((byte) 4, Taflman.TYPE_TAFLMAN, Coord.get(4, 0), this, getBoard(), getBoard().getRules()));
 
         return createHolderListFromTaflmanList(taflmen);
     }

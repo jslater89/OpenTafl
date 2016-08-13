@@ -46,6 +46,8 @@ public class RulesSerializer {
         map.put("afor", "");
         map.put("dfor", "");
 
+        map.put("spd", "-1");
+
         map.put("corh", "tcnkTCNK");
         map.put("cenh", "tcnk");
         map.put("cenhe", "tcnkTCNK");
@@ -105,8 +107,8 @@ public class RulesSerializer {
             otnrString += "tfr:" + getStringForThreefoldResult(rules.threefoldRepetitionResult()) + " ";
         }
 
-        if(!rules.isKingArmed()) {
-            otnrString += "ka:n ";
+        if(rules.getKingArmedMode() != Rules.KING_ARMED) {
+            otnrString += "ka:" + getStringForKingArmedMode(rules.getKingArmedMode()) + " ";
         }
 
         if(rules.getKingStrengthMode() != Rules.KING_STRONG) {
@@ -163,6 +165,11 @@ public class RulesSerializer {
             }
 
             otnrString += fortString + " ";
+        }
+
+        String spd = getStringForTaflmanSpeeds(rules);
+        if(!spd.equals(defaults.get("spd"))) {
+            otnrString += "spd:" + spd + " ";
         }
 
         String corp = getStringForTaflmanTypeList(rules.cornerPassableFor);
@@ -263,7 +270,7 @@ public class RulesSerializer {
         if(config.containsKey("surf")) rules.setSurroundingFatal(getBooleanForString(config.get("surf")));
         if(config.containsKey("atkf")) rules.setAttackersFirst(getBooleanForString(config.get("atkf")));
         if(config.containsKey("tfr")) rules.setThreefoldResult(getThreefoldResultForString(config.get("tfr")));
-        if(config.containsKey("ka")) rules.setKingArmed(getBooleanForString(config.get("ka")));
+        if(config.containsKey("ka")) rules.setKingArmed(getKingArmedModeForString(config.get("ka")));
         if(config.containsKey("ks")) rules.setKingStrength(getKingModeForString(config.get("ks")));
         if(config.containsKey("kj")) rules.setKingJumpMode(getJumpModeForString(config.get("kj")));
         if(config.containsKey("nj")) rules.setKnightJumpMode(getJumpModeForString(config.get("nj")));
@@ -272,6 +279,11 @@ public class RulesSerializer {
         if(config.containsKey("swf")) rules.setShieldwallFlankingRequired(getBooleanForString(config.get("swf")));
         if(config.containsKey("efe")) rules.setEdgeFortEscape(getBooleanForString(config.get("efe")));
         if(config.containsKey("ber")) rules.setBerserkMode(getBerserkModeForString(config.get("ber")));
+
+        if(config.containsKey("spd")) {
+            TaflmanSpeedHolder holder = getTaflmanSpeedsForString(config.get("spd"));
+            rules.setSpeedLimits(holder.mode, holder.speeds);
+        }
 
         if(config.containsKey("cor")) rules.setCornerSpaces(getCoordListForString(config.get("cor")));
         if(config.containsKey("cen")) rules.setCenterSpaces(getCoordListForString(config.get("cen")));
@@ -384,17 +396,38 @@ public class RulesSerializer {
         switch(kingMode) {
             case Rules.KING_STRONG: return "s";
             case Rules.KING_STRONG_CENTER: return "c";
+            case Rules.KING_MIDDLEWEIGHT: return "m";
             case Rules.KING_WEAK: return "w";
             default: return "s";
         }
     }
 
     private static int getKingModeForString(String kingMode) {
-        if(kingMode.equals("s")) return Rules.KING_STRONG;
+        if(kingMode.equals("s") || kingMode.equals("y")) return Rules.KING_STRONG;
         if(kingMode.equals("c")) return Rules.KING_STRONG_CENTER;
-        if(kingMode.equals("w")) return Rules.KING_WEAK;
+        if(kingMode.equals("m")) return Rules.KING_MIDDLEWEIGHT;
+        if(kingMode.equals("w") || kingMode.equals("n")) return Rules.KING_WEAK;
 
         return Rules.KING_STRONG;
+    }
+
+    private static String getStringForKingArmedMode(int kingArmedMode) {
+        switch(kingArmedMode) {
+            case Rules.KING_ARMED: return "y";
+            case Rules.KING_HAMMER_ONLY: return "h";
+            case Rules.KING_ANVIL_ONLY: return "a";
+            case Rules.KING_UNARMED: return "n";
+            default: return "y";
+        }
+    }
+
+    private static int getKingArmedModeForString(String armedMode) {
+        if(armedMode.equals("y")) return Rules.KING_ARMED;
+        if(armedMode.equals("h")) return Rules.KING_HAMMER_ONLY;
+        if(armedMode.equals("a")) return Rules.KING_ANVIL_ONLY;
+        if(armedMode.equals("n")) return Rules.KING_UNARMED;
+
+        return Rules.KING_ARMED;
     }
 
     private static String getStringForJumpMode(int jumpMode) {
@@ -435,6 +468,102 @@ public class RulesSerializer {
         Set<Coord> defaultCenter = new HashSet<Coord>(2);
         defaultCenter.add(Coord.get(center, center));
         return defaultCenter;
+    }
+
+    public static String getStringForTaflmanSpeeds(Rules rules) {
+        int[] speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length];
+        for(char prototypeTaflman : Taflman.ALL_TAFLMAN_TYPES) {
+            int i = TaflmanCodes.getIndexForTaflmanChar(prototypeTaflman);
+            speeds[i] = rules.getTaflmanSpeedLimit(prototypeTaflman);
+        }
+
+        boolean allSpeedsIdentical = true;
+        boolean attackerSpeedsIdentical = true;
+        boolean defenderSpeedsIdentical = true;
+
+        int defenderSpeed = -2;
+        int attackerSpeed = -2;
+        for(int i = 0; i < speeds.length / 2; i++) {
+            if(defenderSpeed == -2) {
+                defenderSpeed = speeds[i];
+            }
+            else if(defenderSpeed != speeds[i]) {
+                defenderSpeedsIdentical = false;
+            }
+        }
+
+        for(int i = speeds.length / 2; i < speeds.length; i++) {
+            if(attackerSpeed == -2) {
+                attackerSpeed = speeds[i];
+            }
+            else if(attackerSpeed != speeds[i]) {
+                attackerSpeedsIdentical = false;
+            }
+        }
+
+        // Three cases: attacker speeds are all identical and defender speeds are all identical,
+        // but each side has a different speed; or attackers/defenders (two cases) have differing
+        // speeds internally. If one or more is true, all speeds are not identical.
+        if(attackerSpeed != defenderSpeed || !attackerSpeedsIdentical || !defenderSpeedsIdentical) {
+            allSpeedsIdentical = false;
+        }
+
+        if(allSpeedsIdentical) {
+            return "" + speeds[0];
+        }
+        else if(attackerSpeedsIdentical && defenderSpeedsIdentical) {
+            return speeds[TaflmanCodes.getIndexForChar('t')] + "," + speeds[TaflmanCodes.getIndexForChar('T')] + ",";
+        }
+        else {
+            String toReturn = "";
+            for (int speed : speeds) {
+                toReturn += speed + ",";
+            }
+            return toReturn;
+        }
+    }
+
+    private static class TaflmanSpeedHolder {
+        int[] speeds;
+        int mode;
+    }
+
+    public static TaflmanSpeedHolder getTaflmanSpeedsForString(String speedString) {
+        String[] speedStrings = speedString.split(",");
+        TaflmanSpeedHolder holder = new TaflmanSpeedHolder();
+
+        holder.speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length];
+
+        if(speedStrings.length == 0) {
+            Arrays.fill(holder.speeds, -1);
+            holder.mode = Rules.SPEED_LIMITS_NONE;
+        }
+        if(speedStrings.length == 1) {
+            int speed = Integer.parseInt(speedStrings[0]);
+
+            if(speed == -1) holder.mode = Rules.SPEED_LIMITS_NONE;
+            else holder.mode = Rules.SPEED_LIMITS_IDENTICAL;
+
+            Arrays.fill(holder.speeds, speed);
+        }
+        else if(speedStrings.length == 2) {
+            Arrays.fill(holder.speeds, 0, holder.speeds.length / 2, -1);
+            Arrays.fill(holder.speeds, holder.speeds.length / 2, holder.speeds.length, -1);
+
+            holder.mode = Rules.SPEED_LIMITS_BY_SIDE;
+        }
+        else if(speedStrings.length == holder.speeds.length) {
+            for(int i = 0; i < holder.speeds.length; i++) {
+                int speed = Integer.parseInt(speedStrings[i]);
+                holder.speeds[i] = speed;
+            }
+
+            holder.mode = Rules.SPEED_LIMITS_BY_TYPE;
+        }
+        else {
+            throw new IllegalArgumentException("Invalid speed limit string: " + speedString);
+        }
+        return holder;
     }
 
     public static String getStringForTaflmanTypeList(boolean[] typeList) {

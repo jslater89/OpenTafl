@@ -3,7 +3,7 @@ package com.manywords.softworks.tafl.engine;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
-import com.manywords.softworks.tafl.rules.Coord;
+import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
@@ -59,10 +59,10 @@ public class Game {
         }
 
         int boardSquares = rules.getBoard().getBoardDimension() * rules.getBoard().getBoardDimension();
-        mZobristConstants = new long[boardSquares][Taflman.COUNT_TYPES * 2];
+        mZobristConstants = new long[boardSquares][Taflman.ALL_TAFLMAN_TYPES.length];
         Random r = new XorshiftRandom(10201989);
         for (int i = 0; i < boardSquares; i++) {
-            for (int j = 0; j < Taflman.COUNT_TYPES * 2; j++) {
+            for (int j = 0; j < Taflman.ALL_TAFLMAN_TYPES.length; j++) {
                 mZobristConstants[i][j] = r.nextLong();
             }
         }
@@ -76,6 +76,29 @@ public class Game {
         mHistory.add(mCurrentState);
 
         mCallback = callback;
+    }
+
+    // Used for replays
+    public Game(Game copyGame) {
+        // Primitives/final variables: not changed or copied by value anyway
+        mZobristConstants = copyGame.mZobristConstants;
+        mAverageBranchingFactor = copyGame.mAverageBranchingFactor;
+        mAverageBranchingFactorCount = copyGame.mAverageBranchingFactorCount;
+
+        // Things we don't need to copy: if they exist, we want the same ones
+        mClock = copyGame.mClock;
+        mCallback = copyGame.mCallback;
+        mGameRules = copyGame.mGameRules;
+        mTagMap = copyGame.mTagMap;
+
+        // Game states: we want copies of these.
+        mHistory = new ArrayList<>();
+        for(GameState copyState : copyGame.getHistory()) {
+            GameState copied = new GameState(copyState);
+            copied.mGame = this;
+            mHistory.add(copied);
+        }
+        mCurrentState = mHistory.get(mHistory.size() - 1);
     }
 
     public final long[][] mZobristConstants;
@@ -179,48 +202,13 @@ public class Game {
     }
 
     public String getHistoryString() {
-        String gameRecord = "";
-        gameRecord = Pattern.compile("\\[.*?\\]", Pattern.DOTALL).matcher(getCommentedHistoryString()).replaceAll("");
-        gameRecord = Pattern.compile("\n\n").matcher(gameRecord).replaceAll("\n");
-
-        return gameRecord;
+        ReplayGame rg = ReplayGame.copyGameToReplay(this);
+        return rg.getUncommentedHistoryString(true);
     }
 
     public String getCommentedHistoryString() {
-        String gameRecord = "";
-        int turnCount = 1;
-
-        int i = 0;
-        List<GameState> thisTurn = new ArrayList<>();
-        boolean startingSideAttackers = getRules().getStartingSide().isAttackingSide();
-        boolean otherSideWent = false;
-        while(i < getHistory().size()) {
-            GameState s = getHistory().get(i++);
-            if(s.getExitingMove() == null) break;
-
-            if(!otherSideWent && s.getCurrentSide().isAttackingSide() == startingSideAttackers) {
-                thisTurn.add(s);
-            }
-            else if(s.getCurrentSide().isAttackingSide() != startingSideAttackers) {
-                thisTurn.add(s);
-                otherSideWent = true;
-            }
-            else if(otherSideWent && s.getCurrentSide().isAttackingSide() == startingSideAttackers) {
-                gameRecord += getCommentedStringForMoves(turnCount, thisTurn);
-
-                thisTurn.clear();
-                thisTurn.add(s);
-                turnCount++;
-                otherSideWent = false;
-            }
-
-        }
-
-        if(thisTurn.size() > 0) {
-            gameRecord += getCommentedStringForMoves(turnCount, thisTurn);
-        }
-
-        return gameRecord;
+        ReplayGame rg = ReplayGame.copyGameToReplay(this);
+        return rg.getCommentedHistoryString(true);
     }
 
     private String getCommentedStringForMoves(int turnNumber, List<GameState> states) {
@@ -266,16 +254,22 @@ public class Game {
                 true, // update zobrist
                 berserkingTaflman);
 
-        mCurrentState = nextState;
-        mHistory.add(mCurrentState);
+        if(recordState) {
+            mCurrentState = nextState;
+            mHistory.add(mCurrentState);
 
-        if(mClock != null) {
-            mClock.slap(advanceTurn);
+            if (mClock != null) {
+                mClock.slap(advanceTurn);
+            }
+
+            // Victory
+            mCurrentState.checkVictory();
+            return mCurrentState;
         }
-
-        // Victory
-        mCurrentState.checkVictory();
-        return mCurrentState;
+        else {
+            nextState.checkVictory();
+            return nextState;
+        }
     }
 
     public boolean historyContainsHash(long zobrist) {

@@ -41,6 +41,8 @@ public class MoveRecord {
         return start.get("file") + start.get("rank") + "-" + end.get("file") + end.get("rank");
     }
 
+    public boolean isDetailed() { return false; }
+
     public String toString() {
         Map<String, String> start = Board.getChessNotation(this.start);
         Map<String, String> end = Board.getChessNotation(this.end);

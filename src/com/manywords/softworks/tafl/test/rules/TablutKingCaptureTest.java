@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.test.rules;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
@@ -81,17 +82,17 @@ public class TablutKingCaptureTest extends TaflTest implements UiCallback {
         GameState state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(6, 4), state.getSpaceAt(5, 4));
+        state.makeMove(new MoveRecord(Coord.get(6,4), Coord.get(5,4)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
         assert game.getCurrentState().getPieceAt(4, 4) != Taflman.EMPTY;
         assert game.getCurrentState().checkVictory() == GameState.GOOD_MOVE;
 
-        state.moveTaflman(state.getPieceAt(5, 5), state.getSpaceAt(5, 8));
+        state.makeMove(new MoveRecord(Coord.get(5,5), Coord.get(5,8)));
         state = game.getCurrentState();
 
-        state.moveTaflman(state.getPieceAt(4, 2), state.getSpaceAt(4, 3));
+        state.makeMove(new MoveRecord(Coord.get(4,2), Coord.get(4,3)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
@@ -103,50 +104,50 @@ public class TablutKingCaptureTest extends TaflTest implements UiCallback {
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(6, 4), state.getSpaceAt(6, 3));
+        state.makeMove(new MoveRecord(Coord.get(6,4), Coord.get(6,3)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(3, 3), state.getSpaceAt(3, 0));
+        state.makeMove(new MoveRecord(Coord.get(3,3), Coord.get(3,0)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(3, 4), state.getSpaceAt(3, 3));
+        state.makeMove(new MoveRecord(Coord.get(3,4), Coord.get(3,3)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(5, 3), state.getSpaceAt(5, 0));
+        state.makeMove(new MoveRecord(Coord.get(5,3), Coord.get(5,0)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(4, 5), state.getSpaceAt(4, 7));
+        state.makeMove(new MoveRecord(Coord.get(4,5), Coord.get(4,7)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(4, 4), state.getSpaceAt(4, 3));
+        state.makeMove(new MoveRecord(Coord.get(4,4), Coord.get(4,3)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(4, 2), state.getSpaceAt(4, 1));
+        state.makeMove(new MoveRecord(Coord.get(4,2), Coord.get(4,1)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(5, 5), state.getSpaceAt(7, 5));
+        state.makeMove(new MoveRecord(Coord.get(5,5), Coord.get(7,5)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(6, 3), state.getSpaceAt(5, 3));
+        state.makeMove(new MoveRecord(Coord.get(6,3), Coord.get(5,3)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
         assert game.getCurrentState().getPieceAt(4, 3) != Taflman.EMPTY;
         assert game.getCurrentState().checkVictory() == GameState.GOOD_MOVE;
 
-        state.moveTaflman(state.getPieceAt(7, 5), state.getSpaceAt(6, 5));
+        state.makeMove(new MoveRecord(Coord.get(7,5), Coord.get(6,5)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(4, 1), state.getSpaceAt(4, 2));
+        state.makeMove(new MoveRecord(Coord.get(4,1), Coord.get(4,2)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
@@ -157,15 +158,15 @@ public class TablutKingCaptureTest extends TaflTest implements UiCallback {
         game = new Game(rules, null);
         state = game.getCurrentState();
 
-        state.moveTaflman(state.getPieceAt(4, 2), state.getSpaceAt(4, 0));
+        state.makeMove(new MoveRecord(Coord.get(4,2), Coord.get(4,0)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(4, 4), state.getSpaceAt(4, 1));
+        state.makeMove(new MoveRecord(Coord.get(4,4), Coord.get(4,1)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(4, 5), state.getSpaceAt(4, 2));
+        state.makeMove(new MoveRecord(Coord.get(4,5), Coord.get(4,2)));
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 

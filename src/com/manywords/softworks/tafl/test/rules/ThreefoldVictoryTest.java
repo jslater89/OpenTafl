@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.test.rules;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
@@ -83,31 +84,30 @@ public class ThreefoldVictoryTest extends TaflTest implements UiCallback {
 
         // First time at the position
         //RawTerminal.renderGameState(state);
-        state.moveTaflman(state.getPieceAt(5, 3), state.getSpaceAt(4, 3));
+        state.makeMove(new MoveRecord(Coord.get(5,3), Coord.get(4,3)));
         state = game.getCurrentState();
 
-        state.moveTaflman(state.getPieceAt(5, 1), state.getSpaceAt(4, 1));
+        state.makeMove(new MoveRecord(Coord.get(5,1), Coord.get(4,1)));
         state = game.getCurrentState();
 
-
-        state.moveTaflman(state.getPieceAt(4, 3), state.getSpaceAt(5, 3));
+        state.makeMove(new MoveRecord(Coord.get(4,3), Coord.get(5,3)));
         state = game.getCurrentState();
 
-        state.moveTaflman(state.getPieceAt(4, 1), state.getSpaceAt(5, 1));
+        state.makeMove(new MoveRecord(Coord.get(4,1), Coord.get(5,1)));
         state = game.getCurrentState();
         // Second time at the position
         //RawTerminal.renderGameState(state);
 
-        state.moveTaflman(state.getPieceAt(5, 3), state.getSpaceAt(4, 3));
+        state.makeMove(new MoveRecord(Coord.get(5,3), Coord.get(4,3)));
         state = game.getCurrentState();
 
-        state.moveTaflman(state.getPieceAt(5, 1), state.getSpaceAt(4, 1));
+        state.makeMove(new MoveRecord(Coord.get(5,1), Coord.get(4,1)));
         state = game.getCurrentState();
 
-        state.moveTaflman(state.getPieceAt(4, 3), state.getSpaceAt(5, 3));
+        state.makeMove(new MoveRecord(Coord.get(4,3), Coord.get(5,3)));
         state = game.getCurrentState();
 
-        state.moveTaflman(state.getPieceAt(4, 1), state.getSpaceAt(5, 1));
+        state.makeMove(new MoveRecord(Coord.get(4,1), Coord.get(5,1)));
         state = game.getCurrentState();
         // Third time at the position
         //RawTerminal.renderGameState(state);

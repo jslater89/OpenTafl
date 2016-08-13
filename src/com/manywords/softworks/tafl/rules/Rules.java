@@ -5,7 +5,7 @@ import com.manywords.softworks.tafl.notation.RulesSerializer;
 import java.util.*;
 
 public abstract class Rules {
-    public static final int TAFLMAN_TYPE_COUNT = Taflman.COUNT_TYPES * 2;
+    public static final int TAFLMAN_TYPE_COUNT = Taflman.ALL_TAFLMAN_TYPES.length;
 
     public final int boardSize;
     private Set<Coord> mCenterSpaces = new LinkedHashSet<Coord>();
@@ -188,11 +188,31 @@ public abstract class Rules {
     public abstract void setupSpaceGroups(int boardSize);
 
     /**
+     * The king can take part in captures as the moving piece or the static piece.
+     */
+    public static final int KING_ARMED = 0;
+
+    /**
+     * The king can take part in captures, but only as the moving piece.
+     */
+    public static final int KING_HAMMER_ONLY = 1;
+
+    /**
+     * The king can take part in captures, but only as the stationary piece.
+     */
+    public static final int KING_ANVIL_ONLY = 2;
+
+    /**
+     * The king cannot take part in captures.
+     */
+    public static final int KING_UNARMED = 3;
+
+    /**
      * Can the king participate in captures?
      *
      * @return
      */
-    public abstract boolean isKingArmed();
+    public abstract int getKingArmedMode();
 
     /**
      * The king is strong, requiring four men to capture at all times.
@@ -211,6 +231,12 @@ public abstract class Rules {
     public static final int KING_WEAK = 2;
 
     /**
+     * The king is middleweight: all of his adjacent spaces must be hostile
+     * for him to be captured. (Confinement capture at playtaflonline)
+     */
+    public static final int KING_MIDDLEWEIGHT = 3;
+
+    /**
      * Does the king take two or four men to
      * capture?
      *
@@ -227,13 +253,24 @@ public abstract class Rules {
 
     public abstract int getCommanderJumpMode();
 
-    public abstract int getMercenaryJumpMode();
-
     public abstract boolean canSideJump(Side side);
 
     public abstract int howManyAttackers();
 
     public abstract int howManyDefenders();
+
+    public static final int SPEED_LIMITS_NONE = 0;
+    public static final int SPEED_LIMITS_IDENTICAL = 1;
+    public static final int SPEED_LIMITS_BY_SIDE = 2;
+    public static final int SPEED_LIMITS_BY_TYPE = 3;
+    public abstract int getSpeedLimitMode();
+
+    /**
+     * How many spaces can the given taflman move?
+     * @param taflman The taflman in question.
+     * @return The speed for that taflman in spaces per turn, or -1 for no limit.
+     */
+    public abstract int getTaflmanSpeedLimit(char taflman);
 
     /**
      * Is the a square or group of squares currently

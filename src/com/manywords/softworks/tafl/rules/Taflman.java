@@ -1,7 +1,6 @@
 package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
-import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 
@@ -30,6 +29,17 @@ public class Taflman {
 
     public static final char DEVELOPED = 4096;
     public static final char UNDEVELOPED = 0;
+
+    public static final char[] ALL_TAFLMAN_TYPES = new char[] {
+            TYPE_TAFLMAN | SIDE_ATTACKERS,
+            TYPE_TAFLMAN | SIDE_DEFENDERS,
+            TYPE_COMMANDER | SIDE_ATTACKERS,
+            TYPE_COMMANDER | SIDE_DEFENDERS,
+            TYPE_KNIGHT | SIDE_ATTACKERS,
+            TYPE_KNIGHT | SIDE_DEFENDERS,
+            TYPE_KING | SIDE_ATTACKERS,
+            TYPE_KING | SIDE_DEFENDERS
+    };
 
     public static char encode(TaflmanImpl taflman) {
         char packedTaflman = 0;
@@ -145,13 +155,24 @@ public class Taflman {
 //        int y = space.y;
 //        int boardSize = getBoard(state).getBoardDimension();
 
+        int speedLimit = -1;
+        if(rules.getSpeedLimitMode() != Rules.SPEED_LIMITS_NONE) {
+            speedLimit = getBoard(state).getRules().getTaflmanSpeedLimit(taflman);
+        }
+
         for(List<Coord> direction : Coord.getRankAndFileCoords(b.getBoardDimension(), space)) {
+            int distance = 1;
             for(Coord potentialMove : direction) {
                 boolean canPass = rules.canTaflmanMoveThrough(getBoard(state), taflman, potentialMove);
                 if (getBoard(state).getOccupier(potentialMove) != EMPTY || !canPass) {
                     break;
-                } else {
+                }
+                else if (speedLimit > 0 && distance > speedLimit) {
+                    break;
+                }
+                else {
                     allowableMoves.add(potentialMove);
+                    distance++;
                 }
             }
         }
@@ -495,11 +516,14 @@ public class Taflman {
 
         // If the capturing piece is an unarmed king, don't check anything
         // else.
-        if (Taflman.isKing(capturer) && !rules.isKingArmed()) {
+        if (Taflman.isKing(capturer)
+                && rules.getKingArmedMode() != Rules.KING_ARMED
+                && rules.getKingArmedMode() != Rules.KING_HAMMER_ONLY) {
             return false;
         }
 
         boolean isKingStrong = false;
+        boolean fourSpacesRequired = true;
         if(Taflman.isKing(taflman)) {
             if(rules.getKingStrengthMode() == Rules.KING_STRONG) isKingStrong = true;
             else if(rules.getKingStrengthMode() == Rules.KING_STRONG_CENTER) {
@@ -508,11 +532,19 @@ public class Taflman {
 
                 if(centerAndAdjacent.contains(current)) isKingStrong = true;
             }
+            else if(rules.getKingStrengthMode() == Rules.KING_MIDDLEWEIGHT) {
+                isKingStrong = true;
+                fourSpacesRequired = false;
+            }
         }
 
         // If this piece is a strong king, we need to check all four squares
-        // around us for hostility
-        if (Taflman.isKing(taflman) && isKingStrong) {
+        // around us for hostility.
+        //
+        // Strong kings can be captured by commander sandwich, or by commander
+        // sandwich against the corners, but not against the throne. If the
+        // other side has commanders or knights, we can't shortcut here.
+        if (Taflman.isKing(taflman) && isKingStrong && !Taflman.getSide(state, capturer).hasCommanders() && !Taflman.getSide(state, capturer).hasKnights()) {
             int hostileAdjacentSpaces = 0;
             List<Coord> adjacentSpaces = board.getAdjacentSpaces(Taflman.getCurrentSpace(state, taflman));
 
@@ -531,11 +563,9 @@ public class Taflman {
                 }
             }
 
-            if (Taflman.getSide(state, capturer).hasCommanders() || Taflman.getSide(state, capturer).hasKnights()) {
-                // Strong kings can be captured by commander sandwich, or by commander
-                // sandwich against the corners, but not against the throne. If the
-                // other side has commanders or knights, we can't shortcut here.
-            } else if (hostileAdjacentSpaces == 4) {
+            if (hostileAdjacentSpaces == 4) {
+                return true;
+            } else if (!fourSpacesRequired && hostileAdjacentSpaces == adjacentSpaces.size()) {
                 return true;
             } else {
                 return false;
@@ -579,9 +609,10 @@ public class Taflman {
 
     private static boolean checkSandwichCapture(GameState state, char taflman, char capturer, Coord move, Coord adjacentOne, Coord adjacentTwo) {
         Rules rules = getBoard(state).getRules();
+        Board board = getBoard(state);
 
-        if ((getBoard(state).isSpaceHostileTo(adjacentOne, taflman) || adjacentOne == move)
-                && (getBoard(state).isSpaceHostileTo(adjacentTwo, taflman) || adjacentTwo == move)) {
+        if ((board.isSpaceHostileTo(adjacentOne, taflman) || adjacentOne == move)
+                && (board.isSpaceHostileTo(adjacentTwo, taflman) || adjacentTwo == move)) {
 
             // A piece which can jump can't capture a piece against itself.
             //
@@ -604,8 +635,9 @@ public class Taflman {
                     && (Taflman.getSide(state, capturer).hasCommanders() || Taflman.getSide(state, capturer).hasKnights())) {
                 // If the other side has commanders or knights and this is a strong
                 // king, we need to check for commander/knight sandwich.
-                if (getBoard(state).getSpaceTypeFor(adjacentOne) == SpaceType.CENTER || getBoard(state).getSpaceTypeFor(adjacentTwo) == SpaceType.CENTER) {
-                    // If one of the squares in question is a center space, we're safe.
+                if (board.getSpaceTypeFor(adjacentOne) == SpaceType.CENTER || board.getSpaceTypeFor(adjacentTwo) == SpaceType.CENTER) {
+                    // If one of the squares in question is a center space, we're safe. Commanders can't capture the king against the
+                    // throne.
                     return false;
                 } else if (getBoard(state).getSpaceTypeFor(Taflman.getCurrentSpace(state, taflman)) == SpaceType.CENTER) {
                     // Can't be commander-sandwiched on the throne.
@@ -648,8 +680,30 @@ public class Taflman {
                     if (commanderCount + hostileCorner >= 2) return true;
                     else return false;
                 }
+            } else if (Taflman.isKing(taflman) && rules.getKingStrengthMode() == Rules.KING_MIDDLEWEIGHT){
+                int hostileAdjacentSpaces = 0;
+                List<Coord> adjacentSpaces = board.getAdjacentSpaces(Taflman.getCurrentSpace(state, taflman));
+
+                // Check all adjacent spaces for hostility.
+                for (Coord space : adjacentSpaces) {
+                    if (move == space) {
+                        // A hostile piece is asking about moving to this adjacent space,
+                        // so although it isn't hostile now, it would be if this move
+                        // were made.
+                        hostileAdjacentSpaces++;
+                    } else if (board.isSpaceHostileTo(space, taflman)) {
+                        hostileAdjacentSpaces++;
+                    } else {
+                        // Non-hostile adjacent space
+                        return false;
+                    }
+                }
+
+                // If no spaces are non-hostile, all spaces are hostile, and we can say that the king is captured.
+                return true;
             } else {
                 // If we are a strong king with no commanders or knights, we've already left.
+                // We've just handled the middleweight king.
                 // So, we're either a weak king or a regular piece, and we don't care whether
                 // the guys on either side are commanders or knights.
                 return true;

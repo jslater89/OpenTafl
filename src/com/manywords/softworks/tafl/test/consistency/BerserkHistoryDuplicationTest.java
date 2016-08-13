@@ -83,56 +83,56 @@ public class BerserkHistoryDuplicationTest extends TaflTest implements UiCallbac
         long lastZobrist = state.mZobristHash;
 
         //f4-i4
-        char ofInterest = state.getPieceAt(5, 3);
-        state.moveTaflman(ofInterest, Coord.get(8, 3));
+        MoveRecord move = new MoveRecord(Coord.get(5,3), Coord.get(8,3));
+        state.makeMove(move);
         state = game.getCurrentState();
 
         assert state.mZobristHash != lastZobrist;
         lastZobrist = state.mZobristHash;
 
         //h1-h3
-        ofInterest = state.getPieceAt(7, 0);
-        assert GameState.GOOD_MOVE == state.moveTaflman(ofInterest, Coord.get(7, 2)).getLastMoveResult();
+        move = new MoveRecord(Coord.get(7,0), Coord.get(7,2));
+        assert GameState.GOOD_MOVE == state.makeMove(move);
         state = game.getCurrentState();
 
         assert state.mZobristHash != lastZobrist;
         lastZobrist = state.mZobristHash;
 
         //h6-i6
-        ofInterest = state.getPieceAt(7, 5);
-        state.moveTaflman(ofInterest, Coord.get(8, 5));
+        move = new MoveRecord(Coord.get(7,5), Coord.get(8,5));
+        state.makeMove(move);
         state = game.getCurrentState();
 
         assert state.mZobristHash != lastZobrist;
         lastZobrist = state.mZobristHash;
 
         //k4-j4
-        ofInterest = state.getPieceAt(10, 3);
-        state.moveTaflman(ofInterest, Coord.get(9, 3));
+        move = new MoveRecord(Coord.get(10,3), Coord.get(9,3));
+        state.makeMove(move);
         state = game.getCurrentState();
 
         assert state.mZobristHash != lastZobrist;
         lastZobrist = state.mZobristHash;
 
         //d6-d5
-        ofInterest = state.getPieceAt(3, 5);
-        state.moveTaflman(ofInterest, Coord.get(3, 4));
+        move = new MoveRecord(Coord.get(3,5), Coord.get(3,4));
+        state.makeMove(move);
         state = game.getCurrentState();
 
         assert state.mZobristHash != lastZobrist;
         lastZobrist = state.mZobristHash;
 
         // h3-h4
-        ofInterest = state.getPieceAt(7, 2);
-        state.moveTaflman(ofInterest, Coord.get(7, 3));
+        move = new MoveRecord(Coord.get(7,2), Coord.get(7,3));
+        state.makeMove(move);
         state = game.getCurrentState();
 
         assert state.mZobristHash != lastZobrist;
         lastZobrist = state.mZobristHash;
 
         // h4-h6
-        ofInterest = state.getPieceAt(7, 3);
-        state.moveTaflman(ofInterest, Coord.get(7, 5));
+        move = new MoveRecord(Coord.get(7,3), Coord.get(7,5));
+        state.makeMove(move);
         state = game.getCurrentState();
 
         assert state.mZobristHash != lastZobrist;

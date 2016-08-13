@@ -153,7 +153,7 @@ public class HumanReadableRulesPrinter {
             }
 
             if(!moveEntryString.contains("no taflmen")) {
-                rules += "The following taflmen may freely move through the throne: " + moveEntryString + ". ";
+                rules += "The following taflmen may freely move through the throne, but may not stop on it: " + moveEntryString + ". ";
             }
 
             if(!moveNoEntryString.contains("no taflmen")) {
@@ -300,7 +300,7 @@ public class HumanReadableRulesPrinter {
             }
 
             if(!moveEntryString.contains("no taflmen")) {
-                rules += "The following taflmen may freely move through the attacker forts: " + moveEntryString + ". ";
+                rules += "The following taflmen may freely move through the attacker forts, but may not stop on them: " + moveEntryString + ". ";
             }
 
             if(!moveNoEntryString.contains("no taflmen")) {
@@ -430,7 +430,7 @@ public class HumanReadableRulesPrinter {
             }
 
             if(!moveEntryString.contains("no taflmen")) {
-                rules += "The following taflmen may freely move through the defender forts: " + moveEntryString + ". ";
+                rules += "The following taflmen may freely move through the defender forts, but may not stop on them: " + moveEntryString + ". ";
             }
 
             if(!moveNoEntryString.contains("no taflmen")) {
@@ -457,22 +457,80 @@ public class HumanReadableRulesPrinter {
         rules += ruleNumber++ + ". The " + (r.getStartingSide().isAttackingSide() ? "attacking side" : "defending side") + " moves first. Moves alternate " +
                 "between sides.\n\n";
 
-        rules += ruleNumber++ + ". All taflmen move like the rook in chess: any number of vacant spaces along a row or column. Taflmen may " +
-                "not move onto or through a space occupied by another taflman.\n\n";
+
+        if(r.getSpeedLimitMode() == Rules.SPEED_LIMITS_NONE) {
+            rules += ruleNumber++ + ". All taflmen move like the rook in chess: any number of vacant spaces along a row or column. Taflmen may " +
+                    "not move onto or through a space occupied by another taflman.\n\n";
+        }
+        else if(r.getSpeedLimitMode() == Rules.SPEED_LIMITS_IDENTICAL) {
+            int speedLimit = r.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[0]);
+            rules += ruleNumber++ + ". All taflmen move along rows or columns, up to " + speedLimit + " spaces per move. Taflmen may " +
+                    "not move onto or through a space occupied by another taflman.\n\n";
+        }
+        else if(r.getSpeedLimitMode() == Rules.SPEED_LIMITS_BY_SIDE) {
+            int attackerLimit = r.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[0]);
+            int defenderLimit = r.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[Taflman.ALL_TAFLMAN_TYPES.length / 2]);
+            rules += ruleNumber++ + ". All taflmen move along rows or columns. ";
+            rules += "Attacking taflmen move up to " + attackerLimit + " spaces per move, while defending taflmen move up to " + defenderLimit + " spaces. ";
+            rules += "Taflmen may not move onto or through a space occupied by another taflman.\n\n";
+        }
+        else if(r.getSpeedLimitMode() == Rules.SPEED_LIMITS_BY_TYPE) {
+            rules += ruleNumber++ + ". All taflmen move along rows or columns. ";
+
+            for(int i = 0; i < Taflman.ALL_TAFLMAN_TYPES.length; i++) {
+                boolean isAttacking = Taflman.getPackedSide(Taflman.ALL_TAFLMAN_TYPES[i]) == Taflman.SIDE_ATTACKERS;
+                char taflmanType = Taflman.getPackedType(Taflman.ALL_TAFLMAN_TYPES[i]);
+                String side = isAttacking ? "attacking" : "defending";
+
+                int speedLimit = r.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[i]);
+
+                if(taflmanType == Taflman.TYPE_KING) {
+                    if(!isAttacking) rules += "The king moves up to " + speedLimit + " spaces.";
+                }
+                else if(taflmanType == Taflman.TYPE_COMMANDER) {
+                    if(isAttacking && r.getAttackers().hasCommanders()) rules += "Attacking commanders move up to " + speedLimit + " spaces. ";
+                    else if(!isAttacking && r.getDefenders().hasCommanders()) rules += "Defending commanders move up to " + speedLimit + " spaces. ";
+                }
+                else if(taflmanType == Taflman.TYPE_KNIGHT) {
+                    if(isAttacking && r.getAttackers().hasKnights()) rules += "Attacking knights move up to " + speedLimit + " spaces. ";
+                    else if(!isAttacking && r.getDefenders().hasKnights()) rules += "Defending knights move up to " + speedLimit + " spaces. ";
+                }
+                else {
+                    side = Character.toUpperCase(side.charAt(0)) + side.substring(1);
+                    rules += side + " taflmen move up to " + speedLimit + " spaces";
+                }
+            }
+
+            rules += "\n\n";
+        }
 
         rules += ruleNumber++ + ". All taflmen " + (r.getKingStrengthMode() != Rules.KING_WEAK ? "except the king " : "") + "are captured when the opposing side moves " +
                 "a taflman such that the captured taflman is surrounded on both sides, along a row or a column, by enemy taflmen or hostile spaces. " +
                 "A taflman is only captured if the opponent's move closes the trap: a taflman may therefore safely move in between two enemy taflmen, or " +
-                "an enemy taflman and a hostile space. Captured taflmen are removed from the game. " + (r.isKingArmed() ? "The king may take part in " +
-                "captures." : "The king may not take part in captures.") + "\n\n";
+                "an enemy taflman and a hostile space. Captured taflmen are removed from the game. ";
 
-        if(r.getKingStrengthMode() == Rules.KING_STRONG) {
-            rules += ruleNumber++ + ". The king must be surrounded by enemy taflmen or hostile spaces on all four sides to be captured. " +
-                    "The king cannot be captured against the edge of the board. ";
+        switch(r.getKingArmedMode()) {
+            case Rules.KING_ARMED:
+                rules += "The king may take part in captures.\n\n";
+                break;
+            case Rules.KING_HAMMER_ONLY:
+                rules += "The king may take part in captures, but only as the moving piece.\n\n";
+                break;
+            case Rules.KING_ANVIL_ONLY:
+                rules += "The king may take part in captures, but only as the stationary piece.\n\n";
+                break;
+            case Rules.KING_UNARMED:
+                rules += "The king may not take part in captures.\n\n";
+                break;
+        }
 
-                    if(centers.size() > 0) rules += "The king may be captured by three attacking taflmen against an empty throne.";
+        if(r.getKingStrengthMode() == Rules.KING_STRONG || (r.getKingStrengthMode() == Rules.KING_STRONG_CENTER && centers.size() == 0)) {
+            rules += ruleNumber++ + ". The king must be surrounded by enemy taflmen or hostile spaces on all four sides to be captured. ";
+            if(r.getKingStrengthMode() != Rules.KING_MIDDLEWEIGHT) {
+                rules += "The king cannot be captured against the edge of the board. ";
+            }
 
-                    rules += "\n\n";
+            rules += "\n\n";
         }
         else if(r.getKingStrengthMode() == Rules.KING_STRONG_CENTER && centers.size() > 0) {
             rules += ruleNumber++ + ". When the king is on the throne, he must be surrounded by attacking taflmen on all sides to be captured. " +

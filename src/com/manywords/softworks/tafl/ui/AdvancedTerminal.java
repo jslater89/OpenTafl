@@ -87,6 +87,15 @@ public class AdvancedTerminal<T extends Terminal> {
         }
     }
 
+    public TerminalSize getSize() {
+        try {
+            return mTerminal.getTerminalSize();
+        } catch (IOException e) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Critical error getting terminal size");
+        }
+        return null;
+    }
+
     public void changeActiveScreen(LogicalScreen screen) {
         if(mActiveScreen != null) {
             mActiveScreen.setInactive();

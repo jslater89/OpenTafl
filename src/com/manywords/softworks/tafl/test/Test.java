@@ -3,10 +3,7 @@ package com.manywords.softworks.tafl.test;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.test.ai.*;
 import com.manywords.softworks.tafl.test.consistency.*;
-import com.manywords.softworks.tafl.test.mechanics.ExternalEngineHostTest;
-import com.manywords.softworks.tafl.test.mechanics.GameClockTest;
-import com.manywords.softworks.tafl.test.mechanics.KingMissingPositionRecordTest;
-import com.manywords.softworks.tafl.test.mechanics.ServerTickThreadTest;
+import com.manywords.softworks.tafl.test.mechanics.*;
 import com.manywords.softworks.tafl.test.network.HeadlessAITest;
 import com.manywords.softworks.tafl.test.network.LoadServerGameTest;
 import com.manywords.softworks.tafl.test.network.ServerTest;
@@ -19,6 +16,8 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
+        // Initial tests (debug only)
+
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
         tests.add(new MoveSerializerConsistencyTest());
@@ -29,6 +28,9 @@ public class Test {
         tests.add(new BerserkHistoryDuplicationTest());
 
         // Rules tests
+        tests.add(new KingHammerAnvilTest());
+        tests.add(new KingUnsafeAgainstBoardEdgeTest());
+        tests.add(new SpeedLimitTest());
         tests.add(new RestrictedFortReentryTest());
         tests.add(new ThreefoldDrawTest());
         tests.add(new ThreefoldVictoryTest());
@@ -51,16 +53,20 @@ public class Test {
         tests.add(new BadFetlarCaptureTest());
         tests.add(new BadCopenhagenCaptureTest());
 
+        // Mechanics tests
+        tests.add(new MoveAddressTest());
+        tests.add(new ReplayGameTest());
+        tests.add(new KingMissingPositionRecordTest());
+
+        // Long-running mechanics tests
+        tests.add(new ExternalEngineHostTest());
+        tests.add(new GameClockTest());
+
         // Network tests
+        tests.add(new ServerTickThreadTest());
         tests.add(new ServerTest());
         tests.add(new LoadServerGameTest());
         tests.add(new HeadlessAITest()); // also tests client connection somewhat
-
-        // Mechanics tests
-        tests.add(new ExternalEngineHostTest());
-        tests.add(new GameClockTest());
-        tests.add(new ServerTickThreadTest());
-        tests.add(new KingMissingPositionRecordTest());
 
         // AI tests
         tests.add(new AIMatchingZobristTest());

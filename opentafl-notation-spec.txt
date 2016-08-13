@@ -171,6 +171,8 @@ are present only for organizational purposes.
 			[<space><",">]...
 		piece-type-list:
 			[<taflman-symbol>]...
+
+			Preferred order is 'tcnkTCNK'.
 		shieldwall-mode:
 			"n": no shieldwall capture
 			"w": weak shieldwalls, corners may not close a shieldwall position
@@ -195,21 +197,43 @@ Explanatory notes:
 		(attackers first) should the attacking side go first? Defaults to "y" (yes).
 		If "n", the defenders move first.
 	tfr:
-	    	(threefold repetition) what should happen in the case of a threefold repetition?
+		(threefold repetition) what should happen in the case of a threefold repetition?
 		if "w", the player forced to respond wins. If "l", the player forced to respond
 		loses. If "d", the game is a draw (default). If "i", threefold repetitions are
 		ignored.
 	ka: 
 		(king armed) does the king participate in captures? Defaults to "y" (yes).
+		If "a" (anvil-only), the king can be captured against, but cannot move to make a
+		capture. If "h" (hammer-only), the king cannot be captured against, but can move
+		to make a capture. If "n", the king never participates in captures.
 	ks: 
 		(king strong) does the king need to be surrounded on four sides to be captured? 
-		Defaults to "y" (yes). If "n", the king need only be surrounded on two sides.
+		Defaults to "s" (strong). If "w", the king need only be surrounded on two sides.
+		If "c", the king is strong on or adjacent to the throne, but weak elsewhere on
+		the board. If "m", the king is strong, but can be captured against the board
+		edge.
+
+		"y" is equivalent to "s", and "n" is equivalent to "w", for backward
+		compatibility.
 	kj: 
 		(king jump) can the king jump? Defaults to "n" (no).
 	nj: 
 		(knight jump) can the knight jump? Defaults to "c" (capturing jumps).
 	cj: 
 		(commander jump) can the commander jump? Defaults to "j" (non-capturing jumps).
+	spd:
+		(speed limits) the speed limit for the game. Defaults to "-1", no speed limit
+		for any piece. Several options are available: a single number will set the
+		speed limit for all pieces. Two numbers, separated by commas, will set the
+		speed limit for attackers and defenders, respectively. Finally, eight numbers,
+		separated by commas, will set the speed limits for each piece type individually,
+		in standard tcnkTCNK order.
+
+		e.g.:
+		spd:-1 - no speed limit
+		spd:4 - all pieces move up to 4 spaces per turn
+		spd:3,4 - attackers move up to 3 spaces, defenders move up to 4 spaces
+		spd:1,1,1,1,1,1,1,2 - all pieces but the king move 1 space per turn, king moves 2
 	cor: 
 		(corner spaces) a list of spaces to treat as corner spaces, useful for e.g. alea
 		evangelii with larger corner forts. Defaults to "default": the four physical
@@ -307,7 +331,7 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 	# This pattern repeats for the whole game. The final element may omit
 	# one move record, if the game ends. The host engine should display
 	# commentary, if provided, alongside a loaded game.
-	<<turn-number><"."> <move-record> <move-record> [move-record]...>
+	<<turn-number> <move-record> <move-record> [move-record]...>
 	[<first-half-commentary>[<"|"><more-commentary>]...]
 
 	tags: 
@@ -366,10 +390,46 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		rules string.
 
 	turn-number:
-		the number of times both players have moved, starting at 1.
+		for moves in the principal line of play, the number of times both players have
+		moved, followed by a period, starting at '1.'
+
+        For moves in a variation, the turn number is the variation address, which
+        follows this pattern: first, the address of the move, followed by a variation
+        number, followed by 1a, repeating as necessary to uniquely identify a given
+        line of play. If a variation starts on the second or later move in a given
+        turn, substitute '.....' for the moves which match the moves in the
+        variation's parent. Consider these examples:
+
+            1a.1.1a. h5-h3 h1-h2
+            From right to left, this is the first move in the first variation off of
+            the first move in the first turn.
+
+            3. h2-a2 b1-b2
+            3b.3.1a ..... a4-a3xa2
+            From right to left, this is the first move in the third variation off of
+            the second move in the first turn. Note that the address of the first move
+            in this variation is, in actuality, 3b.3.1b: the first move in the
+            variation is the second move in the turn. In both cases, h2-a2 is the first
+            move of the turn. The variation begins with the response.
+
+            Considering variations as turns, as the OpenTafl Game Notation format does,
+            makes for greater readability and easier compilation by hand, so this
+            format addresses the turn, at 3b.3.1a, instead of the initial move.
+
+            4a.5.4c.2.2a
+            This is a complicated example, and is best read right to left, as is
+            ordinarily the case with variation addresses. This is the first move in
+            the second turn (2a) of the second variation (2) off of the third move
+            of the fourth turn (4c; this must be a game allowing berserker moves)
+            in the fifth variation (5) off of the first move in the fourth turn
+            of the principal line (4a).
+
+        Note that this distinction is critical: the principal line of play must
+        not have move index letters, but variations must include them.
 	
 	move-record:
-		an OTN move record.
+		an OTN move record. For variations which start on the second or later
+		move of a turn, may be '.....'.
 
 	first-half-commentary:
 		comment on the first move of this turn. By convention, if the commentary

@@ -63,12 +63,12 @@ public class TaflmanCodes {
     }
 
     public static boolean isCodeAttackingSide(char code) {
-        boolean moverAttacker = true;
+        boolean isAttacker = true;
         if(Character.isUpperCase(code)) {
-            moverAttacker = false;
+            isAttacker = false;
         }
 
-        return moverAttacker;
+        return isAttacker;
     }
 
     public static char getTaflmanTypeForCode(char code) {
@@ -83,5 +83,52 @@ public class TaflmanCodes {
         }
 
         return typeFlag;
+    }
+
+    public static int getIndexForTaflmanChar(char taflman) {
+        boolean attacker = Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS;
+        int index = (attacker ? 0 : 4);
+
+        switch(Taflman.getPackedType(taflman)) {
+            // TYPE_TAFLMAN: index += 0
+            case Taflman.TYPE_COMMANDER:
+                index += 1;
+                break;
+            case Taflman.TYPE_KNIGHT:
+                index += 2;
+                break;
+            case Taflman.TYPE_KING:
+                index += 3;
+                break;
+        }
+
+        return index;
+    }
+
+    public static String getTaflmanNameForTaflman(char taflman, boolean plural) {
+        String taflmanType = "taflman";
+
+        char typeFlag = Taflman.getPackedType(taflman);
+
+        switch(Taflman.getPackedType(taflman)) {
+            // TYPE_TAFLMAN: index += 0
+            case Taflman.TYPE_COMMANDER:
+                taflmanType = "commander";
+                break;
+            case Taflman.TYPE_KNIGHT:
+                taflmanType = "knight";
+                break;
+            case Taflman.TYPE_KING:
+                taflmanType = "king";
+                break;
+        }
+
+        if(plural) {
+            taflmanType += "s";
+
+            if(taflmanType.equals("taflmans")) taflmanType = "taflmen";
+        }
+
+        return taflmanType;
     }
 }
