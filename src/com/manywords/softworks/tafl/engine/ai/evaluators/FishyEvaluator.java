@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai.evaluators;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.rules.*;
@@ -20,12 +21,14 @@ public class FishyEvaluator implements Evaluator {
     private static final int HIGH = 1;
     private static final int DEFENDER = 0;
     private static final int ATTACKER = 1;
-    public static int debugId = 0;
+    private static int debugId = 0;
+    public static boolean debug = false;
+    public static String debugString;
+    public static short debugValue;
 
     public short evaluate(GameTreeState state) {
         short value = 0;
-        boolean debug = false;
-        String debugOutputString = "";
+        debugString = "";
 
         int maxDepth = state.mCurrentMaxDepth;
         int depth = state.mDepth;
@@ -55,8 +58,9 @@ public class FishyEvaluator implements Evaluator {
         int remainingDepth = maxDepth - depth;
 
         if (debug) {
+            debugValue = 0;
             RawTerminal.disableColor();
-            debugOutputString = RawTerminal.getGameStateString(state);
+            debugString = RawTerminal.getGameStateString(state);
             RawTerminal.enableColor();
         }
 
@@ -65,14 +69,14 @@ public class FishyEvaluator implements Evaluator {
         // states that evaluate to almost-win to make them tastier.
 
         if (victory == GameState.ATTACKER_WIN) {
-            if (debug) debugOutputString += "Attacker win at depth " + depth + "\n";
+            if (debug) debugString += "Attacker win at depth " + depth + "\n";
             value = (short)(Evaluator.ATTACKER_WIN + (500 * (remainingDepth + 1)));
-            if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
+            if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
         } else if (victory == GameState.DEFENDER_WIN) {
-            if (debug) debugOutputString += "Defender win at depth " + depth + "\n";
+            if (debug) debugString += "Defender win at depth " + depth + "\n";
             value = (short)(Evaluator.DEFENDER_WIN - (500 * (remainingDepth + 1)));
-            if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
+            if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
         }
 
@@ -168,38 +172,44 @@ public class FishyEvaluator implements Evaluator {
 
         if (edgeEscape) { // block max: defender 0.75, attacker 0.0
             if (kingEdges >= 2) {
-                if (debug) debugOutputString += "Defender win--two ways to an edge\n";
+                if (debug) debugString += "Defender win--two ways to an edge\n";
                 value = (short)(Evaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
-                if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
+                if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
                 return value;
             }
 
             if (kingEdges == 1) {
-                if (debug) debugOutputString += "King has edge access: " + KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.4;
+                if (debug) debugString += "King has edge access: " + KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.75  + "\n";
                 value += KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.75;
             }
         } else if (cornerEscape) { // block max: defender 0.4, attacker 0.0
             if (kingCorners >= 2) {
-                if (debug) debugOutputString += "Defender win--two ways to a corner\n";
+                if (debug) debugString += "Defender win--two ways to a corner\n";
                 value = (short)(Evaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
-                if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
+                if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
                 return value;
             }
 
             if (kingCorners == 1) {
-                if (debug) debugOutputString += "King has corner access: " + KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.2;
+                if (debug) debugString += "King has corner access: " + KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.2  + "\n";
                 value += KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.2;
             }
 
             if (kingEdges >= 1) {
-                if (debug) debugOutputString += "King has edge access: " + KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.2;
+                if (debug) debugString += "King has edge access: " + KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.1  + "\n";
                 value += KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.1;
             }
         }
 
         // If the king is on a rank or file controlled by us, that's good.
-        if(rankControl[kingCoord.y] == DEFENDER) value += KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.1;
-        if(fileControl[kingCoord.x] == DEFENDER) value += KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.1;
+        if(rankControl[kingCoord.y] == DEFENDER) {
+            if (debug) debugString += "King on one of our ranks: " + KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.1  + "\n";
+            value += KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.1;
+        }
+        if(fileControl[kingCoord.x] == DEFENDER) {
+            if (debug) debugString += "King on one of our files: " + KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.1  + "\n";
+            value += KING_FREEDOM_VALUE * GameTreeState.DEFENDER * 0.1;
+        }
 
         // ==================== 2. KING RISK ====================
         // If the king is in check, an enemy taflman can close the trap, and
@@ -214,18 +224,18 @@ public class FishyEvaluator implements Evaluator {
 
         if (armedKing && strongKing) { // block max: defender 1, attacker 1
             if (enemyKingAdjacentTaflmen.size() <= 2) {
-                if (debug) debugOutputString += "Strong armed king adjacent to " + enemyKingAdjacentTaflmen.size() + " taflmen, which is cool: " + KING_RISK_VALUE * GameTreeState.DEFENDER * 0.1 * enemyKingAdjacentTaflmen.size();
+                if (debug) debugString += "Strong armed king adjacent to " + enemyKingAdjacentTaflmen.size() + " taflmen, which is cool: " + KING_RISK_VALUE * GameTreeState.DEFENDER * 0.1 * enemyKingAdjacentTaflmen.size() + "\n";
                 // There's value in having an armed, strong king next to one or two enemy taflmen--leads to captures.
                 value += KING_RISK_VALUE * GameTreeState.DEFENDER * 0.1 * enemyKingAdjacentTaflmen.size();
             }
             else if (enemyKingAdjacentTaflmen.size() > 2) {
                 // Having a king in check is risky.
-                if (debug) debugOutputString += "Strong armed king adjacent to " + enemyKingAdjacentTaflmen.size() + " taflmen, which is check!: " + KING_RISK_VALUE * GameTreeState.ATTACKER * 0.5;
+                if (debug) debugString += "Strong armed king adjacent to " + enemyKingAdjacentTaflmen.size() + " taflmen, which is check!: " + KING_RISK_VALUE * GameTreeState.ATTACKER * 1 + "\n";
                 value += KING_RISK_VALUE * GameTreeState.ATTACKER * 1;
             }
 
             if (kingAdjacentTaflmen.size() > enemyKingAdjacentTaflmen.size()) {
-                if (debug) debugOutputString += "King has a bodyguard: " + KING_RISK_VALUE * GameTreeState.DEFENDER * 0.5;
+                if (debug) debugString += "King has a bodyguard: " + KING_RISK_VALUE * GameTreeState.DEFENDER * 0.8  + "\n";
                 value += KING_RISK_VALUE * GameTreeState.DEFENDER * 0.8;
             }
         }
@@ -233,13 +243,13 @@ public class FishyEvaluator implements Evaluator {
             // if unarmed strong king, or weak armed or unarmed king
             if (enemyKingAdjacentTaflmen.size() > 2) {
                 // Having a king in check is risky.
-                if (debug) debugOutputString += "Strong king adjacent to " + enemyKingAdjacentTaflmen.size() + " taflmen, which is check!: " + KING_RISK_VALUE * GameTreeState.ATTACKER * 0.5;
+                if (debug) debugString += "Strong king adjacent to " + enemyKingAdjacentTaflmen.size() + " taflmen, which is check!: " + KING_RISK_VALUE * GameTreeState.ATTACKER * 1  + "\n";
                 value += KING_RISK_VALUE * GameTreeState.ATTACKER * 1;
             }
 
             // A piece next to a king means no check.
             if (kingAdjacentTaflmen.size() > enemyKingAdjacentTaflmen.size()) {
-                if (debug) debugOutputString += "Kng has a bodyguard: " + KING_RISK_VALUE * GameTreeState.DEFENDER * 0.5;
+                if (debug) debugString += "King has a bodyguard: " + KING_RISK_VALUE * GameTreeState.DEFENDER * 1  + "\n";
                 value += KING_RISK_VALUE * GameTreeState.DEFENDER * 1;
             }
         }
@@ -247,6 +257,7 @@ public class FishyEvaluator implements Evaluator {
             // armed/unarmed weak kings
             if (enemyKingAdjacentTaflmen.size() == 1) {
                 // Having a king in check is risky.
+                if(debug) debugString += "King in check: " + KING_RISK_VALUE * GameTreeState.ATTACKER * 1 + "\n";
                 value += KING_RISK_VALUE * GameTreeState.ATTACKER * 1;
             }
         }
@@ -254,6 +265,8 @@ public class FishyEvaluator implements Evaluator {
         // 3. ==================== CONTROL OF IMPORTANT RANKS AND FILES ====================
         // Attacker max this section: 1
         // Defender max this section: 1
+
+        if(debug) debugValue = value;
 
         // The points diagonally adjacent to the corners are important, and it's good for the
         // attackers to occupy them.
@@ -270,6 +283,11 @@ public class FishyEvaluator implements Evaluator {
             }
         }
 
+        if(debug) {
+            debugString += "Control of corner diagonals: " + (value - debugValue) + "\n";
+            debugValue = value;
+        }
+
         // It's good for the attacker to control ranks and files. It's good for the defender to be alone
         // on ranks and files.
         // attacker max: 0.4
@@ -284,13 +302,17 @@ public class FishyEvaluator implements Evaluator {
             else if(fileControl[i] == ATTACKER) value += attackerValuePerRank * GameTreeState.ATTACKER;
         }
 
+        if(debug) {
+            debugString += "Control/aloneness on ranks and files: " + (value - debugValue) + "\n";
+            debugValue = value;
+        }
+
         // It's better to have more developed pieces than fewer developed pieces.
         // attacker max, defender max: 0.2
         int attackerDeveloped = 0;
         int defenderDeveloped = 0;
         final double valuePerAttacker = RANK_AND_FILE_VALUE * 0.2 / startingAttackingTaflmenCount;
         final double valuePerDefender = RANK_AND_FILE_VALUE * 0.2 / startingAttackingTaflmenCount;
-
 
         for(char taflman : allTaflmen) {
             if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
@@ -308,6 +330,11 @@ public class FishyEvaluator implements Evaluator {
         value += attackerDeveloped * valuePerAttacker * GameTreeState.ATTACKER;
         value += defenderDeveloped * valuePerDefender * GameTreeState.DEFENDER;
 
+        if(debug) {
+            debugString += "Taflman development: " + (value - debugValue) + "\n";
+            debugValue = value;
+        }
+
         // 4. ==================== TAFLMAN RISK ====================
 
         // 5. ==================== MATERIAL COMPARISON ====================
@@ -321,13 +348,20 @@ public class FishyEvaluator implements Evaluator {
         value += attackersLost * attackerValue * GameTreeState.DEFENDER;
         value += defendersLost * defenderValue * GameTreeState.ATTACKER;
 
-        if (debug) printDebug(debugOutputString, value, state.getCurrentSide().isAttackingSide(), depth);
+        if(debug) {
+            debugString += "Material: " + (value - debugValue) + "\n";
+            debugValue = value;
+        }
+
+        if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
         return value;
     }
 
     private static void printDebug(String debugString, double value, boolean isAttackingSide, int depth) {
-        debugString += "\n\nFinal evaluation " + value;
+        debugString += "\n\nFinal evaluation " + value + "\n";
 
+
+        //OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, debugString);
 
         // The sequence justifying this logic:
         // 1. getCurrentSide().isAttackingSide() explores moves.

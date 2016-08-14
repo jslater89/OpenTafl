@@ -22,6 +22,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator.debugString;
+
 /**
  * Created by jay on 3/10/16.
  */
@@ -110,6 +112,26 @@ public class ExternalEngineClient implements UiCallback {
             }
         });
         mAiThread.start();
+    }
+
+    private void handleDumpCommand(String command) {
+        command = command.replaceFirst("dump", "");
+
+        int child = 0;
+
+        try {
+            child = Integer.parseInt(command.trim());
+        }
+        catch (Exception e) {
+            System.out.println("Bad arg in dump");
+        }
+
+        AiWorkspace w = GameTreeState.workspace;
+
+        if(w != null) {
+            String debugString = w.dumpEvaluationFor(child);
+            sendDumpCommand("dump " + debugString);
+        }
     }
 
     private void handleClockCommand(String command) {
@@ -266,6 +288,12 @@ public class ExternalEngineClient implements UiCallback {
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
     }
 
+    private void sendDumpCommand(String command) {
+        command = command.replaceAll("\n", "XXXXX");
+        command += "\n";
+        mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
+    }
+
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
         @Override
         public void onCommandReceived(byte[] command) {
@@ -301,6 +329,9 @@ public class ExternalEngineClient implements UiCallback {
                 }
                 else if(cmd.startsWith("goodbye")) {
                     handleGoodbyeCommand(cmd);
+                }
+                else if(cmd.startsWith("dump")) {
+                    handleDumpCommand(cmd);
                 }
             }
         }

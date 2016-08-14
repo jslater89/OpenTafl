@@ -69,7 +69,7 @@ public class CommunicationThread extends Thread {
 
     @Override
     public void run() {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[65536];
         while(running) {
             try {
                 int i = input.read(buffer);

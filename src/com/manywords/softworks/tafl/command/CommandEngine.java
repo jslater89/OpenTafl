@@ -602,4 +602,8 @@ public class CommandEngine {
     public UiCallback.Mode getMode() {
         return mMode;
     }
+
+    public ExternalEnginePlayer getAnalysisPlayer() {
+        return mDummyAnalysisPlayer;
+    }
 }

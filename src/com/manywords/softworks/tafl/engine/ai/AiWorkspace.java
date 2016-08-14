@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.engine.ai;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
@@ -10,10 +11,7 @@ import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.text.DecimalFormat;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class AiWorkspace extends Game {
     private static String lastRulesString = "";
@@ -223,6 +221,8 @@ public class AiWorkspace extends Game {
         int depth;
         int treeSizePreExtension = 0;
 
+        GameTreeState.workspace = this;
+
         // Do the main search
         for (depth = 1; depth <= maxDepth;) {
             mLastDepth = depth;
@@ -333,6 +333,36 @@ public class AiWorkspace extends Game {
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
             mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec, extended by " + (fullNodes - nodes) + " extra nodes");
         }
+    }
+
+    public String dumpEvaluationFor(int childIndex) {
+        ((FishyEvaluator) evaluator).debug = true;
+
+        GameTreeNode node = getTreeRoot().getNthChild(childIndex);
+
+        List<GameTreeNode> sequence = new ArrayList<>();
+        while(node != null) {
+            sequence.add(node);
+            node = node.getBestChild();
+        }
+
+        String debugString = "";
+        FishyEvaluator e = (FishyEvaluator) evaluator;
+        for(GameTreeNode n: sequence) {
+            if(n instanceof MinimalGameTreeNode) {
+                GameTreeState s = GameTreeState.getStateForMinimalNode(getTreeRoot(), (MinimalGameTreeNode) n);
+                evaluator.evaluate(s);
+                debugString += e.debugString + "\n-------------------------------------------\n";
+            }
+            else {
+                evaluator.evaluate((GameTreeState) n);
+                debugString += e.debugString + "\n-------------------------------------------\n";
+            }
+        }
+
+        ((FishyEvaluator) evaluator).debug = false;
+
+        return debugString;
     }
 
     public void stopExploring() {
