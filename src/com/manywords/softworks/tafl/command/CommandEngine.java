@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.command;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
@@ -79,8 +80,11 @@ public class CommandEngine {
     }
 
     public void leaveReplay() {
-        mReplay.prepareForGameStart();
         mMode = UiCallback.Mode.GAME;
+
+        if(mDummyAnalysisPlayer != null) {
+            mDummyAnalysisPlayer.setGame(mGame);
+        }
 
         callbackModeChange(UiCallback.Mode.GAME, mGame);
     }
@@ -515,6 +519,7 @@ public class CommandEngine {
             ReplayGameState result = mReplay.makeVariation(record);
             int moveResult = result.getLastMoveResult();
 
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Variation result: " + -1);
             if(moveResult < GameState.GOOD_MOVE) {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, GameState.getStringForMoveResult(moveResult), moveResult);
             }

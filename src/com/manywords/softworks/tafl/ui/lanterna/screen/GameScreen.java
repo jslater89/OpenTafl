@@ -477,6 +477,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             mInReplay = false;
             mBoardWindow.setGame(g);
             mBoardWindow.leaveReplay();
+            mBoardWindow.rerenderBoard();
             mGame = g;
 
             mCommandEngine.startGame();
