@@ -3,7 +3,6 @@ package com.manywords.softworks.tafl.engine.ai;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
@@ -351,11 +350,12 @@ public class AiWorkspace extends Game {
         for(GameTreeNode n: sequence) {
             if(n instanceof MinimalGameTreeNode) {
                 GameTreeState s = GameTreeState.getStateForMinimalNode(getTreeRoot(), (MinimalGameTreeNode) n);
-                evaluator.evaluate(s);
+                evaluator.evaluate(s, s.mCurrentMaxDepth, s.mDepth);
                 debugString += e.debugString + "\n-------------------------------------------\n";
             }
             else {
-                evaluator.evaluate((GameTreeState) n);
+                GameTreeState s = (GameTreeState) n;
+                evaluator.evaluate(s, s.mCurrentMaxDepth, s.mDepth);
                 debugString += e.debugString + "\n-------------------------------------------\n";
             }
         }

@@ -188,7 +188,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
     public short evaluate() {
         if (mValue != Evaluator.NO_VALUE) return mValue;
-        else return workspace.evaluator.evaluate(this);
+        else return workspace.evaluator.evaluate(this, mCurrentMaxDepth, mDepth);
     }
 
     public void replaceChild(GameTreeNode oldNode, GameTreeNode newNode) {
@@ -523,7 +523,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 if(mValue == Evaluator.NO_VALUE) {
                     short evaluation = workspace.transpositionTable.getValue(mValue, mCurrentMaxDepth - mDepth, mGameLength);
                     if(evaluation == Evaluator.NO_VALUE) {
-                        evaluation = workspace.evaluator.evaluate(GameTreeState.this);
+                        evaluation = workspace.evaluator.evaluate(GameTreeState.this, mCurrentMaxDepth, mDepth);
                     }
                     setValue(evaluation);
                     OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");

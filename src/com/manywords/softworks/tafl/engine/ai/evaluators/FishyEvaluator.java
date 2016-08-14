@@ -1,6 +1,5 @@
 package com.manywords.softworks.tafl.engine.ai.evaluators;
 
-import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.rules.*;
@@ -26,12 +25,10 @@ public class FishyEvaluator implements Evaluator {
     public static String debugString;
     public static short debugValue;
 
-    public short evaluate(GameTreeState state) {
+    public short evaluate(GameState state, int maxDepth, int depth) {
         short value = 0;
         debugString = "";
 
-        int maxDepth = state.mCurrentMaxDepth;
-        int depth = state.mDepth;
         int victory = state.checkVictory();
 
         Board board = state.getBoard();
@@ -71,12 +68,12 @@ public class FishyEvaluator implements Evaluator {
         if (victory == GameState.ATTACKER_WIN) {
             if (debug) debugString += "Attacker win at depth " + depth + "\n";
             value = (short)(Evaluator.ATTACKER_WIN + (500 * (remainingDepth + 1)));
-            if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
+            if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
         } else if (victory == GameState.DEFENDER_WIN) {
             if (debug) debugString += "Defender win at depth " + depth + "\n";
             value = (short)(Evaluator.DEFENDER_WIN - (500 * (remainingDepth + 1)));
-            if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
+            if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
         }
 
@@ -174,7 +171,7 @@ public class FishyEvaluator implements Evaluator {
             if (kingEdges >= 2) {
                 if (debug) debugString += "Defender win--two ways to an edge\n";
                 value = (short)(Evaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
-                if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
+                if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
                 return value;
             }
 
@@ -186,7 +183,7 @@ public class FishyEvaluator implements Evaluator {
             if (kingCorners >= 2) {
                 if (debug) debugString += "Defender win--two ways to a corner\n";
                 value = (short)(Evaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
-                if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
+                if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
                 return value;
             }
 
@@ -353,11 +350,11 @@ public class FishyEvaluator implements Evaluator {
             debugValue = value;
         }
 
-        if (debug) printDebug(debugString, value, state.getCurrentSide().isAttackingSide(), depth);
+        if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
         return value;
     }
 
-    private static void printDebug(String debugString, double value, boolean isAttackingSide, int depth) {
+    private static void printDebug(short value, boolean isAttackingSide, int depth) {
         debugString += "\n\nFinal evaluation " + value + "\n";
 
 

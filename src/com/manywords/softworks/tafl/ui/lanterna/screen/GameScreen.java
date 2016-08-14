@@ -18,6 +18,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
@@ -498,7 +499,22 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                         }
                     }
 
-                    mCommandEngine.getAnalysisPlayer().getExternalEngineHost().dumpEvaluation(child);
+                    if(child < 0) {
+                        FishyEvaluator fe = new FishyEvaluator();
+                        fe.debug = true;
+
+                        if(mCommandEngine.getReplay() != null) {
+                            fe.evaluate(mCommandEngine.getReplay().getCurrentState(), 0, 0);
+                        }
+                        else {
+                            fe.evaluate(mCommandEngine.getGame().getCurrentState(), 0, 0);
+                        }
+
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, fe.debugString);
+                    }
+                    else {
+                        mCommandEngine.getAnalysisPlayer().getExternalEngineHost().dumpEvaluation(child);
+                    }
                 }
                 else {
                     OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "No AI workspace");
