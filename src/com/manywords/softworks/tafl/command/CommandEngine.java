@@ -67,8 +67,17 @@ public class CommandEngine {
     public void enterReplay(ReplayGame rg) {
         mMode = UiCallback.Mode.REPLAY;
         mReplay = rg;
+
+        Game g = mReplay.getGame();
+
+        g.setUiCallback(mPrimaryUiCallback);
+        if(mDummyAnalysisPlayer != null) {
+            mDummyAnalysisPlayer.setGame(g);
+        }
+
         callbackModeChange(UiCallback.Mode.REPLAY, rg);
     }
+
     public void leaveReplay() {
         mReplay.prepareForGameStart();
         mMode = UiCallback.Mode.GAME;
@@ -82,6 +91,10 @@ public class CommandEngine {
         g.setUiCallback(mPrimaryUiCallback);
         mAttacker.setGame(g);
         mDefender.setGame(g);
+
+        if(mDummyAnalysisPlayer != null) {
+            mDummyAnalysisPlayer.setGame(g);
+        }
 
         callbackModeChange(UiCallback.Mode.GAME, g);
     }
@@ -382,7 +395,12 @@ public class CommandEngine {
                 return new CommandResult(Command.Type.ANALYZE, CommandResult.FAIL, "No analysis engine loaded", null);
             }
             else {
-                mAnalysisEngine.analyzePosition(a.moves, a.seconds, mGame.getCurrentState());
+                Game g = mGame;
+                if(mReplay != null) {
+                    g = mReplay.getGame();
+                }
+
+                mAnalysisEngine.analyzePosition(a.moves, a.seconds, g.getCurrentState());
                 return new CommandResult(Command.Type.ANALYZE, CommandResult.SUCCESS, "", null);
             }
         }
