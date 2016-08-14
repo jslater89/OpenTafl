@@ -243,6 +243,9 @@ public class ReplayGame {
             setCurrentState(variationState);
             mDirty = true;
         }
+        else {
+            return new ReplayGameState(variationState.getLastMoveResult());
+        }
 
         return getCurrentState();
     }
