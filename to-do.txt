@@ -7,3 +7,15 @@ AI stuff:
 1. Aspiration windows (i.e. initial alpha-beta in a window around last iterative deepening)
 2. Killer-move heuristic (array indexed by: ply, fromindex, toindex to track counts, list of: ply, move for moves)
 3. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)
+
+AI evaluation function to-do:
+1. Reduce ridiculously large defender bonus for having a piece next to the king
+2. Give the defender some incentive to take/hold ranks+files
+3. Tell the defender that doubling up on a rank+file is cool
+4. More things to separate early-game moves
+    1. Good for the defender to make his first move away from the attacker's first move, generally.
+    2. Good for the attacker to develop symmetry and respond to the defender's moves.
+5. Verify that it's better for the king to move somewhere free/out of check than to stay permanently
+on own ranks and files
+6. Correct king-in-check calculations for tablut, only award points if piece can't be instantly recaptured and if the
+other space is open
