@@ -396,7 +396,7 @@ public class CommandEngine {
             }
             else {
                 Game g = mGame;
-                if(mReplay != null) {
+                if(mMode == UiCallback.Mode.REPLAY) {
                     g = mReplay.getGame();
                 }
 
