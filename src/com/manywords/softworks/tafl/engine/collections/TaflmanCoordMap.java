@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.engine.collections;
 
+import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 
@@ -11,6 +12,7 @@ import java.util.List;
 public class TaflmanCoordMap {
     private char[] mTaflmen;
     private char[] mCoords;
+    private byte[] mTaflmanIndexByCoord;
 
     private final int mDimension;
     private final short mSize;
@@ -24,10 +26,10 @@ public class TaflmanCoordMap {
         this.mDimension = dimension;
         mTaflmen = new char[mSize];
         mCoords = new char[mSize];
+        mTaflmanIndexByCoord = new byte[mDimension * mDimension];
 
-        for(int i = 0; i < mSize; i++) {
-            mCoords[i] = (char) -1;
-        }
+        Utilities.fillArray(mCoords, (char) -1);
+        Utilities.fillArray(mTaflmanIndexByCoord, (byte) -1);
     }
 
     public TaflmanCoordMap(TaflmanCoordMap other) {
@@ -37,10 +39,14 @@ public class TaflmanCoordMap {
         this.mDimension = other.mDimension;
         mTaflmen = new char[mSize];
         mCoords = new char[mSize];
+        mTaflmanIndexByCoord = new byte[mDimension * mDimension];
 
-        for(int i = 0; i < mSize; i++) {
-            mTaflmen[i] = other.mTaflmen[i];
-            mCoords[i] = other.mCoords[i];
+        for(int i = 0; i < mTaflmanIndexByCoord.length; i++) {
+            if(i < mSize) {
+                mTaflmen[i] = other.mTaflmen[i];
+                mCoords[i] = other.mCoords[i];
+            }
+            mTaflmanIndexByCoord[i] = other.mTaflmanIndexByCoord[i];
         }
     }
 
@@ -73,10 +79,9 @@ public class TaflmanCoordMap {
     }
 
     public char getTaflman(int c) {
-        for(int i = 0; i < mCoords.length; i++) {
-            if(mCoords[i] == c) return mTaflmen[i];
-        }
-        return Taflman.EMPTY;
+        byte index = mTaflmanIndexByCoord[c];
+        if(index != -1) return mTaflmen[index];
+        else return Taflman.EMPTY;
     }
 
     public void remove(char taflman) {
@@ -85,8 +90,11 @@ public class TaflmanCoordMap {
 
         // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
         int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
+        char coord = mCoords[index];
+
         mCoords[index] = (char) -1;
         mTaflmen[index] = Taflman.EMPTY;
+        mTaflmanIndexByCoord[coord] = (byte) -1;
     }
 
     public void put(char taflman, Coord space) {
@@ -96,20 +104,24 @@ public class TaflmanCoordMap {
         // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
         int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
         char coord = (char) Coord.getIndex(mDimension, space);
-
+        char oldCoord = mCoords[index];
         mCoords[index] = coord;
         mTaflmen[index] = taflman;
+        mTaflmanIndexByCoord[coord] = (byte) index;
+
+        if(oldCoord != (char) -1) {
+            mTaflmanIndexByCoord[oldCoord] = (byte) -1;
+        }
     }
 
     public char[] getTaflmen() {
         return mTaflmen;
     }
-    public List<Coord> getOccupiedSpaces() { return null; }
 
     public String toString() {
         String s = "";
         for(int i = 0; i < mSize; i++) {
-            s += Taflman.getStringSymbol(mTaflmen[i]) + " id " + Taflman.getPackedId(mTaflmen[i]) + "@" + Coord.getCoordForIndex(mDimension, mCoords[i]) + ", ";
+            s += Taflman.getStringSymbol(mTaflmen[i]) + " id " + Taflman.getPackedId(mTaflmen[i]) + "@" + Coord.getCoordForIndex(mDimension, mCoords[i]) + "i" + mTaflmanIndexByCoord[i]+ ", ";
         }
         s += "\n";
 
