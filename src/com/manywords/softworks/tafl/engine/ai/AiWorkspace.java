@@ -267,6 +267,8 @@ public class AiWorkspace extends Game {
             }
         }
 
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "MAIN SEARCH");
+        //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
 
         continuationDepth = deepestSearch;
         while(true) {
@@ -299,11 +301,12 @@ public class AiWorkspace extends Game {
             continuationDepth++;
         }
 
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "CONTINUATION SEARCH");
+        //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
 
         // Do the horizon search, looking quickly at the current best moves in the hopes of catching any dumb
         // refutations.
 
-        /*
         currentHorizonDepth = deepestSearch;
         while(true) {
             if (!isTimeCritical()) {
@@ -343,11 +346,11 @@ public class AiWorkspace extends Game {
 
                     List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
                     GameTreeNode n = nodes.get(nodes.size() - 1);
-                    n.explore(currentHorizonDepth, depth, n.getAlpha(), n.getBeta(), mThreadPool, false);
                     if (n.getVictory() == GameState.GOOD_MOVE) {
+                        n.explore(currentHorizonDepth, depth, n.getAlpha(), n.getBeta(), mThreadPool, false);
                         certainVictory = false;
+                        n.revalueParent(n.getDepth());
                     }
-                    n.revalueParent(n.getDepth());
 
                     e++;
                     if (e > horizonStart + horizonCount) break;
@@ -362,7 +365,9 @@ public class AiWorkspace extends Game {
                 break;
             }
         }
-        */
+
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "HORIZON SEARCH");
+        //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
 
         mDeepestSearch = deepestSearch;
         mEndTime = System.currentTimeMillis();
