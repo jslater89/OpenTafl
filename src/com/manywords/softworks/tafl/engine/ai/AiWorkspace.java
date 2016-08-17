@@ -287,15 +287,15 @@ public class AiWorkspace extends Game {
 
             if(continuationDepth >= maxDepth) break;
 
+            if (chatty && mUiCallback != null) {
+                mUiCallback.statusText("Continuation search at depth " + continuationDepth);
+            }
+
             mStartingState.explore(continuationDepth, continuationDepth - 1, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, true);
 
             int size = getGameTreeSize(continuationDepth) - getGameTreeSize(continuationDepth - 1);
             mContinuationNodes += size;
 
-
-            if (chatty && mUiCallback != null) {
-                mUiCallback.statusText("Continuation search at depth " + continuationDepth);
-            }
 
             if(continuationDepth > deepestSearch) deepestSearch = continuationDepth;
             continuationDepth++;
@@ -396,7 +396,7 @@ public class AiWorkspace extends Game {
 
         if(chatty && mUiCallback != null) {
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
-            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, continuation search: " + mContinuationNodes + ", horizon search: " + (fullNodes - (mContinuationNodes + nodes)));
+            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, continuation search: " + mContinuationNodes + " nodes, horizon search: " + (fullNodes - (mContinuationNodes + nodes)) + " nodes");
             mUiCallback.statusText("Overall speed: " + (fullNodes / ((mEndTime - mStartTime)/ 1000d)) + " nodes/sec");
         }
     }
