@@ -1,5 +1,7 @@
 package com.manywords.softworks.tafl.engine.ai;
 
+import com.manywords.softworks.tafl.OpenTafl;
+
 /**
  * Created by jay on 2/19/16.
  */
@@ -15,6 +17,12 @@ public class GameTreeNodeMethods {
             }
 
             n.getParentNode().revalueParent(depthOfObservation);
+        }
+    }
+
+    public static void printChildEvaluations(GameTreeNode n) {
+        for(GameTreeNode child : n.getBranches()) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, child.getEnteringMove() + " " + child.getDepth() + "d " + child.getValue());
         }
     }
 }

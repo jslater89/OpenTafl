@@ -66,12 +66,12 @@ public class FishyEvaluator implements Evaluator {
         // states that evaluate to almost-win to make them tastier.
 
         if (victory == GameState.ATTACKER_WIN) {
-            if (debug) debugString += "Attacker win at depth " + depth + "\n";
+            if (debug) debugString += "Attacker win at depth " + depth + "/" + remainingDepth + "\n";
             value = (short)(Evaluator.ATTACKER_WIN + (500 * (remainingDepth + 1)));
             if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
         } else if (victory == GameState.DEFENDER_WIN) {
-            if (debug) debugString += "Defender win at depth " + depth + "\n";
+            if (debug) debugString += "Defender win at depth " + depth + "/" + remainingDepth + "\n";
             value = (short)(Evaluator.DEFENDER_WIN - (500 * (remainingDepth + 1)));
             if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
             return value;

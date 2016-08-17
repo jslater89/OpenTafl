@@ -17,6 +17,10 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
+        tests.add(new AICertainKingEscapeTest());
+        tests.add(new AICertainKingCaptureTest());
+        tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
+        tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
 
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
@@ -70,6 +74,7 @@ public class Test {
 
         // AI tests
         tests.add(new AIMatchingZobristTest());
+        tests.add(new AICertainKingEscapeTest());
         tests.add(new AICertainKingCaptureTest());
         tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
         tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());

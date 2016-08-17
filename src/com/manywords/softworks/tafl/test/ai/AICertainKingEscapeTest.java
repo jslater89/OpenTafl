@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
+import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
@@ -15,7 +16,7 @@ import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.Player;
 
-public class AICertainKingCaptureTest extends TaflTest implements UiCallback {
+public class AICertainKingEscapeTest extends TaflTest implements UiCallback {
 
     @Override
     public void gameStarting() {
@@ -85,10 +86,20 @@ public class AICertainKingCaptureTest extends TaflTest implements UiCallback {
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
 
+        state.makeMove(new MoveRecord(Coord.get(1,0), Coord.get(1,1)));
+        state = game.getCurrentState();
+
         //RawTerminal.renderGameState(state);
         AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
         //workspace.chatty = true;
         workspace.explore(1);
+
+        //workspace.getTreeRoot().printChildEvaluations();
+        //for(GameTreeNode n : workspace.getTreeRoot().getNthPath(2)) {
+        //  System.out.print(n.getEnteringMove() + "/" + n.getBranches().size() + " ");
+        //}
+        //System.out.println();
+        //System.exit(0);
 
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);
@@ -96,7 +107,7 @@ public class AICertainKingCaptureTest extends TaflTest implements UiCallback {
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
 
-        assert game.getCurrentState().checkVictory() == GameState.ATTACKER_WIN;
+        assert game.getCurrentState().checkVictory() == GameState.DEFENDER_WIN;
     }
 
 }

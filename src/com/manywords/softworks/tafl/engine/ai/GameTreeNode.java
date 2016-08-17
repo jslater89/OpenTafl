@@ -50,4 +50,6 @@ public interface GameTreeNode {
     public abstract long getZobrist();
 
     public abstract void revalueParent(int depthOfObservation);
+
+    public abstract void printChildEvaluations();
 }

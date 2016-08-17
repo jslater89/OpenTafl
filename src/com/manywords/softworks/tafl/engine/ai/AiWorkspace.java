@@ -55,7 +55,7 @@ public class AiWorkspace extends Game {
 
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory());
-        mLastTimeToDepth = new long[20];
+        mLastTimeToDepth = new long[25];
         setGameRules(startingGame.getRules());
         setUiCallback(null);
         mOriginalStartingState = startingState;
@@ -180,7 +180,7 @@ public class AiWorkspace extends Game {
         mMaxThinkTime = maxThinkTime * 1000;
 
         mStartTime = System.currentTimeMillis();
-        int maxDepth = 25;
+        int maxDepth = 24;
 
         if(mTimeRemaining == null && mGame.getClock() != null) {
             mClockLength = mGame.getClock().toTimeSpec();
@@ -228,16 +228,13 @@ public class AiWorkspace extends Game {
         GameTreeState.workspace = this;
 
         // Do the main search
-        for (depth = 0; depth <= maxDepth;) {
+        for (depth = 1; depth <= maxDepth;) {
             mLastDepth = depth;
 
             if (canDoDeeperSearch(depth)) {
                 if (isTimeCritical() || mNoTime || mExtensionTime) {
                     break;
                 }
-
-                depth++;
-                deepestSearch = depth;
 
                 mAlphaCutoffs = new long[maxDepth];
                 mAlphaCutoffDistances = new long[maxDepth];
@@ -260,13 +257,18 @@ public class AiWorkspace extends Game {
                 if (chatty && mUiCallback != null) {
                     mUiCallback.statusText("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
                 }
+
+
+                depth++;
+                deepestSearch = depth;
             }
             else {
                 break;
             }
         }
 
-        continuationDepth = deepestSearch + 1;
+        /*
+        continuationDepth = deepestSearch;
         while(true) {
             if(isTimeCritical() || mNoTime || mExtensionTime) {
                 break;
@@ -296,6 +298,7 @@ public class AiWorkspace extends Game {
             if(continuationDepth > deepestSearch) deepestSearch = continuationDepth;
             continuationDepth++;
         }
+        */
 
         /*
         // Extend each child by three until we're out of time. This isn't as good as
@@ -347,7 +350,8 @@ public class AiWorkspace extends Game {
         // Do the horizon search, looking quickly at the current best moves in the hopes of catching any dumb
         // refutations.
 
-        currentHorizonDepth = continuationDepth;
+        /*
+        currentHorizonDepth = deepestSearch;
         while(true) {
             if (!isTimeCritical()) {
                 if (firstHorizon) {
@@ -405,6 +409,7 @@ public class AiWorkspace extends Game {
                 break;
             }
         }
+        */
 
         mDeepestSearch = deepestSearch;
         mEndTime = System.currentTimeMillis();
@@ -428,6 +433,13 @@ public class AiWorkspace extends Game {
 
         GameTreeNode node = getTreeRoot().getNthChild(childIndex);
 
+        int depth = 0;
+        for(int i = 0; i < getTreeRoot().getBranches().size(); i++) {
+            if(getTreeRoot().getNthPath(i).size() > depth) {
+                depth = getTreeRoot().getNthPath(i).size();
+            }
+        }
+
         List<GameTreeNode> sequence = new ArrayList<>();
         while(node != null) {
             sequence.add(node);
@@ -439,11 +451,13 @@ public class AiWorkspace extends Game {
         for(GameTreeNode n: sequence) {
             if(n instanceof MinimalGameTreeNode) {
                 GameTreeState s = GameTreeState.getStateForMinimalNode(getTreeRoot(), (MinimalGameTreeNode) n);
+                s.mCurrentMaxDepth = depth;
                 evaluator.evaluate(s, s.mCurrentMaxDepth, s.mDepth);
                 debugString += e.debugString + "\n-------------------------------------------\n";
             }
             else {
                 GameTreeState s = (GameTreeState) n;
+                s.mCurrentMaxDepth = depth;
                 evaluator.evaluate(s, s.mCurrentMaxDepth, s.mDepth);
                 debugString += e.debugString + "\n-------------------------------------------\n";
             }

@@ -211,4 +211,8 @@ public class MinimalGameTreeNode implements GameTreeNode {
         return mBranches;
     }
 
+    @Override
+    public void printChildEvaluations() {
+        GameTreeNodeMethods.printChildEvaluations(this);
+    }
 }
