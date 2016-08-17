@@ -266,6 +266,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
         if(extension && mDepth < overallMaxDepth) {
             if(workspace.mNoTime) return mValue;
+            if(mVictory > GOOD_MOVE) return mValue;
 
             continuationOnChildren(currentMaxDepth, overallMaxDepth);
 
