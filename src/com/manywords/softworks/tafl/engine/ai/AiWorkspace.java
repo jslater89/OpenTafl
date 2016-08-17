@@ -180,6 +180,7 @@ public class AiWorkspace extends Game {
         if(maxThinkTime == 0) maxThinkTime = 86400;
         mMaxThinkTime = maxThinkTime * 1000;
 
+        mContinuationNodes = 0;
         mStartTime = System.currentTimeMillis();
         int maxDepth = 24;
 
@@ -270,7 +271,9 @@ public class AiWorkspace extends Game {
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "MAIN SEARCH");
         //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
 
+
         continuationDepth = deepestSearch;
+        long start = System.currentTimeMillis();
         while(true) {
             if(isTimeCritical() || mNoTime || mExtensionTime) {
                 break;
@@ -282,28 +285,33 @@ public class AiWorkspace extends Game {
                 }
             }
 
-            long start = System.currentTimeMillis();
+            if(continuationDepth >= maxDepth) break;
 
             mStartingState.explore(continuationDepth, continuationDepth - 1, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, true);
 
-            long finish = System.currentTimeMillis();
-            double timeTaken = (finish - start) / 1000d;
-
             int size = getGameTreeSize(continuationDepth) - getGameTreeSize(continuationDepth - 1);
-            mContinuationNodes = size;
-            double statesPerSec = size / ((finish - start) / 1000d);
+            mContinuationNodes += size;
+
 
             if (chatty && mUiCallback != null) {
-                mUiCallback.statusText("Continuation search at depth " + continuationDepth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
+                mUiCallback.statusText("Continuation search at depth " + continuationDepth);
             }
 
-            //System.exit(0);
             if(continuationDepth > deepestSearch) deepestSearch = continuationDepth;
             continuationDepth++;
+        }
+        long finish = System.currentTimeMillis();
+
+        double timeTaken = (finish - start) / 1000d;
+        double statesPerSec = mContinuationNodes / ((finish - start) / 1000d);
+        if(chatty && mUiCallback != null) {
+            mUiCallback.statusText("Continuation searches explored " + mContinuationNodes + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
         }
 
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "CONTINUATION SEARCH");
         //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
+        //getTreeRoot().printTree("");
+
 
         // Do the horizon search, looking quickly at the current best moves in the hopes of catching any dumb
         // refutations.
@@ -333,8 +341,8 @@ public class AiWorkspace extends Game {
 
                 currentHorizonDepth += horizonDepth;
 
-                if (currentHorizonDepth > depth + horizonLimit) {
-                    currentHorizonDepth = depth + extensionDepth;
+                if (currentHorizonDepth > deepestSearch + horizonLimit) {
+                    currentHorizonDepth = deepestSearch + horizonDepth;
                     horizonStart += horizonCount;
                 }
 
@@ -349,7 +357,7 @@ public class AiWorkspace extends Game {
                     List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
                     GameTreeNode n = nodes.get(nodes.size() - 1);
                     if (n.getVictory() == GameState.GOOD_MOVE) {
-                        n.explore(currentHorizonDepth, depth, n.getAlpha(), n.getBeta(), mThreadPool, false);
+                        n.explore(currentHorizonDepth, deepestSearch, n.getAlpha(), n.getBeta(), mThreadPool, false);
                         certainVictory = false;
                         n.revalueParent(n.getDepth());
                     }
@@ -357,6 +365,8 @@ public class AiWorkspace extends Game {
                     e++;
                     if (e > horizonStart + horizonCount) break;
                 }
+
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Ran horizon search at depth: " + currentHorizonDepth + " starting index " + horizonStart + " ending index " + (horizonStart + horizonCount));
 
                 if(currentHorizonDepth > deepestSearch) deepestSearch = currentHorizonDepth;
 
@@ -370,21 +380,23 @@ public class AiWorkspace extends Game {
 
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "HORIZON SEARCH");
         //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
+        //getTreeRoot().printTree("");
+
 
         mDeepestSearch = deepestSearch;
         mEndTime = System.currentTimeMillis();
     }
 
     public void printSearchStats() {
-        int nodes = getGameTreeSize(mLastDepth);
-        int fullNodes = getGameTreeSize(mLastDepth + mDeepestSearch);
+        int nodes = getGameTreeSize(mLastDepth - 1);
+        int fullNodes = getGameTreeSize(mDeepestSearch);
         int size = getTreeRoot().mBranches.size();
         double observedBranching = ((mGame.mAverageBranchingFactor * mGame.mAverageBranchingFactorCount) + size) / (++mGame.mAverageBranchingFactorCount);
         mGame.mAverageBranchingFactor = observedBranching;
 
         if(chatty && mUiCallback != null) {
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
-            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec, continuation search saw " + mContinuationNodes + " nodes, horizon search saw " + (fullNodes - mContinuationNodes - nodes) + " nodes");
+            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, continuation search: " + mContinuationNodes + ", horizon search: " + (fullNodes - (mContinuationNodes + nodes)));
             mUiCallback.statusText("Overall speed: " + (fullNodes / ((mEndTime - mStartTime)/ 1000d)) + " nodes/sec");
         }
     }

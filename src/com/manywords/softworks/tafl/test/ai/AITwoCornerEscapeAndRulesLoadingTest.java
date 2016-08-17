@@ -106,6 +106,8 @@ public class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements Ui
             value = workspace.getTreeRoot().getBestChild().getValue();
             List<GameTreeNode> path = workspace.getTreeRoot().getBestPath();
 
+            workspace.printSearchStats();
+
             state.makeMove(nextMove);
             state = game.getCurrentState();
         }

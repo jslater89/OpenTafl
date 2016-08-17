@@ -107,6 +107,8 @@ public class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCa
             }
             */
 
+            workspace.printSearchStats();
+
             victory = state.checkVictory();
             if(victory != GameState.GOOD_MOVE) {
                 break;

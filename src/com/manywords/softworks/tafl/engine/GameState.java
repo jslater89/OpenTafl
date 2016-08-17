@@ -136,7 +136,6 @@ public class GameState {
         }
     }
 
-    private static final int VICTORY_UNCHECKED = -50;
     public Game mGame;
     public int mLastMoveResult;
     protected int mVictory = VICTORY_UNCHECKED;
@@ -278,6 +277,8 @@ public class GameState {
     public static final int ILLEGAL_SIDE_BERSERKER = -2;
     public static final int ILLEGAL_MOVE = -3;
     public static final int ILLEGAL_MOVE_BERSERKER = -4;
+    public static final int TRANSPOSITION_HIT = -49;
+    public static final int VICTORY_UNCHECKED = -50;
 
     protected GameState moveTaflman(char taflman, Coord destination) {
         if (mBerserkingTaflman != Taflman.EMPTY && Taflman.getSide(this, taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {

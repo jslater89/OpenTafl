@@ -90,6 +90,8 @@ public class AICertainKingCaptureTest extends TaflTest implements UiCallback {
         //workspace.chatty = true;
         workspace.explore(5);
 
+        workspace.printSearchStats();
+
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);
 

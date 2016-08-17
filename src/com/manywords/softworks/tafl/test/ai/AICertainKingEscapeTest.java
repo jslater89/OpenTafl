@@ -91,15 +91,10 @@ public class AICertainKingEscapeTest extends TaflTest implements UiCallback {
 
         //RawTerminal.renderGameState(state);
         AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
-        //workspace.chatty = true;
+        workspace.chatty = true;
         workspace.explore(5);
 
-        //workspace.getTreeRoot().printChildEvaluations();
-        //for(GameTreeNode n : workspace.getTreeRoot().getNthPath(2)) {
-        //  System.out.print(n.getEnteringMove() + "/" + n.getBranches().size() + " ");
-        //}
-        //System.out.println();
-        //System.exit(0);
+        workspace.printSearchStats();
 
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);
