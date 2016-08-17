@@ -164,7 +164,7 @@ public class AiWorkspace extends Game {
 
     private boolean canDoDeeperSearch(int nextDepth) {
         long timeLeft = mStartTime + mThinkTime - System.currentTimeMillis();
-        long timeToPreviousDepth = mLastTimeToDepth[nextDepth];
+        long timeToPreviousDepth = mLastTimeToDepth[depth - 1];
 
         // We can start a deeper search
         return !(isTimeCritical() || timeLeft < (timeToPreviousDepth * 15));
