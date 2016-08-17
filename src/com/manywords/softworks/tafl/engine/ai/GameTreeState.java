@@ -255,6 +255,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation) {
         mContinuation = continuation;
 
+        setAlpha(alpha);
+        setBeta(beta);
+
         boolean extension = false;
         if(overallMaxDepth < currentMaxDepth) {
             extension = true;
@@ -263,21 +266,18 @@ public class GameTreeState extends GameState implements GameTreeNode {
         if(extension && mDepth < overallMaxDepth) {
             if(workspace.mNoTime) return mValue;
 
-            for(GameTreeNode child : getBranches()) {
-                child.explore(currentMaxDepth, overallMaxDepth, getAlpha(), getBeta(), threadPool, continuation);
-            }
+            continuationOnChildren(currentMaxDepth, overallMaxDepth);
 
             return mValue;
         }
 
-        setAlpha(alpha);
-        setBeta(beta);
         mCurrentMaxDepth = currentMaxDepth;
 
         short cachedValue = Evaluator.NO_VALUE;
-        if(!extension) {
+        if(!extension && !continuation) {
             cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
         }
+
         else if(mDepth > overallMaxDepth && mDepth <= currentMaxDepth) {
             // If we're in an extension and past the point we've already explored, transposition table hits are allowed.
             cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
@@ -321,12 +321,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
             mParent.replaceChild(GameTreeState.this, smallChild);
         } else {
             this.mValue = Evaluator.NO_VALUE;
-            if(continuation && mBranches.size() != 0) {
-                System.out.println("Overall max depth: " + overallMaxDepth);
-                System.out.println("Current max depth: " + currentMaxDepth);
-                System.out.println("Current depth: " + mDepth);
-                throw new IllegalStateException();
-            }
             exploreChildren(this, currentMaxDepth, overallMaxDepth, continuation);
         }
 
@@ -400,7 +394,88 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     mValue = evaluation;
                 }
 
-                if (getCurrentSide().isAttackingSide()) {
+                if (isMaximizingNode()) {
+                    mValue = (short) Math.max(mValue, evaluation);
+                    mAlpha = (short) Math.max(mAlpha, mValue);
+
+                    //System.out.println("Depth " + mDepth + " Attacker value " + mValue + " Alpha " + mAlpha + " Beta " + mBeta);
+                    if (mBeta <= mAlpha) {
+                        //System.out.println("Beta cutoff");
+                        cutoffType = 1;
+                        if(workspace.mBetaCutoffs.length > mDepth) {
+                            workspace.mBetaCutoffs[mDepth]++;
+                            workspace.mBetaCutoffDistances[mDepth] += distanceToFirstCutoff;
+                        }
+                        cutoff = true;
+                    }
+                } else {
+                    mValue = (short) Math.min(mValue, evaluation);
+                    mBeta = (short) Math.min(mBeta, mValue);
+
+                    //System.out.println("Depth " + mDepth + " Defender value " + mValue + " Alpha " + mAlpha + " Beta " + mBeta);
+                    if (mBeta <= mAlpha) {
+                        //System.out.println("Alpha cutoff");
+                        cutoffType = 0;
+                        if(workspace.mBetaCutoffs.length > mDepth) {
+                            workspace.mAlphaCutoffs[mDepth]++;
+                            workspace.mAlphaCutoffDistances[mDepth] += distanceToFirstCutoff;
+                        }
+                        cutoff = true;
+                    }
+                }
+            }
+        }
+
+
+
+        // If we have no legal moves, the other side wins
+        if(mBranches.size() == 0) {
+            if(getCurrentSide().isAttackingSide()) {
+                mVictory = DEFENDER_WIN;
+            }
+            else {
+                mVictory = ATTACKER_WIN;
+            }
+            mValue = evaluate();
+        }
+
+        workspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
+        mTaflmanMoveCache = null;
+
+        minifyState();
+    }
+
+    public void continuationOnChildren(int currentMaxDepth, int overallMaxDepth) {
+        List<GameTreeNode> successorStates = getBranches();
+
+        boolean cutoff = false;
+        int cutoffType = 0;
+
+        int distanceToFirstCutoff = 0;
+        boolean savedDistanceToFirstCutoff = false;
+
+        for(GameTreeNode node : successorStates) {
+            if (cutoff) {
+                break;
+            }
+
+            // Node will be null in e.g. berserk tafl, where moves are legal
+            // according to the movement rules, but not legal according to
+            // special rules, like the berserk rule.
+            if (node == null) {
+                continue;
+            }
+
+            node.explore(currentMaxDepth, overallMaxDepth, mAlpha, mBeta, null, mContinuation);
+            short evaluation = node.getValue();
+            distanceToFirstCutoff++;
+
+            if (evaluation != Evaluator.NO_VALUE) {
+                if (mValue == Evaluator.NO_VALUE) {
+                    mValue = evaluation;
+                }
+
+                if (isMaximizingNode()) {
                     mValue = (short) Math.max(mValue, evaluation);
                     mAlpha = (short) Math.max(mAlpha, mValue);
 
@@ -443,23 +518,31 @@ public class GameTreeState extends GameState implements GameTreeNode {
             mValue = evaluate();
         }
 
-        workspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
-        mTaflmanMoveCache = null;
+        minifyState();
+/*
+        System.out.println("CONTINUATION");
+        System.out.println("My depth: " + mDepth);
+        System.out.println("My children: " + mBranches.size());
+        System.out.println("My current max depth: " + currentMaxDepth);
+        System.out.println("My overall max depth: " + overallMaxDepth);
+        */
+    }
 
+    private void minifyState() {
         // All moves explored; minify this state
         if(mDepth != 0) {
             if(mValue == Evaluator.NO_VALUE) {
-                short evaluation = workspace.transpositionTable.getValue(mValue, currentMaxDepth - mDepth, mGameLength);
+                short evaluation = workspace.transpositionTable.getValue(mValue, mCurrentMaxDepth - mDepth, mGameLength);
                 if(evaluation != Evaluator.NO_VALUE) {
                     setValue(evaluation);
                 }
                 else {
-                    setValue(workspace.evaluator.evaluate(GameTreeState.this, currentMaxDepth, mDepth));
+                    setValue(workspace.evaluator.evaluate(GameTreeState.this, mCurrentMaxDepth, mDepth));
                     OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
                 }
 
             }
-            MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
+            MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
             if (mParent != null) {
                 mParent.replaceChild(GameTreeState.this, minifiedNode);
             }

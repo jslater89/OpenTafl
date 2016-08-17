@@ -266,7 +266,7 @@ public class AiWorkspace extends Game {
             }
         }
 
-        continuationDepth = deepestSearch;
+        continuationDepth = deepestSearch + 1;
         while(true) {
             if(isTimeCritical() || mNoTime || mExtensionTime) {
                 break;
@@ -280,18 +280,19 @@ public class AiWorkspace extends Game {
 
             long start = System.currentTimeMillis();
 
-            mStartingState.explore(continuationDepth, continuationDepth - 1, mStartingState.getAlpha(), mStartingState.getBeta(), mThreadPool, true);
+            mStartingState.explore(continuationDepth, continuationDepth - 1, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, true);
 
             long finish = System.currentTimeMillis();
             double timeTaken = (finish - start) / 1000d;
 
-            int size = getGameTreeSize(continuationDepth);
+            int size = getGameTreeSize(continuationDepth) - getGameTreeSize(continuationDepth - 1);
             double statesPerSec = size / ((finish - start) / 1000d);
 
             if (chatty && mUiCallback != null) {
                 mUiCallback.statusText("Continuation search at depth " + continuationDepth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
             }
 
+            //System.exit(0);
             if(continuationDepth > deepestSearch) deepestSearch = continuationDepth;
             continuationDepth++;
         }
