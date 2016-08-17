@@ -267,7 +267,7 @@ public class AiWorkspace extends Game {
             }
         }
 
-        /*
+
         continuationDepth = deepestSearch;
         while(true) {
             if(isTimeCritical() || mNoTime || mExtensionTime) {
@@ -298,53 +298,6 @@ public class AiWorkspace extends Game {
             if(continuationDepth > deepestSearch) deepestSearch = continuationDepth;
             continuationDepth++;
         }
-        */
-
-        /*
-        // Extend each child by three until we're out of time. This isn't as good as
-        // getting to start a new depth, but it is better than getting stuck with an
-        while(true) {
-            if (!isTimeCritical() && !mExtensionTime) {
-                if (firstExtension) {
-                    firstExtension = false;
-                    if (chatty && mUiCallback != null) {
-                        mUiCallback.statusText("Running extension search to fill time...");
-                    }
-                }
-
-                getTreeRoot().getBranches().sort((o1, o2) -> {
-                    // Sort by value high to low
-                    if (getTreeRoot().isMaximizingNode()) {
-                        return -(o1.getValue() - o2.getValue());
-                    }
-                    else {
-                        // low to high
-                        return (o1.getValue() - o2.getValue());
-                    }
-                });
-
-                depth += extensionDepth;
-
-                boolean certainVictory = true;
-                for (GameTreeNode branch : getTreeRoot().getBranches()) {
-                    List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
-                    GameTreeNode n = nodes.get(nodes.size() - 1);
-                    n.explore(depth, depth, n.getAlpha(), n.getBeta(), mThreadPool);
-                    if (n.getVictory() == GameState.GOOD_MOVE) {
-                        certainVictory = false;
-                    }
-                    n.revalueParent(n.getDepth());
-                }
-
-                if(depth > deepestSearch) deepestSearch = depth;
-
-                if (certainVictory) break;
-            }
-            else {
-                break;
-            }
-        }
-        */
 
 
         // Do the horizon search, looking quickly at the current best moves in the hopes of catching any dumb

@@ -88,7 +88,7 @@ public class AICertainKingCaptureTest extends TaflTest implements UiCallback {
         //RawTerminal.renderGameState(state);
         AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
         //workspace.chatty = true;
-        workspace.explore(1);
+        workspace.explore(5);
 
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         state.makeMove(nextMove);
