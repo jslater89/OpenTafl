@@ -76,11 +76,11 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     @Override
-    public short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool) {
+    public short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation) {
         // First, we have to get a full game tree state for this node:
         GameTreeState thisState = GameTreeState.getStateForMinimalNode(getRootNode(), this);
-        thisState.explore(currentMaxDepth, overallMaxDepth, alpha, beta, threadPool);
-        return 0;
+        thisState.explore(currentMaxDepth, overallMaxDepth, alpha, beta, threadPool, continuation);
+        return thisState.getValue();
     }
 
     @Override

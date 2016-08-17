@@ -21,7 +21,7 @@ public interface GameTreeNode {
 
     public abstract int getVictory();
 
-    public abstract short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool);
+    public abstract short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation);
 
     public abstract short evaluate();
 

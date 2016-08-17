@@ -34,7 +34,7 @@ public class AiWorkspace extends Game {
     private long mEndTime;
 
     private int mLastDepth;
-    private int mLastExtensionDepth;
+    public int mDeepestSearch;
     /**
      * In milliseconds
      */
@@ -164,10 +164,10 @@ public class AiWorkspace extends Game {
 
     private boolean canDoDeeperSearch(int nextDepth) {
         long timeLeft = mStartTime + mThinkTime - System.currentTimeMillis();
-        long timeToPreviousDepth = mLastTimeToDepth[nextDepth - 1];
+        long timeToPreviousDepth = mLastTimeToDepth[nextDepth];
 
         // We can start a deeper search
-        return !(isTimeCritical() || timeLeft < (timeToPreviousDepth * 2));
+        return !(isTimeCritical() || timeLeft < (timeToPreviousDepth * 15));
     }
 
     private boolean isTimeCritical() {
@@ -180,7 +180,7 @@ public class AiWorkspace extends Game {
         mMaxThinkTime = maxThinkTime * 1000;
 
         mStartTime = System.currentTimeMillis();
-        int maxDepth = 10;
+        int maxDepth = 25;
 
         if(mTimeRemaining == null && mGame.getClock() != null) {
             mClockLength = mGame.getClock().toTimeSpec();
@@ -211,25 +211,33 @@ public class AiWorkspace extends Game {
         }, mThinkTime - (Math.min((int) (mThinkTime * 0.05), 250))); // save 1/4 second or 5%, whichever is less
 
         boolean firstExtension = true;
-        final int extensionDepth = 2;
-        final int extensionCount = 5;
-        final int extensionLimit = 6;
-        int extensionStart = 0;
-        int deepestExtension = 1;
-        int extensionIterations = 0;
+        boolean firstHorizon = true;
+        final int extensionDepth = 3;
+        int continuationDepth;
+
+        final int horizonDepth = 2;
+        final int horizonCount = 5;
+        final int horizonLimit = 6;
+        int currentHorizonDepth = 0;
+        int horizonStart = 0;
+        int deepestSearch = 1;
+        int horizonIterations = 0;
         int depth;
         int treeSizePreExtension = 0;
 
         GameTreeState.workspace = this;
 
         // Do the main search
-        for (depth = 1; depth <= maxDepth;) {
+        for (depth = 0; depth <= maxDepth;) {
             mLastDepth = depth;
 
             if (canDoDeeperSearch(depth)) {
                 if (isTimeCritical() || mNoTime || mExtensionTime) {
                     break;
                 }
+
+                depth++;
+                deepestSearch = depth;
 
                 mAlphaCutoffs = new long[maxDepth];
                 mAlphaCutoffDistances = new long[maxDepth];
@@ -238,7 +246,7 @@ public class AiWorkspace extends Game {
 
                 long start = System.currentTimeMillis();
                 mStartingState = new GameTreeState(this, new GameState(mOriginalStartingState));
-                mStartingState.explore(depth, maxDepth, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool);
+                mStartingState.explore(depth, maxDepth, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, false);
                 long finish = System.currentTimeMillis();
 
                 if (!mNoTime) {
@@ -252,17 +260,47 @@ public class AiWorkspace extends Game {
                 if (chatty && mUiCallback != null) {
                     mUiCallback.statusText("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
                 }
-                depth++;
-                deepestExtension = depth;
             }
             else {
                 break;
             }
         }
 
-        // Do the extension search
+        continuationDepth = deepestSearch;
         while(true) {
-            if (!isTimeCritical()) {
+            if(isTimeCritical() || mNoTime || mExtensionTime) {
+                break;
+            }
+            else if(firstExtension) {
+                firstExtension = false;
+                if(chatty && mUiCallback != null) {
+                    mUiCallback.statusText("Running continuation search to fill time...");
+                }
+            }
+
+            long start = System.currentTimeMillis();
+
+            mStartingState.explore(continuationDepth, continuationDepth - 1, mStartingState.getAlpha(), mStartingState.getBeta(), mThreadPool, true);
+
+            long finish = System.currentTimeMillis();
+            double timeTaken = (finish - start) / 1000d;
+
+            int size = getGameTreeSize(continuationDepth);
+            double statesPerSec = size / ((finish - start) / 1000d);
+
+            if (chatty && mUiCallback != null) {
+                mUiCallback.statusText("Continuation search at depth " + continuationDepth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
+            }
+
+            if(continuationDepth > deepestSearch) deepestSearch = continuationDepth;
+            continuationDepth++;
+        }
+
+        /*
+        // Extend each child by three until we're out of time. This isn't as good as
+        // getting to start a new depth, but it is better than getting stuck with an
+        while(true) {
+            if (!isTimeCritical() && !mExtensionTime) {
                 if (firstExtension) {
                     firstExtension = false;
                     if (chatty && mUiCallback != null) {
@@ -270,7 +308,6 @@ public class AiWorkspace extends Game {
                     }
                 }
 
-                // Do an extension search on the best-known moves.
                 getTreeRoot().getBranches().sort((o1, o2) -> {
                     // Sort by value high to low
                     if (getTreeRoot().isMaximizingNode()) {
@@ -282,48 +319,99 @@ public class AiWorkspace extends Game {
                     }
                 });
 
-                deepestExtension += extensionDepth;
+                depth += extensionDepth;
 
-                if (deepestExtension > depth + extensionLimit) {
-                    deepestExtension = depth + extensionDepth;
-                    extensionStart += extensionCount;
+                boolean certainVictory = true;
+                for (GameTreeNode branch : getTreeRoot().getBranches()) {
+                    List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
+                    GameTreeNode n = nodes.get(nodes.size() - 1);
+                    n.explore(depth, depth, n.getAlpha(), n.getBeta(), mThreadPool);
+                    if (n.getVictory() == GameState.GOOD_MOVE) {
+                        certainVictory = false;
+                    }
+                    n.revalueParent(n.getDepth());
+                }
+
+                if(depth > deepestSearch) deepestSearch = depth;
+
+                if (certainVictory) break;
+            }
+            else {
+                break;
+            }
+        }
+        */
+
+
+        // Do the horizon search, looking quickly at the current best moves in the hopes of catching any dumb
+        // refutations.
+
+        currentHorizonDepth = continuationDepth;
+        while(true) {
+            if (!isTimeCritical()) {
+                if (firstHorizon) {
+                    firstHorizon = false;
+                    if (chatty && mUiCallback != null) {
+                        mUiCallback.statusText("Running horizon on best moves...");
+                    }
+                }
+
+                // Do an extension search on the best known moves.
+                getTreeRoot().getBranches().sort((o1, o2) -> {
+                    // Sort by value high to low
+                    if (getTreeRoot().isMaximizingNode()) {
+                        return -(o1.getValue() - o2.getValue());
+                    }
+                    else {
+                        // low to high
+                        return (o1.getValue() - o2.getValue());
+                    }
+                });
+
+                currentHorizonDepth += horizonDepth;
+
+                if (currentHorizonDepth > depth + horizonLimit) {
+                    currentHorizonDepth = depth + extensionDepth;
+                    horizonStart += horizonCount;
                 }
 
                 boolean certainVictory = true;
                 int e = 0;
                 for (GameTreeNode branch : getTreeRoot().getBranches()) {
-                    if (e < extensionStart) {
+                    if (e < horizonStart) {
                         e++;
                         continue;
                     }
 
                     List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
                     GameTreeNode n = nodes.get(nodes.size() - 1);
-                    n.explore(deepestExtension, depth, n.getAlpha(), n.getBeta(), mThreadPool);
+                    n.explore(currentHorizonDepth, depth, n.getAlpha(), n.getBeta(), mThreadPool, false);
                     if (n.getVictory() == GameState.GOOD_MOVE) {
                         certainVictory = false;
                     }
                     n.revalueParent(n.getDepth());
 
                     e++;
-                    if (e > extensionStart + extensionCount) break;
+                    if (e > horizonStart + horizonCount) break;
                 }
 
+                if(currentHorizonDepth > deepestSearch) deepestSearch = currentHorizonDepth;
+
                 if (certainVictory) break;
-                extensionIterations++;
+                horizonIterations++;
             }
             else {
                 break;
             }
         }
 
-        mLastExtensionDepth = extensionDepth;
+        mDeepestSearch = deepestSearch;
         mEndTime = System.currentTimeMillis();
     }
 
     public void printSearchStats() {
         int nodes = getGameTreeSize(mLastDepth);
-        int fullNodes = getGameTreeSize(mLastDepth + mLastExtensionDepth);
+        int fullNodes = getGameTreeSize(mLastDepth + mDeepestSearch);
         int size = getTreeRoot().mBranches.size();
         double observedBranching = ((mGame.mAverageBranchingFactor * mGame.mAverageBranchingFactorCount) + size) / (++mGame.mAverageBranchingFactorCount);
         mGame.mAverageBranchingFactor = observedBranching;
