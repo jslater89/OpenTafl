@@ -268,7 +268,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
             if(workspace.mNoTime) return mValue;
             if(mVictory > GOOD_MOVE) return mValue;
 
-            this.mValue = Evaluator.NO_VALUE;
             continuationOnChildren(currentMaxDepth, overallMaxDepth);
 
             return mValue;
@@ -326,6 +325,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         } else {
             this.mValue = Evaluator.NO_VALUE;
             exploreChildren(currentMaxDepth, overallMaxDepth, continuation);
+            revalueParent(mDepth);
         }
 
         return mValue;
@@ -500,8 +500,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
             mValue = evaluate();
         }
-
-        revalueParent(mDepth);
+        
         minifyState();
 /*
         System.out.println("CONTINUATION");
