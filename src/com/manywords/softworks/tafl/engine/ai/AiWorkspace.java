@@ -34,6 +34,7 @@ public class AiWorkspace extends Game {
     private long mEndTime;
 
     private int mLastDepth;
+    private int mContinuationNodes;
     public int mDeepestSearch;
     /**
      * In milliseconds
@@ -162,7 +163,7 @@ public class AiWorkspace extends Game {
         }
     }
 
-    private boolean canDoDeeperSearch(int nextDepth) {
+    private boolean canSearchToDepth(int depth) {
         long timeLeft = mStartTime + mThinkTime - System.currentTimeMillis();
         long timeToPreviousDepth = mLastTimeToDepth[depth - 1];
 
@@ -231,7 +232,7 @@ public class AiWorkspace extends Game {
         for (depth = 1; depth <= maxDepth;) {
             mLastDepth = depth;
 
-            if (canDoDeeperSearch(depth)) {
+            if (canSearchToDepth(depth)) {
                 if (isTimeCritical() || mNoTime || mExtensionTime) {
                     break;
                 }
@@ -257,7 +258,6 @@ public class AiWorkspace extends Game {
                 if (chatty && mUiCallback != null) {
                     mUiCallback.statusText("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
                 }
-
 
                 depth++;
                 deepestSearch = depth;
@@ -290,6 +290,7 @@ public class AiWorkspace extends Game {
             double timeTaken = (finish - start) / 1000d;
 
             int size = getGameTreeSize(continuationDepth) - getGameTreeSize(continuationDepth - 1);
+            mContinuationNodes = size;
             double statesPerSec = size / ((finish - start) / 1000d);
 
             if (chatty && mUiCallback != null) {
@@ -306,6 +307,7 @@ public class AiWorkspace extends Game {
 
         // Do the horizon search, looking quickly at the current best moves in the hopes of catching any dumb
         // refutations.
+
 
         currentHorizonDepth = deepestSearch;
         while(true) {
@@ -382,7 +384,8 @@ public class AiWorkspace extends Game {
 
         if(chatty && mUiCallback != null) {
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
-            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec, extended by " + (fullNodes - nodes) + " extra nodes");
+            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec, continuation search saw " + mContinuationNodes + " nodes, horizon search saw " + (fullNodes - mContinuationNodes - nodes) + " nodes");
+            mUiCallback.statusText("Overall speed: " + (fullNodes / ((mEndTime - mStartTime)/ 1000d)) + " nodes/sec");
         }
     }
 
