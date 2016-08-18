@@ -74,12 +74,14 @@ public class SelfplayRunner {
         int firstEngineVictories = 0;
         int secondEngineVictories = 0;
 
+        boolean firstIsAttacker = TerminalSettings.attackerEngineSpec == mFirstEngineSpec;
+
         for(MatchResult r : getMatchResults()) {
             if(r.getMatchWinner() == mFirstEngineSpec) firstEngineVictories++;
             if(r.getMatchWinner() == mSecondEngineSpec) secondEngineVictories++;
         }
 
-        String title = "Match " + matchCount + ": " + mFirstEngineSpec.name + " (w" + firstEngineVictories +") v. " + mSecondEngineSpec.name + " (w" + secondEngineVictories +")";
+        String title = "Match " + matchCount + ": " + mFirstEngineSpec.name + " (" + (firstIsAttacker ? "atk, " : "def, ") + "w" + firstEngineVictories +") v. " + mSecondEngineSpec.name + " (" + (firstIsAttacker ? "def, " : "atk, ") + "w" + secondEngineVictories +")";
 
         return title;
     }
