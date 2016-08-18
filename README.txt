@@ -232,6 +232,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 10. VERSION HISTORY -----------------------------------------------------------
 
+v0.4.2.4b (released 08/16/16):
+- Fix some bugs with replays and annotations
+- ~20% speed improvement, though memory use is slightly up
+
 v0.4.2.3b (released 08/12/16):
 - Fix bug where speed limits were applied to the opposite side
 

@@ -78,13 +78,15 @@ public class SelfplayWindow extends BasicWindow {
         for(String s : lines) {
             descriptionString += s + "\n";
         }
-        BigInteger searchdepth = TextInputDialog.showNumberDialog(
+        BigInteger searchDepth = TextInputDialog.showNumberDialog(
                 getTextGUI(),
                 "Iterations",
                 descriptionString,
                 "" + mIterations);
-        int intDepth = searchdepth.intValue();
-        mIterations = intDepth;
-        mIterationsLabel.setText("" + mIterations);
+        if(searchDepth != null) {
+            int intDepth = searchDepth.intValue();
+            mIterations = intDepth;
+            mIterationsLabel.setText("" + mIterations);
+        }
     }
 }
