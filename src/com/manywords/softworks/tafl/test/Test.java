@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.test;
 
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.test.ai.*;
+import com.manywords.softworks.tafl.test.ai.tactics.AITacticsEscapeTest;
 import com.manywords.softworks.tafl.test.consistency.*;
 import com.manywords.softworks.tafl.test.mechanics.*;
 import com.manywords.softworks.tafl.test.network.HeadlessAITest;
@@ -17,6 +18,20 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
+
+        // AI tests: up here while I'm doing AI stuff for ease of use
+        // Tactics tests
+        tests.add(new AITacticsEscapeTest());
+
+        // AI tests
+        tests.add(new AIMatchingZobristTest());
+        tests.add(new AICertainKingEscapeTest());
+        tests.add(new AICertainKingCaptureTest());
+        tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
+        tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
+        tests.add(new AIMoveRepetitionTest());
+
+
 
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
@@ -75,6 +90,9 @@ public class Test {
         tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
         tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
         tests.add(new AIMoveRepetitionTest());
+
+        // Tactics tests
+        tests.add(new AITacticsEscapeTest());
 
         for (TaflTest test : tests) {
             try {
