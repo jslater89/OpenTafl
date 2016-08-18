@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
+import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.ui.UiCallback;
@@ -15,6 +16,10 @@ import java.util.*;
 public class AiWorkspace extends Game {
     private static String lastRulesString = "";
     public static TranspositionTable transpositionTable = null;
+    public static KillerMoveTable killerMoveTable = null;
+
+    private static final int MAX_DEPTH = 25;
+    private static final int KILLER_MOVES = 3;
 
     private static final DecimalFormat doubleFormat = new DecimalFormat("#.00");
     public static final Evaluator evaluator = new FishyEvaluator();
@@ -68,6 +73,12 @@ public class AiWorkspace extends Game {
         if (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !startingGame.getRules().getOTRString().equals(lastRulesString)) {
             transpositionTable = new TranspositionTable(transpositionTableSize);
         }
+
+        if (killerMoveTable == null || killerMoveTable.getDepth() != MAX_DEPTH || killerMoveTable.movesToKeep() != KILLER_MOVES) {
+            killerMoveTable = new KillerMoveTable(MAX_DEPTH, KILLER_MOVES);
+        }
+
+        killerMoveTable.reset();
 
         lastRulesString = startingGame.getRules().getOTRString();
     }

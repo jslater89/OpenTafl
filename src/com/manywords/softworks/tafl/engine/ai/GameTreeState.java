@@ -366,7 +366,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         List<MoveRecord> successorMoves = new ArrayList<>();
 
         if(!continuation || getBranches().size() == 0) {
-            successorMoves = generateSuccessorMoves(this, currentMaxDepth);
+            successorMoves = generateSuccessorMoves(currentMaxDepth);
         }
 
         boolean cutoff = false;
@@ -400,6 +400,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 }
 
                 cutoff = handleEvaluationResults(evaluation, distanceToFirstCutoff);
+
+                if(cutoff) {
+                    AiWorkspace.killerMoveTable.putMove(mDepth, move);
+                }
             }
         }
 
@@ -415,7 +419,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
 
-        workspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
+        AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
         mTaflmanMoveCache = null;
 
         minifyState();
@@ -424,7 +428,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public void continuationOnChildren(int currentMaxDepth, int overallMaxDepth) {
         List<GameTreeNode> successorStates = getBranches();
 
-        List<MoveRecord> successorMoves = generateSuccessorMoves(this, currentMaxDepth);
+        List<MoveRecord> successorMoves = generateSuccessorMoves(currentMaxDepth);
 
         boolean cutoff = false;
         int cutoffType = 0;
@@ -486,6 +490,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     }
 
                     cutoff = handleEvaluationResults(evaluation, distanceToFirstCutoff);
+
+                    if(cutoff) {
+                        AiWorkspace.killerMoveTable.putMove(mDepth, move);
+                    }
                 }
             }
         }
@@ -568,12 +576,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
     }
 
-    private List<MoveRecord> generateSuccessorMoves(GameTreeState state, int currentMaxDepth) {
+    private List<MoveRecord> generateSuccessorMoves(int currentMaxDepth) {
         List<MoveRecord> successorMoves = new ArrayList<>();
         List<Character> taflmen = new ArrayList<>();
-        taflmen.addAll(state.getCurrentSide().getTaflmen());
+        taflmen.addAll(getCurrentSide().getTaflmen());
 
-        boolean considerJumps = mGame.getRules().canSideJump(state.getCurrentSide());
+        boolean considerJumps = mGame.getRules().canSideJump(getCurrentSide());
 
         // Generate all successor moves.
         for (char taflman : taflmen) {
@@ -622,37 +630,52 @@ public class GameTreeState extends GameState implements GameTreeNode {
             long o1Zobrist = updateZobristHash(mZobristHash, getBoard(), o1);
             long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o2);
 
-            short o1Entry = workspace.transpositionTable.getValue(o1Zobrist, currentMaxDepth - mDepth, mGameLength);
-            short o2Entry = workspace.transpositionTable.getValue(o2Zobrist, currentMaxDepth - mDepth, mGameLength);
+            short o1Entry = AiWorkspace.transpositionTable.getValue(o1Zobrist, currentMaxDepth - mDepth, mGameLength);
+            short o2Entry = AiWorkspace.transpositionTable.getValue(o2Zobrist, currentMaxDepth - mDepth, mGameLength);
 
-            // No transposition table entries? Sort the one with more captures first.
-            if(o1Entry == Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
-                if(o1CaptureCount > o2CaptureCount) return -1;
-                else if(o2CaptureCount > o1CaptureCount) return 1;
-                else return 0;
+            int o1KillerValue = AiWorkspace.killerMoveTable.rateMove(mDepth, o1);
+            int o2KillerValue = AiWorkspace.killerMoveTable.rateMove(mDepth, o2);
+
+            // Killer moves: 20
+            // Captures: 10
+            // Transposition table hit: 5
+
+            int sortValue = 0;
+
+            if(o1KillerValue > o2KillerValue) {
+                sortValue += 20;
+            }
+            else if(o1KillerValue < o2KillerValue) {
+                sortValue -= 20;
             }
 
-            // if one has a transposition table entry and the other doesn't,
-            // put the one with the entry first.
-            if (o1Entry != Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
-                return -1;
+            if(o1CaptureCount > o2CaptureCount) {
+                sortValue += 10;
             }
-            if (o1Entry == Evaluator.NO_VALUE && o2Entry != Evaluator.NO_VALUE) {
-                return 1;
+            else if(o1CaptureCount < o2CaptureCount){
+                sortValue -= 10;
             }
 
-            // if both have entries, compare the values, and sort them with the higher value
-            // first. If the entries are equal, sort the one with more captures first.
-            if (o1Entry > o2Entry) {
-                return -1;
-            } else if (o2Entry > o1Entry) {
-                return 1;
-            } else {
-                if(o1CaptureCount > o2CaptureCount) return -1;
-                else if(o2CaptureCount > o1CaptureCount) return 1;
-                else return 0;
+            if(o1Entry != Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
+                sortValue += 5;
             }
+            else if(o1Entry == Evaluator.NO_VALUE && o2Entry != Evaluator.NO_VALUE) {
+                sortValue -= 5;
+            }
+            else if(o1Entry > o2Entry) {
+                sortValue += 5;
+            }
+            else if(o1Entry < o2Entry) {
+                sortValue -= 5;
+            }
+
+            return sortValue;
         });
+
+        // Defenders sort moves from low to high, attackers sort moves from high to low.
+        if(getCurrentSide().isAttackingSide()) {
+            Collections.reverse(successorMoves);
+        }
 
         return successorMoves;
     }
