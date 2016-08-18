@@ -202,6 +202,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     public void gameStarting() {
         statusText("Game starting");
         mInGame = true;
+
+        if(mSelfplayWindow != null) {
+
+            mStatusWindow.setTitle("Information " + mSelfplayWindow.getRunner().getTitle());
+
+        }
     }
 
     @Override

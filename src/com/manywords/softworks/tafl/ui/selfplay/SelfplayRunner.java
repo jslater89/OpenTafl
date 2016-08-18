@@ -51,6 +51,8 @@ public class SelfplayRunner {
 
     public void startTournament() {
         mHost.getTerminalCallback().setSelfplayWindow(mHost);
+        String title = "Match 1: " + mFirstEngineSpec.name + " v. " + mSecondEngineSpec;
+        mHost.setTitle(title);
 
         runTournamentMatch();
     }
@@ -65,6 +67,21 @@ public class SelfplayRunner {
 
     public void notifyGameFinished(Game g) {
         mLastGame = g;
+    }
+
+    public String getTitle() {
+        int matchCount = getMatchResults().size() + 1;
+        int firstEngineVictories = 0;
+        int secondEngineVictories = 0;
+
+        for(MatchResult r : getMatchResults()) {
+            if(r.getMatchWinner() == mFirstEngineSpec) firstEngineVictories++;
+            if(r.getMatchWinner() == mSecondEngineSpec) secondEngineVictories++;
+        }
+
+        String title = "Match " + matchCount + ": " + mFirstEngineSpec.name + " (w" + firstEngineVictories +") v. " + mSecondEngineSpec.name + " (w" + secondEngineVictories +")";
+
+        return title;
     }
 
     public void finishTournament() {
