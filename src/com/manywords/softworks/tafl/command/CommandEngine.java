@@ -519,7 +519,7 @@ public class CommandEngine {
             ReplayGameState result = mReplay.makeVariation(record);
             int moveResult = result.getLastMoveResult();
 
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Variation result: " + -1);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Variation result: " + moveResult);
             if(moveResult < GameState.GOOD_MOVE) {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, GameState.getStringForMoveResult(moveResult), moveResult);
             }
