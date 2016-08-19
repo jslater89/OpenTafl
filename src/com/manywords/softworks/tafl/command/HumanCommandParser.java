@@ -352,6 +352,9 @@ public class HumanCommandParser {
 
             if(engine.getMode() != UiCallback.Mode.REPLAY) {
                 mError = "Not in replay mode.";
+                from = null;
+                to = null;
+                return;
             }
             String[] commandParts = command.split(" ");
             if (commandParts.length != 3) {
