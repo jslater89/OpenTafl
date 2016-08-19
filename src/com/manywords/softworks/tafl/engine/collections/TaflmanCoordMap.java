@@ -121,7 +121,7 @@ public class TaflmanCoordMap {
     public String toString() {
         String s = "";
         for(int i = 0; i < mSize; i++) {
-            s += Taflman.getStringSymbol(mTaflmen[i]) + " id " + Taflman.getPackedId(mTaflmen[i]) + "@" + Coord.getCoordForIndex(mDimension, mCoords[i]) + "i" + mTaflmanIndexByCoord[i]+ ", ";
+            s += Taflman.getStringSymbol(mTaflmen[i]) + " id " + Taflman.getPackedId(mTaflmen[i]) + "@" + Coord.getCoordForIndex(mDimension, mCoords[i]) + "i" + mTaflmanIndexByCoord[mCoords[i]]+ "/" + i + ", ";
         }
         s += "\n";
 
