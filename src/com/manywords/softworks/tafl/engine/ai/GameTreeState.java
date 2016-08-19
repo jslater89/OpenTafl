@@ -620,10 +620,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     }
                 }
 
-                long nextZobrist = updateZobristHash(mZobristHash, getBoard(), move);
-                if(!mGame.historyContainsHash(nextZobrist) && !treeParentsContainHash(nextZobrist)) {
-                    successorMoves.add(move);
-                }
+                successorMoves.add(move);
             }
         }
 

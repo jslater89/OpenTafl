@@ -75,6 +75,14 @@ public class FishyEvaluator implements Evaluator {
             value = (short)(Evaluator.DEFENDER_WIN - (500 * (remainingDepth + 1)));
             if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
+        } else if (victory == GameState.DRAW) {
+            if (debug) debugString += "Draw at depth " + depth + "/" + remainingDepth + "\n";
+
+            // Treat draws as losses
+            if (state.getCurrentSide().isAttackingSide()) value = (short)(Evaluator.DEFENDER_WIN - (500 * (remainingDepth + 1)));
+            else value = (short)(Evaluator.ATTACKER_WIN - (500 * (remainingDepth + 1)));
+
+            if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
         }
 
         value = 0;
