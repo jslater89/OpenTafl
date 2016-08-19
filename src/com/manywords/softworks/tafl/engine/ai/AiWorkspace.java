@@ -43,14 +43,14 @@ public class AiWorkspace extends Game {
     public int mDeepestSearch;
 
     // These are only used internally
-    private boolean mIterativeDeepening = false;
-    private boolean mUseContinuationSearch = false;
-    private boolean mUseHorizonSearch = false;
+    private boolean mIterativeDeepening = true;
+    private boolean mUseContinuationSearch = true;
+    private boolean mUseHorizonSearch = true;
 
     // These need getters
-    private boolean mDoMoveOrdering = false;
-    private boolean mUseKillerMoves = false;
-    private boolean mUseTranspositionTable = false;
+    private boolean mDoMoveOrdering = true;
+    private boolean mUseKillerMoves = true;
+    private int mUseTranspositionTable = TRANSPOSITION_TABLE_ON;
 
     /**
      * In depth from the root, inclusive (root == 0, e.g. depth 5 searches to nodes with depth of 5)
@@ -88,8 +88,13 @@ public class AiWorkspace extends Game {
         mThreadPool = new AiThreadPool(Math.min(1, Runtime.getRuntime().availableProcessors() - 1));
 
         // If the transposition table is null, the size is different, or the rules are different, create a new transposition table.
-        if (mUseTranspositionTable && (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !startingGame.getRules().getOTRString().equals(lastRulesString))) {
-            transpositionTable = new TranspositionTable(mTranspositionTableSize);
+        if (mUseTranspositionTable > 0 && (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !startingGame.getRules().getOTRString().equals(lastRulesString))) {
+            if(mUseTranspositionTable == TRANSPOSITION_TABLE_ON) {
+                transpositionTable = new TranspositionTable(mTranspositionTableSize);
+            }
+            else {
+                transpositionTable = new TranspositionTable(mTranspositionTableSize, true);
+            }
         }
         else {
             transpositionTable = new TranspositionTable(0);
@@ -150,10 +155,16 @@ public class AiWorkspace extends Game {
         return mDoMoveOrdering;
     }
 
-    public void allowTranspositionTable(boolean allow) {
-        mUseTranspositionTable = allow;
-        if(allow) {
+    public static final int TRANSPOSITION_TABLE_OFF = 0;
+    public static final int TRANSPOSITION_TABLE_EXACT_ONLY = 1;
+    public static final int TRANSPOSITION_TABLE_ON = 2;
+    public void allowTranspositionTable(int mode) {
+        mUseTranspositionTable = mode;
+        if(mode == TRANSPOSITION_TABLE_ON) {
             transpositionTable = new TranspositionTable(mTranspositionTableSize);
+        }
+        else if(mode == TRANSPOSITION_TABLE_EXACT_ONLY) {
+            transpositionTable = new TranspositionTable(mTranspositionTableSize, true);
         }
         else {
             transpositionTable = new TranspositionTable(0);

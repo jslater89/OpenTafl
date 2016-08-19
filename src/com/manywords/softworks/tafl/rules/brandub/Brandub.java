@@ -88,12 +88,12 @@ public class Brandub extends Rules {
 
     @Override
     public int getKnightJumpMode() {
-        return Taflman.JUMP_NONE;
+        return Taflman.JUMP_CAPTURE;
     }
 
     @Override
     public int getCommanderJumpMode() {
-        return Taflman.JUMP_NONE;
+        return Taflman.JUMP_STANDARD;
     }
 
     @Override

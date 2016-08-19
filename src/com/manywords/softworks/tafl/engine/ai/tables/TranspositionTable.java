@@ -74,7 +74,7 @@ public class TranspositionTable {
             byte entryDepthOfSearch = (byte) ((data & DEPTH_MASK) >>> DEPTH_SHIFT);
             char entryAge = (char) ((data & AGE_MASK) >>> AGE_SHIFT);
 
-            if (entryDepthOfSearch <= dataDepthOfSearch || (gameLength - entryAge) >= DISCARD_AFTER_PLIES) {
+            if (entryDepthOfSearch < dataDepthOfSearch || (gameLength - entryAge) >= DISCARD_AFTER_PLIES) {
                 add = true;
             }
         }

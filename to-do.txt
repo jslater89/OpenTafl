@@ -3,13 +3,10 @@ Tafl To-Do
 v0.4.x features:
 
 AI stuff:
--1: Better planning of time usage. Don't go to a new level if we don't have for-sure enough time.
--1a: Rather than the extension search done now, do a 'continuation search'. We know that we've searched fully
-to overallMaxDepth, so don't allow transposition table hits on those and zip down the tree to the leaves. Expand
-the leaves as able. Then do horizon search.
+-2: Fix move ordering error
+-1: Figure out why Brandub.newBrandub7() and GenericRules (load Brandub 7) work differently
 0. Evaluation function work: underpins all further heuristics work
 1. Aspiration windows (i.e. initial alpha-beta in a window around last iterative deepening)
-2. Killer-move heuristic (array indexed by: ply, fromindex, toindex to track counts, list of: ply, move for moves)
 3. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)
 
 AI evaluation function to-do:
