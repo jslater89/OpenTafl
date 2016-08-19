@@ -46,7 +46,7 @@ public class KillerMoveTable {
         }
 
         // Otherwise, replace the last one.
-        if(!added) {
+        if(!added && killers[depth].length > 0) {
             killers[depth][killers[depth].length - 1] = move;
         }
     }

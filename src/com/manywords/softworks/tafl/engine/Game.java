@@ -31,7 +31,7 @@ public class Game {
         public static final String RULES = "rules";
         public static final String POSITION = "position";
     }
-    public Game(long[][] zobristTable, List<GameState> history) {
+    public Game(long[][][] zobristTable, List<GameState> history) {
         if (!(this instanceof AiWorkspace)) {
             throw new IllegalArgumentException("Empty constructor is only for AiWorkspace!");
         }
@@ -59,13 +59,16 @@ public class Game {
         }
 
         int boardSquares = rules.getBoard().getBoardDimension() * rules.getBoard().getBoardDimension();
-        mZobristConstants = new long[boardSquares][Taflman.ALL_TAFLMAN_TYPES.length];
+        mZobristConstants = new long[ZOBRIST_ELEMENTS][boardSquares][Taflman.ALL_TAFLMAN_TYPES.length];
         Random r = new XorshiftRandom(10201989);
         for (int i = 0; i < boardSquares; i++) {
             for (int j = 0; j < Taflman.ALL_TAFLMAN_TYPES.length; j++) {
-                mZobristConstants[i][j] = r.nextLong();
+                mZobristConstants[ZOBRIST_BOARD][i][j] = r.nextLong();
             }
         }
+
+        mZobristConstants[ZOBRIST_STATE][ZOBRIST_TURN][ZOBRIST_TURN_ATTACKERS] = r.nextInt();
+        mZobristConstants[ZOBRIST_STATE][ZOBRIST_TURN][ZOBRIST_TURN_DEFENDERS] = r.nextInt();
 
         mHistory = new ArrayList<GameState>();
 
@@ -101,7 +104,23 @@ public class Game {
         mCurrentState = mHistory.get(mHistory.size() - 1);
     }
 
-    public final long[][] mZobristConstants;
+    // Two parts to the main zobrist array: the board array (space index, piece type)
+    // and the state array: currently only turn, may also include other state-specific
+    // information.
+    public static final int ZOBRIST_ELEMENTS = 2;
+
+    // The zobrist board arrays are at index 0 in the zobrist array.
+    public static final int ZOBRIST_BOARD = 0;
+
+    // The zobrist state arrays are at index 1 in the zobrist array.
+    public static final int ZOBRIST_STATE = 1;
+
+    // The zobrist turn array is the first index in the zobrist state array.
+    public static final int ZOBRIST_TURN = 0;
+    public static final int ZOBRIST_TURN_ATTACKERS = 0;
+    public static final int ZOBRIST_TURN_DEFENDERS = 1;
+
+    public final long[][][] mZobristConstants;
     public double mAverageBranchingFactor = 0;
     public int mAverageBranchingFactorCount = 0;
     private GameClock mClock;

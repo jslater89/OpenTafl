@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.rules.Coord;
+import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 
 import java.util.ArrayList;
@@ -127,14 +128,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public GameTreeNode getBestChild() {
         GameTreeNode bestMove = null;
         for (GameTreeNode child : getBranches()) {
-            if(mGame.historyContainsHash(child.getZobrist())) {
-                // Don't make moves that repeat board states.
-                // We have to have this here, in addition to the exploration
-                // function, in case of transposition table hits, which don't
-                // keep track of move repetitions.
-                continue;
-            }
-            else if (bestMove == null) {
+            if (bestMove == null) {
                 bestMove = child;
                 continue;
             }
@@ -424,7 +418,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
         // TODO: try putting continuation search/extension search into the transposition table at a depth penalty, since
         // they're useful but not exact.
         if(!continuation && !extension) AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
-        mTaflmanMoveCache = null;
 
         minifyState();
     }
@@ -586,6 +579,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         taflmen.addAll(getCurrentSide().getTaflmen());
 
         boolean considerJumps = mGame.getRules().canSideJump(getCurrentSide());
+        int berserkMode = mGame.getRules().getBerserkMode();
 
         // Generate all successor moves.
         for (char taflman : taflmen) {
@@ -624,58 +618,67 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
         }
 
-        successorMoves.sort((o1, o2) -> {
-            int o1CaptureCount = o1.captures.size();
-            int o2CaptureCount = o2.captures.size();
+        if(workspace.isMoveOrderingAllowed()) {
+            successorMoves.sort((o1, o2) -> {
+                int o1CaptureCount = o1.captures.size();
+                int o2CaptureCount = o2.captures.size();
 
-            long o1Zobrist = updateZobristHash(mZobristHash, getBoard(), o1);
-            long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o2);
+                boolean o1ChangeTurn = true;
+                boolean o2ChangeTurn = true;
 
-            short o1Entry = AiWorkspace.transpositionTable.getValue(o1Zobrist, currentMaxDepth - mDepth, mGameLength);
-            short o2Entry = AiWorkspace.transpositionTable.getValue(o2Zobrist, currentMaxDepth - mDepth, mGameLength);
+                if (berserkMode == Rules.BERSERK_ANY_MOVE && o1CaptureCount > 0) o1ChangeTurn = false;
+                if (berserkMode == Rules.BERSERK_ANY_MOVE && o2CaptureCount > 0) o2ChangeTurn = false;
 
-            int o1KillerValue = AiWorkspace.killerMoveTable.rateMove(mDepth, o1);
-            int o2KillerValue = AiWorkspace.killerMoveTable.rateMove(mDepth, o2);
+                long o1Zobrist = updateZobristHash(mZobristHash, getBoard(), o1, o1ChangeTurn);
+                long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o2, o2ChangeTurn);
 
-            // Killer moves: 20
-            // Captures: 10
-            // Transposition table hit: 5
+                short o1Entry = AiWorkspace.transpositionTable.getValue(o1Zobrist, currentMaxDepth - mDepth, mGameLength);
+                short o2Entry = AiWorkspace.transpositionTable.getValue(o2Zobrist, currentMaxDepth - mDepth, mGameLength);
 
-            int sortValue = 0;
+                // The less-good move ordering on berserk moves is almost certainly faster than calculating
+                // the destinations and capturing moves from the other position every time.
+                if (berserkMode == Rules.BERSERK_CAPTURE_ONLY && o1CaptureCount > 0) o1Entry = Evaluator.NO_VALUE;
+                if (berserkMode == Rules.BERSERK_CAPTURE_ONLY && o2CaptureCount > 0) o2Entry = Evaluator.NO_VALUE;
 
-            if(o1KillerValue > o2KillerValue) {
-                sortValue += 20;
+                int o1KillerValue = AiWorkspace.killerMoveTable.rateMove(mDepth, o1);
+                int o2KillerValue = AiWorkspace.killerMoveTable.rateMove(mDepth, o2);
+
+                // Killer moves: 20
+                // Captures: 10
+                // Transposition table hit: 5
+
+                int sortValue = 0;
+
+                if (o1KillerValue > o2KillerValue) {
+                    sortValue += 20;
+                } else if (o1KillerValue < o2KillerValue) {
+                    sortValue -= 20;
+                }
+
+                if (o1CaptureCount > o2CaptureCount) {
+                    sortValue += 10;
+                } else if (o1CaptureCount < o2CaptureCount) {
+                    sortValue -= 10;
+                }
+
+                if (o1Entry != Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
+                    sortValue += 5;
+                } else if (o1Entry == Evaluator.NO_VALUE && o2Entry != Evaluator.NO_VALUE) {
+                    sortValue -= 5;
+                } else if (o1Entry > o2Entry) {
+                    sortValue += 5;
+                } else if (o1Entry < o2Entry) {
+                    sortValue -= 5;
+                }
+
+                return sortValue;
+            });
+
+            // Defenders sort moves from low to high, attackers sort moves from high to low.
+            if(getCurrentSide().isAttackingSide()) {
+                Collections.reverse(successorMoves);
             }
-            else if(o1KillerValue < o2KillerValue) {
-                sortValue -= 20;
-            }
 
-            if(o1CaptureCount > o2CaptureCount) {
-                sortValue += 10;
-            }
-            else if(o1CaptureCount < o2CaptureCount){
-                sortValue -= 10;
-            }
-
-            if(o1Entry != Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
-                sortValue += 5;
-            }
-            else if(o1Entry == Evaluator.NO_VALUE && o2Entry != Evaluator.NO_VALUE) {
-                sortValue -= 5;
-            }
-            else if(o1Entry > o2Entry) {
-                sortValue += 5;
-            }
-            else if(o1Entry < o2Entry) {
-                sortValue -= 5;
-            }
-
-            return sortValue;
-        });
-
-        // Defenders sort moves from low to high, attackers sort moves from high to low.
-        if(getCurrentSide().isAttackingSide()) {
-            Collections.reverse(successorMoves);
         }
 
         return successorMoves;

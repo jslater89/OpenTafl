@@ -24,7 +24,9 @@ public class TaflmanMoveCache {
     private static byte mDefenders;
     private static long mValidZobrist;
 
-    public TaflmanMoveCache(int dimension, long zobrist, byte attackers, byte defenders) {
+    private static boolean usable = true;
+
+    public static void reset(int dimension, long zobrist, byte attackers, byte defenders) {
         if(mAttackers != attackers || mDefenders != defenders || mDimension != dimension) {
             mDimension = dimension;
             mAttackers = attackers;
@@ -42,11 +44,14 @@ public class TaflmanMoveCache {
         mCachedCapturingMoves.reset();
         mCachedReachableSpaces.reset();
         mCachedJumps.reset();
+        usable = true;
 
         mValidZobrist = zobrist;
     }
 
-    private boolean check(long zobrist) {
+    private static boolean check(long zobrist) {
+        if(!usable) return false;
+
         if(mValidZobrist != zobrist) {
             mCachedAllowableMoves.reset();
             mCachedAllowableDestinations.reset();
@@ -60,52 +65,61 @@ public class TaflmanMoveCache {
         else return true;
     }
 
-    public void setCachedAllowableMovesForTaflman(long zobrist, char taflman, List<Coord> moves) {
+    public static void invalidate() {
+        usable = false;
+    }
+
+    public static void setCachedAllowableMovesForTaflman(long zobrist, char taflman, List<Coord> moves) {
+        if(!usable) return;
         check(zobrist);
         mCachedAllowableMoves.put(taflman, moves);
     }
 
-    public void setCachedAllowableDestinationsForTaflman(long zobrist, char taflman, List<Coord> moves) {
+    public static void setCachedAllowableDestinationsForTaflman(long zobrist, char taflman, List<Coord> moves) {
+        if(!usable) return;
         check(zobrist);
         mCachedAllowableDestinations.put(taflman, moves);
     }
 
-    public void setCachedJumpsForTaflman(long zobrist, char taflman, List<Coord> jumps) {
+    public static void setCachedJumpsForTaflman(long zobrist, char taflman, List<Coord> jumps) {
+        if(!usable) return;
         check(zobrist);
         mCachedJumps.put(taflman, jumps);
     }
 
-    public void setCachedCapturingMovesForTaflman(long zobrist, char taflman, List<Coord> moves) {
+    public static void setCachedCapturingMovesForTaflman(long zobrist, char taflman, List<Coord> moves) {
+        if(!usable) return;
         check(zobrist);
         mCachedCapturingMoves.put(taflman, moves);
     }
 
-    public void setCachedReachableSpacesForTaflman(long zobrist, char taflman, List<Coord> moves) {
+    public static void setCachedReachableSpacesForTaflman(long zobrist, char taflman, List<Coord> moves) {
+        if(!usable) return;
         check(zobrist);
         mCachedReachableSpaces.put(taflman, moves);
     }
 
-    public List<Coord> getCachedAllowableMovesForTaflman(long zobrist, char taflman) {
+    public static List<Coord> getCachedAllowableMovesForTaflman(long zobrist, char taflman) {
         if(!check(zobrist)) return null;
         return mCachedAllowableMoves.get(taflman);
     }
 
-    public List<Coord> getCachedAllowableDestinationsForTaflman(long zobrist, char taflman) {
+    public static List<Coord> getCachedAllowableDestinationsForTaflman(long zobrist, char taflman) {
         if(!check(zobrist)) return null;
         return mCachedAllowableDestinations.get(taflman);
     }
 
-    public List<Coord> getCachedJumpsForTaflman(long zobrist, char taflman) {
+    public static List<Coord> getCachedJumpsForTaflman(long zobrist, char taflman) {
         if(!check(zobrist)) return null;
         return mCachedJumps.get(taflman);
     }
 
-    public List<Coord> getCachedCapturingMovesForTaflman(long zobrist, char taflman) {
+    public static List<Coord> getCachedCapturingMovesForTaflman(long zobrist, char taflman) {
         if(!check(zobrist)) return null;
         return mCachedCapturingMoves.get(taflman);
     }
 
-    public List<Coord> getCachedReachableSpacesForTaflman(long zobrist, char taflman) {
+    public static List<Coord> getCachedReachableSpacesForTaflman(long zobrist, char taflman) {
         if(!check(zobrist)) return null;
         return mCachedReachableSpaces.get(taflman);
     }

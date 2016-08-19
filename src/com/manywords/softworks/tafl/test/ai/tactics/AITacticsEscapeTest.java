@@ -31,6 +31,7 @@ public class AITacticsEscapeTest extends TaflTest {
         Game game = new Game(r, this);
 
         GameState state = game.getCurrentState();
+        state.setCurrentSide(state.getDefenders());
 
         int victory = GameState.GOOD_MOVE;
         int value = 0;
@@ -42,7 +43,7 @@ public class AITacticsEscapeTest extends TaflTest {
                 break;
             }
 
-            RawTerminal.renderGameState(state);
+            //RawTerminal.renderGameState(state);
             AiWorkspace workspace = new AiWorkspace(this, game, state, 25);
             workspace.chatty = true;
             workspace.explore(15);

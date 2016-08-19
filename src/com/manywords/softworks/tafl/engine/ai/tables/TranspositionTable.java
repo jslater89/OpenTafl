@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai.tables;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 
 /**
@@ -25,60 +26,75 @@ public class TranspositionTable {
     // 8 bytes of data table;
     private static final int ENTRY_SIZE = 16;
 
-    private int mMaxSize = (1024 * 1024 * 500) / ENTRY_SIZE; // 500 mb, 16 bytes per entry
+    private int mArraySize = (1024 * 1024 * 500) / ENTRY_SIZE; // 500 mb, 16 bytes per entry
     private int mRequestedSize = 0;
     private long[] mZobristTable;
     private long[] mDataTable;
+
+    private int mTableQueries = 0;
+    private int mTableHits = 0;
+
+    private int mInsertQueries = 0;
+    private int mInsertsAdded = 0;
+
+    private boolean mExact;
 
     /**
      *
      * @param size Size of the table in megabytes.
      */
     public TranspositionTable(int size) {
-        mRequestedSize = size;
-        mMaxSize = size * 1024 * 1024 / ENTRY_SIZE;
+        this(size, false);
+    }
 
-        mZobristTable = new long[mMaxSize];
-        mDataTable = new long[mMaxSize];
+    public TranspositionTable(int size, boolean exact) {
+        mRequestedSize = size;
+        mArraySize = size * 1024 * 1024 / ENTRY_SIZE;
+
+        mZobristTable = new long[mArraySize];
+        mDataTable = new long[mArraySize];
+        mExact = exact;
     }
 
     public int size() {
         return mRequestedSize;
     }
 
-    public void putValue(long zobrist, short value, int searchedToDepth, int gameLength) {
+    public void putValue(long zobrist, short value, int dataDepthOfSearch, int gameLength) {
         if(mRequestedSize == 0) return;
+        mInsertQueries++;
 
-        int index = (Math.abs((int)(zobrist % mMaxSize)));
+        int index = (Math.abs((int)(zobrist % mArraySize)));
         boolean add = false;
         if(mZobristTable[index] == 0) add = true;
 
         if(!add) {
             long data = mDataTable[index];
 
-            byte entryDepth = (byte) ((data & DEPTH_MASK) >>> DEPTH_SHIFT);
+            byte entryDepthOfSearch = (byte) ((data & DEPTH_MASK) >>> DEPTH_SHIFT);
             char entryAge = (char) ((data & AGE_MASK) >>> AGE_SHIFT);
 
-            if (entryDepth < searchedToDepth || (gameLength - entryAge) >= DISCARD_AFTER_PLIES) {
+            if (entryDepthOfSearch <= dataDepthOfSearch || (gameLength - entryAge) >= DISCARD_AFTER_PLIES) {
                 add = true;
             }
         }
 
         if(add) {
+            mInsertsAdded++;
             mZobristTable[index] = zobrist;
-            mDataTable[index] = value | ((long) gameLength << AGE_SHIFT) | ((long) searchedToDepth << DEPTH_SHIFT);
+            mDataTable[index] = value | ((long) gameLength << AGE_SHIFT) | ((long) dataDepthOfSearch << DEPTH_SHIFT);
         }
     }
 
-    public short getValue(long zobrist, int minDepth, int gameLength) {
-        if (true) return Evaluator.NO_VALUE;
+    public short getValue(long zobrist, int minDepthOfSearch, int gameLength) {
         if(mRequestedSize == 0) return Evaluator.NO_VALUE;
+        mTableQueries++;
 
-        int index = (Math.abs((int)(zobrist % mMaxSize)));
+        int index = (Math.abs((int)(zobrist % mArraySize)));
         if(mZobristTable[index] != zobrist) return Evaluator.NO_VALUE;
 
         long data = mDataTable[index];
-        byte entryDepth = (byte)((data & DEPTH_MASK) >>> DEPTH_SHIFT);
+        byte entryDepthOfSearch = (byte)((data & DEPTH_MASK) >>> DEPTH_SHIFT);
 
         short age = (short)((data & AGE_MASK) >>> AGE_SHIFT);
         if(gameLength - age > DISCARD_AFTER_PLIES) {
@@ -86,14 +102,26 @@ public class TranspositionTable {
             return Evaluator.NO_VALUE;
         }
 
-        if (entryDepth < minDepth) return Evaluator.NO_VALUE;
-        else return (short)((data & EVAL_MASK));
+        if (mExact && entryDepthOfSearch != minDepthOfSearch) return Evaluator.NO_VALUE;
+        if (!mExact && entryDepthOfSearch < minDepthOfSearch) return Evaluator.NO_VALUE;
+        else {
+            mTableHits++;
+            return (short)((data & EVAL_MASK));
+        }
     }
 
     public long getData(long zobrist) {
-        int index = (Math.abs((int)(zobrist % mMaxSize)));
+        int index = (Math.abs((int)(zobrist % mArraySize)));
         if(mZobristTable[index] != zobrist) return Evaluator.NO_VALUE;
 
         return mDataTable[index];
+    }
+
+    public String getTableStats() {
+        return "Table hits/queries: " + mTableHits + "/" + mTableQueries + " Table inserts/attempts: " + mInsertsAdded + "/" + mInsertQueries;
+    }
+
+    public void resetTableStats() {
+        mTableHits = mTableQueries = mInsertsAdded = mInsertQueries = 0;
     }
 }

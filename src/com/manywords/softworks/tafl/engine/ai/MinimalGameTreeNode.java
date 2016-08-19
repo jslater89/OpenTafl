@@ -134,14 +134,7 @@ public class MinimalGameTreeNode implements GameTreeNode {
 
         GameTreeNode bestMove = null;
         for (GameTreeNode child : getBranches()) {
-            if(getRootNode().mGame.historyContainsHash(child.getZobrist())) {
-                // Don't make moves that repeat board states.
-                // We have to have this here, in addition to the exploration
-                // function, in case of transposition table hits, which don't
-                // keep track of move repetitions.
-                continue;
-            }
-            else if (bestMove == null) {
+            if (bestMove == null) {
                 bestMove = child;
                 continue;
             }

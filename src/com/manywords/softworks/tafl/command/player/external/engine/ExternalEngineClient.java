@@ -12,6 +12,7 @@ import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -107,6 +108,7 @@ public class ExternalEngineClient implements UiCallback {
                 GameTreeNode bestMove = workspace.getTreeRoot().getBestChild();
                 sendMoveCommand(bestMove.getEnteringMove());
                 mGame.getCurrentState().makeMove(bestMove.getEnteringMove());
+                RawTerminal.renderGameState(mGame.getCurrentState());
 
                 workspace.printSearchStats();
             }

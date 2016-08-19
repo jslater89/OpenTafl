@@ -18,7 +18,7 @@ public class AiWorkspace extends Game {
     public static TranspositionTable transpositionTable = null;
     public static KillerMoveTable killerMoveTable = null;
 
-    private static final int MAX_DEPTH = 25;
+    private int mTranspositionTableSize = 5;
     private static final int KILLER_MOVES = 3;
 
     private static final DecimalFormat doubleFormat = new DecimalFormat("#.00");
@@ -41,6 +41,22 @@ public class AiWorkspace extends Game {
     private int mLastDepth;
     private int mContinuationNodes;
     public int mDeepestSearch;
+
+    // These are only used internally
+    private boolean mIterativeDeepening = false;
+    private boolean mUseContinuationSearch = false;
+    private boolean mUseHorizonSearch = false;
+
+    // These need getters
+    private boolean mDoMoveOrdering = false;
+    private boolean mUseKillerMoves = false;
+    private boolean mUseTranspositionTable = false;
+
+    /**
+     * In depth from the root, inclusive (root == 0, e.g. depth 5 searches to nodes with depth of 5)
+     */
+    private int mMaxDepth = 5;
+
     /**
      * In milliseconds
      */
@@ -61,21 +77,29 @@ public class AiWorkspace extends Game {
 
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory());
-        mLastTimeToDepth = new long[25];
+        mLastTimeToDepth = new long[mMaxDepth + 1];
+
+        mTranspositionTableSize = transpositionTableSize;
         setGameRules(startingGame.getRules());
-        setUiCallback(null);
+
         mOriginalStartingState = startingState;
         mGame = startingGame;
         mUiCallback = ui;
         mThreadPool = new AiThreadPool(Math.min(1, Runtime.getRuntime().availableProcessors() - 1));
 
         // If the transposition table is null, the size is different, or the rules are different, create a new transposition table.
-        if (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !startingGame.getRules().getOTRString().equals(lastRulesString)) {
-            transpositionTable = new TranspositionTable(transpositionTableSize);
+        if (mUseTranspositionTable && (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !startingGame.getRules().getOTRString().equals(lastRulesString))) {
+            transpositionTable = new TranspositionTable(mTranspositionTableSize);
+        }
+        else {
+            transpositionTable = new TranspositionTable(0);
         }
 
-        if (killerMoveTable == null || killerMoveTable.getDepth() != MAX_DEPTH || killerMoveTable.movesToKeep() != KILLER_MOVES) {
-            killerMoveTable = new KillerMoveTable(MAX_DEPTH, KILLER_MOVES);
+        if (mUseKillerMoves && (killerMoveTable == null || killerMoveTable.getDepth() != mMaxDepth || killerMoveTable.movesToKeep() != KILLER_MOVES)) {
+            killerMoveTable = new KillerMoveTable(mMaxDepth, KILLER_MOVES);
+        }
+        else {
+            killerMoveTable = new KillerMoveTable(mMaxDepth, 0);
         }
 
         killerMoveTable.reset();
@@ -85,6 +109,55 @@ public class AiWorkspace extends Game {
 
     public static void resetTranspositionTable() {
         transpositionTable = new TranspositionTable((transpositionTable != null? transpositionTable.size() : 5));
+    }
+
+    public void setMaxDepth(int depth) {
+        mMaxDepth = depth;
+
+        if (mUseKillerMoves && (killerMoveTable == null || killerMoveTable.getDepth() != mMaxDepth || killerMoveTable.movesToKeep() != KILLER_MOVES)) {
+            killerMoveTable = new KillerMoveTable(mMaxDepth, KILLER_MOVES);
+        }
+    }
+
+    // Getters and setters for turning things on and off
+    public void allowIterativeDeepening(boolean allow) {
+        mIterativeDeepening = allow;
+    }
+
+    public void allowContinuation(boolean allow) {
+        mUseContinuationSearch = allow;
+    }
+
+    public void allowHorizon(boolean allow) {
+        mUseHorizonSearch = allow;
+    }
+
+    public void allowMoveOrdering(boolean allow) {
+        mDoMoveOrdering = allow;
+    }
+
+    public void allowKillerMoves(boolean allow) {
+        mUseKillerMoves = allow;
+        if(allow) {
+            killerMoveTable = new KillerMoveTable(mMaxDepth, KILLER_MOVES);
+        }
+        else {
+            killerMoveTable = new KillerMoveTable(mMaxDepth, 0);
+        }
+    }
+
+    public boolean isMoveOrderingAllowed() {
+        return mDoMoveOrdering;
+    }
+
+    public void allowTranspositionTable(boolean allow) {
+        mUseTranspositionTable = allow;
+        if(allow) {
+            transpositionTable = new TranspositionTable(mTranspositionTableSize);
+        }
+        else {
+            transpositionTable = new TranspositionTable(0);
+        }
     }
 
     public void setTimeRemaining(TimeSpec length, TimeSpec entry) {
@@ -188,12 +261,13 @@ public class AiWorkspace extends Game {
     }
 
     public void explore(int maxThinkTime) {
+        transpositionTable.resetTableStats();
+
         if(maxThinkTime == 0) maxThinkTime = 86400;
         mMaxThinkTime = maxThinkTime * 1000;
 
         mContinuationNodes = 0;
         mStartTime = System.currentTimeMillis();
-        int maxDepth = 24;
 
         if(mTimeRemaining == null && mGame.getClock() != null) {
             mClockLength = mGame.getClock().toTimeSpec();
@@ -241,7 +315,10 @@ public class AiWorkspace extends Game {
         GameTreeState.workspace = this;
 
         // Do the main search
-        for (depth = 1; depth <= maxDepth;) {
+        depth = 1;
+        if(!mIterativeDeepening) depth = mMaxDepth;
+
+        for (;depth <= mMaxDepth;) {
             mLastDepth = depth;
 
             if (canSearchToDepth(depth)) {
@@ -249,14 +326,14 @@ public class AiWorkspace extends Game {
                     break;
                 }
 
-                mAlphaCutoffs = new long[maxDepth];
-                mAlphaCutoffDistances = new long[maxDepth];
-                mBetaCutoffs = new long[maxDepth];
-                mBetaCutoffDistances = new long[maxDepth];
+                mAlphaCutoffs = new long[mMaxDepth];
+                mAlphaCutoffDistances = new long[mMaxDepth];
+                mBetaCutoffs = new long[mMaxDepth];
+                mBetaCutoffDistances = new long[mMaxDepth];
 
                 long start = System.currentTimeMillis();
                 mStartingState = new GameTreeState(this, new GameState(mOriginalStartingState));
-                mStartingState.explore(depth, maxDepth, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, false);
+                mStartingState.explore(depth, mMaxDepth, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, false);
                 long finish = System.currentTimeMillis();
 
                 if (!mNoTime) {
@@ -284,133 +361,164 @@ public class AiWorkspace extends Game {
 
 
 
-        continuationDepth = deepestSearch;
-        long start = System.currentTimeMillis();
-        while(true) {
-            if(isTimeCritical() || mNoTime || mExtensionTime) {
-                break;
-            }
-            else if(firstExtension) {
-                firstExtension = false;
-                if(chatty && mUiCallback != null) {
-                    mUiCallback.statusText("Running continuation search to fill time...");
+        if(mUseContinuationSearch) {
+            continuationDepth = deepestSearch;
+            long start = System.currentTimeMillis();
+            while (true) {
+                if (isTimeCritical() || mNoTime || mExtensionTime) {
+                    break;
+                } else if (firstExtension) {
+                    firstExtension = false;
+                    if (chatty && mUiCallback != null) {
+                        mUiCallback.statusText("Running continuation search to fill time...");
+                    }
                 }
+
+                if (continuationDepth >= mMaxDepth) break;
+
+                if (chatty && mUiCallback != null) {
+                    mUiCallback.statusText("Continuation search at depth " + continuationDepth);
+                }
+
+                mStartingState.explore(continuationDepth, continuationDepth - 1, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, true);
+
+                int size = getGameTreeSize(continuationDepth) - getGameTreeSize(continuationDepth - 1);
+                mContinuationNodes += size;
+
+
+                if (continuationDepth > deepestSearch) deepestSearch = continuationDepth;
+                continuationDepth++;
             }
+            long finish = System.currentTimeMillis();
 
-            if(continuationDepth >= maxDepth) break;
-
+            double timeTaken = (finish - start) / 1000d;
+            double statesPerSec = mContinuationNodes / ((finish - start) / 1000d);
             if (chatty && mUiCallback != null) {
-                mUiCallback.statusText("Continuation search at depth " + continuationDepth);
+                mUiCallback.statusText("Continuation searches explored " + mContinuationNodes + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
             }
 
-            mStartingState.explore(continuationDepth, continuationDepth - 1, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, true);
 
-            int size = getGameTreeSize(continuationDepth) - getGameTreeSize(continuationDepth - 1);
-            mContinuationNodes += size;
-
-
-            if(continuationDepth > deepestSearch) deepestSearch = continuationDepth;
-            continuationDepth++;
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "CONTINUATION SEARCH");
+            //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
+            //getTreeRoot().printTree("");
         }
-        long finish = System.currentTimeMillis();
-
-        double timeTaken = (finish - start) / 1000d;
-        double statesPerSec = mContinuationNodes / ((finish - start) / 1000d);
-        if(chatty && mUiCallback != null) {
-            mUiCallback.statusText("Continuation searches explored " + mContinuationNodes + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
-        }
-
-
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "CONTINUATION SEARCH");
-        //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
-        //getTreeRoot().printTree("");
 
 
         // Do the horizon search, looking quickly at the current best moves in the hopes of catching any dumb
         // refutations.
 
 
-        currentHorizonDepth = deepestSearch;
-        while(true) {
-            if (!isTimeCritical()) {
-                if (firstHorizon) {
-                    firstHorizon = false;
-                    if (chatty && mUiCallback != null) {
-                        mUiCallback.statusText("Running horizon on best moves...");
+        if(mUseHorizonSearch) {
+            currentHorizonDepth = deepestSearch;
+            while (true) {
+                if (!isTimeCritical()) {
+                    if (firstHorizon) {
+                        firstHorizon = false;
+                        if (chatty && mUiCallback != null) {
+                            mUiCallback.statusText("Running horizon on best moves...");
+                        }
                     }
-                }
 
-                // Do an extension search on the best known moves.
-                getTreeRoot().getBranches().sort((o1, o2) -> {
-                    // Sort by value high to low
-                    if (getTreeRoot().isMaximizingNode()) {
-                        return -(o1.getValue() - o2.getValue());
+                    // Do an extension search on the best known moves.
+                    getTreeRoot().getBranches().sort((o1, o2) -> {
+                        // Sort by value high to low
+                        if (getTreeRoot().isMaximizingNode()) {
+                            return -(o1.getValue() - o2.getValue());
+                        } else {
+                            // low to high
+                            return (o1.getValue() - o2.getValue());
+                        }
+                    });
+
+                    currentHorizonDepth += horizonDepth;
+
+                    if (currentHorizonDepth > deepestSearch + horizonLimit) {
+                        currentHorizonDepth = deepestSearch + horizonDepth;
+                        horizonStart += horizonCount;
                     }
-                    else {
-                        // low to high
-                        return (o1.getValue() - o2.getValue());
-                    }
-                });
 
-                currentHorizonDepth += horizonDepth;
+                    boolean certainVictory = true;
+                    int e = 0;
+                    for (GameTreeNode branch : getTreeRoot().getBranches()) {
+                        if (e < horizonStart) {
+                            e++;
+                            continue;
+                        }
 
-                if (currentHorizonDepth > deepestSearch + horizonLimit) {
-                    currentHorizonDepth = deepestSearch + horizonDepth;
-                    horizonStart += horizonCount;
-                }
+                        List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
+                        GameTreeNode n = nodes.get(nodes.size() - 1);
+                        if (n.getVictory() == GameState.GOOD_MOVE) {
+                            n.explore(currentHorizonDepth, deepestSearch, n.getAlpha(), n.getBeta(), mThreadPool, false);
+                            certainVictory = false;
+                            n.revalueParent(n.getDepth());
+                        }
 
-                boolean certainVictory = true;
-                int e = 0;
-                for (GameTreeNode branch : getTreeRoot().getBranches()) {
-                    if (e < horizonStart) {
                         e++;
-                        continue;
+                        if (e > horizonStart + horizonCount) break;
                     }
 
-                    List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
-                    GameTreeNode n = nodes.get(nodes.size() - 1);
-                    if (n.getVictory() == GameState.GOOD_MOVE) {
-                        n.explore(currentHorizonDepth, deepestSearch, n.getAlpha(), n.getBeta(), mThreadPool, false);
-                        certainVictory = false;
-                        n.revalueParent(n.getDepth());
-                    }
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Ran horizon search at depth: " + currentHorizonDepth + " starting index " + horizonStart + " ending index " + (horizonStart + horizonCount));
 
-                    e++;
-                    if (e > horizonStart + horizonCount) break;
+                    if (currentHorizonDepth > deepestSearch) deepestSearch = currentHorizonDepth;
+
+                    if (certainVictory) break;
+                    horizonIterations++;
+                } else {
+                    break;
                 }
-
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Ran horizon search at depth: " + currentHorizonDepth + " starting index " + horizonStart + " ending index " + (horizonStart + horizonCount));
-
-                if(currentHorizonDepth > deepestSearch) deepestSearch = currentHorizonDepth;
-
-                if (certainVictory) break;
-                horizonIterations++;
             }
-            else {
-                break;
-            }
+
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "HORIZON SEARCH");
+            //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
+            //getTreeRoot().printTree("");
         }
-
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "HORIZON SEARCH");
-        //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
-        //getTreeRoot().printTree("");
-
 
         mDeepestSearch = deepestSearch;
         mEndTime = System.currentTimeMillis();
     }
 
     public void printSearchStats() {
-        int nodes = getGameTreeSize(mLastDepth - 1);
+        int nodes = getGameTreeSize(mLastDepth);
         int fullNodes = getGameTreeSize(mDeepestSearch);
         int size = getTreeRoot().mBranches.size();
         double observedBranching = ((mGame.mAverageBranchingFactor * mGame.mAverageBranchingFactorCount) + size) / (++mGame.mAverageBranchingFactorCount);
         mGame.mAverageBranchingFactor = observedBranching;
 
         if(chatty && mUiCallback != null) {
+            mUiCallback.statusText("# cutoffs/avg. to 1st a/b a/b");
+            for (int i = 0; i < mAlphaCutoffs.length && i < mDeepestSearch; i++) {
+                String line = "Depth " + i + ": " + mAlphaCutoffs[i] + "/" + mBetaCutoffs[i];
+                if (mAlphaCutoffDistances[i] > 0) {
+                    line += " " + mAlphaCutoffDistances[i] / mAlphaCutoffs[i];
+                } else {
+                    line += " 0";
+                }
+                line += "/";
+
+                if (mBetaCutoffDistances[i] > 0) {
+                    line += "" + mBetaCutoffDistances[i] / mBetaCutoffs[i];
+                } else {
+                    line += "0";
+                }
+                mUiCallback.statusText(line);
+            }
+
+
+            mUiCallback.statusText("Finding best state...");
+            GameTreeNode bestMove = getTreeRoot().getBestChild();
+            mUiCallback.statusText("Best move: " + bestMove.getRootMove() + " with path...");
+
+            List<GameTreeNode> bestPath = getTreeRoot().getBestPath();
+
+            for (GameTreeNode node : bestPath) {
+                mUiCallback.statusText("\t" + node.getEnteringMove());
+            }
+            mUiCallback.statusText("End of best path scored " + bestMove.getValue());
+
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
             mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, continuation search: " + mContinuationNodes + " nodes, horizon search: " + (fullNodes - (mContinuationNodes + nodes)) + " nodes");
             mUiCallback.statusText("Overall speed: " + (fullNodes / ((mEndTime - mStartTime)/ 1000d)) + " nodes/sec");
+            mUiCallback.statusText("Transposition table stats: " + transpositionTable.getTableStats());
         }
     }
 
