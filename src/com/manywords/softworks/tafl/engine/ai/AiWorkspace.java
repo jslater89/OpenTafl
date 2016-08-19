@@ -310,7 +310,7 @@ public class AiWorkspace extends Game {
 
         boolean firstExtension = true;
         boolean firstHorizon = true;
-        final int extensionDepth = 3;
+        final int continuationLimit = 3;
         int continuationDepth;
 
         final int horizonDepth = 2;
@@ -372,8 +372,8 @@ public class AiWorkspace extends Game {
 
 
 
+        continuationDepth = deepestSearch;
         if(mUseContinuationSearch) {
-            continuationDepth = deepestSearch;
             long start = System.currentTimeMillis();
             while (true) {
                 if (isTimeCritical() || mNoTime || mExtensionTime) {
@@ -385,7 +385,7 @@ public class AiWorkspace extends Game {
                     }
                 }
 
-                if (continuationDepth >= mMaxDepth) break;
+                if (continuationDepth >= mMaxDepth + continuationLimit) break;
 
                 if (chatty && mUiCallback != null) {
                     mUiCallback.statusText("Continuation search at depth " + continuationDepth);
@@ -443,8 +443,8 @@ public class AiWorkspace extends Game {
 
                     currentHorizonDepth += horizonDepth;
 
-                    if (currentHorizonDepth > deepestSearch + horizonLimit) {
-                        currentHorizonDepth = deepestSearch + horizonDepth;
+                    if (currentHorizonDepth > continuationDepth + horizonLimit) {
+                        currentHorizonDepth = continuationDepth + horizonDepth;
                         horizonStart += horizonCount;
                     }
 
@@ -459,7 +459,7 @@ public class AiWorkspace extends Game {
                         List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
                         GameTreeNode n = nodes.get(nodes.size() - 1);
                         if (n.getVictory() == GameState.GOOD_MOVE) {
-                            n.explore(currentHorizonDepth, deepestSearch, n.getAlpha(), n.getBeta(), mThreadPool, false);
+                            n.explore(currentHorizonDepth, continuationDepth, n.getAlpha(), n.getBeta(), mThreadPool, false);
                             certainVictory = false;
                             n.revalueParent(n.getDepth());
                         }
