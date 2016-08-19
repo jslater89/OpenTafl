@@ -36,6 +36,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public GameTreeState(AiWorkspace workspace, GameState copyState) {
         super(copyState);
         mGame = workspace;
+        this.workspace = workspace;
 
         mZobristHash = copyState.mZobristHash;
         setCurrentSide((copyState.getCurrentSide().isAttackingSide() ? getAttackers() : getDefenders()));
