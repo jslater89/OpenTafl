@@ -514,7 +514,7 @@ public class CommandEngine {
             }
 
             Coord destination = mReplay.getCurrentState().getSpaceAt(v.to.x, v.to.y);
-            MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mGame.getCurrentState(), piece), destination);
+            MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mReplay.getCurrentState(), piece), destination);
 
             ReplayGameState result = mReplay.makeVariation(record);
             int moveResult = result.getLastMoveResult();
