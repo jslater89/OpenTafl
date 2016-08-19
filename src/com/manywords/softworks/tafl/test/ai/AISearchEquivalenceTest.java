@@ -139,7 +139,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceDeepeningOrdering.chatty = true;
         workspaceDeepeningOrdering.setMaxDepth(5);
 
-        workspaceDeepeningOrdering.allowIterativeDeepening(false);
+        workspaceDeepeningOrdering.allowIterativeDeepening(true);
         workspaceDeepeningOrdering.allowContinuation(false);
         workspaceDeepeningOrdering.allowHorizon(false);
         workspaceDeepeningOrdering.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
