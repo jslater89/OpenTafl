@@ -23,3 +23,13 @@ AI evaluation function to-do:
 on own ranks and files
 6. Correct king-in-check calculations for tablut, only award points if piece can't be instantly recaptured and if the
 other space is open
+
+Checking for is it safe to check the king:
+1. King is weak, or center strong and off of the throne
+2. Space opposite the king is empty
+3. Limited enemy access to the spaces near me (done as taflman safety, maybe?)
+
+a.lang.NullPointerException
+	at com.manywords.softworks.tafl.ui.lanterna.screen.GameScreen.statusText(GameScreen.java:246)
+	at com.manywords.softworks.tafl.command.player.LocalAi$1.run(LocalAi.java:43)
+	at java.lang.Thread.run(Thread.java:74

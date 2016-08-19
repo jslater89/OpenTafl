@@ -259,6 +259,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
         setAlpha(alpha);
         setBeta(beta);
 
+        int remainingDepth = mCurrentMaxDepth - mDepth;
+
         boolean extension = false;
         if(overallMaxDepth < currentMaxDepth) {
             extension = true;
@@ -275,15 +277,13 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
         short cachedValue = Evaluator.NO_VALUE;
         if(!extension && !continuation) {
-            cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
+            cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), remainingDepth, mGameLength);
         }
-        /*
-        else if(mDepth > overallMaxDepth && mDepth <= currentMaxDepth) {
+        else if(mDepth > overallMaxDepth) {
             // If we're in an extension and past the point we've already explored, transposition table hits are allowed.
             // No transposition hits allowed in the first level of depthin', I guess.
-            cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
+            cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), remainingDepth, mGameLength);
         }
-        */
 
 
         if (cachedValue != Evaluator.NO_VALUE && mDepth > 0) {
@@ -317,14 +317,16 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // If we're at depth 0, go explore another level, just to be safe.
             mValue = evaluate();
 
-            AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
+            // Leaf nodes we don't get to finish are always in the transposition table at depth 0.
+            // This also holds for e.g. continuation search and other things.
+            AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, 0, mGameLength);
 
             // Replace small child
             MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
             mParent.replaceChild(GameTreeState.this, smallChild);
         } else {
             this.mValue = Evaluator.NO_VALUE;
-            exploreChildren(currentMaxDepth, overallMaxDepth, continuation);
+            exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
             revalueParent(mDepth);
         }
 
@@ -362,7 +364,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return false;
     }
 
-    public void exploreChildren(int currentMaxDepth, int overallMaxDepth, boolean continuation) {
+    public void exploreChildren(int currentMaxDepth, int overallMaxDepth, boolean continuation, boolean extension) {
         List<MoveRecord> successorMoves = new ArrayList<>();
 
         if(!continuation || getBranches().size() == 0) {
@@ -419,7 +421,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
 
-        AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
+        // TODO: try putting continuation search/extension search into the transposition table at a depth penalty, since
+        // they're useful but not exact.
+        if(!continuation && !extension) AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
         mTaflmanMoveCache = null;
 
         minifyState();

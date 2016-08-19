@@ -283,6 +283,7 @@ public class AiWorkspace extends Game {
         //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
 
 
+
         continuationDepth = deepestSearch;
         long start = System.currentTimeMillis();
         while(true) {
@@ -318,6 +319,7 @@ public class AiWorkspace extends Game {
         if(chatty && mUiCallback != null) {
             mUiCallback.statusText("Continuation searches explored " + mContinuationNodes + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
         }
+
 
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "CONTINUATION SEARCH");
         //OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, dumpEvaluationFor(0));
