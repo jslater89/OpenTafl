@@ -645,6 +645,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
         if(workspace.isMoveOrderingAllowed()) {
+            Collections.shuffle(successorMoves);
+            /*
             successorMoves.sort((o1, o2) -> {
                 int o1CaptureCount = o1.captures.size();
                 int o2CaptureCount = o2.captures.size();
@@ -704,9 +706,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             if(getCurrentSide().isAttackingSide()) {
                 Collections.reverse(successorMoves);
             }
-            else {
-                Collections.shuffle(successorMoves);
-            }
+            */
 
         }
 

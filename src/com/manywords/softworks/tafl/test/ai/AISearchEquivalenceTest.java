@@ -32,7 +32,7 @@ public class AISearchEquivalenceTest extends TaflTest {
 
     @Override
     public void run() {
-        Rules r = RulesSerializer.loadRulesRecord("rules dim:7 name:Brandub surf:n spd:1 atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/");
+        Rules r = RulesSerializer.loadRulesRecord("rules dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/");
         MoveRecord move;
         short bestValue;
 
@@ -57,7 +57,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceNoOptimizations.explore(5);
 
         workspaceNoOptimizations.printSearchStats();
-        workspaceNoOptimizations.getTreeRoot().printTree("T1: ");
+        //workspaceNoOptimizations.getTreeRoot().printTree("T1: ");
 
         move = workspaceNoOptimizations.getTreeRoot().getBestChild().getEnteringMove();
         bestValue = workspaceNoOptimizations.getTreeRoot().getBestChild().getValue();
@@ -78,10 +78,11 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceOrdering.explore(5);
 
         workspaceOrdering.printSearchStats();
-        workspaceOrdering.getTreeRoot().printTree("T2: ");
+        //workspaceOrdering.getTreeRoot().printTree("T2: ");
 
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "7. move: " + workspaceOrdering.getTreeRoot().getBestChild().getEnteringMove() + " value: " + workspaceOrdering.getTreeRoot().getBestChild().getValue());
 
+        /*
         List<List<MoveRecord>> noOptimizationSequences = workspaceNoOptimizations.getAllEnteringSequences();
         List<List<MoveRecord>> orderingSequences = workspaceOrdering.getAllEnteringSequences();
 
@@ -109,9 +110,14 @@ public class AISearchEquivalenceTest extends TaflTest {
                 assert n1.getValue() == n2.getValue();
             }
         }
+        */
 
 
         if(!workspaceOrdering.getTreeRoot().getBestChild().getEnteringMove().equals(move)) {
+            if(workspaceOrdering.getTreeRoot().getBestChild().getValue() != bestValue) {
+                //assert workspaceOrdering.getTreeRoot().getBestChild().getEnteri/ngMove().isSymmetricWith()
+                assert false;
+            }
             assert workspaceOrdering.getTreeRoot().getBestChild().getValue() == bestValue;
             System.out.println("warn: different states, same value");
         }
