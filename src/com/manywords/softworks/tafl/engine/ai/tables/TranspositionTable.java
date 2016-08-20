@@ -62,6 +62,8 @@ public class TranspositionTable {
 
     public void putValue(long zobrist, short value, int dataDepthOfSearch, int gameLength) {
         if(mRequestedSize == 0) return;
+        // Don't put winning moves into the table, since they're path-dependent and super-easy to evaluate anyway
+        if(value >= Evaluator.ATTACKER_WIN || value <= Evaluator.DEFENDER_WIN) return;
         mInsertQueries++;
 
         int index = (Math.abs((int)(zobrist % mArraySize)));
