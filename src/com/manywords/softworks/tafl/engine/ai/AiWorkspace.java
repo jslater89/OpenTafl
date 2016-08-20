@@ -49,6 +49,7 @@ public class AiWorkspace extends Game {
     private boolean mUseHorizonSearch = true;
 
     // These need getters
+    private boolean mAlphaBetaPruning = true;
     private boolean mDoMoveOrdering = true;
     private boolean mUseKillerMoves = true;
     private int mUseTranspositionTable = TRANSPOSITION_TABLE_ON;
@@ -125,6 +126,10 @@ public class AiWorkspace extends Game {
         }
     }
 
+    public void allowCutoffs(boolean allow) {
+        mAlphaBetaPruning = allow;
+    }
+
     // Getters and setters for turning things on and off
     public void allowIterativeDeepening(boolean allow) {
         mIterativeDeepening = allow;
@@ -150,6 +155,10 @@ public class AiWorkspace extends Game {
         else {
             killerMoveTable = new KillerMoveTable(mMaxDepth, 0);
         }
+    }
+
+    public boolean areCutoffsAllowed() {
+        return mAlphaBetaPruning;
     }
 
     public boolean isMoveOrderingAllowed() {
