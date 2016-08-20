@@ -8,6 +8,7 @@ AI stuff:
 0. Evaluation function work: underpins all further heuristics work
 1. Aspiration windows (i.e. initial alpha-beta in a window around last iterative deepening)
 3. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)
+4. Leaf states not being minified (possibly interior states too?)
 
 AI evaluation function to-do:
 1. Reduce ridiculously large defender bonus for having a piece next to the king

@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.engine.ai;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
@@ -17,12 +18,12 @@ public class AiWorkspace extends Game {
     private static String lastRulesString = "";
     public static TranspositionTable transpositionTable = null;
     public static KillerMoveTable killerMoveTable = null;
+    public static Evaluator evaluator = new FishyEvaluator();
 
     private int mTranspositionTableSize = 5;
     private static final int KILLER_MOVES = 3;
 
     private static final DecimalFormat doubleFormat = new DecimalFormat("#.00");
-    public static final Evaluator evaluator = new FishyEvaluator();
 
     private Game mGame;
     private TimeSpec mClockLength;
@@ -588,6 +589,10 @@ public class AiWorkspace extends Game {
 
     public int getGameTreeSize(int toDepth) {
         return mStartingState.countChildren(toDepth);
+    }
+
+    public List<List<MoveRecord>> getAllEnteringSequences() {
+        return getTreeRoot().getAllEnteringSequences();
     }
 
     /**

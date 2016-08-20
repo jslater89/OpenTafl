@@ -17,6 +17,7 @@ import static com.manywords.softworks.tafl.rules.Taflman.EMPTY;
 
 public class GameTreeState extends GameState implements GameTreeNode {
     public static AiWorkspace workspace;
+    private static final boolean DEBUG = false;
 
     public static final int DEFENDER = -1;
     public static final int ATTACKER = 1;
@@ -156,6 +157,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return bestMove;
     }
 
+    @Override
+    public List<List<MoveRecord>> getAllEnteringSequences() {
+        return GameTreeNodeMethods.getAllEnteringSequences(this);
+    }
+
     public boolean isMaximizingNode() {
         return getCurrentSide().isAttackingSide();
     }
@@ -222,6 +228,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
         Collections.reverse(moves);
 
         return moves;
+    }
+
+    @Override
+    public GameTreeNode getChildForPath(List<MoveRecord> moves) {
+        return GameTreeNodeMethods.getChildForPath(this, moves);
     }
 
     @Override
@@ -302,8 +313,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 }
             }
 
-            MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, GameState.TRANSPOSITION_HIT, mGameLength);
-            mParent.replaceChild(GameTreeState.this, smallChild);
+            minifyState();
         } else if (mDepth != 0 && (checkVictory() != GOOD_MOVE || mDepth >= currentMaxDepth || (workspace.mNoTime) || (!extension && workspace.mExtensionTime) || (extension && continuation && workspace.mExtensionTime))) {
             // If this is a victory, evaluate and stop exploring.
             // If we've hit the target depth, evaluate and stop exploring.
@@ -317,8 +327,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, 0, mGameLength);
 
             // Replace small child
-            MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
-            mParent.replaceChild(GameTreeState.this, smallChild);
+            minifyState();
         } else {
             this.mValue = Evaluator.NO_VALUE;
             exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
@@ -373,6 +382,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
         boolean savedDistanceToFirstCutoff = false;
         for (MoveRecord move : successorMoves) {
             if (cutoff) {
+                if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
+                if(DEBUG) System.out.println("Cutoff at depth " + mDepth);
                 break;
             }
 
@@ -385,15 +396,23 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
 
             mBranches.add(node);
+
+            if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
+            if(DEBUG) System.out.println(mDepth + " exploring child " + node.getEnteringMoveSequence() + " with value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
+
             node.explore(currentMaxDepth, overallMaxDepth, mAlpha, mBeta, null, mContinuation);
             distanceToFirstCutoff++;
 
             short evaluation = node.getValue();
 
+
             // A/B pruning
             if (evaluation != Evaluator.NO_VALUE) {
                 if (mValue == Evaluator.NO_VALUE) {
                     mValue = evaluation;
+
+                    if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
+                    if(DEBUG) System.out.println(mDepth + " setting value to child value: " + evaluation);
                 }
 
                 cutoff = handleEvaluationResults(evaluation, distanceToFirstCutoff);
@@ -524,7 +543,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
             mValue = (short) Math.max(mValue, nextStateEvaluation);
             mAlpha = (short) Math.max(mAlpha, mValue);
 
-            //System.out.println("Max node depth " + mDepth + " Child value " + nextStateEvaluation + " This value " + mValue + " Alpha " + mAlpha + " Beta " + mBeta);
+            if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
+            if(DEBUG) System.out.println(mDepth + 1 + " value: " + nextStateEvaluation);
+            if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
+            if(DEBUG) System.out.println("New " + mDepth + " value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
             if (mBeta <= mAlpha) {
                 //System.out.println("Beta cutoff");
                 if(workspace.mBetaCutoffs.length > mDepth) {
@@ -537,7 +559,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
             mValue = (short) Math.min(mValue, nextStateEvaluation);
             mBeta = (short) Math.min(mBeta, mValue);
 
-            //System.out.println("Min node depth " + mDepth + " Child value " + nextStateEvaluation + " This value " + mValue + " Alpha " + mAlpha + " Beta " + mBeta);
+            if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
+            if(DEBUG) System.out.println(mDepth + 1 + " value: " + nextStateEvaluation);
+            if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
+            if(DEBUG) System.out.println("New " + mDepth + " value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
             if (mBeta <= mAlpha) {
                 //System.out.println("Alpha cutoff");
                 if(workspace.mBetaCutoffs.length > mDepth) {
@@ -679,6 +704,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
             if(getCurrentSide().isAttackingSide()) {
                 Collections.reverse(successorMoves);
             }
+            else {
+                Collections.shuffle(successorMoves);
+            }
 
         }
 
@@ -736,14 +764,13 @@ public class GameTreeState extends GameState implements GameTreeNode {
             System.out.println(prefix + getEnteringMove() + (isMaximizingNode() ? " (+) " : " (-) ") + "(d" + getDepth() + ")" + " (s" + getParentNode().getBranches().size() + ") " + "(w" + getVictory() + ") " + "(v" + getValue() + ") " + "(a" + getAlpha() + ") " + "(b" + getBeta() + ") ");
         }
 
-        for(int i = 0; i < getBranches().size(); i++) {
-            GameTreeNode n = getNthChild(i);
+        for(GameTreeNode n : getBranches()) {
             GameTreeState s;
             if(n instanceof MinimalGameTreeNode) {
                 s = GameTreeState.getStateForMinimalNode(workspace.getTreeRoot(), (MinimalGameTreeNode) n);
             }
             else {
-                s = (GameTreeState) getNthChild(i);
+                s = (GameTreeState) n;
             }
             s.printTree(prefix + "\t");
         }

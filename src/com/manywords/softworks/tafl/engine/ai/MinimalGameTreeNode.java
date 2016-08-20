@@ -114,6 +114,11 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     @Override
+    public GameTreeNode getChildForPath(List<MoveRecord> moves) {
+        return GameTreeNodeMethods.getChildForPath(this, moves);
+    }
+
+    @Override
     public GameTreeState getRootNode() {
         if (mParent == null) throw new IllegalStateException("MinimalGameTreeNode has no parent!");
 
@@ -152,6 +157,11 @@ public class MinimalGameTreeNode implements GameTreeNode {
         }
 
         return bestMove;
+    }
+
+    @Override
+    public List<List<MoveRecord>> getAllEnteringSequences() {
+        return GameTreeNodeMethods.getAllEnteringSequences(this);
     }
 
     public int getDepth() {

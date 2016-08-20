@@ -31,6 +31,8 @@ public interface GameTreeNode {
 
     public abstract List<MoveRecord> getEnteringMoveSequence();
 
+    public abstract GameTreeNode getChildForPath(List<MoveRecord> moves);
+
     public abstract GameTreeNode getParentNode();
 
     public abstract GameTreeState getRootNode();
@@ -46,6 +48,8 @@ public interface GameTreeNode {
     public abstract List<GameTreeNode> getBranches();
 
     public abstract GameTreeNode getBestChild();
+
+    public abstract List<List<MoveRecord>> getAllEnteringSequences();
 
     public abstract long getZobrist();
 
