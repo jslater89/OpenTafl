@@ -9,6 +9,7 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
@@ -19,6 +20,9 @@ import com.manywords.softworks.tafl.test.mechanics.ExternalEngineHostTest;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,17 +36,46 @@ public class AISearchEquivalenceTest extends TaflTest {
 
     @Override
     public void run() {
-        Rules r = RulesSerializer.loadRulesRecord("rules dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/");
-        MoveRecord move;
-        short bestValue;
+        //Rules r = RulesSerializer.loadRulesRecord("rules dim:5 name:MiniTafl surf:n spd:1 atkf:y ks:w nj:n cj:n cens:tcnkTCNK cenh: cenhe: start:/1t3/t1T2/2K2/5/3t1/");
+        Rules r = RulesSerializer.loadRulesRecord("rules dim:7 name:Brandub_Test surf:n atkf:n ks:w nj:n cj:n cens:tcnkTCNK cenh: cenhe: start:/4t2/3t3/3T3/ttTKTtt/3T3/3t3/3t3/");
+        MoveRecord move = null;
+        short bestValue = Evaluator.NO_VALUE;
+        List<MoveRecord> equivalentMoves = new ArrayList<>();
+        List<MoveRecord> localEquivalentMoves = new ArrayList<>();
+
+        // 0. MINIMAX STRAIGHT UP --------------------------------------------------------------------------------------
+        Game g = new Game(r, null);
+        GameState state = g.getCurrentState();
+
+        //RawTerminal.renderGameState(state);
+
+        AiWorkspace workspaceStraightMinimax = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        workspaceStraightMinimax.chatty = true;
+        workspaceStraightMinimax.setMaxDepth(3);
+
+        workspaceStraightMinimax.allowCutoffs(false);
+        workspaceStraightMinimax.allowIterativeDeepening(false);
+        workspaceStraightMinimax.allowContinuation(false);
+        workspaceStraightMinimax.allowHorizon(false);
+        workspaceStraightMinimax.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
+        workspaceStraightMinimax.allowKillerMoves(false);
+        workspaceStraightMinimax.allowMoveOrdering(false);
+
+        workspaceStraightMinimax.explore(5);
+
+        workspaceStraightMinimax.printSearchStats();
+        //workspaceStraightMinimax.getTreeRoot().printTree("T1: ");
+
+        move = workspaceStraightMinimax.getTreeRoot().getBestChild().getEnteringMove();
+        bestValue = workspaceStraightMinimax.getTreeRoot().getBestChild().getValue();
+
+        for(GameTreeNode n : workspaceStraightMinimax.getTreeRoot().getBranches()) {
+            if(n.getValue() == bestValue) equivalentMoves.add(n.getEnteringMove());
+        }
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "0. Straight minimax move: " + move + " value: " + bestValue);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "0. " + equivalentMoves.size() + " equivalent moves (including best): " + equivalentMoves);
 
         // 1. NO FEATURES, JUST THE MOVE -------------------------------------------------------------------------------
-        Game g = new Game(r, null);
-
-        GameState state = g.getCurrentState();
-        state.makeMove(new MoveRecord(Coord.get(3, 0), Coord.get(4, 0)));
-        state = g.getCurrentState();
-
         AiWorkspace workspaceNoOptimizations = new AiWorkspace(this, g, g.getCurrentState(), 5);
         workspaceNoOptimizations.chatty = true;
         workspaceNoOptimizations.setMaxDepth(3);
@@ -59,11 +92,20 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceNoOptimizations.printSearchStats();
         //workspaceNoOptimizations.getTreeRoot().printTree("T1: ");
 
-        move = workspaceNoOptimizations.getTreeRoot().getBestChild().getEnteringMove();
-        bestValue = workspaceNoOptimizations.getTreeRoot().getBestChild().getValue();
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "1. move: " + move + " value: " + bestValue);
+        localEquivalentMoves.clear();
+        for(GameTreeNode n : workspaceNoOptimizations.getTreeRoot().getBranches()) {
+            if(n.getValue() == workspaceNoOptimizations.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
+        }
 
-        //7. MOVE ORDERING ---------------------------------------------------------------------------------------------
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "1. Alpha-beta move: " + workspaceNoOptimizations.getTreeRoot().getBestChild().getEnteringMove() + " value: " + workspaceNoOptimizations.getTreeRoot().getBestChild().getValue());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "1. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
+        localEquivalentMoves.retainAll(equivalentMoves);
+        assert localEquivalentMoves.size() > 0;
+        if(!equivalentMoves.contains(workspaceNoOptimizations.getTreeRoot().getBestChild().getEnteringMove())) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
+        }
+
+        //2. MOVE ORDERING ---------------------------------------------------------------------------------------------
         AiWorkspace workspaceOrdering = new AiWorkspace(this, g, g.getCurrentState(), 5);
         workspaceOrdering.chatty = true;
         workspaceOrdering.setMaxDepth(3);
@@ -80,52 +122,48 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceOrdering.printSearchStats();
         //workspaceOrdering.getTreeRoot().printTree("T2: ");
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "7. move: " + workspaceOrdering.getTreeRoot().getBestChild().getEnteringMove() + " value: " + workspaceOrdering.getTreeRoot().getBestChild().getValue());
-
-        /*
-        List<List<MoveRecord>> noOptimizationSequences = workspaceNoOptimizations.getAllEnteringSequences();
-        List<List<MoveRecord>> orderingSequences = workspaceOrdering.getAllEnteringSequences();
-
-        for(List<MoveRecord> path : orderingSequences) {
-            //System.out.println(n.getDepth() + "(" + n.getClass().getSimpleName() + "): " + n.getEnteringMoveSequence() + " " + n.getValue());
-
-            if(noOptimizationSequences.contains(path)) {
-                System.out.println("Overlap! Path: " + path);
-                GameTreeNode n1 = workspaceOrdering.getTreeRoot().getChildForPath(path);
-                GameTreeNode n2 = workspaceNoOptimizations.getTreeRoot().getChildForPath(path);
-
-                assert n1.getEnteringMoveSequence().equals(n2.getEnteringMoveSequence());
-
-                System.out.println(n1.getDepth() + "(" + n1.getClass().getSimpleName() + "): " + n1.getEnteringMoveSequence() + " " + n1.getValue());
-                System.out.println(n2.getDepth() + "(" + n2.getClass().getSimpleName() + "): " + n2.getEnteringMoveSequence() + " " + n2.getValue());
-
-                FishyEvaluator.debug = true;
-                System.out.println(AiWorkspace.evaluator.evaluate((GameTreeState) n1, ((GameTreeState) n1).mCurrentMaxDepth, n1.getDepth()));
-                System.out.println(FishyEvaluator.debugString);
-
-                System.out.println(AiWorkspace.evaluator.evaluate((GameTreeState) n2, ((GameTreeState) n1).mCurrentMaxDepth, n1.getDepth()));
-                System.out.println(FishyEvaluator.debugString);
-                FishyEvaluator.debug = false;
-
-                assert n1.getValue() == n2.getValue();
-            }
-        }
-        */
-
-
-        if(!workspaceOrdering.getTreeRoot().getBestChild().getEnteringMove().equals(move)) {
-            if(workspaceOrdering.getTreeRoot().getBestChild().getValue() != bestValue) {
-                //assert workspaceOrdering.getTreeRoot().getBestChild().getEnteri/ngMove().isSymmetricWith()
-                assert false;
-            }
-            assert workspaceOrdering.getTreeRoot().getBestChild().getValue() == bestValue;
-            System.out.println("warn: different states, same value");
+        localEquivalentMoves.clear();
+        for(GameTreeNode n : workspaceOrdering.getTreeRoot().getBranches()) {
+            if(n.getValue() == workspaceOrdering.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
         }
 
-        System.exit(0);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "2. Move-ordering alpha-beta move: " + workspaceOrdering.getTreeRoot().getBestChild().getEnteringMove() + " value: " + workspaceOrdering.getTreeRoot().getBestChild().getValue());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "2. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
+        localEquivalentMoves.retainAll(equivalentMoves);
+        assert localEquivalentMoves.size() > 0;
+        if(!equivalentMoves.contains(workspaceOrdering.getTreeRoot().getBestChild().getEnteringMove())) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
+        }
 
+        //3. BENCHMARK DEPTH-5 ALPHA-BETA ONLY SEARCH ------------------------------------------------------------------
+        AiWorkspace workspaceAlphabetaBenchmark = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        workspaceAlphabetaBenchmark.chatty = true;
+        workspaceAlphabetaBenchmark.setMaxDepth(5);
 
-        // 2. EXTERNAL ENGINE MOVE -------------------------------------------------------------------------------------
+        workspaceAlphabetaBenchmark.allowIterativeDeepening(false);
+        workspaceAlphabetaBenchmark.allowContinuation(false);
+        workspaceAlphabetaBenchmark.allowHorizon(false);
+        workspaceAlphabetaBenchmark.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
+        workspaceAlphabetaBenchmark.allowKillerMoves(false);
+        workspaceAlphabetaBenchmark.allowMoveOrdering(false);
+
+        workspaceAlphabetaBenchmark.explore(5);
+
+        workspaceAlphabetaBenchmark.printSearchStats();
+        //workspaceAlphabetaBenchmark.getTreeRoot().printTree("T1: ");
+
+        move = workspaceAlphabetaBenchmark.getTreeRoot().getBestChild().getEnteringMove();
+        bestValue = workspaceAlphabetaBenchmark.getTreeRoot().getBestChild().getValue();
+
+        equivalentMoves.clear();
+        for(GameTreeNode n : workspaceAlphabetaBenchmark.getTreeRoot().getBranches()) {
+            if(n.getValue() == bestValue) equivalentMoves.add(n.getEnteringMove());
+        }
+
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "3. Alpha-beta benchmark move: " + move + " value: " + bestValue);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "3. " + equivalentMoves.size() + " equivalent moves (including best): " + equivalentMoves);
+
+        //4. EXTERNAL ENGINE MOVE --------------------------------------------------------------------------------------
         ExternalEngineClient c = new ExternalEngineClient();
         c.setDebugMode(true);
         c.start();
@@ -143,10 +181,22 @@ public class AISearchEquivalenceTest extends TaflTest {
             e.printStackTrace();
         }
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "2. move: " + c.mWorkspace.getTreeRoot().getBestChild().getEnteringMove() + " value: " + c.mWorkspace.getTreeRoot().getBestChild().getValue());
-        assert c.mWorkspace.getTreeRoot().getBestChild().getEnteringMove().equals(move);
+        AiWorkspace tempWorkspace = c.mWorkspace;
+        localEquivalentMoves.clear();
+        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+            if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
+        }
 
-        //3. CONTINUATION+HORIZON SEARCHES -----------------------------------------------------------------------------
+        GameTreeNode bestChild = tempWorkspace.getTreeRoot().getBestChild();
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "4. External engine move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "4. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
+        localEquivalentMoves.retainAll(equivalentMoves);
+        assert localEquivalentMoves.size() > 0;
+        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
+        }
+
+        //5. CONTINUATION+HORIZON SEARCHES -----------------------------------------------------------------------------
         AiWorkspace workspaceContinuations = new AiWorkspace(this, g, g.getCurrentState(), 5);
         workspaceContinuations.chatty = true;
         workspaceContinuations.setMaxDepth(5);
@@ -162,10 +212,22 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         workspaceContinuations.printSearchStats();
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "3. move: " + workspaceContinuations.getTreeRoot().getBestChild().getEnteringMove() + " value: " + workspaceContinuations.getTreeRoot().getBestChild().getValue());
-        assert workspaceContinuations.getTreeRoot().getBestChild().getEnteringMove().equals(move);
+        tempWorkspace = workspaceContinuations;
+        localEquivalentMoves.clear();
+        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+            if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
+        }
 
-        //4. TRANSPOSITION SEARCH (FIXED DEPTH) ------------------------------------------------------------------------
+        bestChild = tempWorkspace.getTreeRoot().getBestChild();
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. Continuation+horizon move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
+        localEquivalentMoves.retainAll(equivalentMoves);
+        assert localEquivalentMoves.size() > 0;
+        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
+        }
+
+        //6. TRANSPOSITION SEARCH (FIXED DEPTH) ------------------------------------------------------------------------
         AiWorkspace workspaceTranspositionFixed = new AiWorkspace(this, g, g.getCurrentState(), 5);
         workspaceTranspositionFixed.chatty = true;
         workspaceTranspositionFixed.setMaxDepth(5);
@@ -181,10 +243,22 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         workspaceTranspositionFixed.printSearchStats();
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "4. move: " + workspaceTranspositionFixed.getTreeRoot().getBestChild().getEnteringMove() + " value: " + workspaceTranspositionFixed.getTreeRoot().getBestChild().getValue());
-        assert workspaceTranspositionFixed.getTreeRoot().getBestChild().getEnteringMove().equals(move);
+        tempWorkspace = workspaceTranspositionFixed;
+        localEquivalentMoves.clear();
+        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+            if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
+        }
 
-        //5. TRANSPOSITION SEARCH (ANY DEPTH) --------------------------------------------------------------------------
+        bestChild = tempWorkspace.getTreeRoot().getBestChild();
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "6. Exact transposition move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "6. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
+        localEquivalentMoves.retainAll(equivalentMoves);
+        assert localEquivalentMoves.size() > 0;
+        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
+        }
+
+        //7. TRANSPOSITION SEARCH (ANY DEPTH) --------------------------------------------------------------------------
         AiWorkspace workspaceTranspositionAny = new AiWorkspace(this, g, g.getCurrentState(), 5);
         workspaceTranspositionAny.chatty = true;
         workspaceTranspositionAny.setMaxDepth(5);
@@ -200,10 +274,22 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         workspaceTranspositionAny.printSearchStats();
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. move: " + workspaceTranspositionAny.getTreeRoot().getBestChild().getEnteringMove() + " value: " + workspaceTranspositionAny.getTreeRoot().getBestChild().getValue());
-        assert workspaceTranspositionAny.getTreeRoot().getBestChild().getEnteringMove().equals(move);
+        tempWorkspace = workspaceTranspositionAny;
+        localEquivalentMoves.clear();
+        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+            if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
+        }
 
-        //6. ALL BUT ORDERING ------------------------------------------------------------------------------------------
+        bestChild = tempWorkspace.getTreeRoot().getBestChild();
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "7. Any transposition move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "7. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
+        localEquivalentMoves.retainAll(equivalentMoves);
+        assert localEquivalentMoves.size() > 0;
+        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
+        }
+
+        //8. ALL BUT ORDERING ------------------------------------------------------------------------------------------
         AiWorkspace workspaceAllButOrdering = new AiWorkspace(this, g, g.getCurrentState(), 5);
         workspaceAllButOrdering.chatty = true;
         workspaceAllButOrdering.setMaxDepth(5);
@@ -219,10 +305,22 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         workspaceAllButOrdering.printSearchStats();
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "6. move: " + workspaceAllButOrdering.getTreeRoot().getBestChild().getEnteringMove() + " value: " + workspaceAllButOrdering.getTreeRoot().getBestChild().getValue());
-        assert workspaceAllButOrdering.getTreeRoot().getBestChild().getEnteringMove().equals(move);
+        tempWorkspace = workspaceAllButOrdering;
+        localEquivalentMoves.clear();
+        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+            if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
+        }
 
-        //8. WORKSPACE EVERYTHING --------------------------------------------------------------------------------------
+        bestChild = tempWorkspace.getTreeRoot().getBestChild();
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "8. All but ordering move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "8. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
+        localEquivalentMoves.retainAll(equivalentMoves);
+        assert localEquivalentMoves.size() > 0;
+        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
+        }
+
+        //9. WORKSPACE EVERYTHING --------------------------------------------------------------------------------------
         AiWorkspace workspaceEverything = new AiWorkspace(this, g, g.getCurrentState(), 5);
         workspaceEverything.chatty = true;
         workspaceEverything.setMaxDepth(5);
@@ -238,11 +336,19 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         workspaceEverything.printSearchStats();
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "8. move: " + workspaceEverything.getTreeRoot().getBestChild().getEnteringMove() + " value: " + workspaceEverything.getTreeRoot().getBestChild().getValue());
+        tempWorkspace = workspaceEverything;
+        localEquivalentMoves.clear();
+        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+            if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
+        }
 
-        if(!workspaceEverything.getTreeRoot().getBestChild().getEnteringMove().equals(move)) {
-            assert workspaceEverything.getTreeRoot().getBestChild().getValue() == bestValue;
-            System.out.println("warn: different states, same value");
+        bestChild = tempWorkspace.getTreeRoot().getBestChild();
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "9. All features move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "9. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
+        localEquivalentMoves.retainAll(equivalentMoves);
+        assert localEquivalentMoves.size() > 0;
+        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
         }
     }
 }

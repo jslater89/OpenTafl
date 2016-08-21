@@ -331,7 +331,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
         } else {
             this.mValue = Evaluator.NO_VALUE;
             exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
-            revalueParent(mDepth);
+
+            // If we've finished an extension-search tree, we need to change the parent node's value.
+            if((extension || continuation) && mDepth == overallMaxDepth) revalueParent(mDepth);
         }
 
         return mValue;
@@ -383,7 +385,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         for (MoveRecord move : successorMoves) {
             if (cutoff) {
                 if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
-                if(DEBUG) System.out.println("Cutoff at depth " + mDepth);
+                if(DEBUG) System.out.println("Cutoff at depth " + mDepth + " with value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
                 break;
             }
 
@@ -415,7 +417,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     if(DEBUG) System.out.println(mDepth + " setting value to child value: " + evaluation);
                 }
 
-                cutoff = handleEvaluationResults(evaluation, distanceToFirstCutoff);
+                cutoff = handleEvaluationResults(evaluation, distanceToFirstCutoff) && workspace.areCutoffsAllowed();
 
                 if(cutoff) {
                     AiWorkspace.killerMoveTable.putMove(mDepth, move);
@@ -547,7 +549,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             if(DEBUG) System.out.println(mDepth + 1 + " value: " + nextStateEvaluation);
             if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
             if(DEBUG) System.out.println("New " + mDepth + " value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
-            if (mBeta <= mAlpha) {
+            if (workspace.areCutoffsAllowed() && mBeta <= mAlpha) {
                 //System.out.println("Beta cutoff");
                 if(workspace.mBetaCutoffs.length > mDepth) {
                     workspace.mBetaCutoffs[mDepth]++;
@@ -563,7 +565,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             if(DEBUG) System.out.println(mDepth + 1 + " value: " + nextStateEvaluation);
             if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
             if(DEBUG) System.out.println("New " + mDepth + " value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
-            if (mBeta <= mAlpha) {
+            if (workspace.areCutoffsAllowed() && mBeta <= mAlpha) {
                 //System.out.println("Alpha cutoff");
                 if(workspace.mBetaCutoffs.length > mDepth) {
                     workspace.mAlphaCutoffs[mDepth]++;
@@ -645,8 +647,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
         if(workspace.isMoveOrderingAllowed()) {
-            Collections.shuffle(successorMoves);
-            /*
             successorMoves.sort((o1, o2) -> {
                 int o1CaptureCount = o1.captures.size();
                 int o2CaptureCount = o2.captures.size();
@@ -706,8 +706,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
             if(getCurrentSide().isAttackingSide()) {
                 Collections.reverse(successorMoves);
             }
-            */
-
         }
 
         return successorMoves;
