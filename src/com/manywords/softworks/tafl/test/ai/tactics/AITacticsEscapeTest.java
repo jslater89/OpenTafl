@@ -46,7 +46,7 @@ public class AITacticsEscapeTest extends TaflTest {
             //RawTerminal.renderGameState(state);
             AiWorkspace workspace = new AiWorkspace(this, game, state, 25);
             workspace.chatty = true;
-            workspace.explore(15);
+            workspace.explore(5);
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             value = workspace.getTreeRoot().getBestChild().getValue();
             List<GameTreeNode> path = workspace.getTreeRoot().getBestPath();

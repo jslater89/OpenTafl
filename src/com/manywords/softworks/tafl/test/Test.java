@@ -9,6 +9,7 @@ import com.manywords.softworks.tafl.test.network.HeadlessAITest;
 import com.manywords.softworks.tafl.test.network.LoadServerGameTest;
 import com.manywords.softworks.tafl.test.network.ServerTest;
 import com.manywords.softworks.tafl.test.rules.*;
+import com.manywords.softworks.tafl.ui.Ansi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,6 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
-        tests.add(new TranspositionTableConsistencyTest());
 
         // AI tests: up here while I'm doing AI stuff for ease of use
         // Tactics tests
@@ -32,8 +32,6 @@ public class Test {
         tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
         tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
         tests.add(new AIMoveRepetitionTest());
-
-
 
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
@@ -86,30 +84,31 @@ public class Test {
         tests.add(new LoadServerGameTest());
         tests.add(new HeadlessAITest()); // also tests client connection somewhat
 
-        // AI tests
-        tests.add(new AIMatchingZobristTest());
-        tests.add(new AISearchEquivalenceTest());
-        tests.add(new AICertainKingEscapeTest());
-        tests.add(new AICertainKingCaptureTest());
-        tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
-        tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
-        tests.add(new AIMoveRepetitionTest());
-
-        // Tactics tests
-        tests.add(new AITacticsEscapeTest());
+        // AI tests TODO: uncomment these at the end of this branch, remove the copies up top.
+//        tests.add(new AIMatchingZobristTest());
+//        tests.add(new AISearchEquivalenceTest());
+//        tests.add(new AICertainKingEscapeTest());
+//        tests.add(new AICertainKingCaptureTest());
+//        tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
+//        tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
+//        tests.add(new AIMoveRepetitionTest());
+//
+//        // Tactics tests
+//        tests.add(new AITacticsEscapeTest());
 
         for (TaflTest test : tests) {
             try {
-                OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, test.getClass().getSimpleName() + ": ");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + "Running " + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF);
                 test.run();
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "passed");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + " PASSED" + Ansi.UNDERLINE_OFF);
+
             } catch (AssertionError e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "FAILED");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + " FAILED" + Ansi.UNDERLINE_OFF);
                 OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Assertion: " + e);
                 OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
                 System.exit(1);
             } catch (Exception e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "CRASHED");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + " CRASHED" + Ansi.UNDERLINE_OFF);
                 OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Exception: " + e);
                 OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
                 System.exit(1);
