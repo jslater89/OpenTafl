@@ -18,10 +18,11 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
-        tests.add(new AISearchEquivalenceTest());
+        tests.add(new MoveRecordRotationMirrorTest());
 
         // AI tests: up here while I'm doing AI stuff for ease of use
         // Tactics tests
+        tests.add(new AISearchEquivalenceTest());
         tests.add(new AITacticsEscapeTest());
 
         // AI tests
@@ -70,6 +71,7 @@ public class Test {
         tests.add(new BadCopenhagenCaptureTest());
 
         // Mechanics tests
+        tests.add(new MoveRecordRotationMirrorTest());
         tests.add(new MoveAddressTest());
         tests.add(new ReplayGameTest());
         tests.add(new KingMissingPositionRecordTest());

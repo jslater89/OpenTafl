@@ -101,7 +101,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "1. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
         localEquivalentMoves.retainAll(equivalentMoves);
         assert localEquivalentMoves.size() > 0;
-        if(!equivalentMoves.contains(workspaceNoOptimizations.getTreeRoot().getBestChild().getEnteringMove())) {
+        if(!isMoveEquivalent(workspaceNoOptimizations.getTreeRoot().getBestChild().getEnteringMove(), equivalentMoves)) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
         }
 
@@ -131,7 +131,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "2. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
         localEquivalentMoves.retainAll(equivalentMoves);
         assert localEquivalentMoves.size() > 0;
-        if(!equivalentMoves.contains(workspaceOrdering.getTreeRoot().getBestChild().getEnteringMove())) {
+        if(!isMoveEquivalent(workspaceOrdering.getTreeRoot().getBestChild().getEnteringMove(), equivalentMoves)) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
         }
 
@@ -192,7 +192,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "4. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
         localEquivalentMoves.retainAll(equivalentMoves);
         assert localEquivalentMoves.size() > 0;
-        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
         }
 
@@ -223,7 +223,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
         localEquivalentMoves.retainAll(equivalentMoves);
         assert localEquivalentMoves.size() > 0;
-        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
         }
 
@@ -254,7 +254,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "6. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
         localEquivalentMoves.retainAll(equivalentMoves);
         assert localEquivalentMoves.size() > 0;
-        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
         }
 
@@ -285,7 +285,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "7. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
         localEquivalentMoves.retainAll(equivalentMoves);
         assert localEquivalentMoves.size() > 0;
-        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
         }
 
@@ -316,7 +316,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "8. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
         localEquivalentMoves.retainAll(equivalentMoves);
         assert localEquivalentMoves.size() > 0;
-        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
         }
 
@@ -347,8 +347,16 @@ public class AISearchEquivalenceTest extends TaflTest {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "9. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
         localEquivalentMoves.retainAll(equivalentMoves);
         assert localEquivalentMoves.size() > 0;
-        if(!equivalentMoves.contains(bestChild.getEnteringMove())) {
+        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
         }
+    }
+
+    private boolean isMoveEquivalent(MoveRecord m, List<MoveRecord> testAgainst) {
+        for(MoveRecord test : testAgainst) {
+            if(MoveRecord.isRotationOrMirror(7, m, test)) return true;
+        }
+
+        return false;
     }
 }
