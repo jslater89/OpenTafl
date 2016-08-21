@@ -18,7 +18,7 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
-        tests.add(new MoveRecordRotationMirrorTest());
+        tests.add(new TranspositionTableConsistencyTest());
 
         // AI tests: up here while I'm doing AI stuff for ease of use
         // Tactics tests
