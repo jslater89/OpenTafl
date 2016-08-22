@@ -332,8 +332,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
             this.mValue = Evaluator.NO_VALUE;
             exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
 
-            // If we've finished an extension-search tree, we need to change the parent node's value.
-            if((extension || continuation) && mDepth == overallMaxDepth) revalueParent(mDepth);
+            // Continuation search runs through the whole tree again, so only horizon search (i.e. extension, but not
+            // continuation) needs to revalue a parent. Put another way, only revalue parent if we don't start at the
+            // tree root.
+            // if((extension && !continuation) && mDepth == overallMaxDepth) revalueParent(mDepth);
         }
 
         return mValue;
