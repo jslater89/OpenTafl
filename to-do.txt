@@ -3,12 +3,11 @@ Tafl To-Do
 v0.4.x features:
 
 AI stuff:
--2: Fix move ordering error
--1: Figure out why Brandub.newBrandub7() and GenericRules (load Brandub 7) work differently
+-1. Do I need to revalue parents during continuation search? I lean no, but I'm not sure.
 0. Evaluation function work: underpins all further heuristics work
 1. Aspiration windows (i.e. initial alpha-beta in a window around last iterative deepening)
 3. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)
-4. Leaf states not being minified (possibly interior states too?)
+4. Leaf states not being minified
 
 AI evaluation function to-do:
 1. Reduce ridiculously large defender bonus for having a piece next to the king
