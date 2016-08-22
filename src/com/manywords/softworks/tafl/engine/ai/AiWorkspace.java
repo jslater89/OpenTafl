@@ -42,8 +42,7 @@ public class AiWorkspace extends Game {
     private long mEndTime;
 
     private int mLastDepth;
-    private int mContinuationNodes;
-    public int mDeepestSearch;
+    private int mDeepestSearch;
 
     // These are only used internally
     private boolean mIterativeDeepening = true;
@@ -59,7 +58,7 @@ public class AiWorkspace extends Game {
     /**
      * In depth from the root, inclusive (root == 0, e.g. depth 5 searches to nodes with depth of 5)
      */
-    private int mMaxDepth = 5;
+    private int mMaxDepth = 25;
 
     /**
      * In milliseconds
@@ -295,7 +294,6 @@ public class AiWorkspace extends Game {
         if(maxThinkTime == 0) maxThinkTime = 86400;
         mMaxThinkTime = maxThinkTime * 1000;
 
-        mContinuationNodes = 0;
         mStartTime = System.currentTimeMillis();
 
         if(mTimeRemaining == null && mGame.getClock() != null) {
@@ -411,19 +409,14 @@ public class AiWorkspace extends Game {
 
                 mStartingState.explore(continuationDepth, continuationDepth - 1, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, true);
 
-                int size = getGameTreeSize(continuationDepth) - getGameTreeSize(continuationDepth - 1);
-                mContinuationNodes += size;
-
-
                 if (continuationDepth > deepestSearch) deepestSearch = continuationDepth;
                 continuationDepth++;
             }
             long finish = System.currentTimeMillis();
 
             double timeTaken = (finish - start) / 1000d;
-            double statesPerSec = mContinuationNodes / ((finish - start) / 1000d);
             if (chatty && mUiCallback != null) {
-                mUiCallback.statusText("Continuation searches explored " + mContinuationNodes + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
+                mUiCallback.statusText("Continuation searches took " + timeTaken + " sec");
             }
 
 
@@ -546,7 +539,7 @@ public class AiWorkspace extends Game {
 
             mUiCallback.statusText("Transpositions ignored because of repetitions: " + mRepetitionsIgnoreTranspositionTable);
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
-            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, continuation search: " + mContinuationNodes + " nodes, horizon search: " + (fullNodes - (mContinuationNodes + nodes)) + " nodes");
+            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, extension searches " + (fullNodes - nodes) + " nodes");
             mUiCallback.statusText("Overall speed: " + (fullNodes / ((mEndTime - mStartTime)/ 1000d)) + " nodes/sec");
             mUiCallback.statusText("Transposition table stats: " + transpositionTable.getTableStats());
         }
