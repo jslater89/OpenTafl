@@ -40,13 +40,13 @@ public class KillerMoveTable {
 
         // If there are null moves, add it in place of one of those.
         boolean added = false;
-        for(int i = 0; i < killers[depth].length; i++) {
+        for(int i = 0; i < killersToKeep; i++) {
             if(killers[depth][i] == null) killers[depth][i] = move;
             added = true;
         }
 
         // Otherwise, replace the last one.
-        if(!added && killers[depth].length > 0) {
+        if(!added && killersToKeep > 0) {
             killers[depth][killers[depth].length - 1] = move;
         }
     }
@@ -57,7 +57,7 @@ public class KillerMoveTable {
         if(depth >= killers.length) return moves;
 
 
-        for(int i = 0; i < killers[depth].length; i++) {
+        for(int i = 0; i < killersToKeep; i++) {
             moves.add(killers[depth][i]);
         }
 
@@ -73,8 +73,8 @@ public class KillerMoveTable {
     public int rateMove(int depth, MoveRecord record) {
         if(depth >= killers.length) return -1;
 
-        for(int rank = killers[depth].length; rank > 0; rank--) {
-            int index = killers[depth].length - rank;
+        for(int rank = killersToKeep; rank > 0; rank--) {
+            int index = killersToKeep - rank;
 
             if(record.softEquals(killers[depth][index])) return rank;
         }
