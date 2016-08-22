@@ -1,8 +1,6 @@
 package com.manywords.softworks.tafl.engine;
 
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
-import com.manywords.softworks.tafl.engine.replay.ReplayGame;
-import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.rules.*;
 
@@ -356,14 +354,7 @@ public class GameState {
     }
 
     public int countPositionOccurrences() {
-        int repeats = 0;
-        for (GameState state : mGame.getHistory()) {
-            if (this.mZobristHash == state.mZobristHash) {
-                repeats++;
-            }
-        }
-
-        return repeats;
+        return mGame.getRepetitions().getRepetitionCount(this.mZobristHash);
     }
 
     public void winByResignation(boolean isWinnerAttackingSide) {
@@ -383,13 +374,13 @@ public class GameState {
         else if (getDefenders().getTaflmen().size() == 0) return ATTACKER_WIN;
         int threefoldRepetitionResult = mGame.getRules().threefoldRepetitionResult();
         // Threefold repetition cannot occur as the result of a berserk move
-        if(threefoldRepetitionResult != Rules.IGNORE && mBerserkingTaflman == Taflman.EMPTY) {
+        if(threefoldRepetitionResult != Rules.THIRD_REPETITION_IGNORED && mBerserkingTaflman == Taflman.EMPTY) {
             int repeats = countPositionOccurrences();
 
             // If this position has occurred two other times plus this one, do the threefold
             // checks.
             if(repeats > 2) {
-                if(threefoldRepetitionResult == Rules.DRAW) {
+                if(threefoldRepetitionResult == Rules.THIRD_REPETITION_DRAWS) {
                     return DRAW;
                 }
                 else if (threefoldRepetitionResult == Rules.THIRD_REPETITION_LOSES) {

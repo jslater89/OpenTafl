@@ -137,7 +137,7 @@ public class Tawlbwrdd extends Rules {
 
     @Override
     public int threefoldRepetitionResult() {
-        return Rules.DRAW;
+        return Rules.THIRD_REPETITION_DRAWS;
     }
 
     @Override

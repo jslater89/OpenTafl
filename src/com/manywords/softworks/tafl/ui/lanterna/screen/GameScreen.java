@@ -264,11 +264,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         if(!mInReplay) {
             // Notify the player if this is a victory on move repetition
-            int repeats = mGame.getCurrentState().countPositionOccurrences();
-            repeats++;
-            if (repeats > 2) {
-                statusText("This position has repeated " + repeats + " times!");
-            }
         }
 
         if(side == null) {

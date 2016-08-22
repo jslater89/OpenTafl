@@ -282,7 +282,15 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
         short cachedValue = Evaluator.NO_VALUE;
-        if(!extension && !continuation) {
+
+        if(mGame.getRules().threefoldRepetitionResult() != Rules.THIRD_REPETITION_IGNORED && workspace.getRepetitions().getRepetitionCount(getZobrist()) > 1) {
+            // If this state has occurred more than once in the history, we're in danger of a threefold repetition,
+            // provided the rules call for threefold repetition results. We should therefore search this position, rather
+            // than hit the TT.
+            workspace.mRepetitionsIgnoreTranspositionTable++;
+            cachedValue = Evaluator.NO_VALUE;
+        }
+        else if(!extension && !continuation) {
             cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), remainingDepth, mGameLength);
         }
         else if(mDepth > overallMaxDepth) {
@@ -330,7 +338,15 @@ public class GameTreeState extends GameState implements GameTreeNode {
             minifyState();
         } else {
             this.mValue = Evaluator.NO_VALUE;
+
+            // This state has occurred in the history for our children
+            workspace.getRepetitions().increment(this.getZobrist());
+
+            // Explore our children
             exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
+
+            // This state has not occurred in the history for not-our-children
+            workspace.getRepetitions().decrement(this.getZobrist());
 
             // Continuation search runs through the whole tree again, so only horizon search (i.e. extension, but not
             // continuation) needs to revalue a parent. Put another way, only revalue parent if we don't start at the

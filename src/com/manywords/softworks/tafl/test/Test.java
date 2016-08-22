@@ -33,6 +33,13 @@ public class Test {
         tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
         tests.add(new AIMoveRepetitionTest());
 
+        // Mechanics tests
+        tests.add(new RepetitionHashTableTest());
+        tests.add(new MoveRecordRotationMirrorTest());
+        tests.add(new MoveAddressTest());
+        tests.add(new ReplayGameTest());
+        tests.add(new KingMissingPositionRecordTest());
+
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
         tests.add(new MoveSerializerConsistencyTest());
@@ -67,12 +74,6 @@ public class Test {
         tests.add(new BerserkMoveDuplicationTest());
         tests.add(new BadFetlarCaptureTest());
         tests.add(new BadCopenhagenCaptureTest());
-
-        // Mechanics tests
-        tests.add(new MoveRecordRotationMirrorTest());
-        tests.add(new MoveAddressTest());
-        tests.add(new ReplayGameTest());
-        tests.add(new KingMissingPositionRecordTest());
 
         // Long-running mechanics tests
         tests.add(new ExternalEngineHostTest());

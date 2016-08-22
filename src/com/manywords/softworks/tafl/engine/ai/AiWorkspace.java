@@ -9,6 +9,7 @@ import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.engine.collections.RepetitionHashTable;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.text.DecimalFormat;
@@ -35,6 +36,7 @@ public class AiWorkspace extends Game {
     public long[] mBetaCutoffs;
     public long[] mBetaCutoffDistances;
     public static long[] mLastTimeToDepth;
+    public int mRepetitionsIgnoreTranspositionTable = 0;
 
     private long mStartTime;
     private long mEndTime;
@@ -78,7 +80,7 @@ public class AiWorkspace extends Game {
     public boolean silent = OpenTafl.logLevel == OpenTafl.LogLevel.SILENT;
 
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
-        super(startingGame.mZobristConstants, startingGame.getHistory());
+        super(startingGame.mZobristConstants, startingGame.getHistory(), startingGame.getRepetitions());
         mLastTimeToDepth = new long[mMaxDepth + 1];
 
         mTranspositionTableSize = transpositionTableSize;
@@ -283,6 +285,7 @@ public class AiWorkspace extends Game {
 
     public void explore(int maxThinkTime) {
         transpositionTable.resetTableStats();
+        mRepetitionsIgnoreTranspositionTable = 0;
 
         if(maxThinkTime == 0) maxThinkTime = 86400;
         mMaxThinkTime = maxThinkTime * 1000;
@@ -536,6 +539,7 @@ public class AiWorkspace extends Game {
             }
             mUiCallback.statusText("End of best path scored " + bestMove.getValue());
 
+            mUiCallback.statusText("Transpositions ignored because of repetitions: " + mRepetitionsIgnoreTranspositionTable);
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
             mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, continuation search: " + mContinuationNodes + " nodes, horizon search: " + (fullNodes - (mContinuationNodes + nodes)) + " nodes");
             mUiCallback.statusText("Overall speed: " + (fullNodes / ((mEndTime - mStartTime)/ 1000d)) + " nodes/sec");

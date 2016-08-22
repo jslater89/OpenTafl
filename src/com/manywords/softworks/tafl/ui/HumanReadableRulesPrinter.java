@@ -544,10 +544,10 @@ public class HumanReadableRulesPrinter {
                 "The attackers win if the king is captured. If, at any point, a player's turn begins and that player has no legal moves, that player " +
                 "loses.\n\n";
 
-        if(r.threefoldRepetitionResult() != Rules.IGNORE) {
+        if(r.threefoldRepetitionResult() != Rules.THIRD_REPETITION_IGNORED) {
             rules += ruleNumber++ + ". If a board position is repeated three times,";
 
-            if(r.threefoldRepetitionResult() == Rules.DRAW) {
+            if(r.threefoldRepetitionResult() == Rules.THIRD_REPETITION_DRAWS) {
                 rules += " the game is drawn.";
             }
             else if(r.threefoldRepetitionResult() == Rules.THIRD_REPETITION_LOSES) {
