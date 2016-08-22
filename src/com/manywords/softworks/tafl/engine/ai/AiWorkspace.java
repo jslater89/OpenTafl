@@ -279,7 +279,7 @@ public class AiWorkspace extends Game {
         long timeToPreviousDepth = mLastTimeToDepth[depth - 1];
 
         // We can start a deeper search
-        return mBenchmarkMode || !(isTimeCritical() || timeLeft < (timeToPreviousDepth * 15));
+        return mBenchmarkMode || !(isTimeCritical() || timeLeft < (timeToPreviousDepth * (depth % 2 == 0 ? 3.5 : 19)));
     }
 
     private boolean isTimeCritical() {
