@@ -170,7 +170,7 @@ public class OpenTafl {
                 //display.runUi();
                 break;
             case BENCHMARK:
-                Benchmark.run();
+                new Benchmark().run();
                 break;
             case HELP:
                 printHelpMessage();

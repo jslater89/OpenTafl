@@ -97,6 +97,7 @@ public class Test {
 //        // Tactics tests
 //        tests.add(new AITacticsEscapeTest());
 
+
         for (TaflTest test : tests) {
             try {
                 OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + "Running " + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF);

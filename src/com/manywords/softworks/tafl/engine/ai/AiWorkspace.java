@@ -69,6 +69,7 @@ public class AiWorkspace extends Game {
 
     public boolean mNoTime = false;
     public boolean mExtensionTime = false;
+    private boolean mBenchmarkMode = false;
 
     private final Object mTimeLock = new Object();
 
@@ -126,6 +127,10 @@ public class AiWorkspace extends Game {
         if (mUseKillerMoves && (killerMoveTable == null || killerMoveTable.getDepth() != mMaxDepth || killerMoveTable.movesToKeep() != KILLER_MOVES)) {
             killerMoveTable = new KillerMoveTable(mMaxDepth, KILLER_MOVES);
         }
+    }
+
+    public void setBenchmarkMode(boolean on) {
+        mBenchmarkMode = on;
     }
 
     public void allowCutoffs(boolean allow) {
@@ -275,7 +280,7 @@ public class AiWorkspace extends Game {
         long timeToPreviousDepth = mLastTimeToDepth[depth - 1];
 
         // We can start a deeper search
-        return !(isTimeCritical() || timeLeft < (timeToPreviousDepth * 15));
+        return mBenchmarkMode || !(isTimeCritical() || timeLeft < (timeToPreviousDepth * 15));
     }
 
     private boolean isTimeCritical() {
