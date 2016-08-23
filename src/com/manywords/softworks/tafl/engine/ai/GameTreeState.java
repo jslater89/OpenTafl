@@ -696,7 +696,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 int o1HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o1);
                 int o2HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o2);
 
-                return o1HistoryValue - o2HistoryValue;
+                return o2HistoryValue - o1HistoryValue;
             });
 
             transpositionMoves.sort((o1, o2) -> {
@@ -723,7 +723,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             sortedSuccessors.addAll(transpositionMoves);
             sortedSuccessors.addAll(historyMoves);
             sortedSuccessors.addAll(successorMoves);
-            
+
             return sortedSuccessors;
         }
 
