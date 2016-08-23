@@ -315,7 +315,7 @@ public class AiWorkspace extends Game {
         if(mTimeToDepthAge[depth] > 3) mLastTimeToDepth[depth] = 0;
         if(mLastTimeToDepth[depth] != 0) return mLastTimeToDepth[depth];
 
-        return (long) (mLastTimeToDepth[depth - 1] * ((depth) % 2 == 0 ? 3.5 : 19));
+        return (long) (mLastTimeToDepth[depth - 1] * ((depth) % 2 == 0 ? 10 : 19));
     }
 
     private boolean canSearchToDepth(int depth) {
@@ -408,6 +408,7 @@ public class AiWorkspace extends Game {
                 mStartingState.explore(depth, mMaxDepth, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, false);
                 long finish = System.currentTimeMillis();
 
+                double timeTaken = (finish - start) / 1000d;
 
                 // If we aren't out of time, we can save this tree as a known good tree.
                 // Otherwise, we should restore the previous tree.
@@ -415,25 +416,29 @@ public class AiWorkspace extends Game {
                     mPreviousStartingState = mStartingState;
                     mLastTimeToDepth[depth] = finish - start;
                     mTimeToDepthAge[depth] = 0;
+
+                    int size = getGameTreeSize(depth);
+                    double statesPerSec = size / ((finish - start) / 1000d);
+
+                    if (chatty && mUiCallback != null) {
+                        mUiCallback.statusText("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
+                    }
+
+                    depth++;
+                    deepestSearch = depth;
                 }
                 else {
                     if(mPreviousStartingState != null) mStartingState = mPreviousStartingState;
+
+                    if(chatty && mUiCallback != null) {
+                        mUiCallback.statusText("Failed to complete tree at depth " + depth);
+                        mUiCallback.statusText("Time taken: " + timeTaken + " sec, which is " + doubleFormat.format((timeTaken / (mLastTimeToDepth[depth - 1] / 1000d))) + "x time to previous depth");
+                    }
 
                     for(int i = depth; i < mMaxDepth; i++) {
                         mTimeToDepthAge[i]++;
                     }
                 }
-                double timeTaken = (finish - start) / 1000d;
-
-                int size = getGameTreeSize(depth);
-                double statesPerSec = size / ((finish - start) / 1000d);
-
-                if (chatty && mUiCallback != null) {
-                    mUiCallback.statusText("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
-                }
-
-                depth++;
-                deepestSearch = depth;
             }
             else {
                 break;
