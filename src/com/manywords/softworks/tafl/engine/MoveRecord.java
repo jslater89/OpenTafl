@@ -84,7 +84,11 @@ public class MoveRecord {
             rotationsAndMirrors.addAll(getMirrors(dimension, rotation));
         }
 
-        return rotationsAndMirrors.contains(m2);
+        for(MoveRecord equivalentMove : rotationsAndMirrors) {
+            if(equivalentMove.softEquals(m2)) return true;
+        }
+
+        return false;
     }
 
     public static List<MoveRecord> getMirrors(int dimension, MoveRecord m) {

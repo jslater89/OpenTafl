@@ -43,6 +43,9 @@ public class AISearchEquivalenceTest extends TaflTest {
         List<MoveRecord> equivalentMoves = new ArrayList<>();
         List<MoveRecord> localEquivalentMoves = new ArrayList<>();
 
+        AiWorkspace tempWorkspace;
+        GameTreeNode bestChild;
+
         // 0. MINIMAX STRAIGHT UP --------------------------------------------------------------------------------------
         Game g = new Game(r, null);
         GameState state = g.getCurrentState();
@@ -60,6 +63,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceStraightMinimax.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
         workspaceStraightMinimax.allowKillerMoves(false);
         workspaceStraightMinimax.allowMoveOrdering(false);
+        workspaceStraightMinimax.allowHistoryTable(false);
 
         workspaceStraightMinimax.explore(5);
 
@@ -86,6 +90,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceNoOptimizations.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
         workspaceNoOptimizations.allowKillerMoves(false);
         workspaceNoOptimizations.allowMoveOrdering(false);
+        workspaceNoOptimizations.allowHistoryTable(false);
 
         workspaceNoOptimizations.explore(5);
 
@@ -116,6 +121,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceOrdering.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
         workspaceOrdering.allowKillerMoves(false);
         workspaceOrdering.allowMoveOrdering(true);
+        workspaceOrdering.allowHistoryTable(false);
 
         workspaceOrdering.explore(5);
 
@@ -163,32 +169,31 @@ public class AISearchEquivalenceTest extends TaflTest {
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "3. Alpha-beta benchmark move: " + move + " value: " + bestValue);
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "3. " + equivalentMoves.size() + " equivalent moves (including best): " + equivalentMoves);
 
-        //4. EXTERNAL ENGINE MOVE --------------------------------------------------------------------------------------
-        ExternalEngineClient c = new ExternalEngineClient();
-        c.setDebugMode(true);
-        c.start();
+        //4. HISTORY TABLE SEARCH --------------------------------------------------------------------------------------
+        AiWorkspace workspaceHistoryOrdering = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        workspaceHistoryOrdering.chatty = true;
+        workspaceHistoryOrdering.setMaxDepth(5);
 
-        c.setAiFeatures(5, false, false, false, false, false, false);
-        c.setThinkTime(5);
+        workspaceHistoryOrdering.allowIterativeDeepening(false);
+        workspaceHistoryOrdering.allowContinuation(false);
+        workspaceHistoryOrdering.allowHorizon(false);
+        workspaceHistoryOrdering.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
+        workspaceHistoryOrdering.allowKillerMoves(false);
+        workspaceHistoryOrdering.allowMoveOrdering(true);
+        workspaceHistoryOrdering.allowHistoryTable(true);
 
-        c.mCommCallback.onCommandReceived("rules dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/".getBytes(Charset.forName("US-ASCII")));
-        c.mCommCallback.onCommandReceived("opponent-move d1-e1 /4t2/3t3/3T3/ttTKTtt/3T3/3t3/3t3/".getBytes(Charset.forName("US-ASCII")));
-        c.mCommCallback.onCommandReceived("play defenders".getBytes(Charset.forName("US-ASCII")));
+        workspaceHistoryOrdering.explore(10);
 
-        try {
-            Thread.sleep(6000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        workspaceHistoryOrdering.printSearchStats();
 
-        AiWorkspace tempWorkspace = c.mWorkspace;
+        tempWorkspace = workspaceHistoryOrdering;
         localEquivalentMoves.clear();
         for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
             if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
         }
 
-        GameTreeNode bestChild = tempWorkspace.getTreeRoot().getBestChild();
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "4. External engine move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
+        bestChild = tempWorkspace.getTreeRoot().getBestChild();
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "4. History table move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "4. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
         localEquivalentMoves.retainAll(equivalentMoves);
         assert localEquivalentMoves.size() > 0;
@@ -237,7 +242,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceTranspositionFixed.allowHorizon(false);
         workspaceTranspositionFixed.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_EXACT_ONLY);
         workspaceTranspositionFixed.allowKillerMoves(false);
-        workspaceTranspositionFixed.allowMoveOrdering(false);
+        workspaceTranspositionFixed.allowMoveOrdering(true);
 
         workspaceTranspositionFixed.explore(10);
 
@@ -268,7 +273,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceTranspositionAny.allowHorizon(false);
         workspaceTranspositionAny.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_ON);
         workspaceTranspositionAny.allowKillerMoves(false);
-        workspaceTranspositionAny.allowMoveOrdering(false);
+        workspaceTranspositionAny.allowMoveOrdering(true);
 
         workspaceTranspositionAny.explore(10);
 

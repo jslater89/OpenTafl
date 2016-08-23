@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
+import com.manywords.softworks.tafl.engine.ai.tables.HistoryTable;
 import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -20,6 +21,7 @@ public class AiWorkspace extends Game {
     private static String lastRulesString = "";
     public static TranspositionTable transpositionTable = null;
     public static KillerMoveTable killerMoveTable = null;
+    public static HistoryTable historyTable = null;
     public static Evaluator evaluator = new FishyEvaluator();
 
     private int mTranspositionTableSize = 5;
@@ -49,12 +51,13 @@ public class AiWorkspace extends Game {
     private boolean mIterativeDeepening = true;
     private boolean mUseContinuationSearch = true;
     private boolean mUseHorizonSearch = true;
+    private boolean mUseKillerMoves = true; // sets table size to 0, so it ignores puts
+    private int mUseTranspositionTable = TRANSPOSITION_TABLE_ON; // sets table size to 0, so it ignores puts
 
     // These need getters
     private boolean mAlphaBetaPruning = true;
     private boolean mDoMoveOrdering = true;
-    private boolean mUseKillerMoves = true;
-    private int mUseTranspositionTable = TRANSPOSITION_TABLE_ON;
+    private boolean mUseHistoryTable = true;
 
     /**
      * In depth from the root, inclusive (root == 0, e.g. depth 5 searches to nodes with depth of 5)
@@ -124,6 +127,10 @@ public class AiWorkspace extends Game {
 
         killerMoveTable.reset();
 
+        if (mUseHistoryTable && (historyTable == null || historyTable.getDimension() != getRules().boardSize || !RulesSerializer.rulesEqual(startingGame.getRules().getOTRString(), lastRulesString))) {
+            historyTable = new HistoryTable(getRules().boardSize);
+        }
+
         lastRulesString = startingGame.getRules().getOTRString();
     }
 
@@ -174,12 +181,8 @@ public class AiWorkspace extends Game {
         }
     }
 
-    public boolean areCutoffsAllowed() {
-        return mAlphaBetaPruning;
-    }
-
-    public boolean isMoveOrderingAllowed() {
-        return mDoMoveOrdering;
+    public void allowHistoryTable(boolean allow) {
+        mUseHistoryTable = allow;
     }
 
     public static final int TRANSPOSITION_TABLE_OFF = 0;
@@ -196,6 +199,18 @@ public class AiWorkspace extends Game {
         else {
             transpositionTable = new TranspositionTable(0);
         }
+    }
+
+    public boolean areCutoffsAllowed() {
+        return mAlphaBetaPruning;
+    }
+
+    public boolean isMoveOrderingAllowed() {
+        return mDoMoveOrdering;
+    }
+
+    public boolean isHistoryTableAllowed() {
+        return mUseHistoryTable;
     }
 
     public void setTimeRemaining(TimeSpec length, TimeSpec entry) {

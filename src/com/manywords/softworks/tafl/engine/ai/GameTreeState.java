@@ -292,6 +292,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             cachedValue = Evaluator.NO_VALUE;
         }
         else if(!extension && !continuation) {
+            // Always allow TT hits in the main tree once we've accounted for repetitions.
             cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), remainingDepth, mGameLength);
         }
         else if(mDepth > overallMaxDepth) {
@@ -402,16 +403,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
         int distanceToFirstCutoff = 0;
         boolean savedDistanceToFirstCutoff = false;
         for (MoveRecord move : successorMoves) {
-            if (cutoff) {
-                if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
-                if(DEBUG) System.out.println("Cutoff at depth " + mDepth + " with value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
-                break;
-            }
-
             GameTreeState node = considerMove(move.start, move.end);
             // Node will be null in e.g. berserk tafl, where moves are legal
             // according to the movement rules, but not legal according to
             // special rules, like the berserk rule.
+            // TODO: account for threefold repetition forbidden?
             if(node == null) {
                 continue;
             }
@@ -440,6 +436,14 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
                 if(cutoff) {
                     AiWorkspace.killerMoveTable.putMove(mDepth, move);
+
+                    if(workspace.isHistoryTableAllowed()) {
+                        AiWorkspace.historyTable.putMove(getCurrentSide().isAttackingSide(), currentMaxDepth - mDepth, move);
+                    }
+
+                    if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
+                    if(DEBUG) System.out.println("Cutoff at depth " + mDepth + " with value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
+                    break;
                 }
             }
         }
