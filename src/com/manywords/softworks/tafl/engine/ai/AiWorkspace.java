@@ -413,7 +413,9 @@ public class AiWorkspace extends Game {
                     mTimeToDepthAge[depth] = 0;
                 }
                 else {
-                    mTimeToDepthAge[depth]++;
+                    for(int i = depth; i < mMaxDepth; i++) {
+                        mTimeToDepthAge[i]++;
+                    }
                 }
                 double timeTaken = (finish - start) / 1000d;
 
