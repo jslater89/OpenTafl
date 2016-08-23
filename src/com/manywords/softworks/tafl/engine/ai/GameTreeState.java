@@ -127,33 +127,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public GameTreeNode getBestChild() {
-        GameTreeNode bestMove = null;
-        for (GameTreeNode child : getBranches()) {
-            if (bestMove == null) {
-                bestMove = child;
-                continue;
-            }
-            else if (isMaximizingNode()) {
-                // Attackers maximize
-                if (child.getValue() == bestMove.getValue()) {
-                    //if(Math.random() > 0.5) bestMove = child;
-                }
-                else if (child.getValue() > bestMove.getValue()) {
-                    bestMove = child;
-                }
-            }
-            else {
-                // Defenders minimize
-                if (child.getValue() == bestMove.getValue()) {
-                    //if(Math.random() > 0.5) bestMove = child;
-                }
-                else if (child.getValue() < bestMove.getValue()) {
-                    bestMove = child;
-                }
-            }
-        }
-
-        return bestMove;
+        return GameTreeNodeMethods.getBestChild(this);
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.manywords.softworks.tafl.engine.ai;
 
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,5 +63,56 @@ public class GameTreeNodeMethods {
         }
 
         return null;
+    }
+
+    public static GameTreeNode getBestChild(GameTreeNode root) {
+        if (root.getDepth() > 0 && root.getVictory() != GameTreeState.GOOD_MOVE) return null;
+
+        GameTreeNode bestMove = null;
+        for (GameTreeNode child : root.getBranches()) {
+            if (bestMove == null) {
+                bestMove = child;
+                continue;
+            }
+            else if (root.isMaximizingNode()) {
+                // Attackers maximize
+                if (child.getValue() == bestMove.getValue()) {
+                    //if(Math.random() > 0.5) bestMove = child;
+                }
+                else if (child.getValue() > bestMove.getValue()) {
+                    bestMove = child;
+                }
+            }
+            else {
+                // Defenders minimize
+                if (child.getValue() == bestMove.getValue()) {
+                    //if(Math.random() > 0.5) bestMove = child;
+                }
+                else if (child.getValue() < bestMove.getValue()) {
+                    bestMove = child;
+                }
+            }
+        }
+
+        if(bestMove != null && bestMove.getValue() == Evaluator.NO_VALUE) {
+            System.out.println(bestMove);
+            List<GameTreeNode> path = new ArrayList<>();
+
+            GameTreeNode parent = bestMove.getParentNode();
+            while(parent != null) {
+                path.add(parent);
+                parent = parent.getParentNode();
+            }
+
+            System.out.println(path);
+
+            System.out.println(bestMove.getDepth());
+            System.out.println(bestMove.getBranches().size());
+            System.out.println(bestMove.getValue());
+
+            throw new IllegalStateException();
+        }
+
+        return bestMove;
     }
 }

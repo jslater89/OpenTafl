@@ -135,28 +135,7 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     public GameTreeNode getBestChild() {
-        if (this.mVictory != GameTreeState.GOOD_MOVE) return null;
-
-        GameTreeNode bestMove = null;
-        for (GameTreeNode child : getBranches()) {
-            if (bestMove == null) {
-                bestMove = child;
-                continue;
-            }
-            else if (mCurrentSideAttackers) {
-                // Attackers maximize
-                if (child.getValue() > bestMove.getValue()) {
-                    bestMove = child;
-                }
-            } else {
-                // Defenders minimize
-                if (child.getValue() < bestMove.getValue()) {
-                    bestMove = child;
-                }
-            }
-        }
-
-        return bestMove;
+        return GameTreeNodeMethods.getBestChild(this);
     }
 
     @Override
