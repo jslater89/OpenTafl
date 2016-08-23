@@ -71,10 +71,10 @@ public class Benchmark extends TaflTest {
         w.setBenchmarkMode(true);
 
         start = System.currentTimeMillis();
-        //w.explore(TIME);
+        w.explore(TIME);
         end = System.currentTimeMillis();
-        //w.printSearchStats();
-        //size = w.getGameTreeSize(10);
+        w.printSearchStats();
+        size = w.getGameTreeSize(10);
         totalSize += size;
 
         OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Brandub 7: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(7));
@@ -90,10 +90,10 @@ public class Benchmark extends TaflTest {
         w.setBenchmarkMode(true);
 
         start = System.currentTimeMillis();
-        //w.explore(TIME);
+        w.explore(TIME);
         end = System.currentTimeMillis();
-        //w.printSearchStats();
-        //size = w.getGameTreeSize(10);
+        w.printSearchStats();
+        size = w.getGameTreeSize(10);
         totalSize += size;
 
         OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Tablut 9: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(9));
