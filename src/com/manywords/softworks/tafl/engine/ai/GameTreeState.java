@@ -4,15 +4,13 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static com.manywords.softworks.tafl.rules.Taflman.EMPTY;
 
@@ -670,65 +668,66 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
         if(workspace.isMoveOrderingAllowed()) {
-            successorMoves.sort((o1, o2) -> {
-                int o1CaptureCount = o1.captures.size();
-                int o2CaptureCount = o2.captures.size();
+            List<MoveRecord> killerMoves = new ArrayList<>(AiWorkspace.killerMoveTable.killersToKeep);
+            List<MoveRecord> capturingMoves = new ArrayList<>(4);
+            List<MoveRecord> transpositionMoves = new ArrayList<MoveRecord>();
+            List<MoveRecord> sortedSuccessors = new ArrayList<>(successorMoves.size());
+            List<MoveRecord> historyMoves = new ArrayList<>(successorMoves.size());
 
-                boolean o1ChangeTurn = true;
-                boolean o2ChangeTurn = true;
-
-                if (berserkMode == Rules.BERSERK_ANY_MOVE && o1CaptureCount > 0) o1ChangeTurn = false;
-                if (berserkMode == Rules.BERSERK_ANY_MOVE && o2CaptureCount > 0) o2ChangeTurn = false;
-
-                long o1Zobrist = updateZobristHash(mZobristHash, getBoard(), o1, o1ChangeTurn);
-                long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o2, o2ChangeTurn);
-
-                short o1Entry = AiWorkspace.transpositionTable.getValue(o1Zobrist, currentMaxDepth - mDepth, mGameLength);
-                short o2Entry = AiWorkspace.transpositionTable.getValue(o2Zobrist, currentMaxDepth - mDepth, mGameLength);
-
-                // The less-good move ordering on berserk moves is almost certainly faster than calculating
-                // the destinations and capturing moves from the other position every time.
-                if (berserkMode == Rules.BERSERK_CAPTURE_ONLY && o1CaptureCount > 0) o1Entry = Evaluator.NO_VALUE;
-                if (berserkMode == Rules.BERSERK_CAPTURE_ONLY && o2CaptureCount > 0) o2Entry = Evaluator.NO_VALUE;
-
-                int o1KillerValue = AiWorkspace.killerMoveTable.rateMove(mDepth, o1);
-                int o2KillerValue = AiWorkspace.killerMoveTable.rateMove(mDepth, o2);
-
-                // Killer moves: 20
-                // Captures: 10
-                // Transposition table hit: 5
-
-                int sortValue = 0;
-
-                if (o1KillerValue > o2KillerValue) {
-                    sortValue += 20;
-                } else if (o1KillerValue < o2KillerValue) {
-                    sortValue -= 20;
+            for(MoveRecord m : successorMoves) {
+                if(AiWorkspace.killerMoveTable.rateMove(mDepth, m) > 0) killerMoves.add(m);
+                else if(workspace.isHistoryTableAllowed()) {
+                    int rating = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), m);
+                    if(rating > 0) {
+                        historyMoves.add(m);
+                    }
                 }
+                else if(m.captures.size() > 0) capturingMoves.add(m);
+                else {
+                    boolean changeTurn = (berserkMode != Rules.BERSERK_ANY_MOVE || m.captures.size() == 0);
+                    long zobrist = updateZobristHash(mZobristHash, getBoard(), m, changeTurn);
+                    int transpositionTableRating = AiWorkspace.transpositionTable.getValue(zobrist, currentMaxDepth - mDepth, mGameLength);
 
-                if (o1CaptureCount > o2CaptureCount) {
-                    sortValue += 10;
-                } else if (o1CaptureCount < o2CaptureCount) {
-                    sortValue -= 10;
+                    transpositionMoves.add(m);
                 }
+            }
 
-                if (o1Entry != Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
-                    sortValue += 5;
-                } else if (o1Entry == Evaluator.NO_VALUE && o2Entry != Evaluator.NO_VALUE) {
-                    sortValue -= 5;
-                } else if (o1Entry > o2Entry) {
-                    sortValue += 5;
-                } else if (o1Entry < o2Entry) {
-                    sortValue -= 5;
-                }
+            historyMoves.sort((o1, o2) -> {
+                int o1HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o1);
+                int o2HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o2);
 
-                return sortValue;
+                return o1HistoryValue - o2HistoryValue;
             });
 
-            // Defenders sort moves from low to high, attackers sort moves from high to low.
-            if(getCurrentSide().isAttackingSide()) {
-                Collections.reverse(successorMoves);
-            }
+            transpositionMoves.sort((o1, o2) -> {
+                boolean o1ChangeTurn = (berserkMode != Rules.BERSERK_ANY_MOVE || o1.captures.size() == 0);
+                long o1Zobrist = updateZobristHash(mZobristHash, getBoard(), o1, o1ChangeTurn);
+                int o1Rating = AiWorkspace.transpositionTable.getValue(o1Zobrist, currentMaxDepth - mDepth, mGameLength);
+
+                boolean o2ChangeTurn = (berserkMode != Rules.BERSERK_ANY_MOVE || o1.captures.size() == 0);
+                long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o1, o2ChangeTurn);
+                int o2Rating = AiWorkspace.transpositionTable.getValue(o2Zobrist, currentMaxDepth - mDepth, mGameLength);
+
+                if(isMaximizingNode()) {
+                    return o2Rating - o1Rating;
+                }
+                else {
+                    return o1Rating - o2Rating;
+                }
+            });
+
+            successorMoves.removeAll(killerMoves);
+            successorMoves.removeAll(capturingMoves);
+            successorMoves.removeAll(historyMoves);
+            successorMoves.removeAll(transpositionMoves);
+
+            sortedSuccessors.addAll(killerMoves);
+            sortedSuccessors.addAll(historyMoves);
+            sortedSuccessors.addAll(capturingMoves);
+            sortedSuccessors.addAll(transpositionMoves);
+            sortedSuccessors.addAll(successorMoves);
+
+            return sortedSuccessors;
         }
 
         return successorMoves;
