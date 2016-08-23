@@ -39,6 +39,7 @@ public class AiWorkspace extends Game {
     public long[] mBetaCutoffs;
     public long[] mBetaCutoffDistances;
     public static long[] mLastTimeToDepth;
+    public static int[] mTimeToDepthAge;
     public int mRepetitionsIgnoreTranspositionTable = 0;
 
     private long mStartTime;
@@ -87,7 +88,11 @@ public class AiWorkspace extends Game {
 
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory(), startingGame.getRepetitions());
-        mLastTimeToDepth = new long[mMaxDepth + 1];
+
+        if(mLastTimeToDepth == null) {
+            mLastTimeToDepth = new long[mMaxDepth + 1];
+            mTimeToDepthAge = new int[mMaxDepth + 1];
+        }
 
         mTranspositionTableSize = transpositionTableSize;
         setGameRules(startingGame.getRules());
@@ -144,6 +149,9 @@ public class AiWorkspace extends Game {
         if (mUseKillerMoves && (killerMoveTable == null || killerMoveTable.getDepth() != mMaxDepth || killerMoveTable.movesToKeep() != KILLER_MOVES)) {
             killerMoveTable = new KillerMoveTable(mMaxDepth, KILLER_MOVES);
         }
+
+        mLastTimeToDepth = new long[mMaxDepth + 1];
+        mTimeToDepthAge = new int[mMaxDepth + 1];
     }
 
     public void setBenchmarkMode(boolean on) {
@@ -304,7 +312,10 @@ public class AiWorkspace extends Game {
         if(depth <= 1) return 0;
         if(depth >= mLastTimeToDepth.length) return 3600 * 1000;
 
-        return (long) (mLastTimeToDepth[depth - 1] * (depth % 2 == 0 ? 3.5 : 19));
+        if(mTimeToDepthAge[depth] > 3) mLastTimeToDepth[depth] = 0;
+        if(mLastTimeToDepth[depth] != 0) return mLastTimeToDepth[depth];
+
+        return (long) (mLastTimeToDepth[depth - 1] * ((depth) % 2 == 0 ? 3.5 : 19));
     }
 
     private boolean canSearchToDepth(int depth) {
@@ -360,10 +371,10 @@ public class AiWorkspace extends Game {
 
         boolean firstExtension = true;
         boolean firstHorizon = true;
-        final int continuationLimit = 3;
+        final int continuationLimit = 5;
         int continuationDepth;
 
-        final int horizonDepth = 2;
+        int horizonDepth = 2;
         final int horizonCount = 5;
         final int horizonLimit = 6;
         int currentHorizonDepth = 0;
@@ -399,6 +410,10 @@ public class AiWorkspace extends Game {
 
                 if (!mNoTime) {
                     mLastTimeToDepth[depth] = finish - start;
+                    mTimeToDepthAge[depth] = 0;
+                }
+                else {
+                    mTimeToDepthAge[depth]++;
                 }
                 double timeTaken = (finish - start) / 1000d;
 
@@ -478,6 +493,7 @@ public class AiWorkspace extends Game {
 
 
         if(mUseHorizonSearch) {
+            // Can we afford a search to depth 3?
             currentHorizonDepth = deepestSearch;
             while (true) {
                 if (!isTimeCritical()) {
@@ -487,6 +503,13 @@ public class AiWorkspace extends Game {
                             mUiCallback.statusText("Running horizon on best moves...");
                         }
                     }
+
+                    long horizonStartTime = System.currentTimeMillis();
+                    long timeSpent = horizonStartTime - mStartTime;
+                    long timeRemaining = mThinkTime - timeSpent - 250;
+                    if(timeRemaining > estimatedTimeToDepth(3)) horizonDepth = 3;
+                    else horizonDepth = 2;
+
 
                     // Do an extension search on the best known moves.
                     getTreeRoot().getBranches().sort((o1, o2) -> {
