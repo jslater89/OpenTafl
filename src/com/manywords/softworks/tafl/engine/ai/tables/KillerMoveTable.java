@@ -11,7 +11,7 @@ import java.util.List;
 public class KillerMoveTable {
     private MoveRecord[][] killers;
     private final int maxDepth;
-    private final int killersToKeep;
+    public final int killersToKeep;
 
     public KillerMoveTable(int maxDepth, int killersToKeep) {
         killers = new MoveRecord[maxDepth][killersToKeep];
