@@ -231,6 +231,25 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 10. VERSION HISTORY -----------------------------------------------------------
+v0.4.3.4pre (released 08/22/16):
+- More AI improvements
+	- Fix search bugs with the newly-implemented post-main-search searches
+	- AI can now play out repetitions correctly
+		- Although it's hard to say if this is an improvement, because
+		  v0.4.3.3pre will happily play to the end of a losing repetition, and
+		  so the strength comparison isn't exactly one-to-one
+		- It does still greatly outperform v0.3.3.0b, though
+	- Some minor speed improvements
+	- Still better time use planning
+
+v0.4.3.3pre (released 08/20/16):
+- AI improvements, first prerelease
+	- Fix some search bugs
+	- Implement killer move heuristic
+	- Better time use planning
+	- AI now uses its post-main-search time more productively
+	- AI can now play out repetitions
+
 
 v0.4.2.4b (released 08/16/16):
 - Fix some bugs with replays and annotations
