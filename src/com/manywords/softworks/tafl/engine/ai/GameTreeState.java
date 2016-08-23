@@ -63,11 +63,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public GameTreeState considerMove(Coord start, Coord end) {
         char toMove = getBoard().getOccupier(start);
         GameState nextGameState = moveTaflman(toMove, end);
-        mGame.advanceState(this, nextGameState, nextGameState.getBerserkingTaflman() == EMPTY, nextGameState.getBerserkingTaflman(), true);
 
         // result should be good move except in cases like berserk,
         // where most moves on a berserk turn are illegal.
         if(nextGameState.getLastMoveResult() >= GOOD_MOVE) {
+            mGame.advanceState(this, nextGameState, nextGameState.getBerserkingTaflman() == EMPTY, nextGameState.getBerserkingTaflman(), true);
             GameTreeState nextState = new GameTreeState(workspace, nextGameState, this);
 
             return nextState;
