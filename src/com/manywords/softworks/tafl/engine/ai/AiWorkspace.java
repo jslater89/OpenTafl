@@ -10,6 +10,7 @@ import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.collections.RepetitionHashTable;
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.text.DecimalFormat;
@@ -92,7 +93,15 @@ public class AiWorkspace extends Game {
         mThreadPool = new AiThreadPool(Math.min(1, Runtime.getRuntime().availableProcessors() - 1));
 
         // If the transposition table is null, the size is different, or the rules are different, create a new transposition table.
-        if (mUseTranspositionTable > 0 && (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !startingGame.getRules().getOTRString().equals(lastRulesString))) {
+        if (mUseTranspositionTable > 0 && (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !RulesSerializer.rulesEqual(startingGame.getRules().getOTRString(), lastRulesString))) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Creating new transposition table");
+            if(transpositionTable == null) {
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Table was null");
+            }
+            else {
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Requested/size: " + transpositionTableSize + "/" + transpositionTable.size() + " Rules equal: " + RulesSerializer.rulesEqual(startingGame.getRules().getOTRString(), lastRulesString));
+            }
+
             if(mUseTranspositionTable == TRANSPOSITION_TABLE_ON) {
                 transpositionTable = new TranspositionTable(mTranspositionTableSize);
             }
@@ -100,7 +109,7 @@ public class AiWorkspace extends Game {
                 transpositionTable = new TranspositionTable(mTranspositionTableSize, true);
             }
         }
-        else {
+        else if (mUseTranspositionTable == TRANSPOSITION_TABLE_OFF) {
             transpositionTable = new TranspositionTable(0);
         }
 
