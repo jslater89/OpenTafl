@@ -322,8 +322,8 @@ public class AiWorkspace extends Game {
         if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec, desired " + desiredTime);
 
         //mThreadPool.start();
-        mMainMillis = (long) (mThinkTime * 0.8);
-        mExtensionMillis = (long) (mThinkTime * 0.2) - 250;
+        mMainMillis = (long) (mThinkTime * 0.85);
+        mExtensionMillis = (long) (mThinkTime * 0.15) - 250;
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
@@ -413,10 +413,13 @@ public class AiWorkspace extends Game {
             while (true) {
                 long timeSpent = continuationStart - mStartTime;
                 long timeRemaining = mMainMillis - timeSpent;
+                long timeRequired = estimatedTimeToDepth(continuationDepth - 1) / 2;
 
-                // Since we have to go through the whole tree again, if we don't have a ton
-                // of time, we should break and just go to horizon search.
-                if (timeRemaining < estimatedTimeToDepth(continuationDepth) / 2) {
+                // We have to go through the whole tree again in continuation search, but since we've
+                // already searched most of it, we'll get some nodes out of the search if we have
+                // even a little time remaining.
+                if (timeRemaining < timeRequired) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Skipping continuation search: " + timeRemaining + "msec left, " + timeRequired + " required");
                     break;
                 }
 
