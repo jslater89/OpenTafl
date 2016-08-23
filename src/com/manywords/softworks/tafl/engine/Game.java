@@ -109,8 +109,8 @@ public class Game {
         }
         mCurrentState = mHistory.get(mHistory.size() - 1);
 
-        // We do need to copy this: replays may not end up in the same state as the original game.
-        mRepetitions = new RepetitionHashTable(copyGame.mRepetitions);
+        // We need a new one here: the replay will play out the whole game in its copy, remember.
+        mRepetitions = new RepetitionHashTable();
     }
 
     // Two parts to the main zobrist array: the board array (space index, piece type)
