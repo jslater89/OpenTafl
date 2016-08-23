@@ -10,7 +10,6 @@ import com.manywords.softworks.tafl.engine.ai.tables.HistoryTable;
 import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
-import com.manywords.softworks.tafl.engine.collections.RepetitionHashTable;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
@@ -33,6 +32,7 @@ public class AiWorkspace extends Game {
     private TimeSpec mClockLength;
     private TimeSpec mTimeRemaining;
     private GameTreeState mStartingState;
+    private GameTreeState mPreviousStartingState;
 
     public long[] mAlphaCutoffs;
     public long[] mAlphaCutoffDistances;
@@ -408,11 +408,17 @@ public class AiWorkspace extends Game {
                 mStartingState.explore(depth, mMaxDepth, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, false);
                 long finish = System.currentTimeMillis();
 
-                if (!mNoTime) {
+
+                // If we aren't out of time, we can save this tree as a known good tree.
+                // Otherwise, we should restore the previous tree.
+                if (!mExtensionTime && !mNoTime) {
+                    mPreviousStartingState = mStartingState;
                     mLastTimeToDepth[depth] = finish - start;
                     mTimeToDepthAge[depth] = 0;
                 }
                 else {
+                    if(mPreviousStartingState != null) mStartingState = mPreviousStartingState;
+
                     for(int i = depth; i < mMaxDepth; i++) {
                         mTimeToDepthAge[i]++;
                     }
