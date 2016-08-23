@@ -65,6 +65,8 @@ public class AiWorkspace extends Game {
      * In milliseconds
      */
     private long mThinkTime = -1;
+    private long mMainMillis = -1;
+    private long mExtensionMillis = -1;
     private long mMaxThinkTime = -1;
 
     public boolean mNoTime = false;
@@ -283,12 +285,18 @@ public class AiWorkspace extends Game {
         }
     }
 
+    private long estimatedTimeToDepth(int depth) {
+        if(depth <= 1) return 0;
+        if(depth >= mLastTimeToDepth.length) return 3600 * 1000;
+
+        return (long) (mLastTimeToDepth[depth - 1] * (depth % 2 == 0 ? 3.5 : 19));
+    }
+
     private boolean canSearchToDepth(int depth) {
         long timeLeft = mStartTime + mThinkTime - System.currentTimeMillis();
-        long timeToPreviousDepth = mLastTimeToDepth[depth - 1];
 
         // We can start a deeper search
-        return mBenchmarkMode || !(isTimeCritical() || timeLeft < (timeToPreviousDepth * (depth % 2 == 0 ? 3.5 : 19)));
+        return mBenchmarkMode || !(isTimeCritical() || timeLeft < (estimatedTimeToDepth(depth)));
     }
 
     private boolean isTimeCritical() {
@@ -314,6 +322,8 @@ public class AiWorkspace extends Game {
         if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec, desired " + desiredTime);
 
         //mThreadPool.start();
+        mMainMillis = (long) (mThinkTime * 0.8);
+        mExtensionMillis = (long) (mThinkTime * 0.2) - 250;
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
@@ -322,7 +332,7 @@ public class AiWorkspace extends Game {
                     mExtensionTime = true;
                 }
             }
-        }, (int) (mThinkTime * 0.9));
+        }, mMainMillis);
 
         t.schedule(new TimerTask() {
             @Override
@@ -331,7 +341,7 @@ public class AiWorkspace extends Game {
                     mNoTime = true;
                 };
             }
-        }, mThinkTime - (Math.min((int) (mThinkTime * 0.05), 250))); // save 1/4 second or 5%, whichever is less
+        }, mThinkTime - 250);
 
         boolean firstExtension = true;
         boolean firstHorizon = true;
@@ -399,11 +409,21 @@ public class AiWorkspace extends Game {
 
         continuationDepth = deepestSearch;
         if(mUseContinuationSearch) {
-            long start = System.currentTimeMillis();
+            long continuationStart = System.currentTimeMillis();
             while (true) {
+                long timeSpent = continuationStart - mStartTime;
+                long timeRemaining = mMainMillis - timeSpent;
+
+                // Since we have to go through the whole tree again, if we don't have a ton
+                // of time, we should break and just go to horizon search.
+                if (timeRemaining < estimatedTimeToDepth(continuationDepth) / 2) {
+                    break;
+                }
+
                 if (isTimeCritical() || mNoTime || mExtensionTime) {
                     break;
-                } else if (firstExtension) {
+                }
+                else if (firstExtension) {
                     firstExtension = false;
                     if (chatty && mUiCallback != null) {
                         mUiCallback.statusText("Running continuation search to fill time...");
@@ -421,10 +441,10 @@ public class AiWorkspace extends Game {
                 if (continuationDepth > deepestSearch) deepestSearch = continuationDepth;
                 continuationDepth++;
             }
-            long finish = System.currentTimeMillis();
+            long continuationEnd = System.currentTimeMillis();
 
-            double timeTaken = (finish - start) / 1000d;
-            if (chatty && mUiCallback != null) {
+            double timeTaken = (continuationEnd - continuationStart) / 1000d;
+            if (chatty && timeTaken > 0.5 && mUiCallback != null) {
                 mUiCallback.statusText("Continuation searches took " + timeTaken + " sec");
             }
 
