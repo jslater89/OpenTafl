@@ -95,21 +95,7 @@ public class GameTreeNodeMethods {
         }
 
         if(bestMove != null && bestMove.getValue() == Evaluator.NO_VALUE) {
-            System.out.println(bestMove);
-            List<GameTreeNode> path = new ArrayList<>();
-
-            GameTreeNode parent = bestMove.getParentNode();
-            while(parent != null) {
-                path.add(parent);
-                parent = parent.getParentNode();
-            }
-
-            System.out.println(path);
-
-            System.out.println(bestMove.getDepth());
-            System.out.println(bestMove.getBranches().size());
-            System.out.println(bestMove.getValue());
-
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Chose an unvalued node as the best move!");
             throw new IllegalStateException();
         }
 
