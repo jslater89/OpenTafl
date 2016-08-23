@@ -708,12 +708,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o1, o2ChangeTurn);
                 int o2Rating = AiWorkspace.transpositionTable.getValue(o2Zobrist, currentMaxDepth - mDepth, mGameLength);
 
-                if(isMaximizingNode()) {
-                    return o2Rating - o1Rating;
-                }
-                else {
-                    return o1Rating - o2Rating;
-                }
+                return o1Rating - o2Rating;
+
             });
 
             successorMoves.removeAll(killerMoves);
@@ -726,6 +722,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
             sortedSuccessors.addAll(capturingMoves);
             sortedSuccessors.addAll(transpositionMoves);
             sortedSuccessors.addAll(successorMoves);
+
+            Collections.reverse(sortedSuccessors);
 
             return sortedSuccessors;
         }
