@@ -648,6 +648,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             List<MoveRecord> sortedSuccessors = new ArrayList<>(successorMoves.size());
             List<MoveRecord> historyMoves = new ArrayList<>(successorMoves.size());
 
+            // Get the moves of various sorts of interest
             for(MoveRecord m : successorMoves) {
                 if(AiWorkspace.killerMoveTable.rateMove(mDepth, m) > 0) killerMoves.add(m);
                 else if(workspace.isHistoryTableAllowed()) {
@@ -665,6 +666,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     if(transpositionTableRating != Evaluator.NO_VALUE) transpositionMoves.add(m);
                 }
             }
+
+            // Remove the interesting moves and sort them
+            successorMoves.removeAll(killerMoves);
+            successorMoves.removeAll(capturingMoves);
+            successorMoves.removeAll(historyMoves);
+            successorMoves.removeAll(transpositionMoves);
 
             historyMoves.sort((o1, o2) -> {
                 int o1HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o1);
@@ -690,15 +697,17 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 }
             });
 
-            successorMoves.removeAll(killerMoves);
-            successorMoves.removeAll(capturingMoves);
-            successorMoves.removeAll(historyMoves);
-            successorMoves.removeAll(transpositionMoves);
 
+            List<MoveRecord> topHalfTranspositions = transpositionMoves.subList(0, transpositionMoves.size() / 2);
+            List<MoveRecord> bottomHalfTranspositions = transpositionMoves.subList(transpositionMoves.size() / 2, transpositionMoves.size());
+
+
+            // Add them in sorted order
             sortedSuccessors.addAll(killerMoves);
-            sortedSuccessors.addAll(capturingMoves);
-            sortedSuccessors.addAll(transpositionMoves);
             sortedSuccessors.addAll(historyMoves);
+            sortedSuccessors.addAll(topHalfTranspositions);
+            sortedSuccessors.addAll(capturingMoves);
+            sortedSuccessors.addAll(bottomHalfTranspositions);
             sortedSuccessors.addAll(successorMoves);
 
             return sortedSuccessors;
