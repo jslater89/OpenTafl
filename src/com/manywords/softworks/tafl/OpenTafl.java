@@ -318,7 +318,7 @@ public class OpenTafl {
 
         try {
             logFile.createNewFile();
-            OpenTafl.logPrintln(SILENT, "OpenTafl log from " + new Date() + " on " + getComputerName());
+            OpenTafl.logPrintln(SILENT, "OpenTafl " + CURRENT_VERSION + " log from " + new Date() + " on " + getComputerName());
             OpenTafl.logPrintln(SILENT, "Java version: " + System.getProperty("java.version", "unknown version"));
         } catch (IOException e) {
             logPrintln(LogLevel.NORMAL, "Failed to create log file:" + e);
