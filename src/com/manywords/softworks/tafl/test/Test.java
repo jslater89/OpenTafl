@@ -100,21 +100,23 @@ public class Test {
 
         for (TaflTest test : tests) {
             try {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + "Running " + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": STARTING");
                 test.run();
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + " PASSED" + Ansi.UNDERLINE_OFF);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": PASSED");
 
             } catch (AssertionError e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + " FAILED" + Ansi.UNDERLINE_OFF);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": FAILED");
                 OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Assertion: " + e);
                 OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
                 System.exit(1);
             } catch (Exception e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + " CRASHED" + Ansi.UNDERLINE_OFF);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": CRASHED");
                 OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Exception: " + e);
                 OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
                 System.exit(1);
             }
+
+            System.out.println();
         }
 
         System.exit(0);
