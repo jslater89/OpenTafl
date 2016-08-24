@@ -195,11 +195,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         bestChild = tempWorkspace.getTreeRoot().getBestChild();
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "4. History table move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "4. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
-        localEquivalentMoves.retainAll(equivalentMoves);
-        assert localEquivalentMoves.size() > 0;
-        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
-        }
+        assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //5. CONTINUATION+HORIZON SEARCHES -----------------------------------------------------------------------------
         AiWorkspace workspaceContinuations = new AiWorkspace(this, g, g.getCurrentState(), 5);
@@ -226,11 +222,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         bestChild = tempWorkspace.getTreeRoot().getBestChild();
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. Continuation+horizon move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
-        localEquivalentMoves.retainAll(equivalentMoves);
-        assert localEquivalentMoves.size() > 0;
-        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
-        }
+        assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //6. TRANSPOSITION SEARCH (FIXED DEPTH) ------------------------------------------------------------------------
         AiWorkspace workspaceTranspositionFixed = new AiWorkspace(this, g, g.getCurrentState(), 5);
@@ -257,11 +249,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         bestChild = tempWorkspace.getTreeRoot().getBestChild();
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "6. Exact transposition move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "6. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
-        localEquivalentMoves.retainAll(equivalentMoves);
-        assert localEquivalentMoves.size() > 0;
-        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
-        }
+        assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //7. TRANSPOSITION SEARCH (ANY DEPTH) --------------------------------------------------------------------------
         AiWorkspace workspaceTranspositionAny = new AiWorkspace(this, g, g.getCurrentState(), 5);
@@ -288,11 +276,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         bestChild = tempWorkspace.getTreeRoot().getBestChild();
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "7. Any transposition move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "7. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
-        localEquivalentMoves.retainAll(equivalentMoves);
-        assert localEquivalentMoves.size() > 0;
-        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
-        }
+        assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //8. ALL BUT ORDERING ------------------------------------------------------------------------------------------
         AiWorkspace workspaceAllButOrdering = new AiWorkspace(this, g, g.getCurrentState(), 5);
@@ -319,11 +303,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         bestChild = tempWorkspace.getTreeRoot().getBestChild();
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "8. All but ordering move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "8. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
-        localEquivalentMoves.retainAll(equivalentMoves);
-        assert localEquivalentMoves.size() > 0;
-        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
-        }
+        assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //9. WORKSPACE EVERYTHING --------------------------------------------------------------------------------------
         AiWorkspace workspaceEverything = new AiWorkspace(this, g, g.getCurrentState(), 5);
@@ -350,11 +330,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         bestChild = tempWorkspace.getTreeRoot().getBestChild();
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "9. All features move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "9. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
-        localEquivalentMoves.retainAll(equivalentMoves);
-        assert localEquivalentMoves.size() > 0;
-        if(!isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves)) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "warn: best move not in equivalent moves");
-        }
+        assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
     }
 
     private boolean isMoveEquivalent(MoveRecord m, List<MoveRecord> testAgainst) {
