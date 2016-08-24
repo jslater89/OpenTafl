@@ -31,7 +31,6 @@ public class Test {
         tests.add(new AICertainKingCaptureTest());
         tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
         tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
-        tests.add(new AIMoveRepetitionTest());
 
         // Mechanics tests
         tests.add(new RepetitionHashTableTest());
@@ -92,7 +91,6 @@ public class Test {
 //        tests.add(new AICertainKingCaptureTest());
 //        tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
 //        tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
-//        tests.add(new AIMoveRepetitionTest());
 //
 //        // Tactics tests
 //        tests.add(new AITacticsEscapeTest());
