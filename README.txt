@@ -231,6 +231,28 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 10. VERSION HISTORY -----------------------------------------------------------
+v0.4.3.5pre (released 08/24/16):
+- AI improvements ongoing
+- Implement the history heuristic
+	- Essentially, the history heuristic says, "Moves which have been good
+	  anywhere in the search at any time are likely to be good here, provided
+	  they are legal"
+	- Surprisingly, this works very well: with the history heuristic on, the AI
+	  searches at least 20-30% fewer nodes because of better move ordering
+- Further time usage improvements
+	- OpenTafl should now bail out of the main search earlier, if it doesn't
+	  expect to finish the next deepening step with the time it has remaining
+	- This leaves it more time to do interesting extensions
+	- Also, it makes the tree search much more correct: the previous behavior
+	  would frequently miss non-obvious moves
+- Better move ordering algorithm
+	- Rather than sort the whole list, arrange the list by category: currently
+	  killer moves, capturing moves, transposition moves, history moves, and
+	  all remaining moves
+	- Subject to change as I do benchmarking for nodes-to-depth
+		- This is exciting: algorithmic improvements tend to yield much better
+		  results as far as improving search depths than does pure optimization
+
 v0.4.3.4pre (released 08/22/16):
 - More AI improvements
 	- Fix search bugs with the newly-implemented post-main-search searches
