@@ -450,8 +450,11 @@ public class ReplayGame {
     public String getCommentedHistoryString(boolean truncateRootMoves) {
         return getHistoryString(mGame.getHistory(), null, truncateRootMoves, true);
     }
-
     public static String getHistoryString(List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments) {
+        return getHistoryString(history, highlightAddress, truncateRootMoves, includeComments, "");
+    }
+
+    public static String getHistoryString(List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments, String prefix) {
         StringBuilder resultString = new StringBuilder();
         int historyPosition = 0;
         ReplayGameState state = (ReplayGameState) history.get(historyPosition);
@@ -468,7 +471,7 @@ public class ReplayGame {
                 }
             }
             else {
-                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments);
+                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments, prefix);
 
                 currentTurn.clear();
                 currentTurnVariations.clear();
@@ -481,7 +484,7 @@ public class ReplayGame {
 
             historyPosition += 1;
             if(historyPosition == history.size()) {
-                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments);
+                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments, prefix);
                 break;
             }
             state = (ReplayGameState) history.get(historyPosition);
@@ -496,7 +499,7 @@ public class ReplayGame {
         return resultString.toString();
     }
 
-    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, MoveAddress highlightAddress, StringBuilder resultString, boolean truncateRootMoves, boolean includeComments) {
+    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, MoveAddress highlightAddress, StringBuilder resultString, boolean truncateRootMoves, boolean includeComments, String prefix) {
         boolean first = true;
         boolean emptyTurn = false;
 
@@ -515,10 +518,12 @@ public class ReplayGame {
                 a.getLastElement().moveIndex = 0;
 
                 if(truncateRootMoves && a.getElements().size() == 1) {
+                    if(!includeComments) resultString.append(prefix);
                     resultString.append(a.getLastElement().rootIndex);
                     resultString.append(".");
                 }
                 else {
+                    if(!includeComments) resultString.append(prefix);
                     resultString.append(a);
                 }
 
@@ -547,10 +552,10 @@ public class ReplayGame {
                 resultString.append(" ");
             }
         }
-        resultString.append("\n");
+        if(!first) resultString.append("\n");
 
         // 2. Comments, if necessary
-        if(includeComments && !emptyTurn) {
+        if(includeComments && !emptyTurn && !first) {
             first = true;
             resultString.append("[");
 
@@ -581,7 +586,9 @@ public class ReplayGame {
         for(Variation v : currentTurnVariations) {
             List<GameState> variationStates = new ArrayList<>();
             variationStates.addAll(v.getStates());
-            resultString.append(getHistoryString(variationStates, highlightAddress, truncateRootMoves, includeComments));
+            resultString.append(getHistoryString(variationStates, highlightAddress, truncateRootMoves, includeComments, prefix + "   "));
+            if(!includeComments) resultString.append("\n");
+
         }
     }
 
