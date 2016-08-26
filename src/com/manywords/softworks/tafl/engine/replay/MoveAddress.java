@@ -151,6 +151,9 @@ public class MoveAddress {
     }
 
     public MoveAddress increment(ReplayGame game, ReplayGameState current) {
+        // If this is the starting state ("0a"), return "1a"
+        if(this.equals(newRootAddress())) return increment(true);
+
         MoveAddress other;
         Element inQuestion = mElements.get(mElements.size() - 1);
 
@@ -228,8 +231,14 @@ public class MoveAddress {
         return newSibling;
     }
 
-    public MoveAddress nextVariation(int index) {
+    public MoveAddress nextVariation(ReplayGame game, ReplayGameState current, int variationIndex) {
+        MoveAddress variationRoot = increment(game, current);
+        return variationRoot.nextVariation(variationIndex);
+    }
+
+    private MoveAddress nextVariation(int index) {
         MoveAddress other = new MoveAddress(this);
+
         Element newVariation = new Element();
         newVariation.rootIndex = index;
         newVariation.moveIndex = -1;
@@ -242,15 +251,10 @@ public class MoveAddress {
     // e.g. 1a.1.1b.1.2a.1.2b...
     public MoveAddress firstChild(ReplayGame game, ReplayGameState state) {
         MoveAddress address = state.getParent().getMoveAddress();
-        if(address.getElements().size() == 1) {
-            return firstChild(1, address.getLastElement().moveIndex);
-        }
-        else {
-            MoveAddress lastElement = new MoveAddress();
-            lastElement.mElements.add(address.getLastElement());
-            MoveAddress incremented = lastElement.increment(game, state);
-            return firstChild(1, incremented.getLastElement().moveIndex);
-        }
+        MoveAddress lastElement = new MoveAddress();
+        lastElement.mElements.add(address.getLastElement());
+        MoveAddress incremented = lastElement.increment(game, state);
+        return firstChild(1, incremented.getLastElement().moveIndex);
     }
 
     public MoveAddress firstChild(int rootIndex, int moveIndex) {
@@ -272,7 +276,7 @@ public class MoveAddress {
 
     public static MoveAddress newRootAddress() {
         Element e = new Element();
-        e.rootIndex = 1;
+        e.rootIndex = 0;
         e.moveIndex = 0;
 
         MoveAddress a = new MoveAddress();

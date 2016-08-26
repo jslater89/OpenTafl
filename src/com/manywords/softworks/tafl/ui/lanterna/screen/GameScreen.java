@@ -486,8 +486,22 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void handleInGameCommand(String command) {
+            if(command.startsWith("dumptree")) {
+                AiWorkspace w = GameTreeState.workspace;
+                if(w != null) {
+                    w.getTreeRoot().printTree("");
+                }
 
-            if(command.startsWith("dump ")) {
+                return;
+            }
+            else if(command.startsWith("dumphistory")) {
+                if(mReplay != null) {
+                    mReplay.dumpHistory();
+                }
+
+                return;
+            }
+            else if(command.startsWith("dumpeval")) {
                 ExternalEnginePlayer analysisPlayer = mCommandEngine.getAnalysisPlayer();
                 if(analysisPlayer != null) {
                     String[] parts = command.split(" ");
@@ -521,14 +535,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 else {
                     OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "No AI workspace");
                 }
-                return;
-            }
-            if(command.startsWith("dumptree")) {
-                AiWorkspace w = GameTreeState.workspace;
-                if(w != null) {
-                    w.getTreeRoot().printTree("");
-                }
-
                 return;
             }
 

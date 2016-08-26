@@ -56,15 +56,21 @@ public class ReplayGame {
 
         }
 
+        dumpHistory();
+
         variationsToPlay.sort((o1, o2) -> o1.address.getElements().size() - o2.address.getElements().size());
 
         for(GameSerializer.VariationContainer container : variationsToPlay) {
+            System.out.println("Looking for variation: " + container.address);
             Variation v = getVariationByAddress(new MoveAddress(container.address.getAllRootElements()));
+            System.out.println("Found: " + v);
 
             ReplayGameState rootForVariation;
             if(v == null) {
                 MoveAddress rootStateAddress = new MoveAddress(container.address.getElementsBefore(container.address.getElements().size() - 2));
                 rootForVariation = getStateByAddress(rootStateAddress);
+                rootForVariation = rootForVariation.getParent();
+                System.out.println("Found a root state: " + rootForVariation);
             }
             else {
                 // make a new variation off of the last thing in this variation.
@@ -82,6 +88,7 @@ public class ReplayGame {
                         OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Failed to apply move: " + m + " with result " + state.getLastMoveResult());
                         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Variation container address: " + container.address);
                         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Root state address: " + inVariation.getMoveAddress());
+                        break;
                     }
                 }
             }
@@ -396,7 +403,10 @@ public class ReplayGame {
     public Variation getVariationByAddress(MoveAddress moveAddress) {
         MoveAddress prefix = new MoveAddress(moveAddress.getAllRootElements());
 
+        System.out.println("Looking for variation " + moveAddress + " with prefix " + prefix);
         ReplayGameState state = getStateByAddress(prefix);
+        state = state.getParent();
+        System.out.println("Found state with address " + state.getMoveAddress() + " and variations " + state.getVariations());
 
         if(state != null) {
             if(state.getVariations().size() > (moveAddress.getLastElement().rootIndex - 1)) {
@@ -454,7 +464,9 @@ public class ReplayGame {
             // Get all states in a given turn.
             if(state.getMoveAddress().getLastElement().rootIndex == currentTurnIndex) {
                 currentTurn.add(state);
-                currentTurnVariations.addAll(state.getVariations());
+                if(state.getParent() != null && (state.getParent().getMoveAddress().getElements().size() == state.getMoveAddress().getElements().size())) {
+                    currentTurnVariations.addAll(state.getParent().getVariations());
+                }
             }
             else {
                 finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments);
@@ -463,7 +475,9 @@ public class ReplayGame {
                 currentTurnVariations.clear();
                 currentTurnIndex = state.getMoveAddress().getLastElement().rootIndex;
                 currentTurn.add(state);
-                currentTurnVariations.addAll(state.getVariations());
+                if(state.getParent() != null && (state.getParent().getMoveAddress().getElements().size() == state.getMoveAddress().getElements().size())) {
+                    currentTurnVariations.addAll(state.getParent().getVariations());
+                }
             }
 
             historyPosition += 1;
@@ -490,7 +504,7 @@ public class ReplayGame {
         // 1. States in the current turn
         for(ReplayGameState turnState : currentTurn) {
             if(first) {
-                if(turnState.getMoveAddress().getElements().size() == 1 && turnState.getExitingMove() == null) {
+                if(turnState.getEnteringMove() == null) {
                     emptyTurn = true;
                     break;
                 }
@@ -521,17 +535,9 @@ public class ReplayGame {
             }
 
             boolean appended = false;
-            if(turnState.getMoveAddress().getElements().size() == 1) {
-                if (turnState.getExitingMove() != null) {
-                    resultString.append(turnState.getExitingMove());
-                    appended = true;
-                }
-            }
-            else {
-                if (turnState.getEnteringMove() != null) {
-                    resultString.append(turnState.getEnteringMove());
-                    appended = true;
-                }
+            if (turnState.getEnteringMove() != null) {
+                resultString.append(turnState.getEnteringMove());
+                appended = true;
             }
 
             if(turnState.getMoveAddress().equals(highlightAddress)) {
@@ -551,11 +557,7 @@ public class ReplayGame {
 
             for(ReplayGameState turnState : currentTurn) {
                 DetailedMoveRecord moveOfInterest = null;
-                if (turnState.getMoveAddress().getElements().size() == 1) {
-                    if (turnState.getExitingMove() != null) moveOfInterest = (DetailedMoveRecord) turnState.getExitingMove();
-                } else {
-                    if (turnState.getEnteringMove() != null) moveOfInterest = (DetailedMoveRecord) turnState.getEnteringMove();
-                }
+                if (turnState.getEnteringMove() != null) moveOfInterest = (DetailedMoveRecord) turnState.getEnteringMove();
 
                 if(moveOfInterest != null) {
 

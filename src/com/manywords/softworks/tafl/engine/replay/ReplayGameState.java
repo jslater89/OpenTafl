@@ -169,16 +169,20 @@ public class ReplayGameState extends GameState {
                 }
             }
             else {
-                Variation v = new Variation(this, mMoveAddress.nextVariation(mVariations.size() + 1), nextState);
+                Variation v = new Variation(this, mMoveAddress.nextVariation(mReplayGame, this, mVariations.size() + 1), nextState);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Making new variation from address " + getMoveAddress() + " with address: " + v.getAddress());
                 mVariations.add(v);
                 nextState.setVariationParent(this, v);
             }
+
+            if(move.isDetailed()) {
+                // Preserve comments
+                ((DetailedMoveRecord) nextState.getEnteringMove()).setComment(((DetailedMoveRecord) move).getComment());
+            }
         }
-
-
-        if(move.isDetailed()) {
-            // Preserve comments
-            ((DetailedMoveRecord) nextState.getEnteringMove()).setComment(((DetailedMoveRecord) move).getComment());
+        else {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Failed to apply move " + move);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Result: " + nextState.getLastMoveResult() + " " + GameState.getStringForMoveResult(nextState.getLastMoveResult()));
         }
 
         return nextState;
