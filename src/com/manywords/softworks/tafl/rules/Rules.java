@@ -8,6 +8,11 @@ public abstract class Rules {
     public static final int TAFLMAN_TYPE_COUNT = Taflman.ALL_TAFLMAN_TYPES.length;
 
     public final int boardSize;
+
+    /*
+        This information is given in two ways 
+     */
+    private SpaceType[] mSpaceTypes;
     private Set<Coord> mCenterSpaces = new LinkedHashSet<Coord>();
     private Set<Coord> mCornerSpaces = new LinkedHashSet<Coord>();
     private Set<Coord> mAttackerForts = new LinkedHashSet<Coord>();
@@ -43,6 +48,12 @@ public abstract class Rules {
         board.setRules(this);
         board.setupTaflmen(attackers, defenders);
         boardSize = board.getBoardDimension();
+        mSpaceTypes = new SpaceType[boardSize * boardSize];
+
+        for(int i = 0; i < mSpaceTypes.length; i++) {
+            mSpaceTypes[i] = SpaceType.NONE;
+        }
+
         setupSpaceGroups(boardSize);
     }
 
@@ -94,38 +105,80 @@ public abstract class Rules {
 
     /**
      * Set the spaces considered as center spaces.
-     * @param c
+     * @param coords
      */
-    public void setCenterSpaces(List<Coord> c) {
+    public void setCenterSpaces(List<Coord> coords) {
+        for(Coord c : mCenterSpaces) {
+            mSpaceTypes[Coord.getIndex(boardSize, c)] = SpaceType.NONE;
+        }
+
         mCenterSpaces.clear();
-        mCenterSpaces.addAll(c);
+        mCenterSpaces.addAll(coords);
+
+        for(Coord c : mCenterSpaces) {
+            mSpaceTypes[Coord.getIndex(boardSize, c)] = SpaceType.CENTER;
+        }
     }
 
     /**
      * Set the spaces considered as corner spaces.
-     * @param c
+     * @param coords
      */
-    public void setCornerSpaces(List<Coord> c) {
+    public void setCornerSpaces(List<Coord> coords) {
+        for(Coord c : mCornerSpaces) {
+            mSpaceTypes[Coord.getIndex(boardSize, c)] = SpaceType.NONE;
+        }
+
         mCornerSpaces.clear();
-        mCornerSpaces.addAll(c);
+        mCornerSpaces.addAll(coords);
+
+        for(Coord c : mCornerSpaces) {
+            mSpaceTypes[Coord.getIndex(boardSize, c)] = SpaceType.CORNER;
+        }
     }
 
     /**
      * Set the spaces considered as attacker fortresses.
-     * @param c
+     * @param coord
      */
-    public void setAttackerForts(List<Coord> c) {
+    public void setAttackerForts(List<Coord> coord) {
+        for(Coord c : mAttackerForts) {
+            mSpaceTypes[Coord.getIndex(boardSize, c)] = SpaceType.NONE;
+        }
+
         mAttackerForts.clear();
-        mAttackerForts.addAll(c);
+        mAttackerForts.addAll(coord);
+
+        for(Coord c : mAttackerForts) {
+            mSpaceTypes[Coord.getIndex(boardSize, c)] = SpaceType.ATTACKER_FORT;
+        }
     }
 
     /**
      * Set the spaces considered as defender fortresses.
-     * @param c
+     * @param coords
      */
-    public void setDefenderForts(List<Coord> c) {
+    public void setDefenderForts(List<Coord> coords) {
+        for(Coord c : mDefenderForts) {
+            mSpaceTypes[Coord.getIndex(boardSize, c)] = SpaceType.NONE;
+        }
+
         mDefenderForts.clear();
-        mDefenderForts.addAll(c);
+        mDefenderForts.addAll(coords);
+
+        for(Coord c : mDefenderForts) {
+            mSpaceTypes[Coord.getIndex(boardSize, c)] = SpaceType.DEFENDER_FORT;
+        }
+    }
+
+
+    /**
+     * Return the space type for the given coord.
+     * @param c
+     * @return
+     */
+    public SpaceType getSpaceTypeFor(Coord c) {
+        return mSpaceTypes[Coord.getIndex(boardSize, c)];
     }
 
     /**
@@ -134,7 +187,7 @@ public abstract class Rules {
      * @return
      */
     public boolean isCenterSpace(Coord c) {
-        return mCenterSpaces.contains(c);
+        return mSpaceTypes[Coord.getIndex(boardSize, c)] == SpaceType.CENTER;
     }
 
     /**
@@ -143,7 +196,7 @@ public abstract class Rules {
      * @return
      */
     public boolean isCornerSpace(Coord c) {
-        return mCornerSpaces.contains(c);
+        return mSpaceTypes[Coord.getIndex(boardSize, c)] == SpaceType.CORNER;
     }
 
     /**
@@ -152,7 +205,7 @@ public abstract class Rules {
      * @return
      */
     public boolean isAttackerFort(Coord c) {
-        return mAttackerForts.contains(c);
+        return mSpaceTypes[Coord.getIndex(boardSize, c)] == SpaceType.ATTACKER_FORT;
     }
 
     /**
@@ -161,7 +214,7 @@ public abstract class Rules {
      * @return
      */
     public boolean isDefenderFort(Coord c) {
-        return mDefenderForts.contains(c);
+        return mSpaceTypes[Coord.getIndex(boardSize, c)] == SpaceType.DEFENDER_FORT;
     }
 
     public Set<Coord> getCenterSpaces() {

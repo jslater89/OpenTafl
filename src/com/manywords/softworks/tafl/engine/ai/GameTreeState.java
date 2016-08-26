@@ -568,4 +568,40 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public void revalueParent(int depthOfObservation) {
         GameTreeNodeMethods.revalueParent(this, depthOfObservation);
     }
+    
+
+    public void printPathEvaluations() {
+        for(int i = 0; i < getBranches().size(); i++) {
+            List<GameTreeNode> path = getNthPath(i);
+
+            if(path.size() > 0) {
+                System.out.println(path.get(0).getEnteringMove() + " (d" + path.get(0).getDepth() + ") " + "(v" + path.get(0).getVictory() + ") " + path.get(0).getValue());
+
+                for(int j = 1; j < path.size(); j++) {
+                    System.out.println("\t" + path.get(j).getEnteringMove() + " (d" + path.get(j).getDepth() + ")" + " (s" + path.get(j-1).getBranches().size() + ") " + "(" + path.get(j).getVictory() + ") " + path.get(j).getValue());
+                }
+            }
+        }
+    }
+
+    public void printTree(String prefix) {
+        if(getParentNode() == null) {
+            System.out.println(prefix + "Root " + (isMaximizingNode() ? "(+) " : "(-) ") + "(d" + getDepth() + ")" + " (s0) " + "(w" + getVictory() + ") " + "(v" + getValue() + ") " + "(a" + getAlpha() + ") " + "(b" + getBeta() + ") ");
+        }
+        else {
+            System.out.println(prefix + getEnteringMove() + (isMaximizingNode() ? " (+) " : " (-) ") + "(d" + getDepth() + ")" + " (s" + getParentNode().getBranches().size() + ") " + "(w" + getVictory() + ") " + "(v" + getValue() + ") " + "(a" + getAlpha() + ") " + "(b" + getBeta() + ") ");
+        }
+
+        for(int i = 0; i < getBranches().size(); i++) {
+            GameTreeNode n = getNthChild(i);
+            GameTreeState s;
+            if(n instanceof MinimalGameTreeNode) {
+                s = GameTreeState.getStateForMinimalNode(workspace.getTreeRoot(), (MinimalGameTreeNode) n);
+            }
+            else {
+                s = (GameTreeState) getNthChild(i);
+            }
+            s.printTree(prefix + "\t");
+        }
+    }
 }

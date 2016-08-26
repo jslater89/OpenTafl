@@ -43,12 +43,12 @@ public class OpenTafl {
         SILENT
     }
 
-    public static final String CURRENT_VERSION = "v0.4.2.3b";
+    public static final String CURRENT_VERSION = "v0.4.2.4b";
     public static final int NETWORK_PROTOCOL_VERSION = 7;
 
     public static boolean devMode = false;
     public static LogLevel logLevel = LogLevel.NORMAL;
-    private static final int LOG_BUFFER_SIZE = 1024 * 64;
+    private static final int LOG_BUFFER_SIZE = 1024 * 32;
     private static final StringBuilder logBuffer = new StringBuilder(LOG_BUFFER_SIZE);
     private static File logFile;
 
@@ -224,23 +224,25 @@ public class OpenTafl {
     }
 
     private static void internalLogPrint(LogLevel messageLevel, String s) {
-        if (logLevel == LogLevel.CHATTY) {
-            // Incidental messages
-            System.out.print(s);
-            logBuffer.append(s);
-        } else if (logLevel == LogLevel.NORMAL && messageLevel != LogLevel.CHATTY) {
-            // Normal messages
-            System.out.print(s);
-            logBuffer.append(s);
-        } else if (messageLevel == SILENT) {
-            // Critical errors which should always be displayed
-            System.out.print(s);
-            logBuffer.append(s);
-        }
+        synchronized (logBuffer) {
+            if (logLevel == LogLevel.CHATTY) {
+                // Incidental messages
+                System.out.print(s);
+                logBuffer.append(s);
+            } else if (logLevel == LogLevel.NORMAL && messageLevel != LogLevel.CHATTY) {
+                // Normal messages
+                System.out.print(s);
+                logBuffer.append(s);
+            } else if (messageLevel == SILENT) {
+                // Critical errors which should always be displayed
+                System.out.print(s);
+                logBuffer.append(s);
+            }
 
 
-        if(logBuffer.length() > (LOG_BUFFER_SIZE - 1024)) {
-            flushLog();
+            if (logBuffer.length() > (LOG_BUFFER_SIZE - 1024)) {
+                flushLog();
+            }
         }
     }
 
@@ -252,14 +254,14 @@ public class OpenTafl {
     }
 
     private static void flushLog() {
-        synchronized (logBuffer) {
             new Thread("LogSaveThread") {
                 @Override
                 public void run() {
-                    unsafeFlushLog();
+                    synchronized (logBuffer) {
+                        unsafeFlushLog();
+                    }
                 }
             }.start();
-        }
     }
 
     private static void unsafeFlushLog() {
@@ -299,7 +301,10 @@ public class OpenTafl {
             logPrintln(SILENT, "Exception: " + e);
             logStackTrace(SILENT, e);
             flushLog();
+
+            System.exit(1);
         });
+
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

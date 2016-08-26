@@ -105,20 +105,7 @@ public abstract class BoardImpl extends Board {
 
     @Override
     public SpaceType getSpaceTypeFor(Coord space) {
-        if (getRules().isCenterSpace(space)) {
-            return SpaceType.CENTER;
-        }
-        if (getRules().isCornerSpace(space)) {
-            return SpaceType.CORNER;
-        }
-        if (getRules().isAttackerFort(space)) {
-            return SpaceType.ATTACKER_FORT;
-        }
-        if (getRules().isDefenderFort(space)) {
-            return SpaceType.DEFENDER_FORT;
-        }
-
-        return SpaceType.NONE;
+        return getRules().getSpaceTypeFor(space);
     }
 
     @Override

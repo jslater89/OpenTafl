@@ -29,8 +29,8 @@ public class RulesSerializerConsistencyTest extends TaflTest {
         rules = RulesSerializer.loadRulesRecord(rules1);
         rules2 = rules.getOTRString();
 
-        System.out.println(rules1);
-        System.out.println(rules2);
+//        System.out.println(rules1);
+//        System.out.println(rules2);
         assert RulesSerializer.rulesEqual(rules1, rules2);
         assert rules.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[TaflmanCodes.K]) == 1;
         assert rules.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[TaflmanCodes.t]) == -1;

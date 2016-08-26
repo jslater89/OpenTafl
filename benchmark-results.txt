@@ -1,4 +1,26 @@
-1. v0.4.0.0.1 pre
+1. v0.3.2.2b
+
+	Java version: 1.8.0_101
+	Brandub 7: 2504104 at 83470.13333333333/sec
+	Tablut 9: 2411316 at 80377.2/sec
+	Copenhagen 11: 1437063 at 23951.05/sec
+	Tablut 15: 1992888 at 33214.8/sec
+	************************
+	Final results: 8345371 at 46363.17222222222/sec
+
+	OpenTafl log from Sun Jul 31 13:00:12 EDT 2016 on sif
+	Java version: 1.8.0_101
+	Brandub 7: 2834023 at 94467.43333333333/sec
+	Tablut 9: 2126969 at 70898.96666666666/sec
+	Copenhagen 11: 1424476 at 23741.266666666666/sec
+	Tablut 15: 1912358 at 31872.633333333335/sec
+	************************
+	Final results: 8297826 at 46099.03333333333/sec
+
+	************************
+	Average: 8321598.5 at 46231/sec
+
+2. v0.4.0.0.1 pre
 
 	OpenTafl log from Sun Jul 31 12:45:16 EDT 2016 on sif
 	Java version: 1.8.0_101
@@ -21,24 +43,48 @@
 	************************
 	Average: 8101634 at 45008.5/sec
 
-2. v0.3.2.2b
+3. v0.4.3.0 pre
 
+	OpenTafl log from Tue Aug 16 13:29:44 EDT 2016 on sif
 	Java version: 1.8.0_101
-	Brandub 7: 2504104 at 83470.13333333333/sec
-	Tablut 9: 2411316 at 80377.2/sec
-	Copenhagen 11: 1437063 at 23951.05/sec
-	Tablut 15: 1992888 at 33214.8/sec
+	Brandub 7: 2708394 at 90279.8/sec
+	Tablut 9: 1955004 at 65166.8/sec
+	Copenhagen 11: 1579264 at 26321.066666666666/sec
+	Tablut 15: 2091177 at 34852.95/sec
 	************************
-	Final results: 8345371 at 46363.17222222222/sec
+	Final results: 8333839 at 46299.10555555556/sec
 
-	OpenTafl log from Sun Jul 31 13:00:12 EDT 2016 on sif
+	OpenTafl log from Tue Aug 16 13:33:03 EDT 2016 on sif
 	Java version: 1.8.0_101
-	Brandub 7: 2834023 at 94467.43333333333/sec
-	Tablut 9: 2126969 at 70898.96666666666/sec
-	Copenhagen 11: 1424476 at 23741.266666666666/sec
-	Tablut 15: 1912358 at 31872.633333333335/sec
+	Brandub 7: 2799977 at 93332.56666666667/sec
+	Tablut 9: 2345108 at 78170.26666666666/sec
+	Copenhagen 11: 1606133 at 26768.883333333335/sec
+	Tablut 15: 2078862 at 34647.7/sec
 	************************
-	Final results: 8297826 at 46099.03333333333/sec
+	Final results: 8830080 at 49056.0/sec
 
 	************************
-	Average: 8321598.5 at 46231/sec
+	Average: 8581934 at 47677.4/sec
+
+4. v0.4.3.0 pre2
+
+	OpenTafl log from Tue Aug 16 14:19:25 EDT 2016 on sif
+	Java version: 1.8.0_101
+	Brandub 7: 2854015 at 95133.83333333333/sec
+	Tablut 9: 2536600 at 84553.33333333333/sec
+	Copenhagen 11: 1833573 at 30559.55/sec
+	Tablut 15: 2356171 at 39269.51666666667/sec
+	************************
+	Final results: 9580359 at 53224.21666666667/sec
+
+	OpenTafl log from Tue Aug 16 14:23:47 EDT 2016 on sif
+	Java version: 1.8.0_101
+	Brandub 7: 2786037 at 92867.9/sec
+	Tablut 9: 2515674 at 83855.8/sec
+	Copenhagen 11: 1716880 at 28614.666666666668/sec
+	Tablut 15: 2363386 at 39389.76666666667/sec
+	************************
+	Final results: 9381977 at 52122.09444444445/sec
+
+	************************
+	Average: 9481168 at 52673.1/sec

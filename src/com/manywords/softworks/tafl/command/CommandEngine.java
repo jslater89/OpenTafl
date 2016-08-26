@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.command;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
@@ -67,11 +68,23 @@ public class CommandEngine {
     public void enterReplay(ReplayGame rg) {
         mMode = UiCallback.Mode.REPLAY;
         mReplay = rg;
+
+        Game g = mReplay.getGame();
+
+        g.setUiCallback(mPrimaryUiCallback);
+        if(mDummyAnalysisPlayer != null) {
+            mDummyAnalysisPlayer.setGame(g);
+        }
+
         callbackModeChange(UiCallback.Mode.REPLAY, rg);
     }
+
     public void leaveReplay() {
-        mReplay.prepareForGameStart();
         mMode = UiCallback.Mode.GAME;
+
+        if(mDummyAnalysisPlayer != null) {
+            mDummyAnalysisPlayer.setGame(mGame);
+        }
 
         callbackModeChange(UiCallback.Mode.GAME, mGame);
     }
@@ -82,6 +95,10 @@ public class CommandEngine {
         g.setUiCallback(mPrimaryUiCallback);
         mAttacker.setGame(g);
         mDefender.setGame(g);
+
+        if(mDummyAnalysisPlayer != null) {
+            mDummyAnalysisPlayer.setGame(g);
+        }
 
         callbackModeChange(UiCallback.Mode.GAME, g);
     }
@@ -382,7 +399,12 @@ public class CommandEngine {
                 return new CommandResult(Command.Type.ANALYZE, CommandResult.FAIL, "No analysis engine loaded", null);
             }
             else {
-                mAnalysisEngine.analyzePosition(a.moves, a.seconds, mGame.getCurrentState());
+                Game g = mGame;
+                if(mMode == UiCallback.Mode.REPLAY) {
+                    g = mReplay.getGame();
+                }
+
+                mAnalysisEngine.analyzePosition(a.moves, a.seconds, g.getCurrentState());
                 return new CommandResult(Command.Type.ANALYZE, CommandResult.SUCCESS, "", null);
             }
         }
@@ -492,11 +514,12 @@ public class CommandEngine {
             }
 
             Coord destination = mReplay.getCurrentState().getSpaceAt(v.to.x, v.to.y);
-            MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mGame.getCurrentState(), piece), destination);
+            MoveRecord record = new MoveRecord(Taflman.getCurrentSpace(mReplay.getCurrentState(), piece), destination);
 
             ReplayGameState result = mReplay.makeVariation(record);
             int moveResult = result.getLastMoveResult();
 
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Variation result: " + moveResult);
             if(moveResult < GameState.GOOD_MOVE) {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, GameState.getStringForMoveResult(moveResult), moveResult);
             }
