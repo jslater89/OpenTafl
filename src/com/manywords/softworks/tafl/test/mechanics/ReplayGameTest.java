@@ -88,7 +88,7 @@ public class ReplayGameTest extends TaflTest {
         assert parent != null;
 
         // Try creating a new variation
-        parent = rg.getStateByAddress(MoveAddress.parseAddress("1a"));
+        parent = rg.getStateByAddress(MoveAddress.newRootAddress());
         parent.makeVariation(new MoveRecord(Coord.get(5, 3), Coord.get(5, 2)));
 
         ReplayGameState child = rg.getStateByAddress(MoveAddress.parseAddress("1a.1.1a"));
@@ -109,7 +109,7 @@ public class ReplayGameTest extends TaflTest {
         assert result.getMoveAddress().equals(parent.getMoveAddress().increment(rg, result));
 
         // Try a variation off of 1a again
-        parent = rg.getStateByAddress(MoveAddress.parseAddress("1a"));
+        parent = rg.getStateByAddress(MoveAddress.newRootAddress());
         parent.makeVariation(new MoveRecord(Coord.get(3, 5), Coord.get(2, 5)));
 
         //parent.dumpTree();
@@ -129,7 +129,7 @@ public class ReplayGameTest extends TaflTest {
         assert child.getParent() == parent;
 
         //  Make a third variation!
-        parent = rg.getStateByAddress(MoveAddress.parseAddress("1a"));
+        parent = rg.getStateByAddress(MoveAddress.newRootAddress());
         parent.makeVariation(new MoveRecord(Coord.get(4, 4), Coord.get(3, 4)));
 
         ReplayGameState firstVariation = rg.getStateByAddress(MoveAddress.parseAddress("1a.1.1a"));
@@ -138,7 +138,7 @@ public class ReplayGameTest extends TaflTest {
         assert thirdVariation.getParent() == parent;
 
         // Delete variation 1a.2, and make sure that the variation formerly known as 3 is now known as 2.
-        parent.deleteVariation(MoveAddress.parseAddress("1a.2"));
+        assert rg.deleteVariation(MoveAddress.parseAddress("1a.2"));
 
         assert thirdVariation.getMoveAddress().equals(MoveAddress.parseAddress("1a.2.1a"));
 
@@ -171,7 +171,7 @@ public class ReplayGameTest extends TaflTest {
 
         //System.out.println();
 
-        parent.deleteVariation(MoveAddress.parseAddress("1a.2.1a.1."));
+        assert rg.deleteVariation(MoveAddress.parseAddress("1a.2.1a.1."));
 
         assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b"))) != null;
         //System.out.println(state.getEnteringMove());
@@ -184,12 +184,12 @@ public class ReplayGameTest extends TaflTest {
         //System.out.println();
 
         // Delete a canonical child, relocating the first variation to canonical child-dom
-        parent.deleteVariation(MoveAddress.parseAddress("1a.2.1b"));
+        rg.deleteVariation(MoveAddress.parseAddress("1a.2.1b"));
 
         state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1b"));
         assert state != null;
 
-        //rg.dumpHistory();
+        rg.dumpHistory();
 
         assert (state = rg.getStateByAddress(MoveAddress.parseAddress("1a.2.1a"))) != null;
         //System.out.println(state.getEnteringMove());
@@ -208,11 +208,11 @@ public class ReplayGameTest extends TaflTest {
         state = rg.getStateByAddress(MoveAddress.parseAddress("1a"));
 
         // Delete the two remaining variations
-        state.deleteVariation(MoveAddress.parseAddress("1a.1"));
-        state.deleteVariation(MoveAddress.parseAddress("1a.1"));
+        rg.deleteVariation(MoveAddress.parseAddress("1a.1"));
+        rg.deleteVariation(MoveAddress.parseAddress("1a.1"));
 
         // No-op: variation doesn't exist
-        state.deleteVariation(MoveAddress.parseAddress("1a.3"));
+        rg.deleteVariation(MoveAddress.parseAddress("1a.3"));
 
         assert state.getVariations().size() == 0;
 
@@ -249,7 +249,7 @@ public class ReplayGameTest extends TaflTest {
         1a.3.6a. 0,8 -> 0,10
         */
 
-        ReplayGameState root = rg.getStateByAddress("1a");
+        ReplayGameState root = rg.getStateByAddress(MoveAddress.newRootAddress());
 
         state = root;
 
@@ -258,8 +258,8 @@ public class ReplayGameTest extends TaflTest {
         state = state.makeVariation(new MoveRecord(Coord.get(10,3), Coord.get(8,3)));
         state = state.makeVariation(new MoveRecord(Coord.get(5,3), Coord.get(7,3)));
         state = state.makeVariation(new MoveRecord(Coord.get(6,0), Coord.get(6,3)));
-        state = state.makeVariation(new MoveRecord(Coord.get(7,7), Coord.get(6,7)));
-        state = state.makeVariation(new MoveRecord(Coord.get(6,7), Coord.get(6,2)));
+        state = state.makeVariation(new MoveRecord(Coord.get(7,7), Coord.get(7,1)));
+        state = state.makeVariation(new MoveRecord(Coord.get(7,10), Coord.get(7,2)));
 
         // Variation 1a.1.1a.1:
         state = rg.getStateByAddress("1a.1.1a");
@@ -306,7 +306,7 @@ public class ReplayGameTest extends TaflTest {
 
         // Tree built! Now we should tear it down.
         // First, remove that 1a.2 variation. I never liked it anyway.
-        root.deleteVariation(MoveAddress.parseAddress("1a.2"));
+        rg.deleteVariation(MoveAddress.parseAddress("1a.2"));
 
         state = rg.getStateByAddress("1a.3.1a");
         assert state == null;
@@ -316,7 +316,7 @@ public class ReplayGameTest extends TaflTest {
 
         // Let's get rid of a bunch of things after 1a.1.1a. This removes the principal branch and moves
         // the 1a.1.1a.1 variation to principality.
-        boolean deleteResult = root.deleteVariation(MoveAddress.parseAddress("1a.1.1b"));
+        boolean deleteResult = rg.deleteVariation(MoveAddress.parseAddress("1a.1.1b"));
         assert deleteResult;
 
         // We should have no variations but canonical children.
@@ -330,21 +330,22 @@ public class ReplayGameTest extends TaflTest {
         state = rg.getStateByAddress("1a.2.4a.1.2a");
         assert state != null;
 
-        deleteResult = root.deleteVariation(MoveAddress.parseAddress("1a.2.4a.1.2a"));
+        rg.dumpHistory();
+        deleteResult = rg.deleteVariation(MoveAddress.parseAddress("1a.2.4a.1.2a"));
         assert deleteResult;
 
-        deleteResult = root.deleteVariation(MoveAddress.parseAddress("1a.2.4a.1.2a"));
+        deleteResult = rg.deleteVariation(MoveAddress.parseAddress("1a.2.4a.1.2a"));
         assert !deleteResult;
 
         state = rg.getStateByAddress("1a.2.4a.1.2a");
         assert state == null;
 
         // Let's get rid of all the variations now.
-        deleteResult = root.deleteVariation(MoveAddress.parseAddress("1a.2"));
+        deleteResult = rg.deleteVariation(MoveAddress.parseAddress("1a.2"));
         assert deleteResult;
         assert root.getVariations().size() == 1;
 
-        deleteResult = root.deleteVariation(MoveAddress.parseAddress("1a.1"));
+        deleteResult = rg.deleteVariation(MoveAddress.parseAddress("1a.1"));
         assert deleteResult;
         assert root.getVariations().size() == 0;
 

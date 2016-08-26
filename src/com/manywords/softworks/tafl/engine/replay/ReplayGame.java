@@ -61,16 +61,15 @@ public class ReplayGame {
         variationsToPlay.sort((o1, o2) -> o1.address.getElements().size() - o2.address.getElements().size());
 
         for(GameSerializer.VariationContainer container : variationsToPlay) {
-            System.out.println("Looking for variation: " + container.address);
             Variation v = getVariationByAddress(new MoveAddress(container.address.getAllRootElements()));
-            System.out.println("Found: " + v);
 
             ReplayGameState rootForVariation;
             if(v == null) {
                 MoveAddress rootStateAddress = new MoveAddress(container.address.getElementsBefore(container.address.getElements().size() - 2));
                 rootForVariation = getStateByAddress(rootStateAddress);
-                rootForVariation = rootForVariation.getParent();
-                System.out.println("Found a root state: " + rootForVariation);
+                if(rootForVariation.getMoveAddress().getElements().size() == 1) {
+                    rootForVariation = rootForVariation.getParent();
+                }
             }
             else {
                 // make a new variation off of the last thing in this variation.
@@ -403,10 +402,10 @@ public class ReplayGame {
     public Variation getVariationByAddress(MoveAddress moveAddress) {
         MoveAddress prefix = new MoveAddress(moveAddress.getAllRootElements());
 
-        System.out.println("Looking for variation " + moveAddress + " with prefix " + prefix);
         ReplayGameState state = getStateByAddress(prefix);
-        state = state.getParent();
-        System.out.println("Found state with address " + state.getMoveAddress() + " and variations " + state.getVariations());
+        if(state.getMoveAddress().getElements().size() == 1) {
+            state = state.getParent();
+        }
 
         if(state != null) {
             if(state.getVariations().size() > (moveAddress.getLastElement().rootIndex - 1)) {
@@ -431,7 +430,7 @@ public class ReplayGame {
 
         ReplayGameState result = null;
         if(startingPoint != null && moveAddress.getNonRootElements().size() > 0) {
-            result = startingPoint.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
+            result = startingPoint.getParent().findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
         }
         if(startingPoint != null && startingPoint.getMoveAddress().equals(moveAddress)) {
             result = startingPoint;

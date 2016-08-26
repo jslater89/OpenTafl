@@ -232,7 +232,13 @@ public class MoveAddress {
     }
 
     public MoveAddress nextVariation(ReplayGame game, ReplayGameState current, int variationIndex) {
-        MoveAddress variationRoot = increment(game, current);
+        MoveAddress variationRoot;
+        if(getElements().size() == 1) {
+            variationRoot = this.increment(game, current);
+        }
+        else {
+            variationRoot = new MoveAddress(this);
+        }
         return variationRoot.nextVariation(variationIndex);
     }
 
