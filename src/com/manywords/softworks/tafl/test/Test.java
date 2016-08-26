@@ -19,7 +19,6 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
-        tests.add(new ReplayGameTest());
 
         // AI tests: up here while I'm doing AI stuff for ease of use
         // Tactics tests

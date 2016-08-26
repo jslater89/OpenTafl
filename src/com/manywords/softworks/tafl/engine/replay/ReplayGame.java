@@ -457,7 +457,7 @@ public class ReplayGame {
         ReplayGameState state = (ReplayGameState) history.get(historyPosition);
         List<ReplayGameState> currentTurn = new ArrayList<>();
         List<Variation> currentTurnVariations = new ArrayList<>();
-        int currentTurnIndex = 1;
+        int currentTurnIndex = 0;
 
         while(state != null) {
             // Get all states in a given turn.
