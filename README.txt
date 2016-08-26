@@ -231,6 +231,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 10. VERSION HISTORY -----------------------------------------------------------
+v0.4.3.6b (released 08/26/16):
+- Release candidate for merge to stable branch
+- Slightly improved move ordering/speed of move ordering
+
 v0.4.3.5pre (released 08/24/16):
 - AI improvements ongoing
 - Implement the history heuristic
