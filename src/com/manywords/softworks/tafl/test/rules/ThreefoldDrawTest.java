@@ -15,66 +15,6 @@ import com.manywords.softworks.tafl.command.player.Player;
 public class ThreefoldDrawTest extends TaflTest implements UiCallback {
 
     @Override
-    public void gameStarting() {
-
-    }
-
-    @Override
-    public void modeChanging(Mode mode, Object gameObject) {
-
-    }
-
-    @Override
-    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
-
-    }
-
-    @Override
-    public void timeUpdate(boolean currentSideAttackers) {
-
-    }
-
-    @Override
-    public void moveResult(CommandResult result, MoveRecord move) {
-
-    }
-
-    @Override
-    public void statusText(String text) {
-
-    }
-
-    @Override
-    public void modalStatus(String title, String text) {
-
-    }
-
-    @Override
-    public void gameStateAdvanced() {
-
-    }
-
-    @Override
-    public void victoryForSide(Side side) {
-
-    }
-
-    @Override
-    public void gameFinished() {
-
-    }
-
-    @Override
-    public MoveRecord waitForHumanMoveInput() {
-        return null;
-    }
-
-    @Override
-    public boolean inGame() {
-        return false;
-    }
-
-    @Override
     public void run() {
         Rules rules = Fetlar.newFetlar11();
         Game game = new Game(rules, null);
@@ -88,25 +28,45 @@ public class ThreefoldDrawTest extends TaflTest implements UiCallback {
         state.makeMove(new MoveRecord(Coord.get(5,3), Coord.get(4,3)));
         state = game.getCurrentState();
 
+        assert state.checkVictory() != GameState.DRAW;
+
         state.makeMove(new MoveRecord(Coord.get(5,1), Coord.get(4,1)));
         state = game.getCurrentState();
 
+        assert state.checkVictory() != GameState.DRAW;
+
         state.makeMove(new MoveRecord(Coord.get(4,3), Coord.get(5,3)));
         state = game.getCurrentState();
+
+        assert state.checkVictory() != GameState.DRAW;
 
         state.makeMove(new MoveRecord(Coord.get(4,1), Coord.get(5,1)));
         state = game.getCurrentState();
         // Second time at the position
         //RawTerminal.renderGameState(state);
+        /*
+        for(GameState s : game.getHistory()) {
+            System.out.println(s.mZobristHash);
+        }
+        */
+
+
+        assert state.checkVictory() != GameState.DRAW;
 
         state.makeMove(new MoveRecord(Coord.get(5,3), Coord.get(4,3)));
         state = game.getCurrentState();
 
+        assert state.checkVictory() != GameState.DRAW;
+
         state.makeMove(new MoveRecord(Coord.get(5,1), Coord.get(4,1)));
         state = game.getCurrentState();
 
+        assert state.checkVictory() != GameState.DRAW;
+
         state.makeMove(new MoveRecord(Coord.get(4,3), Coord.get(5,3)));
         state = game.getCurrentState();
+
+        assert state.checkVictory() != GameState.DRAW;
 
         state.makeMove(new MoveRecord(Coord.get(4,1), Coord.get(5,1)));
         state = game.getCurrentState();

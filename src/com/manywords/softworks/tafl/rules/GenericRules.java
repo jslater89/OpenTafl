@@ -54,7 +54,7 @@ public class GenericRules extends Rules {
     private int mEscapeType = CORNERS;
     private boolean mSurroundingFatal = true;
     private boolean mAttackersFirst = true;
-    private int mThreefoldResult = DRAW;
+    private int mThreefoldResult = THIRD_REPETITION_DRAWS;
     private int mKingArmedMode = Rules.KING_ARMED;
     private int mKingMode = Rules.KING_STRONG;
     private int mKingJumpMode = Taflman.JUMP_NONE;

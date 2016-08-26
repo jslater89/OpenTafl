@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
 import com.manywords.softworks.tafl.test.TaflTest;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 
 public class JumpCaptureBerserkerTest extends TaflTest {
 
@@ -18,6 +19,7 @@ public class JumpCaptureBerserkerTest extends TaflTest {
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
 
+        assert rules.getBerserkMode() == Rules.BERSERK_CAPTURE_ONLY;
 
         // Is a jump-capture correctly reported as a capturing move?
         char knight = state.getPieceAt(4, 4);

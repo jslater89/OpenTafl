@@ -92,7 +92,7 @@ public class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCa
             //RawTerminal.renderGameState(state);
             AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
             //workspace.chatty = true;
-            workspace.explore(1);
+            workspace.explore(5);
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             value = workspace.getTreeRoot().getBestChild().getValue();
 
@@ -106,6 +106,8 @@ public class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest implements UiCa
                 System.out.println("Node: " + node.getEnteringMove() + " " + value);
             }
             */
+
+            workspace.printSearchStats();
 
             victory = state.checkVictory();
             if(victory != GameState.GOOD_MOVE) {

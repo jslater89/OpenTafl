@@ -3,7 +3,34 @@ Tafl To-Do
 v0.4.x features:
 
 AI stuff:
+-2. History hash table for detecting repetitions. (If position occurs 1 or more times in history, search instead of hitting TT.)
+    put zobrist before exploring children
+    remove after
+    if hit, search rather than hitting TT
+-1. Do I need to revalue parents during continuation search? I lean no, but I'm not sure.
 0. Evaluation function work: underpins all further heuristics work
-1. Aspiration windows (i.e. initial alpha-beta in a window around last iterative deepening)
-2. Killer-move heuristic (array indexed by: ply, fromindex, toindex to track counts, list of: ply, move for moves)
-3. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)
+1. Draw reports position repeated 4 times when it's clearly only done three
+2. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)
+3. Leaf states not being minified
+
+AI evaluation function to-do:
+1. Reduce ridiculously large defender bonus for having a piece next to the king
+2. Give the defender some incentive to take/hold ranks+files
+3. Tell the defender that doubling up on a rank+file is cool
+4. More things to separate early-game moves
+    1. Good for the defender to make his first move away from the attacker's first move, generally.
+    2. Good for the attacker to develop symmetry and respond to the defender's moves.
+5. Verify that it's better for the king to move somewhere free/out of check than to stay permanently
+on own ranks and files
+6. Correct king-in-check calculations for tablut, only award points if piece can't be instantly recaptured and if the
+other space is open
+
+Checking for is it safe to check the king:
+1. King is weak, or center strong and off of the throne
+2. Space opposite the king is empty
+3. Limited enemy access to the spaces near me (done as taflman safety, maybe?)
+
+a.lang.NullPointerException
+	at com.manywords.softworks.tafl.ui.lanterna.screen.GameScreen.statusText(GameScreen.java:246)
+	at com.manywords.softworks.tafl.command.player.LocalAi$1.run(LocalAi.java:43)
+	at java.lang.Thread.run(Thread.java:74

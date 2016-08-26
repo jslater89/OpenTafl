@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.engine;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.engine.collections.RepetitionHashTable;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
@@ -31,13 +32,16 @@ public class Game {
         public static final String RULES = "rules";
         public static final String POSITION = "position";
     }
-    public Game(long[][] zobristTable, List<GameState> history) {
+    public Game(long[][][] zobristTable, List<GameState> history, RepetitionHashTable repetitions) {
         if (!(this instanceof AiWorkspace)) {
             throw new IllegalArgumentException("Empty constructor is only for AiWorkspace!");
         }
 
         mZobristConstants = zobristTable;
         mHistory = history;
+
+        // AiWorkspace undoes everything it does to this, so we don't need to instantiate a new one. Technically.
+        mRepetitions = repetitions;
     }
 
     public Game(Rules rules, UiCallback callback) {
@@ -59,21 +63,26 @@ public class Game {
         }
 
         int boardSquares = rules.getBoard().getBoardDimension() * rules.getBoard().getBoardDimension();
-        mZobristConstants = new long[boardSquares][Taflman.ALL_TAFLMAN_TYPES.length];
+        mZobristConstants = new long[ZOBRIST_ELEMENTS][boardSquares][Taflman.ALL_TAFLMAN_TYPES.length];
         Random r = new XorshiftRandom(10201989);
         for (int i = 0; i < boardSquares; i++) {
             for (int j = 0; j < Taflman.ALL_TAFLMAN_TYPES.length; j++) {
-                mZobristConstants[i][j] = r.nextLong();
+                mZobristConstants[ZOBRIST_BOARD][i][j] = r.nextLong();
             }
         }
 
+        mZobristConstants[ZOBRIST_STATE][ZOBRIST_TURN][ZOBRIST_TURN_ATTACKERS] = r.nextInt();
+        mZobristConstants[ZOBRIST_STATE][ZOBRIST_TURN][ZOBRIST_TURN_DEFENDERS] = r.nextInt();
+
         mHistory = new ArrayList<GameState>();
+        mRepetitions = new RepetitionHashTable();
 
         // Create a new state off of the game rules.
         mCurrentState = new GameState(this, mGameRules);
 
         // Add the starting state to the history.
         mHistory.add(mCurrentState);
+        mRepetitions.increment(mCurrentState.mZobristHash);
 
         mCallback = callback;
     }
@@ -99,11 +108,31 @@ public class Game {
             mHistory.add(copied);
         }
         mCurrentState = mHistory.get(mHistory.size() - 1);
+
+        // We need a new one here: the replay will play out the whole game in its copy, remember.
+        mRepetitions = new RepetitionHashTable();
     }
 
-    public final long[][] mZobristConstants;
+    // Two parts to the main zobrist array: the board array (space index, piece type)
+    // and the state array: currently only turn, may also include other state-specific
+    // information.
+    public static final int ZOBRIST_ELEMENTS = 2;
+
+    // The zobrist board arrays are at index 0 in the zobrist array.
+    public static final int ZOBRIST_BOARD = 0;
+
+    // The zobrist state arrays are at index 1 in the zobrist array.
+    public static final int ZOBRIST_STATE = 1;
+
+    // The zobrist turn array is the first index in the zobrist state array.
+    public static final int ZOBRIST_TURN = 0;
+    public static final int ZOBRIST_TURN_ATTACKERS = 0;
+    public static final int ZOBRIST_TURN_DEFENDERS = 1;
+
+    public final long[][][] mZobristConstants;
     public double mAverageBranchingFactor = 0;
     public int mAverageBranchingFactorCount = 0;
+    private RepetitionHashTable mRepetitions;
     private GameClock mClock;
     private UiCallback mCallback;
     private Rules mGameRules;
@@ -182,6 +211,10 @@ public class Game {
         return mCurrentState;
     }
 
+    public RepetitionHashTable getRepetitions() {
+        return mRepetitions;
+    }
+
     public List<GameState> getHistory() {
         return mHistory;
     }
@@ -257,6 +290,7 @@ public class Game {
         if(recordState) {
             mCurrentState = nextState;
             mHistory.add(mCurrentState);
+            mRepetitions.increment(mCurrentState.mZobristHash);
 
             if (mClock != null) {
                 mClock.slap(advanceTurn);
@@ -273,10 +307,6 @@ public class Game {
     }
 
     public boolean historyContainsHash(long zobrist) {
-        for (GameState historical : mHistory) {
-            if (historical.mZobristHash == zobrist) return true;
-        }
-
-        return false;
+        return mRepetitions.getRepetitionCount(zobrist) > 0;
     }
 }

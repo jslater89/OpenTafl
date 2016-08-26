@@ -40,37 +40,7 @@ public class LocalAi extends Player {
                 //while(!workspace.isThreadPoolIdle()) { continue; }
                 workspace.stopExploring();
 
-                ui.statusText("# cutoffs/avg. to 1st a/b a/b");
-                for (int i = 0; i < workspace.mAlphaCutoffs.length; i++) {
-                    String line = "Depth " + i + ": " + workspace.mAlphaCutoffs[i] + "/" + workspace.mBetaCutoffs[i];
-                    if (workspace.mAlphaCutoffDistances[i] > 0) {
-                        line += " " + workspace.mAlphaCutoffDistances[i] / workspace.mAlphaCutoffs[i];
-                    } else {
-                        line += " 0";
-                    }
-                    line += "/";
-
-                    if (workspace.mBetaCutoffDistances[i] > 0) {
-                        line += "" + workspace.mBetaCutoffDistances[i] / workspace.mBetaCutoffs[i];
-                    } else {
-                        line += "0";
-                    }
-                    ui.statusText(line);
-                }
-
-
-                ui.statusText("Finding best state...");
                 GameTreeNode bestMove = workspace.getTreeRoot().getBestChild();
-                ui.statusText("Best move: " + bestMove.getRootMove() + " with path...");
-
-                List<GameTreeNode> bestPath = workspace.getTreeRoot().getBestPath();
-
-                for (GameTreeNode node : bestPath) {
-                    ui.statusText("\t" + node.getEnteringMove());
-                }
-                ui.statusText("End of best path scored " + bestMove.getValue());
-                //System.out.println("Best path zobrist: " + bestMove.getZobrist());
-
                 onMoveDecided(bestMove.getRootMove());
                 workspace.printSearchStats();
             }

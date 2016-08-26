@@ -4,18 +4,19 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
 import com.manywords.softworks.tafl.rules.Coord;
+import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.RawTerminal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static com.manywords.softworks.tafl.rules.Taflman.EMPTY;
 
 public class GameTreeState extends GameState implements GameTreeNode {
     public static AiWorkspace workspace;
+    private static final boolean DEBUG = false;
 
     public static final int DEFENDER = -1;
     public static final int ATTACKER = 1;
@@ -27,6 +28,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public short mBeta;
     public short mValue = Evaluator.NO_VALUE;
     public List<GameTreeNode> mBranches = new ArrayList<GameTreeNode>();
+
+    private boolean mContinuation = false;
 
     private String debugOutputString = null;
 
@@ -58,11 +61,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public GameTreeState considerMove(Coord start, Coord end) {
         char toMove = getBoard().getOccupier(start);
         GameState nextGameState = moveTaflman(toMove, end);
-        mGame.advanceState(this, nextGameState, nextGameState.getBerserkingTaflman() == EMPTY, nextGameState.getBerserkingTaflman(), true);
 
         // result should be good move except in cases like berserk,
         // where most moves on a berserk turn are illegal.
         if(nextGameState.getLastMoveResult() >= GOOD_MOVE) {
+            mGame.advanceState(this, nextGameState, nextGameState.getBerserkingTaflman() == EMPTY, nextGameState.getBerserkingTaflman(), true);
             GameTreeState nextState = new GameTreeState(workspace, nextGameState, this);
 
             return nextState;
@@ -124,40 +127,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public GameTreeNode getBestChild() {
-        GameTreeNode bestMove = null;
-        for (GameTreeNode child : getBranches()) {
-            if(mGame.historyContainsHash(child.getZobrist())) {
-                // Don't make moves that repeat board states.
-                // We have to have this here, in addition to the exploration
-                // function, in case of transposition table hits, which don't
-                // keep track of move repetitions.
-                continue;
-            }
-            else if (bestMove == null) {
-                bestMove = child;
-                continue;
-            }
-            else if (isMaximizingNode()) {
-                // Attackers maximize
-                if (child.getValue() == bestMove.getValue()) {
-                    //if(Math.random() > 0.5) bestMove = child;
-                }
-                else if (child.getValue() > bestMove.getValue()) {
-                    bestMove = child;
-                }
-            }
-            else {
-                // Defenders minimize
-                if (child.getValue() == bestMove.getValue()) {
-                    //if(Math.random() > 0.5) bestMove = child;
-                }
-                else if (child.getValue() < bestMove.getValue()) {
-                    bestMove = child;
-                }
-            }
-        }
+        return GameTreeNodeMethods.getBestChild(this);
+    }
 
-        return bestMove;
+    @Override
+    public List<List<MoveRecord>> getAllEnteringSequences() {
+        return GameTreeNodeMethods.getAllEnteringSequences(this);
     }
 
     public boolean isMaximizingNode() {
@@ -189,7 +164,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
     public short evaluate() {
         if (mValue != Evaluator.NO_VALUE) return mValue;
-        else return workspace.evaluator.evaluate(this);
+        else return workspace.evaluator.evaluate(this, mCurrentMaxDepth, mDepth);
     }
 
     public void replaceChild(GameTreeNode oldNode, GameTreeNode newNode) {
@@ -229,6 +204,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     @Override
+    public GameTreeNode getChildForPath(List<MoveRecord> moves) {
+        return GameTreeNodeMethods.getChildForPath(this, moves);
+    }
+
+    @Override
     public GameTreeState getRootNode() {
         if (mParent == null) return this;
 
@@ -251,19 +231,48 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return mBranches;
     }
 
-    public short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool) {
+    public short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation) {
+        mContinuation = continuation;
+        mCurrentMaxDepth = currentMaxDepth;
+
         setAlpha(alpha);
         setBeta(beta);
+
+        int remainingDepth = mCurrentMaxDepth - mDepth;
+
         boolean extension = false;
         if(overallMaxDepth < currentMaxDepth) {
             extension = true;
         }
-        mCurrentMaxDepth = currentMaxDepth;
+
+        if(extension && mDepth < overallMaxDepth) {
+            if(workspace.mNoTime) return mValue;
+            if(mVictory > GOOD_MOVE) return mValue;
+
+            continuationOnChildren(currentMaxDepth, overallMaxDepth);
+
+            return mValue;
+        }
 
         short cachedValue = Evaluator.NO_VALUE;
-        if(!extension) {
-            cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), mCurrentMaxDepth - mDepth, mGameLength);
+
+        if(mGame.getRules().threefoldRepetitionResult() != Rules.THIRD_REPETITION_IGNORED && workspace.getRepetitions().getRepetitionCount(getZobrist()) > 1) {
+            // If this state has occurred more than once in the history, we're in danger of a threefold repetition,
+            // provided the rules call for threefold repetition results. We should therefore search this position, rather
+            // than hit the TT.
+            workspace.mRepetitionsIgnoreTranspositionTable++;
+            cachedValue = Evaluator.NO_VALUE;
         }
+        else if(!extension && !continuation) {
+            // Always allow TT hits in the main tree once we've accounted for repetitions.
+            cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), remainingDepth, mGameLength);
+        }
+        else if(mDepth > overallMaxDepth) {
+            // If we're in an extension and past the point we've already explored, transposition table hits are allowed.
+            // No transposition hits allowed in the first level of depthin', I guess.
+            cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), remainingDepth, mGameLength);
+        }
+
 
         if (cachedValue != Evaluator.NO_VALUE && mDepth > 0) {
             mValue = cachedValue;
@@ -286,9 +295,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 }
             }
 
-            MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
-            mParent.replaceChild(GameTreeState.this, smallChild);
-        } else if (mDepth != 0 && (checkVictory() != GOOD_MOVE || mDepth >= currentMaxDepth || (workspace.mNoTime) || (!extension && workspace.mExtensionTime))) {
+            minifyState();
+        } else if (mDepth != 0 && (checkVictory() != GOOD_MOVE || mDepth >= currentMaxDepth || (workspace.mNoTime) || (!extension && workspace.mExtensionTime) || (extension && continuation && workspace.mExtensionTime))) {
             // If this is a victory, evaluate and stop exploring.
             // If we've hit the target depth, evaluate and stop exploring.
             // If we're out of time and this isn't the root node, stop exploring.
@@ -296,15 +304,28 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // If we're at depth 0, go explore another level, just to be safe.
             mValue = evaluate();
 
-            AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
+            // Leaf nodes we don't get to finish are always in the transposition table at depth 0.
+            // This also holds for e.g. continuation search and other things.
+            AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, 0, mGameLength);
 
             // Replace small child
-            MinimalGameTreeNode smallChild = new MinimalGameTreeNode(mParent, mDepth, currentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
-            mParent.replaceChild(GameTreeState.this, smallChild);
+            minifyState();
         } else {
             this.mValue = Evaluator.NO_VALUE;
-            new ExploreTask(this, currentMaxDepth, overallMaxDepth, threadPool).doTask();
-            //threadPool.execute(new ExploreTask(this, maxDepth, threadPool));
+
+            // This state has occurred in the history for our children
+            workspace.getRepetitions().increment(this.getZobrist());
+
+            // Explore our children
+            exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
+
+            // This state has not occurred in the history for not-our-children
+            workspace.getRepetitions().decrement(this.getZobrist());
+
+            // Continuation search runs through the whole tree again, so only horizon search (i.e. extension, but not
+            // continuation) needs to revalue a parent. Put another way, only revalue parent if we don't start at the
+            // tree root.
+            // if((extension && !continuation) && mDepth == overallMaxDepth) revalueParent(mDepth);
         }
 
         return mValue;
@@ -321,6 +342,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         desiredState.mBeta = minimalGameTreeNode.getBeta();
         desiredState.mValue = minimalGameTreeNode.getValue();
         desiredState.mBranches = minimalGameTreeNode.getBranches();
+        desiredState.mVictory = minimalGameTreeNode.getVictory();
 
         for(GameTreeNode node : minimalGameTreeNode.getBranches()) {
             node.setParent(desiredState);
@@ -340,120 +362,128 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return false;
     }
 
-    private class ExploreTask implements Runnable {
-        GameTreeState mState;
-        int mOverallMaxDepth;
-        AiThreadPool mThreadPool;
+    public void exploreChildren(int currentMaxDepth, int overallMaxDepth, boolean continuation, boolean extension) {
+        List<MoveRecord> successorMoves = new ArrayList<>();
 
-        public ExploreTask(GameTreeState state, int currentMaxDepth, int overallMaxDepth, AiThreadPool threadPool) {
-            mCurrentMaxDepth = currentMaxDepth;
-            mOverallMaxDepth = overallMaxDepth;
-            mState = state;
-            mThreadPool = threadPool;
+        if(!continuation || getBranches().size() == 0) {
+            successorMoves = generateSuccessorMoves(currentMaxDepth);
         }
 
-        //@Override
-        public void doTask() {
-            List<Character> taflmen = new ArrayList<Character>();
-            taflmen.addAll(mState.getCurrentSide().getTaflmen());
+        boolean cutoff = false;
+        int cutoffType = 0;
 
-            List<MoveRecord> successorMoves = new ArrayList<MoveRecord>();
-
-            boolean considerJumps = mGame.getRules().canSideJump(mState.getCurrentSide());
-
-            // Generate all successor moves.
-            for (char taflman : taflmen) {
-                Coord start = Taflman.getCurrentSpace(GameTreeState.this, taflman);
-                if (start == null) continue;
-
-                List<Character> startAdjacent = getBoard().getAdjacentNeighbors(start);
-                boolean taflmanJumpCaptures = false;
-                if (considerJumps) {
-                    if (Taflman.getJumpMode(mGame.getRules(), taflman) == Taflman.JUMP_CAPTURE) {
-                        taflmanJumpCaptures = true;
-                    }
-                }
-
-                for (Coord dest : Taflman.getAllowableDestinations(GameTreeState.this, taflman)) {
-                    MoveRecord move = new MoveRecord(start, dest);
-
-                    List<Character> destAdjacent = getBoard().getAdjacentNeighbors(dest);
-                    for (char destAdjacentTaflman : destAdjacent) {
-                        if (Taflman.isCapturedBy(GameTreeState.this, destAdjacentTaflman, taflman, dest, false)) {
-                            move.captures.add(Taflman.getCurrentSpace(GameTreeState.this, destAdjacentTaflman));
-                        }
-                    }
-
-                    if (taflmanJumpCaptures) {
-                        for (char destAdjacentTaflman : destAdjacent) {
-                            if (startAdjacent.contains(destAdjacentTaflman)) {
-                                if (Taflman.isCapturedBy(GameTreeState.this, destAdjacentTaflman, taflman, dest, true)) {
-                                    move.captures.add(Taflman.getCurrentSpace(GameTreeState.this, destAdjacentTaflman));
-                                }
-                            }
-                        }
-                    }
-
-                    long nextZobrist = updateZobristHash(mZobristHash, getBoard(), move);
-                    if(!mGame.historyContainsHash(nextZobrist) && !treeParentsContainHash(nextZobrist)) {
-                        successorMoves.add(move);
-                    }
-                }
+        int distanceToFirstCutoff = 0;
+        boolean savedDistanceToFirstCutoff = false;
+        for (MoveRecord move : successorMoves) {
+            GameTreeState node = considerMove(move.start, move.end);
+            // Node will be null in e.g. berserk tafl, where moves are legal
+            // according to the movement rules, but not legal according to
+            // special rules, like the berserk rule.
+            // TODO: account for threefold repetition forbidden?
+            if(node == null) {
+                continue;
             }
 
-            successorMoves.sort(new Comparator<MoveRecord>() {
-                @Override
-                public int compare(MoveRecord o1, MoveRecord o2) {
-                    int o1CaptureCount = o1.captures.size();
-                    int o2CaptureCount = o2.captures.size();
+            mBranches.add(node);
 
-                    long o1Zobrist = updateZobristHash(mZobristHash, getBoard(), o1);
-                    long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o2);
+            if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
+            if(DEBUG) System.out.println(mDepth + " exploring child " + node.getEnteringMoveSequence() + " with value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
 
-                    short o1Entry = workspace.transpositionTable.getValue(o1Zobrist, mCurrentMaxDepth - mDepth, mGameLength);
-                    short o2Entry = workspace.transpositionTable.getValue(o2Zobrist, mCurrentMaxDepth - mDepth, mGameLength);
+            node.explore(currentMaxDepth, overallMaxDepth, mAlpha, mBeta, null, mContinuation);
+            distanceToFirstCutoff++;
 
-                    // No transposition table entries? Sort the one with more captures first.
-                    if(o1Entry == Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
-                        if(o1CaptureCount > o2CaptureCount) return -1;
-                        else if(o2CaptureCount > o1CaptureCount) return 1;
-                        else return 0;
-                    }
+            short evaluation = node.getValue();
 
-                    // if one has a transposition table entry and the other doesn't,
-                    // put the one with the entry first.
-                    if (o1Entry != Evaluator.NO_VALUE && o2Entry == Evaluator.NO_VALUE) {
-                        return -1;
-                    }
-                    if (o1Entry == Evaluator.NO_VALUE && o2Entry != Evaluator.NO_VALUE) {
-                        return 1;
-                    }
 
-                    // if both have entries, compare the values, and sort them with the higher value
-                    // first. If the entries are equal, sort the one with more captures first.
-                    if (o1Entry > o2Entry) {
-                        return -1;
-                    } else if (o2Entry > o1Entry) {
-                        return 1;
-                    } else {
-                        if(o1CaptureCount > o2CaptureCount) return -1;
-                        else if(o2CaptureCount > o1CaptureCount) return 1;
-                        else return 0;
-                    }
+            // A/B pruning
+            if (evaluation != Evaluator.NO_VALUE) {
+                if (mValue == Evaluator.NO_VALUE) {
+                    mValue = evaluation;
+
+                    if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
+                    if(DEBUG) System.out.println(mDepth + " setting value to child value: " + evaluation);
                 }
-            });
 
-            boolean cutoff = false;
-            int cutoffType = 0;
+                cutoff = handleEvaluationResults(evaluation, distanceToFirstCutoff) && workspace.areCutoffsAllowed();
 
-            int distanceToFirstCutoff = 0;
-            boolean savedDistanceToFirstCutoff = false;
+                if(cutoff) {
+                    AiWorkspace.killerMoveTable.putMove(mDepth, move);
+
+                    if(workspace.isHistoryTableAllowed()) {
+                        AiWorkspace.historyTable.putMove(getCurrentSide().isAttackingSide(), currentMaxDepth - mDepth, move);
+                    }
+
+                    if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
+                    if(DEBUG) System.out.println("Cutoff at depth " + mDepth + " with value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
+                    break;
+                }
+            }
+        }
+
+        // If we have no legal moves, the other side wins
+        if(successorMoves.size() == 0) {
+            if(getCurrentSide().isAttackingSide()) {
+                mVictory = DEFENDER_WIN;
+            }
+            else {
+                mVictory = ATTACKER_WIN;
+            }
+            mValue = evaluate();
+        }
+
+
+        // TODO: try putting continuation search/extension search into the transposition table at a depth penalty, since
+        // they're useful but not exact.
+        if(!continuation && !extension) AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
+
+        minifyState();
+    }
+
+    public void continuationOnChildren(int currentMaxDepth, int overallMaxDepth) {
+        List<GameTreeNode> successorStates = getBranches();
+
+        List<MoveRecord> successorMoves = generateSuccessorMoves(currentMaxDepth);
+
+        boolean cutoff = false;
+        int cutoffType = 0;
+
+        int distanceToFirstCutoff = 0;
+        boolean savedDistanceToFirstCutoff = false;
+
+        for(GameTreeNode node : successorStates) {
+            if (cutoff) {
+                break;
+            }
+
+            // Node will be null in e.g. berserk tafl, where moves are legal
+            // according to the movement rules, but not legal according to
+            // special rules, like the berserk rule.
+            if (node == null) {
+                continue;
+            }
+
+            successorMoves.remove(node.getEnteringMove());
+
+            node.explore(currentMaxDepth, overallMaxDepth, mAlpha, mBeta, null, mContinuation);
+            short evaluation = node.getValue();
+            distanceToFirstCutoff++;
+
+            if (evaluation != Evaluator.NO_VALUE) {
+                if (mValue == Evaluator.NO_VALUE) {
+                    mValue = evaluation;
+                }
+
+                cutoff = handleEvaluationResults(evaluation, distanceToFirstCutoff);
+            }
+        }
+
+        if(!cutoff && successorMoves.size() > 0) {
             for (MoveRecord move : successorMoves) {
                 if (cutoff) {
                     break;
                 }
 
-                GameTreeState node = mState.considerMove(move.start, move.end);
+                GameTreeState node = considerMove(move.start, move.end);
                 // Node will be null in e.g. berserk tafl, where moves are legal
                 // according to the movement rules, but not legal according to
                 // special rules, like the berserk rule.
@@ -462,7 +492,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 }
 
                 mBranches.add(node);
-                node.explore(mCurrentMaxDepth, mOverallMaxDepth, mAlpha, mBeta, mThreadPool);
+                node.explore(currentMaxDepth, overallMaxDepth, mAlpha, mBeta, null, mContinuation);
                 distanceToFirstCutoff++;
 
                 short evaluation = node.getValue();
@@ -473,76 +503,217 @@ public class GameTreeState extends GameState implements GameTreeNode {
                         mValue = evaluation;
                     }
 
-                    if (getCurrentSide().isAttackingSide()) {
-                        mValue = (short) Math.max(mValue, evaluation);
-                        mAlpha = (short) Math.max(mAlpha, mValue);
+                    cutoff = handleEvaluationResults(evaluation, distanceToFirstCutoff);
 
-                        //System.out.println("Depth " + mDepth + " Attacker value " + mValue + " Alpha " + mAlpha + " Beta " + mBeta);
-                        if (mBeta <= mAlpha) {
-                            //System.out.println("Beta cutoff");
-                            cutoffType = 1;
-                            if(workspace.mBetaCutoffs.length > mDepth) {
-                                workspace.mBetaCutoffs[mDepth]++;
-                                workspace.mBetaCutoffDistances[mDepth] += distanceToFirstCutoff;
-                            }
-                            cutoff = true;
-                        }
-                    } else {
-                        mValue = (short) Math.min(mValue, evaluation);
-                        mBeta = (short) Math.min(mBeta, mValue);
-
-                        //System.out.println("Depth " + mDepth + " Defender value " + mValue + " Alpha " + mAlpha + " Beta " + mBeta);
-                        if (mBeta <= mAlpha) {
-                            //System.out.println("Alpha cutoff");
-                            cutoffType = 0;
-                            if(workspace.mBetaCutoffs.length > mDepth) {
-                                workspace.mAlphaCutoffs[mDepth]++;
-                                workspace.mAlphaCutoffDistances[mDepth] += distanceToFirstCutoff;
-                            }
-                            cutoff = true;
-                        }
+                    if(cutoff) {
+                        AiWorkspace.killerMoveTable.putMove(mDepth, move);
                     }
                 }
             }
+        }
 
-            // If we have no legal moves, the other side wins
-            if(mBranches.size() == 0) {
-                if(getCurrentSide().isAttackingSide()) {
-                    mVictory = DEFENDER_WIN;
+        // If we have no legal moves, the other side wins
+        if(successorMoves.size() == 0 && successorStates.size() == 0) {
+            if(getCurrentSide().isAttackingSide()) {
+                mVictory = DEFENDER_WIN;
+            }
+            else {
+                mVictory = ATTACKER_WIN;
+            }
+            mValue = evaluate();
+        }
+        
+        minifyState();
+/*
+        System.out.println("CONTINUATION");
+        System.out.println("My depth: " + mDepth);
+        System.out.println("My children: " + mBranches.size());
+        System.out.println("My current max depth: " + currentMaxDepth);
+        System.out.println("My overall max depth: " + overallMaxDepth);
+        */
+    }
+
+    private boolean handleEvaluationResults(short nextStateEvaluation, int distanceToFirstCutoff) {
+
+        boolean cutoff = false;
+        if (isMaximizingNode()) {
+            mValue = (short) Math.max(mValue, nextStateEvaluation);
+            mAlpha = (short) Math.max(mAlpha, mValue);
+
+            if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
+            if(DEBUG) System.out.println(mDepth + 1 + " value: " + nextStateEvaluation);
+            if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
+            if(DEBUG) System.out.println("New " + mDepth + " value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
+            if (workspace.areCutoffsAllowed() && mBeta <= mAlpha) {
+                //System.out.println("Beta cutoff");
+                if(workspace.mBetaCutoffs.length > mDepth) {
+                    workspace.mBetaCutoffs[mDepth]++;
+                    workspace.mBetaCutoffDistances[mDepth] += distanceToFirstCutoff;
+                }
+                cutoff = true;
+            }
+        } else {
+            mValue = (short) Math.min(mValue, nextStateEvaluation);
+            mBeta = (short) Math.min(mBeta, mValue);
+
+            if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
+            if(DEBUG) System.out.println(mDepth + 1 + " value: " + nextStateEvaluation);
+            if(DEBUG) for(int i = 0; i < mDepth + 1; i++) System.out.print("\t");
+            if(DEBUG) System.out.println("New " + mDepth + " value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
+            if (workspace.areCutoffsAllowed() && mBeta <= mAlpha) {
+                //System.out.println("Alpha cutoff");
+                if(workspace.mBetaCutoffs.length > mDepth) {
+                    workspace.mAlphaCutoffs[mDepth]++;
+                    workspace.mAlphaCutoffDistances[mDepth] += distanceToFirstCutoff;
+                }
+                cutoff = true;
+            }
+        }
+
+        return cutoff;
+    }
+
+    private void minifyState() {
+        // All moves explored; minify this state
+        if(mDepth != 0) {
+            if(mValue == Evaluator.NO_VALUE) {
+                short evaluation = workspace.transpositionTable.getValue(mValue, mCurrentMaxDepth - mDepth, mGameLength);
+                if(evaluation != Evaluator.NO_VALUE) {
+                    setValue(evaluation);
                 }
                 else {
-                    mVictory = ATTACKER_WIN;
+                    setValue(workspace.evaluator.evaluate(GameTreeState.this, mCurrentMaxDepth, mDepth));
                 }
-                mValue = evaluate();
+                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
+            }
+            MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
+            if (mParent != null) {
+                mParent.replaceChild(GameTreeState.this, minifiedNode);
+            }
+            for (GameTreeNode branch : mBranches) {
+                branch.setParent(minifiedNode);
+            }
+        }
+    }
+
+    private List<MoveRecord> generateSuccessorMoves(int currentMaxDepth) {
+        List<MoveRecord> successorMoves = new ArrayList<>();
+        List<Character> taflmen = new ArrayList<>();
+        taflmen.addAll(getCurrentSide().getTaflmen());
+
+        boolean considerJumps = mGame.getRules().canSideJump(getCurrentSide());
+        int berserkMode = mGame.getRules().getBerserkMode();
+
+        // Generate all successor moves.
+        for (char taflman : taflmen) {
+            Coord start = Taflman.getCurrentSpace(GameTreeState.this, taflman);
+            if (start == null) continue;
+
+            List<Character> startAdjacent = getBoard().getAdjacentNeighbors(start);
+            boolean taflmanJumpCaptures = false;
+            if (considerJumps) {
+                if (Taflman.getJumpMode(mGame.getRules(), taflman) == Taflman.JUMP_CAPTURE) {
+                    taflmanJumpCaptures = true;
+                }
             }
 
-            workspace.transpositionTable.putValue(getZobrist(), mValue, mCurrentMaxDepth - mDepth, mGameLength);
-            mTaflmanMoveCache = null;
+            for (Coord dest : Taflman.getAllowableDestinations(GameTreeState.this, taflman)) {
+                MoveRecord move = new MoveRecord(start, dest);
 
-            // All moves explored; minify this state
-            if(mDepth != 0) {
-                if(mValue == Evaluator.NO_VALUE) {
-                    short evaluation = workspace.transpositionTable.getValue(mValue, mCurrentMaxDepth - mDepth, mGameLength);
-                    if(evaluation == Evaluator.NO_VALUE) {
-                        evaluation = workspace.evaluator.evaluate(GameTreeState.this);
+                List<Character> destAdjacent = getBoard().getAdjacentNeighbors(dest);
+                for (char destAdjacentTaflman : destAdjacent) {
+                    if (Taflman.isCapturedBy(GameTreeState.this, destAdjacentTaflman, taflman, dest, false)) {
+                        move.captures.add(Taflman.getCurrentSpace(GameTreeState.this, destAdjacentTaflman));
                     }
-                    setValue(evaluation);
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
                 }
-                MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
-                if (mParent != null) {
-                    mParent.replaceChild(GameTreeState.this, minifiedNode);
+
+                if (taflmanJumpCaptures) {
+                    for (char destAdjacentTaflman : destAdjacent) {
+                        if (startAdjacent.contains(destAdjacentTaflman)) {
+                            if (Taflman.isCapturedBy(GameTreeState.this, destAdjacentTaflman, taflman, dest, true)) {
+                                move.captures.add(Taflman.getCurrentSpace(GameTreeState.this, destAdjacentTaflman));
+                            }
+                        }
+                    }
                 }
-                for (GameTreeNode branch : mBranches) {
-                    branch.setParent(minifiedNode);
-                }
+
+                successorMoves.add(move);
             }
         }
 
-        @Override
-        public void run() {
-            doTask();
+        if(workspace.isMoveOrderingAllowed()) {
+            List<MoveRecord> killerMoves = new ArrayList<>(AiWorkspace.killerMoveTable.killersToKeep);
+            List<MoveRecord> capturingMoves = new ArrayList<>(4);
+            List<MoveRecord> transpositionMoves = new ArrayList<MoveRecord>();
+            List<MoveRecord> sortedSuccessors = new ArrayList<>(successorMoves.size());
+            List<MoveRecord> historyMoves = new ArrayList<>(successorMoves.size());
+
+            // Get the moves of various sorts of interest
+            for(MoveRecord m : successorMoves) {
+                if(AiWorkspace.killerMoveTable.rateMove(mDepth, m) > 0) killerMoves.add(m);
+                else if(workspace.isHistoryTableAllowed()) {
+                    int rating = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), m);
+                    if(rating > 0) {
+                        historyMoves.add(m);
+                    }
+                }
+                else if(m.captures.size() > 0) capturingMoves.add(m);
+                else {
+                    boolean changeTurn = (berserkMode != Rules.BERSERK_ANY_MOVE || m.captures.size() == 0);
+                    long zobrist = updateZobristHash(mZobristHash, getBoard(), m, changeTurn);
+                    int transpositionTableRating = AiWorkspace.transpositionTable.getValue(zobrist, currentMaxDepth - mDepth, mGameLength);
+
+                    if(transpositionTableRating != Evaluator.NO_VALUE) transpositionMoves.add(m);
+                }
+            }
+
+            // Remove the interesting moves and sort them
+            successorMoves.removeAll(killerMoves);
+            successorMoves.removeAll(capturingMoves);
+            successorMoves.removeAll(historyMoves);
+            successorMoves.removeAll(transpositionMoves);
+
+            historyMoves.sort((o1, o2) -> {
+                int o1HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o1);
+                int o2HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o2);
+
+                return o2HistoryValue - o1HistoryValue;
+            });
+
+            transpositionMoves.sort((o1, o2) -> {
+                boolean o1ChangeTurn = (berserkMode != Rules.BERSERK_ANY_MOVE || o1.captures.size() == 0);
+                long o1Zobrist = updateZobristHash(mZobristHash, getBoard(), o1, o1ChangeTurn);
+                int o1Rating = AiWorkspace.transpositionTable.getValue(o1Zobrist, currentMaxDepth - mDepth, mGameLength);
+
+                boolean o2ChangeTurn = (berserkMode != Rules.BERSERK_ANY_MOVE || o1.captures.size() == 0);
+                long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o1, o2ChangeTurn);
+                int o2Rating = AiWorkspace.transpositionTable.getValue(o2Zobrist, currentMaxDepth - mDepth, mGameLength);
+
+                if(isMaximizingNode()) {
+                    return o2Rating - o1Rating;
+                }
+                else {
+                    return o1Rating - o2Rating;
+                }
+            });
+
+
+            List<MoveRecord> topHalfTranspositions = transpositionMoves.subList(0, transpositionMoves.size() / 2);
+            List<MoveRecord> bottomHalfTranspositions = transpositionMoves.subList(transpositionMoves.size() / 2, transpositionMoves.size());
+
+
+            // Add them in sorted order
+            sortedSuccessors.addAll(killerMoves);
+            sortedSuccessors.addAll(historyMoves);
+            sortedSuccessors.addAll(topHalfTranspositions);
+            sortedSuccessors.addAll(capturingMoves);
+            sortedSuccessors.addAll(bottomHalfTranspositions);
+            sortedSuccessors.addAll(successorMoves);
+
+            return sortedSuccessors;
         }
+
+        return successorMoves;
     }
 
     public int countChildren(int depth) {
@@ -568,7 +739,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public void revalueParent(int depthOfObservation) {
         GameTreeNodeMethods.revalueParent(this, depthOfObservation);
     }
-    
+
+    @Override
+    public void printChildEvaluations() {
+        GameTreeNodeMethods.printChildEvaluations(this);
+    }
 
     public void printPathEvaluations() {
         for(int i = 0; i < getBranches().size(); i++) {
@@ -592,14 +767,13 @@ public class GameTreeState extends GameState implements GameTreeNode {
             System.out.println(prefix + getEnteringMove() + (isMaximizingNode() ? " (+) " : " (-) ") + "(d" + getDepth() + ")" + " (s" + getParentNode().getBranches().size() + ") " + "(w" + getVictory() + ") " + "(v" + getValue() + ") " + "(a" + getAlpha() + ") " + "(b" + getBeta() + ") ");
         }
 
-        for(int i = 0; i < getBranches().size(); i++) {
-            GameTreeNode n = getNthChild(i);
+        for(GameTreeNode n : getBranches()) {
             GameTreeState s;
             if(n instanceof MinimalGameTreeNode) {
                 s = GameTreeState.getStateForMinimalNode(workspace.getTreeRoot(), (MinimalGameTreeNode) n);
             }
             else {
-                s = (GameTreeState) getNthChild(i);
+                s = (GameTreeState) n;
             }
             s.printTree(prefix + "\t");
         }

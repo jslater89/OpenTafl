@@ -103,7 +103,7 @@ public class RulesSerializer {
             otnrString += "atkf:y ";
         }
 
-        if(rules.threefoldRepetitionResult() != Rules.DRAW) {
+        if(rules.threefoldRepetitionResult() != Rules.THIRD_REPETITION_DRAWS) {
             otnrString += "tfr:" + getStringForThreefoldResult(rules.threefoldRepetitionResult()) + " ";
         }
 
@@ -362,10 +362,10 @@ public class RulesSerializer {
             return Rules.THIRD_REPETITION_LOSES;
         }
         else if(threefoldResult.equals("d")) {
-            return Rules.DRAW;
+            return Rules.THIRD_REPETITION_DRAWS;
         }
         else {
-            return Rules.DRAW;
+            return Rules.THIRD_REPETITION_DRAWS;
         }
     }
 
@@ -376,7 +376,7 @@ public class RulesSerializer {
         else if(threefoldResult == Rules.THIRD_REPETITION_LOSES) {
             return "l";
         }
-        else if(threefoldResult == Rules.DRAW) {
+        else if(threefoldResult == Rules.THIRD_REPETITION_DRAWS) {
             return "d";
         }
         else return "i";

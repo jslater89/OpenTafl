@@ -25,7 +25,7 @@ public class Coord {
 
     private static boolean initialized = false;
     private static Coord[][] coords;
-    private static final int minDimension = 7;
+    private static final int minDimension = 5;
     private static final int maxDimension = 19;
     // Map sizes to a list of lists of adjacent coords, indexed by coord index
     private static Map<Integer, List<List<Coord>>> adjacentCoords;

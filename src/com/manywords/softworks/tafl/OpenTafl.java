@@ -1,6 +1,5 @@
 package com.manywords.softworks.tafl;
 
-import com.googlecode.lanterna.gui2.TextGUIThread;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.*;
@@ -43,7 +42,7 @@ public class OpenTafl {
         SILENT
     }
 
-    public static final String CURRENT_VERSION = "v0.4.2.4b";
+    public static final String CURRENT_VERSION = "v0.4.3.5pre";
     public static final int NETWORK_PROTOCOL_VERSION = 7;
 
     public static boolean devMode = false;
@@ -51,10 +50,10 @@ public class OpenTafl {
     private static final int LOG_BUFFER_SIZE = 1024 * 32;
     private static final StringBuilder logBuffer = new StringBuilder(LOG_BUFFER_SIZE);
     private static File logFile;
+    private static Mode runMode = Mode.GRAPHICAL_TERMINAL;
 
     public static void main(String[] args) {
         Map<String, String> mapArgs = getArgs(args);
-        Mode runMode = Mode.GRAPHICAL_TERMINAL;
 
         //System.out.println(mapArgs);
 
@@ -171,7 +170,7 @@ public class OpenTafl {
                 //display.runUi();
                 break;
             case BENCHMARK:
-                Benchmark.run();
+                new Benchmark().run();
                 break;
             case HELP:
                 printHelpMessage();
@@ -297,7 +296,8 @@ public class OpenTafl {
 
     private static void setupLogging() {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-            logPrintln(SILENT, "Uncaught exception in thread " + t.getName());
+            logPrintln(SILENT, "Uncaught exception! This OpenTafl is running as " + runMode);
+            logPrintln(SILENT, "Exception in thread " + t.getName());
             logPrintln(SILENT, "Exception: " + e);
             logStackTrace(SILENT, e);
             flushLog();
@@ -318,7 +318,7 @@ public class OpenTafl {
 
         try {
             logFile.createNewFile();
-            OpenTafl.logPrintln(SILENT, "OpenTafl log from " + new Date() + " on " + getComputerName());
+            OpenTafl.logPrintln(SILENT, "OpenTafl " + CURRENT_VERSION + " log from " + new Date() + " on " + getComputerName());
             OpenTafl.logPrintln(SILENT, "Java version: " + System.getProperty("java.version", "unknown version"));
         } catch (IOException e) {
             logPrintln(LogLevel.NORMAL, "Failed to create log file:" + e);

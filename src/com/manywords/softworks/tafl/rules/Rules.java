@@ -405,11 +405,11 @@ public abstract class Rules {
     /**
      * No result.
      */
-    public static final int IGNORE = 0;
+    public static final int THIRD_REPETITION_IGNORED = 0;
     /**
      * The game is drawn immediately on threefold repetition.
      */
-    public static final int DRAW = 1;
+    public static final int THIRD_REPETITION_DRAWS = 1;
     /**
      * The player who moves to make the third repetition loses.
      * In the most common example case, where one piece is

@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai.evaluators;
 
-import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.engine.GameState;
 
 /**
  * Created by jay on 12/29/15.
@@ -10,5 +10,5 @@ public interface Evaluator {
     public static final short ATTACKER_WIN = 5050;
     public static final short DEFENDER_WIN = -5050;
 
-    public short evaluate(GameTreeState state);
+    public short evaluate(GameState state, int maxDepth, int depth);
 }

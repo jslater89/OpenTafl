@@ -76,11 +76,11 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     @Override
-    public short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool) {
+    public short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation) {
         // First, we have to get a full game tree state for this node:
         GameTreeState thisState = GameTreeState.getStateForMinimalNode(getRootNode(), this);
-        thisState.explore(currentMaxDepth, overallMaxDepth, alpha, beta, threadPool);
-        return 0;
+        thisState.explore(currentMaxDepth, overallMaxDepth, alpha, beta, threadPool, continuation);
+        return thisState.getValue();
     }
 
     @Override
@@ -114,6 +114,11 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     @Override
+    public GameTreeNode getChildForPath(List<MoveRecord> moves) {
+        return GameTreeNodeMethods.getChildForPath(this, moves);
+    }
+
+    @Override
     public GameTreeState getRootNode() {
         if (mParent == null) throw new IllegalStateException("MinimalGameTreeNode has no parent!");
 
@@ -130,35 +135,12 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     public GameTreeNode getBestChild() {
-        if (this.mVictory != GameTreeState.GOOD_MOVE) return null;
+        return GameTreeNodeMethods.getBestChild(this);
+    }
 
-        GameTreeNode bestMove = null;
-        for (GameTreeNode child : getBranches()) {
-            if(getRootNode().mGame.historyContainsHash(child.getZobrist())) {
-                // Don't make moves that repeat board states.
-                // We have to have this here, in addition to the exploration
-                // function, in case of transposition table hits, which don't
-                // keep track of move repetitions.
-                continue;
-            }
-            else if (bestMove == null) {
-                bestMove = child;
-                continue;
-            }
-            else if (mCurrentSideAttackers) {
-                // Attackers maximize
-                if (child.getValue() > bestMove.getValue()) {
-                    bestMove = child;
-                }
-            } else {
-                // Defenders minimize
-                if (child.getValue() < bestMove.getValue()) {
-                    bestMove = child;
-                }
-            }
-        }
-
-        return bestMove;
+    @Override
+    public List<List<MoveRecord>> getAllEnteringSequences() {
+        return GameTreeNodeMethods.getAllEnteringSequences(this);
     }
 
     public int getDepth() {
@@ -211,4 +193,8 @@ public class MinimalGameTreeNode implements GameTreeNode {
         return mBranches;
     }
 
+    @Override
+    public void printChildEvaluations() {
+        GameTreeNodeMethods.printChildEvaluations(this);
+    }
 }

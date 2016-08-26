@@ -242,6 +242,10 @@ public class ExternalEngineHost {
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
     }
 
+    public void dumpEvaluation(int child) {
+        mCommThread.sendCommand(("dump " + child).getBytes(Charset.forName("US-ASCII")));
+    }
+
     public void stopEnginePlay() {
         finish();
     }
@@ -332,6 +336,12 @@ public class ExternalEngineHost {
         }
     }
 
+    private void handleDumpCommand(String command) {
+        command = command.replaceFirst("dump", "");
+        command = command.replaceAll("XXXXX", "\n");
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, command);
+    }
+
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
 
         @Override
@@ -340,7 +350,12 @@ public class ExternalEngineHost {
             String[] commands = strCommand.split("\n");
 
             for(String cmd : commands) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Host received: " + cmd);
+                if(!cmd.startsWith("dump")) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Host received: " + cmd);
+                }
+                else {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Host received dump command");
+                }
 
                 if (cmd.startsWith("hello")) {
                     mConnected = true;
@@ -373,6 +388,9 @@ public class ExternalEngineHost {
                 }
                 else if(cmd.startsWith("error")) {
                     handleErrorCommand(cmd);
+                }
+                else if(cmd.startsWith("dump")) {
+                    handleDumpCommand(cmd);
                 }
             }
         }

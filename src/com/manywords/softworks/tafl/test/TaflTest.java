@@ -1,8 +1,9 @@
 package com.manywords.softworks.tafl.test;
 
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.ui.AbstractUiCallback;
 
-public abstract class TaflTest {
+public abstract class TaflTest extends AbstractUiCallback {
     public void println(Object o) {
         System.out.println(o);
     }

@@ -3,9 +3,7 @@ package com.manywords.softworks.tafl.engine;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MoveRecord {
     public final Coord start;
@@ -72,5 +70,76 @@ public class MoveRecord {
         return (o instanceof MoveRecord)
                 && this.start.equals(((MoveRecord) o).start)
                 && this.end.equals(((MoveRecord) o).end);
+    }
+
+    public static boolean isRotationOrMirror(int dimension, MoveRecord m1, MoveRecord m2) {
+        // If the move is the same, it's obviously a rotation or mirror of itself.
+        if(m1.softEquals(m2)) return true;
+
+        List<MoveRecord> rotations = getRotations(dimension, m1);
+        Set<MoveRecord> rotationsAndMirrors = new HashSet<>();
+
+        for(MoveRecord rotation : rotations) {
+            rotationsAndMirrors.add(rotation);
+            rotationsAndMirrors.addAll(getMirrors(dimension, rotation));
+        }
+
+        for(MoveRecord equivalentMove : rotationsAndMirrors) {
+            if(equivalentMove.softEquals(m2)) return true;
+        }
+
+        return false;
+    }
+
+    public static List<MoveRecord> getMirrors(int dimension, MoveRecord m) {
+        List<MoveRecord> mirrors = new ArrayList<>(2); // At most two mirrors
+
+        int axis = dimension / 2;
+        // Around horizontal axis first
+        if(m.start.y != axis || m.end.y != axis ) {
+            int startDistance = m.start.y - axis;
+            int endDistance = m.end.y - axis;
+
+            mirrors.add(new MoveRecord(Coord.get(m.start.x, axis - startDistance), Coord.get(m.end.x, axis - endDistance)));
+        }
+
+        // Same thing around the vertical axis
+        if(m.start.x != axis || m.end.x != axis ) {
+            int startDistance = m.start.x - axis;
+            int endDistance = m.end.x - axis;
+
+            mirrors.add(new MoveRecord(Coord.get(axis - startDistance, m.start.y), Coord.get(axis - endDistance, m.end.y)));
+        }
+
+        return mirrors;
+    }
+
+    public static List<MoveRecord> getRotations(int dimension, MoveRecord m) {
+        List<MoveRecord> rotations = new ArrayList<>(3); // Always three there are
+
+        int axis = dimension / 2;
+
+        int xStart = m.start.x;
+        int yStart = m.start.y;
+        int xEnd = m.end.x;
+        int yEnd = m.end.y;
+
+        int xTemp, yTemp;
+        for(int i = 0; i < 3; i++) {
+            xTemp = xStart - axis;
+            yTemp = yStart - axis;
+
+            xStart = yTemp + axis;
+            yStart = -xTemp + axis;
+
+            xTemp = xEnd - axis;
+            yTemp = yEnd - axis;
+
+            xEnd = yTemp + axis;
+            yEnd = -xTemp + axis;
+
+            rotations.add(new MoveRecord(Coord.get(xStart, yStart), Coord.get(xEnd, yEnd)));
+        }
+        return rotations;
     }
 }
