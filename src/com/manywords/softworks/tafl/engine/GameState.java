@@ -564,6 +564,15 @@ public class GameState {
         String otnrString = RulesSerializer.getRulesStringWithoutStart(mGame.getRules());
         otnrString += "start:" + PositionSerializer.getPositionRecord(getBoard());
 
+        if(getCurrentSide().isAttackingSide() != mGame.getRules().getStartingSide().isAttackingSide()) {
+            if(getCurrentSide().isAttackingSide()) {
+                otnrString = otnrString.replaceFirst("atkf:n", "atkf:y");
+            }
+            else {
+                otnrString = otnrString.replaceFirst("atkf:y", "atkf:n");
+            }
+        }
+
         return otnrString;
     }
 

@@ -8,6 +8,7 @@ import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.ServerLobbyScreen;
+import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 import java.io.File;
@@ -70,6 +71,13 @@ public class MainMenuWindow extends BasicWindow {
 
         });
         p.addComponent(viewReplayButton);
+
+        Button loadNotationButton = new Button("Load notation", () -> {
+            LoadNotationDialog d = new LoadNotationDialog(mTerminalCallback, null);
+            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+            d.showLoadNotationDialog(getTextGUI());
+        });
+        p.addComponent(loadNotationButton);
 
         if(OpenTafl.devMode) {
             Button tourneyButton = new Button("AI selfplay", () -> mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback)));

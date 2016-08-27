@@ -82,8 +82,8 @@ public class Utilities {
     public static String getFromClipboard() {
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         try {
-            StringSelection s = (StringSelection) c.getData(DataFlavor.stringFlavor);
-            return s.toString();
+            String s = (String) c.getData(DataFlavor.stringFlavor);
+            return s;
         }
         catch (UnsupportedFlavorException e) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Unable to get text data from the clipboard");

@@ -46,6 +46,7 @@ import com.manywords.softworks.tafl.ui.lanterna.window.ingame.AnnotationDialog;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.BoardWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.CommandWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.StatusWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.mainmenu.LoadNotationDialog;
 import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 import java.io.File;
@@ -620,7 +621,9 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     saveReplay = false;
                 }
 
-                File saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games"));
+                File saveFile;
+                if(mCommandEngine.getMode() == Mode.GAME) saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games"));
+                else saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games/replays"));
 
                 if(saveFile == null) {
                     return;
@@ -766,6 +769,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                                     ClientServerConnection.ChatType.SPECTATOR : ClientServerConnection.ChatType.GAME;
                     mServerConnection.sendChatMessage(type, mServerConnection.getUsername(), r.message);
                 }
+            }
+            else if(r.type == Command.Type.CLIPBOARD_PASTE) {
+                LoadNotationDialog d = new LoadNotationDialog(mTerminalCallback, GameScreen.this);
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+                d.showLoadNotationDialog(mGui);
             }
             else {
                 if(r.message != null && !r.message.isEmpty()) {

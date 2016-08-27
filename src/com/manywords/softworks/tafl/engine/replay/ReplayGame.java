@@ -195,7 +195,7 @@ public class ReplayGame {
     }
 
     public void prepareForGameStart() {
-        ReplayGameState state = getStateByAddress("1a");
+        ReplayGameState state = getStateByAddress(MoveAddress.newRootAddress());
         if(state == null) throw new IllegalStateException("Can't start a game from a zero-length replay");
 
         ReplayGameState nextState = null;
