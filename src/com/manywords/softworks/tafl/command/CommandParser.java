@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by jay on 2/15/16.
  */
-public class HumanCommandParser {
+public class CommandParser {
     public static Command parseCommand(CommandEngine engine, String command) {
         if(command.startsWith("move")) {
             return newMoveCommand(engine, command);
@@ -69,6 +69,9 @@ public class HumanCommandParser {
         else if(command.startsWith("annotate")) {
             return newAnnotateCommand(engine, command);
         }
+        else if(command.startsWith("clipboard")) {
+            return newClipboardCommand(engine, command);
+        }
         else if(command.startsWith("chat")) {
             return newChatCommand(engine, command);
         }
@@ -95,6 +98,7 @@ public class HumanCommandParser {
     public static Variation newVariationCommand(CommandEngine engine, String command) { return new Variation(engine, command); }
     public static Delete newDeleteCommand(CommandEngine engine, String command) { return new Delete(engine, command); }
     public static Annotate newAnnotateCommand(CommandEngine engine, String command) { return new Annotate(engine, command); }
+    public static Clipboard newClipboardCommand(CommandEngine engine, String command) { return new Clipboard(engine, command); }
     public static Chat newChatCommand(CommandEngine engine, String command) { return new Chat(engine, command); }
 
     public static class Move extends Command {
@@ -415,6 +419,11 @@ public class HumanCommandParser {
         public Chat(CommandEngine engine, String command) {
             super(Type.CHAT);
             message = command.replaceFirst("chat", "").trim();
+        }
+    }
+    public static class Clipboard extends Command {
+        public Clipboard(CommandEngine engine, String command) {
+            super(Type.CLIPBOARD);
         }
     }
 

@@ -7,7 +7,7 @@ import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.command.Command;
 import com.manywords.softworks.tafl.command.CommandEngine;
 import com.manywords.softworks.tafl.command.CommandResult;
-import com.manywords.softworks.tafl.command.HumanCommandParser;
+import com.manywords.softworks.tafl.command.CommandParser;
 import com.manywords.softworks.tafl.command.player.LocalAi;
 import com.manywords.softworks.tafl.command.player.LocalHuman;
 import com.manywords.softworks.tafl.command.player.Player;
@@ -466,7 +466,7 @@ public class RawTerminal implements UiCallback {
             System.exit(-1);
         }
 
-        Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
+        Command c = CommandParser.parseCommand(mCommandEngine, command);
         CommandResult r = mCommandEngine.executeCommand(c);
 
         if(r.result != CommandResult.SUCCESS) {
@@ -483,7 +483,7 @@ public class RawTerminal implements UiCallback {
             }
         }
         else if (r.type == Command.Type.INFO) {
-            HumanCommandParser.Info infoCommand = (HumanCommandParser.Info) c;
+            CommandParser.Info infoCommand = (CommandParser.Info) c;
             renderGameStateWithAllowableMoves(mGame.getCurrentState(),
                     infoCommand.location,
                     infoCommand.stops,

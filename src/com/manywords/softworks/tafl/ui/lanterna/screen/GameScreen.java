@@ -36,7 +36,7 @@ import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.command.Command;
 import com.manywords.softworks.tafl.command.CommandEngine;
 import com.manywords.softworks.tafl.command.CommandResult;
-import com.manywords.softworks.tafl.command.HumanCommandParser;
+import com.manywords.softworks.tafl.command.CommandParser;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
@@ -539,15 +539,15 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
 
 
-            Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
+            Command c = CommandParser.parseCommand(mCommandEngine, command);
             if(c == null){
                 // This is handled below.
             }
-            else if(!getCurrentCommands().contains(c.getType())) {
+            else if(!getAvailableCommands().contains(c.getType())) {
                 statusText("Command not available at this time.");
                 return;
             }
-            else if(getCurrentCommands().contains(c.getType())) {
+            else if(getAvailableCommands().contains(c.getType())) {
                 if (c.getType() == Command.Type.REPLAY_RETURN) {
                     if (mCommandEngine.getReplay() != null && mCommandEngine.getReplay().isDirty()) {
                         MessageDialogBuilder builder = new MessageDialogBuilder();
@@ -591,7 +591,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 }
             }
             else if (r.type == Command.Type.INFO) {
-                HumanCommandParser.Info infoCommand = (HumanCommandParser.Info) c;
+                CommandParser.Info infoCommand = (CommandParser.Info) c;
                 mBoardWindow.rerenderBoard(infoCommand.location, infoCommand.stops, infoCommand.moves, infoCommand.captures);
             }
             else if (r.type == Command.Type.SHOW) {
@@ -602,7 +602,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 statusText(gameRecord);
             }
             else if (r.type == Command.Type.HELP) {
-                String helpString = HumanCommandParser.getHelpString(getCurrentCommands());
+                String helpString = CommandParser.getHelpString(getAvailableCommands());
 
                 ScrollingMessageDialog dialog = new ScrollingMessageDialog("OpenTafl " + OpenTafl.CURRENT_VERSION + " Help", helpString, MessageDialogButton.Close);
                 dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
@@ -767,6 +767,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     mServerConnection.sendChatMessage(type, mServerConnection.getUsername(), r.message);
                 }
             }
+            else {
+                if(r.message != null && !r.message.isEmpty()) {
+                    statusText(r.message);
+                }
+            }
         }
 
         private void tryTimeUpdate() {
@@ -831,21 +836,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
         }
 
-        private List<Command.Type> getCurrentCommands() {
+        private List<Command.Type> getAvailableCommands() {
             List<Command.Type> types = new ArrayList<>();
 
             if(mInGame) {
                 types.add(Command.Type.MOVE);
-            }
-
-            if(mInReplay) {
-                types.add(Command.Type.VARIATION);
-                types.add(Command.Type.DELETE);
-                types.add(Command.Type.ANNOTATE);
-                types.add(Command.Type.REPLAY_NEXT);
-                types.add(Command.Type.REPLAY_PREVIOUS);
-                types.add(Command.Type.REPLAY_JUMP);
-                types.add(Command.Type.REPLAY_RETURN);
             }
 
             if(mInReplay && mServerConnection == null) {
@@ -854,6 +849,16 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
             if(mInGame || mPostGame) {
                 types.add(Command.Type.REPLAY_ENTER);
+            }
+
+            if(mInReplay) {
+                types.add(Command.Type.REPLAY_NEXT);
+                types.add(Command.Type.REPLAY_PREVIOUS);
+                types.add(Command.Type.REPLAY_JUMP);
+                types.add(Command.Type.REPLAY_RETURN);
+                types.add(Command.Type.VARIATION);
+                types.add(Command.Type.DELETE);
+                types.add(Command.Type.ANNOTATE);
             }
 
             if(mServerConnection != null) {
@@ -868,6 +873,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(Command.Type.HELP);
                 types.add(Command.Type.RULES);
                 types.add(Command.Type.SAVE);
+                types.add(Command.Type.CLIPBOARD);
                 types.add(Command.Type.QUIT);
             }
 

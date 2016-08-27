@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.command;
 
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -19,6 +20,7 @@ import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.command.player.ExternalEnginePlayer;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineHost;
+import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -332,12 +334,12 @@ public class CommandEngine {
             return new CommandResult(Command.Type.SENT, CommandResult.FAIL, command.mError, null);
         }
         // 3. MOVE COMMAND: RETURN MOVE RECORD (receiver sends to callback after verifying side &c)
-        else if(command instanceof HumanCommandParser.Move) {
+        else if(command instanceof CommandParser.Move) {
             if(!mInGame) {
                 return new CommandResult(Command.Type.MOVE, CommandResult.FAIL, "Game over", null);
             }
 
-            HumanCommandParser.Move m = (HumanCommandParser.Move) command;
+            CommandParser.Move m = (CommandParser.Move) command;
             if(m.from == null || m.to == null) {
                 return new CommandResult(Command.Type.MOVE, CommandResult.FAIL, "Invalid coords", null);
             }
@@ -356,15 +358,15 @@ public class CommandEngine {
             return new CommandResult(Command.Type.MOVE, CommandResult.SUCCESS, "", record);
         }
         // 4. INFO COMMAND: SUCCESS (command parser does all the required verification)
-        else if(command instanceof HumanCommandParser.Info) {
+        else if(command instanceof CommandParser.Info) {
             return new CommandResult(Command.Type.INFO, CommandResult.SUCCESS, "", null);
         }
         // 5. SHOW COMMAND: SUCCESS
-        else if(command instanceof HumanCommandParser.Show) {
+        else if(command instanceof CommandParser.Show) {
             return new CommandResult(Command.Type.SHOW, CommandResult.SUCCESS, "", null);
         }
         // 6. HISTORY COMMAND: SUCCESS
-        else if(command instanceof HumanCommandParser.History) {
+        else if(command instanceof CommandParser.History) {
             String gameRecord;
             if(mMode == UiCallback.Mode.REPLAY) {
                 gameRecord = mReplay.getReplayModeInGameHistoryString();
@@ -376,24 +378,24 @@ public class CommandEngine {
             return new CommandResult(Command.Type.HISTORY, CommandResult.SUCCESS, "", gameRecord);
         }
         // 7. HELP COMMAND: SUCCESS
-        else if(command instanceof HumanCommandParser.Help) {
+        else if(command instanceof CommandParser.Help) {
             return new CommandResult(Command.Type.HELP, CommandResult.SUCCESS, "", null);
         }
         // 8. RULES COMMAND: SUCCESS
-        else if(command instanceof HumanCommandParser.Rules) {
+        else if(command instanceof CommandParser.Rules) {
             return new CommandResult(Command.Type.RULES, CommandResult.SUCCESS, "", HumanReadableRulesPrinter.getHumanReadableRules(getGame().getRules()));
         }
         // 9. SAVE COMMAND: SUCCESS
-        else if(command instanceof HumanCommandParser.Save) {
+        else if(command instanceof CommandParser.Save) {
             return new CommandResult(Command.Type.SAVE, CommandResult.SUCCESS, "", null);
         }
         // 10. QUIT COMMAND: SUCCESS
-        else if(command instanceof HumanCommandParser.Quit) {
+        else if(command instanceof CommandParser.Quit) {
             return new CommandResult(Command.Type.QUIT, CommandResult.SUCCESS, "", null);
         }
         // 11. ANALYZE COMMAND
-        else if(command instanceof HumanCommandParser.Analyze) {
-            HumanCommandParser.Analyze a = (HumanCommandParser.Analyze) command;
+        else if(command instanceof CommandParser.Analyze) {
+            CommandParser.Analyze a = (CommandParser.Analyze) command;
 
             if(mAnalysisEngine == null) {
                 return new CommandResult(Command.Type.ANALYZE, CommandResult.FAIL, "No analysis engine loaded", null);
@@ -409,14 +411,14 @@ public class CommandEngine {
             }
         }
         // 12. REPLAY START COMMAND
-        else if(command instanceof HumanCommandParser.ReplayEnter) {
+        else if(command instanceof CommandParser.ReplayEnter) {
             // TODO: if we already have an mReplay, update that off of the current game state.
             ReplayGame rg = ReplayGame.copyGameToReplay(mGame);
             enterReplay(rg);
             return new CommandResult(Command.Type.REPLAY_ENTER, CommandResult.SUCCESS, "", null);
         }
         // 13. REPLAY PLAY HERE COMMAND
-        else if(command instanceof HumanCommandParser.ReplayPlayHere) {
+        else if(command instanceof CommandParser.ReplayPlayHere) {
             if(mInGame) {
                 finishGame(true);
             }
@@ -441,14 +443,14 @@ public class CommandEngine {
             return new CommandResult(Command.Type.REPLAY_PLAY_HERE, CommandResult.SUCCESS, "", null);
         }
         // 14. REPLAY RETURN COMMAND
-        else if(command instanceof HumanCommandParser.ReplayReturn) {
+        else if(command instanceof CommandParser.ReplayReturn) {
             leaveReplay();
 
             return new CommandResult(Command.Type.REPLAY_RETURN, CommandResult.SUCCESS, "", null);
         }
         // 15. REPLAY NEXT COMMAND
-        else if(command instanceof HumanCommandParser.ReplayNext) {
-            HumanCommandParser.ReplayNext n = ((HumanCommandParser.ReplayNext) command);
+        else if(command instanceof CommandParser.ReplayNext) {
+            CommandParser.ReplayNext n = ((CommandParser.ReplayNext) command);
             if(n.nextVariation == -1) {
                 return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Argument is not a variation index", null);
             }
@@ -473,7 +475,7 @@ public class CommandEngine {
             else return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
         }
         // 16. REPLAY PREV COMMAND
-        else if(command instanceof HumanCommandParser.ReplayPrevious) {
+        else if(command instanceof CommandParser.ReplayPrevious) {
             GameState state = mReplay.previousState();
 
             mAttacker.positionChanged(state);
@@ -483,8 +485,8 @@ public class CommandEngine {
             else return new CommandResult(Command.Type.REPLAY_PREVIOUS, CommandResult.FAIL, "At the start of the game history.", null);
         }
         // 17. REPLAY JUMP COMMAND
-        else if(command instanceof HumanCommandParser.ReplayJump) {
-            HumanCommandParser.ReplayJump j = (HumanCommandParser.ReplayJump) command;
+        else if(command instanceof CommandParser.ReplayJump) {
+            CommandParser.ReplayJump j = (CommandParser.ReplayJump) command;
             if(j.moveAddress != null) {
                 GameState state = mReplay.setPositionByAddress(j.moveAddress);
                 mAttacker.positionChanged(state);
@@ -498,8 +500,8 @@ public class CommandEngine {
             return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.FAIL, "Move address " + j.moveAddress + " out of bounds.", null);
         }
         // 18. VARIATION COMMAND
-        else if(command instanceof HumanCommandParser.Variation) {
-            HumanCommandParser.Variation v = (HumanCommandParser.Variation) command;
+        else if(command instanceof CommandParser.Variation) {
+            CommandParser.Variation v = (CommandParser.Variation) command;
 
             if(v.from == null || v.to == null) {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, "Invalid coords", null);
@@ -527,8 +529,8 @@ public class CommandEngine {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", moveResult);
             }
         }
-        else if(command instanceof HumanCommandParser.Delete) {
-            HumanCommandParser.Delete d = (HumanCommandParser.Delete) command;
+        else if(command instanceof CommandParser.Delete) {
+            CommandParser.Delete d = (CommandParser.Delete) command;
 
             boolean deleted = mReplay.deleteVariation(d.moveAddress);
 
@@ -536,12 +538,25 @@ public class CommandEngine {
             else return new CommandResult(Command.Type.DELETE, CommandResult.FAIL, "No variation with address " + d.moveAddress + " to delete.", null);
         }
         // 19. ANNOTATE COMMAND
-        else if(command instanceof HumanCommandParser.Annotate) {
+        else if(command instanceof CommandParser.Annotate) {
             return new CommandResult(Command.Type.ANNOTATE, CommandResult.SUCCESS, "", null);
         }
-        // 20. CHAT COMMAND
-        else if(command instanceof HumanCommandParser.Chat) {
-            HumanCommandParser.Chat c = (HumanCommandParser.Chat) command;
+        // 20. CLIPBOARD COMMAND
+        else if(command instanceof CommandParser.Clipboard) {
+            String completePositionString = "";
+            if(mMode == UiCallback.Mode.GAME) {
+                completePositionString = mGame.getCurrentState().getPasteableRulesString();
+            }
+            else if(mMode == UiCallback.Mode.REPLAY) {
+                completePositionString = mReplay.getCurrentState().getPasteableRulesString();
+            }
+
+            Utilities.pushToClipboard(completePositionString);
+            return new CommandResult(Command.Type.CLIPBOARD, CommandResult.SUCCESS, "Copied position to clipboard", null);
+        }
+        // 21. CHAT COMMAND
+        else if(command instanceof CommandParser.Chat) {
+            CommandParser.Chat c = (CommandParser.Chat) command;
             return new CommandResult(Command.Type.CHAT, CommandResult.SUCCESS, c.message, null);
         }
 

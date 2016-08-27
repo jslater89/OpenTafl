@@ -37,6 +37,7 @@ public abstract class Command {
         VARIATION,
         DELETE,
         ANNOTATE,
+        CLIPBOARD,
         CHAT,
     }
 }

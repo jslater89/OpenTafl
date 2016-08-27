@@ -1,5 +1,14 @@
 package com.manywords.softworks.tafl.engine;
 
+import com.manywords.softworks.tafl.OpenTafl;
+
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+
 /**
  * Created by jay on 8/16/16.
  */
@@ -62,5 +71,26 @@ public class Utilities {
         for (int i = 1; i < len; i += i) {
             System.arraycopy(array, 0, array, i, ((len - i) < i) ? (len - i) : i);
         }
+    }
+
+    public static void pushToClipboard(String string) {
+        StringSelection s = new StringSelection(string);
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        c.setContents(s, s);
+    }
+
+    public static String getFromClipboard() {
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        try {
+            StringSelection s = (StringSelection) c.getData(DataFlavor.stringFlavor);
+            return s.toString();
+        }
+        catch (UnsupportedFlavorException e) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Unable to get text data from the clipboard");
+        }
+        catch (IOException e) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Unable to get text data from the clipboard");
+        }
+        return "";
     }
 }

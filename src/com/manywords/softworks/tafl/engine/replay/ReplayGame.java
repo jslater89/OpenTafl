@@ -13,6 +13,10 @@ import java.util.*;
  * Created by jay on 3/31/16.
  */
 public class ReplayGame {
+    private enum ReplayMode {
+        REPLAY,
+        PUZZLE
+    }
     private Game mGame;
     private List<GameState> mFirstStatesByTurn;
     private List<DetailedMoveRecord> mMoveHistory;
@@ -25,6 +29,7 @@ public class ReplayGame {
     private Map<GameState, TimeSpec> mDefenderTimeSpecsByState;
 
     private boolean mDirty = false;
+    private ReplayMode mMode = ReplayMode.REPLAY;
 
     /**
      * This constructor takes a game object and plays the given
