@@ -20,7 +20,6 @@ import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.command.player.ExternalEnginePlayer;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineHost;
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -542,7 +541,7 @@ public class CommandEngine {
             return new CommandResult(Command.Type.ANNOTATE, CommandResult.SUCCESS, "", null);
         }
         // 20. CLIPBOARD COMMAND
-        else if(command instanceof CommandParser.Clipboard) {
+        else if(command instanceof CommandParser.ClipboardCopy) {
             String completePositionString = "";
             if(mMode == UiCallback.Mode.GAME) {
                 completePositionString = mGame.getCurrentState().getPasteableRulesString();
@@ -552,7 +551,10 @@ public class CommandEngine {
             }
 
             Utilities.pushToClipboard(completePositionString);
-            return new CommandResult(Command.Type.CLIPBOARD, CommandResult.SUCCESS, "Copied position to clipboard", null);
+            return new CommandResult(Command.Type.CLIPBOARD_COPY, CommandResult.SUCCESS, "Copied position to clipboard", null);
+        }
+        else if(command instanceof CommandParser.ClipboardPaste) {
+            return new CommandResult(Command.Type.CLIPBOARD_PASTE, CommandResult.SUCCESS, "", null);
         }
         // 21. CHAT COMMAND
         else if(command instanceof CommandParser.Chat) {

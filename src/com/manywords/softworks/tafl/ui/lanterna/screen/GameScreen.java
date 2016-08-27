@@ -873,7 +873,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(Command.Type.HELP);
                 types.add(Command.Type.RULES);
                 types.add(Command.Type.SAVE);
-                types.add(Command.Type.CLIPBOARD);
+                types.add(Command.Type.CLIPBOARD_COPY);
                 types.add(Command.Type.QUIT);
             }
 

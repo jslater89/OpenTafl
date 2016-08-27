@@ -69,8 +69,11 @@ public class CommandParser {
         else if(command.startsWith("annotate")) {
             return newAnnotateCommand(engine, command);
         }
-        else if(command.startsWith("clipboard")) {
-            return newClipboardCommand(engine, command);
+        else if(command.startsWith("clipboard-copy")) {
+            return newClipboardCopyCommand(engine, command);
+        }
+        else if(command.startsWith("clipboard-paste")) {
+            return newClipboardPasteCommand(engine, command);
         }
         else if(command.startsWith("chat")) {
             return newChatCommand(engine, command);
@@ -98,7 +101,8 @@ public class CommandParser {
     public static Variation newVariationCommand(CommandEngine engine, String command) { return new Variation(engine, command); }
     public static Delete newDeleteCommand(CommandEngine engine, String command) { return new Delete(engine, command); }
     public static Annotate newAnnotateCommand(CommandEngine engine, String command) { return new Annotate(engine, command); }
-    public static Clipboard newClipboardCommand(CommandEngine engine, String command) { return new Clipboard(engine, command); }
+    public static ClipboardCopy newClipboardCopyCommand(CommandEngine engine, String command) { return new ClipboardCopy(engine, command); }
+    public static ClipboardPaste newClipboardPasteCommand(CommandEngine engine, String command) { return new ClipboardPaste(engine, command); }
     public static Chat newChatCommand(CommandEngine engine, String command) { return new Chat(engine, command); }
 
     public static class Move extends Command {
@@ -421,9 +425,14 @@ public class CommandParser {
             message = command.replaceFirst("chat", "").trim();
         }
     }
-    public static class Clipboard extends Command {
-        public Clipboard(CommandEngine engine, String command) {
-            super(Type.CLIPBOARD);
+    public static class ClipboardCopy extends Command {
+        public ClipboardCopy(CommandEngine engine, String command) {
+            super(Type.CLIPBOARD_COPY);
+        }
+    }
+    public static class ClipboardPaste extends Command {
+        public ClipboardPaste(CommandEngine engine, String command) {
+            super(Type.CLIPBOARD_COPY);
         }
     }
 

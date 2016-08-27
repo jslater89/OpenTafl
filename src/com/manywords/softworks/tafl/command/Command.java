@@ -37,7 +37,8 @@ public abstract class Command {
         VARIATION,
         DELETE,
         ANNOTATE,
-        CLIPBOARD,
+        CLIPBOARD_COPY,
+        CLIPBOARD_PASTE,
         CHAT,
     }
 }
