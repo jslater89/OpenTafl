@@ -454,49 +454,69 @@ public class CommandEngine {
                 return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Argument is not a variation index", null);
             }
 
+
             ReplayGameState state = null;
-            if(n.nextVariation == -2) {
-                state = mReplay.nextState();
-            }
-            else {
-                state = mReplay.getCurrentState();
-                List<Variation> variations = state.getVariations();
-                if(variations.size() > n.nextVariation - 1) {
-                    state = variations.get(n.nextVariation - 1).getRoot();
-                    mReplay.setCurrentState(state);
-                }
-            }
+            ReplayGame.NavigationResult result = mReplay.nextState(n.nextVariation);
+            state = mReplay.getCurrentState();
 
-            mAttacker.positionChanged(state);
-            mDefender.positionChanged(state);
-
-            if(state != null) return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", state.getLastMoveResult());
-            else return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
+            switch(result) {
+                case SUCCESS:
+                    mAttacker.positionChanged(state);
+                    mDefender.positionChanged(state);
+                    return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", state.getLastMoveResult());
+                case INVALID_ARGUMENT:
+                    return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Invalid argument.", null);
+                case END_OF_GAME:
+                    return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
+                case PUZZLE_DISALLOWS_NAVIGATION:
+                    return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Puzzle mode does not allow navigation to that state.", null);
+            }
         }
         // 16. REPLAY PREV COMMAND
         else if(command instanceof CommandParser.ReplayPrevious) {
-            GameState state = mReplay.previousState();
+            ReplayGameState state = null;
+            ReplayGame.NavigationResult result = mReplay.previousState();
+            state = mReplay.getCurrentState();
 
-            mAttacker.positionChanged(state);
-            mDefender.positionChanged(state);
-
-            if(state != null) return new CommandResult(Command.Type.REPLAY_PREVIOUS, CommandResult.SUCCESS, "", null);
-            else return new CommandResult(Command.Type.REPLAY_PREVIOUS, CommandResult.FAIL, "At the start of the game history.", null);
+            switch(result) {
+                case SUCCESS:
+                    mAttacker.positionChanged(state);
+                    mDefender.positionChanged(state);
+                    return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", state.getLastMoveResult());
+                case INVALID_ARGUMENT:
+                    return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Invalid argument.", null);
+                case END_OF_GAME:
+                    return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
+                case PUZZLE_DISALLOWS_NAVIGATION:
+                    return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Puzzle mode does not allow navigation to that state.", null);
+            }
         }
         // 17. REPLAY JUMP COMMAND
         else if(command instanceof CommandParser.ReplayJump) {
             CommandParser.ReplayJump j = (CommandParser.ReplayJump) command;
             if(j.moveAddress != null) {
-                GameState state = mReplay.setPositionByAddress(j.moveAddress);
+                ReplayGameState state = null;
+                ReplayGame.NavigationResult result = mReplay.setPositionByAddress(j.moveAddress);
+                state = mReplay.getCurrentState();
+
                 mAttacker.positionChanged(state);
                 mDefender.positionChanged(state);
 
-                if(state != null) {
-                    return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.SUCCESS, "", null);
+                switch(result) {
+                    case SUCCESS:
+                        mAttacker.positionChanged(state);
+                        mDefender.positionChanged(state);
+                        return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.SUCCESS, "", state.getLastMoveResult());
+                    case INVALID_ARGUMENT:
+                        return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Invalid argument.", null);
+                    case END_OF_GAME:
+                        return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "At the end of the game history.", null);
+                    case PUZZLE_DISALLOWS_NAVIGATION:
+                        return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Puzzle mode does not allow navigation to that state.", null);
                 }
             }
 
-            return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.FAIL, "Move address " + j.moveAddress + " out of bounds.", null);
+            return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.FAIL, "Move address out of bounds.", null);
         }
         // 18. VARIATION COMMAND
         else if(command instanceof CommandParser.Variation) {

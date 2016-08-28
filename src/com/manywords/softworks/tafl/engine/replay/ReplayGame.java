@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.engine.replay;
 
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.command.CommandParser;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -230,28 +231,54 @@ public class ReplayGame {
         }
     }
 
-    public ReplayGameState nextState() {
+    // Codes for the navigational methods
+    public enum NavigationResult {
+        SUCCESS,
+        INVALID_ARGUMENT,
+        END_OF_GAME,
+        PUZZLE_DISALLOWS_NAVIGATION
+    }
+    public NavigationResult nextState(int childVariation) {
         ReplayGameState state = getCurrentState();
-        ReplayGameState nextState = state.getCanonicalChild();
+        ReplayGameState nextState;
+        if(childVariation == CommandParser.ReplayNext.CANONICAL_CHILD) {
+            nextState = state.getCanonicalChild();
+        }
+        else {
+            List<Variation> variations = state.getVariations();
+            if(variations.size() > childVariation - 1) {
+                nextState = variations.get(childVariation - 1).getRoot();
+            }
+            else {
+                nextState = null;
+            }
+        }
 
-        if(nextState != null) {
-            if(mMode.isPuzzleMode()) {
+        if (nextState != null) {
+            if (mMode.isPuzzleMode()) {
                 if (nextState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(nextState)) {
                     setCurrentState(nextState);
+                    return NavigationResult.SUCCESS;
                 }
                 else if (nextState.getMoveAddress().isAfter(mPuzzlePrestart) && nextState.getMoveAddress().isOrIsBefore(mPuzzleStart)) {
                     setCurrentState(nextState);
+                    return NavigationResult.SUCCESS;
+                }
+                else {
+                    return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
                 }
             }
             else {
                 setCurrentState(nextState);
+                return NavigationResult.SUCCESS;
             }
         }
-
-        return getCurrentState();
+        else {
+            return NavigationResult.END_OF_GAME;
+        }
     }
 
-    public GameState previousState() {
+    public NavigationResult previousState() {
         ReplayGameState state = getCurrentState();
         ReplayGameState previousState = state.getParent();
 
@@ -259,20 +286,27 @@ public class ReplayGame {
             if(mMode.isPuzzleMode()) {
                 if (previousState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(previousState)) {
                     setCurrentState(previousState);
+                    return NavigationResult.SUCCESS;
                 }
                 else if (previousState.getMoveAddress().isOrIsAfter(mPuzzlePrestart) && previousState.getMoveAddress().isOrIsBefore(mPuzzleStart)) {
                     setCurrentState(previousState);
+                    return NavigationResult.SUCCESS;
+                }
+                else {
+                    return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
                 }
             }
             else {
                 setCurrentState(previousState);
+                return NavigationResult.SUCCESS;
             }
         }
-
-        return getCurrentState();
+        else {
+            return NavigationResult.INVALID_ARGUMENT;
+        }
     }
 
-    public GameState setPositionByAddress(MoveAddress address) {
+    public NavigationResult setPositionByAddress(MoveAddress address) {
         if(address.getElements().size() % 2 == 1) {
             // 12. means 12a
             if(address.getLastElement().moveIndex == -1) {
@@ -291,16 +325,21 @@ public class ReplayGame {
 
         // Don't allow jumping to before the puzzle start (or prestart, if present)
         if(mMode.isPuzzleMode()) {
-            if (mPuzzlePrestart != null && address.isBefore(mPuzzlePrestart)) return getCurrentState();
-            else if (mPuzzlePrestart == null && address.isBefore(mPuzzleStart)) return getCurrentState();
+            if (mPuzzlePrestart != null && address.isBefore(mPuzzlePrestart)) return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
+            else if (mPuzzlePrestart == null && address.isBefore(mPuzzleStart)) return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
 
             if(address.isAfter(mPuzzleStart) && !mPuzzleStatesExplored.contains(state)) {
-                return getCurrentState();
+                return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
             }
         }
 
-        if(state != null) setCurrentState(state);
-        return getCurrentState();
+        if(state != null) {
+            setCurrentState(state);
+            return NavigationResult.SUCCESS;
+        }
+        else {
+            return NavigationResult.INVALID_ARGUMENT;
+        }
     }
 
     public void prepareForGameStart() {

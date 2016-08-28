@@ -290,6 +290,10 @@ public class CommandParser {
     public static class ReplayNext extends Command {
         public final int nextVariation;
 
+        public static final int NO_VARIATION = 0;
+        public static final int ERROR = -1;
+        public static final int CANONICAL_CHILD = -2;
+
         public ReplayNext(CommandEngine engine, String command) {
             super(Type.REPLAY_NEXT);
             if(engine.getMode() != UiCallback.Mode.REPLAY) {
@@ -298,10 +302,10 @@ public class CommandParser {
 
             String[] elements = command.split(" ");
             if(elements.length > 2) {
-                nextVariation = -1;
+                nextVariation = ERROR;
             }
             else if(elements.length == 2) {
-                int test = -1;
+                int test = ERROR;
                 try {
                     test = Integer.parseInt(elements[1]);
                 }
@@ -309,12 +313,12 @@ public class CommandParser {
                 }
 
                 if(test == 0) {
-                    test = -1;
+                    test = ERROR;
                 }
                 nextVariation = test;
             }
             else {
-                nextVariation = -2;
+                nextVariation = CANONICAL_CHILD;
             }
 
             if(nextVariation == -1) {
