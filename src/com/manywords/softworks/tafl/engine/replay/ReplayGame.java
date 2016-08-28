@@ -185,6 +185,10 @@ public class ReplayGame {
 
     public ReplayMode getMode() { return mMode; }
 
+    public void setMode(ReplayMode mode) {
+        mMode = mode;
+    }
+
     public void markDirty() {
         mDirty = true;
     }

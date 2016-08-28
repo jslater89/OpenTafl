@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.List;
@@ -450,7 +451,7 @@ public class CommandParser {
         return help.toString();
     }
 
-    public static String getHelpString(Command.Type type) {
+    private static String getHelpString(Command.Type type) {
         switch (type) {
             case NONE:
                 return "";

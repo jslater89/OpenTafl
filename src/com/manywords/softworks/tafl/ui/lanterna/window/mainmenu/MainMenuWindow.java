@@ -2,6 +2,9 @@ package com.manywords.softworks.tafl.ui.lanterna.window.mainmenu;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
@@ -67,6 +70,19 @@ public class MainMenuWindow extends BasicWindow {
 
             GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
             ReplayGame rg = new ReplayGame(g.game, g.moves, g.variations);
+
+            if(rg.getMode().isPuzzleMode()) {
+                MessageDialogBuilder b = new MessageDialogBuilder();
+                b.setTitle("Puzzle detected");
+                b.setText("This replay contains a puzzle. Should OpenTafl load it as a puzzle?");
+                b.addButton(MessageDialogButton.Yes);
+                b.addButton(MessageDialogButton.No);
+                MessageDialog d = b.build();
+                MessageDialogButton result = d.showDialog(getTextGUI());
+
+                if(result.equals(MessageDialogButton.No)) rg.setMode(ReplayGame.ReplayMode.REPLAY);
+            }
+
             TerminalUtils.startReplay(rg, getTextGUI(), mTerminalCallback);
 
         });
