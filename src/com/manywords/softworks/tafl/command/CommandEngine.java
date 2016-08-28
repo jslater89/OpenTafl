@@ -252,7 +252,7 @@ public class CommandEngine {
             int result = mGame.getCurrentState().makeMove(move);
 
             // non-error moves
-            if(result >= GameState.GOOD_MOVE) {
+            if(result >= GameState.LOWEST_NONERROR_RESULT) {
                 mLastPlayer = mCurrentPlayer;
                 mCurrentPlayer = (mGame.getCurrentSide().isAttackingSide() ? mAttacker : mDefender);
                 callbackMoveResult(new CommandResult(Command.Type.MOVE, CommandResult.SUCCESS, "", null), move);
@@ -521,7 +521,7 @@ public class CommandEngine {
             int moveResult = result.getLastMoveResult();
 
             OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Variation result: " + moveResult);
-            if(moveResult < GameState.GOOD_MOVE) {
+            if(moveResult < GameState.LOWEST_NONERROR_RESULT) {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, GameState.getStringForMoveResult(moveResult), moveResult);
             }
             else {

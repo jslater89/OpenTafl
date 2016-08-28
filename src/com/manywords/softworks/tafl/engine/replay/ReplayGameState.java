@@ -62,7 +62,7 @@ public class ReplayGameState extends GameState {
     protected GameState moveTaflman(char taflman, Coord destination) {
         GameState state = super.moveTaflman(taflman, destination);
 
-        if(state.getLastMoveResult() < GOOD_MOVE) {
+        if(state.getLastMoveResult() < LOWEST_NONERROR_RESULT) {
             return new ReplayGameState(state.getLastMoveResult());
         }
         ReplayGameState replayState = new ReplayGameState(mReplayGame, state);
@@ -81,7 +81,7 @@ public class ReplayGameState extends GameState {
 
     private ReplayGameState moveTaflmanVariation(char taflman, Coord destination) {
         GameState state = super.moveTaflman(taflman, destination);
-        if(state.getLastMoveResult() < GOOD_MOVE) return new ReplayGameState(state.getLastMoveResult());
+        if(state.getLastMoveResult() < LOWEST_NONERROR_RESULT) return new ReplayGameState(state.getLastMoveResult());
         ReplayGameState replayState = new ReplayGameState(mReplayGame, state);
 
         // Don't record this move
@@ -105,7 +105,7 @@ public class ReplayGameState extends GameState {
         if(getPieceAt(nextMove.start.x, nextMove.start.y) == Taflman.EMPTY) return ILLEGAL_MOVE;
 
         GameState nextState = moveTaflman(getPieceAt(nextMove.start.x, nextMove.start.y), nextMove.end);
-        if(nextState.getLastMoveResult() == GOOD_MOVE) {
+        if(nextState.getLastMoveResult() >= LOWEST_NONERROR_RESULT) {
             nextState.mLastMoveResult = nextState.checkVictory();
         }
 
@@ -150,11 +150,11 @@ public class ReplayGameState extends GameState {
 
         ReplayGameState nextState = (ReplayGameState) moveTaflmanVariation(getPieceAt(move.start.x, move.start.y), move.end);
 
-        if(nextState.getLastMoveResult() == GOOD_MOVE) {
+        if(nextState.getLastMoveResult() >= LOWEST_NONERROR_RESULT && nextState.getLastMoveResult() <= HIGHEST_NONTERMINAL_RESULT) {
             nextState.mLastMoveResult = nextState.checkVictory();
         }
 
-        if(nextState.getLastMoveResult() >= GOOD_MOVE) {
+        if(nextState.getLastMoveResult() >= LOWEST_NONERROR_RESULT) {
             if(mCanonicalChild == null) {
                 nextState.setParent(this);
                 nextState.mEnclosingVariation = mEnclosingVariation;

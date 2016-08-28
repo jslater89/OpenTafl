@@ -15,7 +15,8 @@ import java.util.*;
 public class ReplayGame {
     private enum ReplayMode {
         REPLAY,
-        PUZZLE
+        PUZZLE_LOOSE,
+        PUZZLE_STRICT,
     }
     private Game mGame;
     private List<GameState> mFirstStatesByTurn;
@@ -29,7 +30,10 @@ public class ReplayGame {
     private Map<GameState, TimeSpec> mDefenderTimeSpecsByState;
 
     private boolean mDirty = false;
+
     private ReplayMode mMode = ReplayMode.REPLAY;
+    private MoveAddress mReplayPrestart = null; // No default prestart position
+    private MoveAddress mReplayStart = MoveAddress.newRootAddress();
 
     /**
      * This constructor takes a game object and plays the given
@@ -55,7 +59,7 @@ public class ReplayGame {
 
         for(MoveRecord m : movesToPlay) {
             int result = mGame.getCurrentState().makeMove(m);
-            if(result < GameState.GOOD_MOVE) {
+            if(result < GameState.LOWEST_NONERROR_RESULT) {
                 throw new IllegalStateException("Failed to make move " + m + "! Error: " + result);
             }
 
@@ -85,7 +89,7 @@ public class ReplayGame {
                 ReplayGameState inVariation = rootForVariation;
                 for(DetailedMoveRecord m : container.moves) {
                     ReplayGameState state = inVariation.makeVariation(m);
-                    if(state.getLastMoveResult() >= GameState.GOOD_MOVE) {
+                    if(state.getLastMoveResult() >= GameState.LOWEST_NONERROR_RESULT) {
                         inVariation = state;
                     }
                     else {
@@ -107,15 +111,43 @@ public class ReplayGame {
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Game history after load: " + mGame.getHistory());
         setCurrentState((ReplayGameState) mGame.getHistory().get(0));
 
-        /*
-        for(int i = 0; i < movesToPlay.size(); i++) {
-            mGame.getHistory().get(i).setExitingMove(movesToPlay.get(i));
-            mGame.getHistory().get(i+1).setEnteringMove(movesToPlay.get(i));
-        }
-        */
-
         setupFirstStatesList();
         setupTimeSpecLists();
+
+        Map<String, String> tagMap = game.getTagMap();
+        if(tagMap.containsKey("puzzle-mode")) {
+            if(tagMap.get("puzzle-mode").equals("loose")) {
+                mMode = ReplayMode.PUZZLE_LOOSE;
+            }
+            else if(tagMap.get("puzzle-mode").equals("strict")) {
+                mMode = ReplayMode.PUZZLE_STRICT;
+            }
+
+            if(mMode != ReplayMode.REPLAY) {
+                if (tagMap.containsKey("puzzle-prestart")) {
+                    MoveAddress address = MoveAddress.parseAddress(tagMap.get("puzzle-prestart"));
+                    if (address != null) {
+                        mReplayPrestart = address;
+                        mReplayStart = address;
+                    }
+                }
+
+                if (tagMap.containsKey("puzzle-start")) {
+                    MoveAddress address = MoveAddress.parseAddress(tagMap.get("puzzle-start"));
+                    if (address != null) {
+                        mReplayStart = address;
+                    }
+                }
+
+                MoveAddress startPosition = (mReplayPrestart != null ? mReplayPrestart : mReplayStart);
+                ReplayGameState state = getStateByAddress(startPosition);
+                if(state != null) {
+                    setCurrentState(state);
+                }
+            }
+        }
+
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "mode/prestart/start " + mMode + "/" + mReplayPrestart + "/" + mReplayStart);
     }
 
     /**
@@ -239,17 +271,38 @@ public class ReplayGame {
         return mCurrentState;
     }
 
+    public boolean moveExistsFromCurrentState(MoveRecord move) {
+        return moveExistsFromState(move, getCurrentState());
+    }
+
+    public boolean moveExistsFromState(MoveRecord move, ReplayGameState state) {
+        boolean moveExists = false;
+
+        if(state.getCanonicalChild() != null && state.getCanonicalChild().getEnteringMove().softEquals(move)) moveExists = true;
+
+        for(Variation v : state.getVariations()) {
+            if(v.getRoot().getEnteringMove().equals(move)) moveExists = true;
+            if(moveExists) break;
+        }
+
+        return moveExists;
+    }
+
     public ReplayGameState makeVariation(MoveRecord move) {
-        ReplayGameState state = (ReplayGameState) getCurrentState();
+        if(mMode == ReplayMode.PUZZLE_STRICT) {
+            if(!moveExistsFromCurrentState(move)) return new ReplayGameState(GameState.STRICT_PUZZLE_MISSING_MOVE);
+        }
+
+        ReplayGameState state = getCurrentState();
 
         // Don't allow variations after a victory
-        if(state.getLastMoveResult() > GameState.GOOD_MOVE) {
+        if(state.getLastMoveResult() > GameState.HIGHEST_NONTERMINAL_RESULT) {
             return state;
         }
 
         ReplayGameState variationState = state.makeVariation(move);
 
-        if(variationState.getLastMoveResult() >= GameState.GOOD_MOVE) {
+        if(variationState.getLastMoveResult() >= GameState.LOWEST_NONERROR_RESULT) {
             // Don't set errors into current state, oy.
             setCurrentState(variationState);
             mDirty = true;

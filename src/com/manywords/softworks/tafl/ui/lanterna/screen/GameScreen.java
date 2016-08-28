@@ -723,7 +723,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 updateComments();
 
                 int result = (Integer) r.extra;
-                if(result > GameState.GOOD_MOVE) {
+                if(result > GameState.GOOD_MOVE) { // All results > GOOD_MOVE are special, and should have some status
                     statusText(GameState.getStringForMoveResult(result));
                 }
             }
@@ -743,7 +743,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 mBoardWindow.rerenderBoard();
 
                 int result = (Integer) r.extra;
-                if(result > GameState.GOOD_MOVE) {
+                if(result > GameState.GOOD_MOVE) { // All results > GOOD_MOVE are special, and should have some status
                     statusText(GameState.getStringForMoveResult(result));
                 }
             }
