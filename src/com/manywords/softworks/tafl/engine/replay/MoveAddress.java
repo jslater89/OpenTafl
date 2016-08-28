@@ -364,6 +364,21 @@ public class MoveAddress {
         return false;
     }
 
+    public boolean isBefore(MoveAddress other) {
+        return !isOrIsAfter(other);
+    }
+
+    public boolean isOrIsBefore(MoveAddress other) {
+        return !isAfter(other);
+    }
+
+    public boolean isBetween(MoveAddress start, MoveAddress end) {
+        boolean afterStart = (start == null || isOrIsAfter(start));
+        boolean beforeEnd = (end == null || isOrIsBefore(end));
+
+        return afterStart && beforeEnd;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof MoveAddress)) return false;

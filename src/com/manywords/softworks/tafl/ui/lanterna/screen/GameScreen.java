@@ -890,7 +890,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             if(mCommandEngine.getMode() == Mode.REPLAY && mCommandEngine.getReplay().getMode() != ReplayGame.ReplayMode.REPLAY) {
                 if(mCommandEngine.getReplay().isInPuzzlePrestart()) {
                     types.remove(Command.Type.VARIATION);
-                    types.remove(Command.Type.REPLAY_JUMP);
                 }
             }
 

@@ -38,6 +38,7 @@ public class ReplayGame {
     private ReplayMode mMode = ReplayMode.REPLAY;
     private MoveAddress mPuzzlePrestart = null; // No default prestart position
     private MoveAddress mPuzzleStart = MoveAddress.newRootAddress();
+    private Set<GameState> mPuzzleStatesExplored = new HashSet<>();
 
     /**
      * This constructor takes a game object and plays the given
@@ -205,22 +206,69 @@ public class ReplayGame {
         if(puzzleStart.getMoveAddress().equals(puzzlePrestart.getMoveAddress())) return false; // If start and prestart are the same, we can't be in the latter
 
         // If we are or are after the puzzle prestart position, but aren't and aren't after the puzzle start position, we're in prestart.
-        return currentState.getMoveAddress().isOrIsAfter(mPuzzlePrestart) && !currentState.getMoveAddress().isOrIsAfter(mPuzzleStart);
+        return currentState.getMoveAddress().isOrIsAfter(mPuzzlePrestart) && currentState.getMoveAddress().isBefore(mPuzzleStart);
     }
 
     public String getReplayModeInGameHistoryString() {
-        return getHistoryString(mGame.getHistory(), getCurrentState().getMoveAddress(), false, false);
+        if(mMode.isPuzzleMode()) {
+            List<GameState> truncatedHistory = new ArrayList<>();
+            MoveAddress startAddress = (mPuzzlePrestart != null ? mPuzzlePrestart : mPuzzleStart);
+            ReplayGameState state = getStateByAddress(startAddress);
+
+            while(state != null) {
+                MoveAddress address = state.getMoveAddress();
+                if(address.isBetween(mPuzzlePrestart, mPuzzleStart) || mPuzzleStatesExplored.contains(state)) {
+                    truncatedHistory.add(state);
+                }
+                state = state.getCanonicalChild();
+            }
+
+            return getHistoryString(truncatedHistory, getCurrentState().getMoveAddress(), false, false);
+        }
+        else {
+            return getHistoryString(mGame.getHistory(), getCurrentState().getMoveAddress(), false, false);
+        }
     }
 
     public ReplayGameState nextState() {
         ReplayGameState state = getCurrentState();
-        if(state.getCanonicalChild() != null) setCurrentState(state.getCanonicalChild());
+        ReplayGameState nextState = state.getCanonicalChild();
+
+        if(nextState != null) {
+            if(mMode.isPuzzleMode()) {
+                if (nextState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(nextState)) {
+                    setCurrentState(nextState);
+                }
+                else if (nextState.getMoveAddress().isAfter(mPuzzlePrestart) && nextState.getMoveAddress().isOrIsBefore(mPuzzleStart)) {
+                    setCurrentState(nextState);
+                }
+            }
+            else {
+                setCurrentState(nextState);
+            }
+        }
+
         return getCurrentState();
     }
 
     public GameState previousState() {
         ReplayGameState state = getCurrentState();
-        if(state.getParent() != null) setCurrentState(state.getParent());
+        ReplayGameState previousState = state.getParent();
+
+        if(previousState != null) {
+            if(mMode.isPuzzleMode()) {
+                if (previousState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(previousState)) {
+                    setCurrentState(previousState);
+                }
+                else if (previousState.getMoveAddress().isOrIsAfter(mPuzzlePrestart) && previousState.getMoveAddress().isOrIsBefore(mPuzzleStart)) {
+                    setCurrentState(previousState);
+                }
+            }
+            else {
+                setCurrentState(previousState);
+            }
+        }
+
         return getCurrentState();
     }
 
@@ -238,6 +286,16 @@ public class ReplayGame {
             Variation v = getVariationByAddress(new MoveAddress(address.getAllRootElements()));
                 if(v != null){
                 state = v.getRoot();
+            }
+        }
+
+        // Don't allow jumping to before the puzzle start (or prestart, if present)
+        if(mMode.isPuzzleMode()) {
+            if (mPuzzlePrestart != null && address.isBefore(mPuzzlePrestart)) return getCurrentState();
+            else if (mPuzzlePrestart == null && address.isBefore(mPuzzleStart)) return getCurrentState();
+
+            if(address.isAfter(mPuzzleStart) && !mPuzzleStatesExplored.contains(state)) {
+                return getCurrentState();
             }
         }
 
@@ -281,6 +339,10 @@ public class ReplayGame {
 
     public void setCurrentState(ReplayGameState replayGameState) {
         if(replayGameState == null) throw new IllegalArgumentException("Set current state to null");
+
+        if(mMode.isPuzzleMode()) {
+            mPuzzleStatesExplored.add(replayGameState);
+        }
 
         mGame.setCurrentState(replayGameState);
         mCurrentState = replayGameState;
@@ -538,7 +600,6 @@ public class ReplayGame {
         return getHistoryString(history, highlightAddress, truncateRootMoves, includeComments, "");
     }
 
-    //TODO: when in puzzle mode, only return the history up to the current state.
     public static String getHistoryString(List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments, String prefix) {
         StringBuilder resultString = new StringBuilder();
         int historyPosition = 0;
@@ -569,17 +630,12 @@ public class ReplayGame {
 
             historyPosition += 1;
             if(historyPosition == history.size()) {
+                currentTurnVariations.addAll(state.getVariations()); // required for puzzles, where the last known state might have variations
                 finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments, prefix);
                 break;
             }
             state = (ReplayGameState) history.get(historyPosition);
         }
-
-        // Print the turn header.
-
-        // For each state, get all variations and place in list.
-
-        // For each variation, do this method.
 
         return resultString.toString();
     }
