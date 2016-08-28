@@ -324,6 +324,12 @@ public class ReplayGame {
 
         if(variationState.getLastMoveResult() >= GameState.LOWEST_NONERROR_RESULT) {
             // Don't set errors into current state, oy.
+
+            // TODO: when this is flagified, correct the logic
+            if(mMode.isPuzzleMode() && !moveExists && variationState.getLastMoveResult() == GameState.GOOD_MOVE) {
+                variationState.setLastMoveResult(GameState.GOOD_MOVE_NOT_IN_PUZZLE);
+            }
+
             setCurrentState(variationState);
             mDirty = true;
         }

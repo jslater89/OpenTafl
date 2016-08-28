@@ -247,6 +247,10 @@ public class ReplayGameState extends GameState {
 
     }
 
+    void setLastMoveResult(int moveResult) {
+        mLastMoveResult = moveResult;
+    }
+
     private void changeParent(ReplayGameState newParent) {
         // Keep this around. We'll need it to re-prefix things.
         MoveAddress oldAddress = mMoveAddress;
