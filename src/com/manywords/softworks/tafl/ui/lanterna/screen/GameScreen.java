@@ -550,19 +550,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
             else if(getAvailableCommands().contains(c.getType())) {
                 if (c.getType() == Command.Type.REPLAY_RETURN) {
-                    if (mCommandEngine.getReplay() != null && mCommandEngine.getReplay().isDirty()) {
-                        MessageDialogBuilder builder = new MessageDialogBuilder();
-                        builder.setTitle("Replay not saved!");
-                        builder.setText("This replay has been changed, but not yet saved.\nContinuing will exit the replay and discard\nchanges.");
-                        builder.addButton(MessageDialogButton.Continue);
-                        builder.addButton(MessageDialogButton.Cancel);
-                        MessageDialog dialog = builder.build();
-                        MessageDialogButton result = dialog.showDialog(mGui);
-
-                        if (result.equals(MessageDialogButton.Cancel)) {
-                            return;
-                        }
-                    }
+                    checkReplaySave();
                 }
             }
 
@@ -686,19 +674,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     }
                 }
                 else {
-                    if(mCommandEngine.getReplay() != null && mCommandEngine.getReplay().isDirty()) {
-                        MessageDialogBuilder builder = new MessageDialogBuilder();
-                        builder.setTitle("Replay not saved!");
-                        builder.setText("This replay has been changed, but not yet saved.\nContinuing will quit and discard changes.");
-                        builder.addButton(MessageDialogButton.Continue);
-                        builder.addButton(MessageDialogButton.Cancel);
-                        MessageDialog dialog = builder.build();
-                        MessageDialogButton result = dialog.showDialog(mGui);
-
-                        if(result.equals(MessageDialogButton.Cancel)) {
-                            return;
-                        }
-                    }
+                    checkReplaySave();
                     leaveGameUi();
                 }
             }
@@ -778,6 +754,22 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             else {
                 if(r.message != null && !r.message.isEmpty()) {
                     statusText(r.message);
+                }
+            }
+        }
+
+        private void checkReplaySave() {
+            if(mCommandEngine.getReplay() != null && !mCommandEngine.getReplay().getMode().isPuzzleMode() && mCommandEngine.getReplay().isDirty()) {
+                MessageDialogBuilder builder = new MessageDialogBuilder();
+                builder.setTitle("Replay not saved!");
+                builder.setText("This replay has been changed, but not yet saved.\nContinuing will quit and discard changes.");
+                builder.addButton(MessageDialogButton.Continue);
+                builder.addButton(MessageDialogButton.Cancel);
+                MessageDialog dialog = builder.build();
+                MessageDialogButton result = dialog.showDialog(mGui);
+
+                if(result.equals(MessageDialogButton.Cancel)) {
+                    return;
                 }
             }
         }
@@ -892,6 +884,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                         types.remove(Command.Type.ANALYZE);
                         types.remove(Command.Type.REPLAY_ENTER);
                     }
+                }
+            }
+
+            if(mCommandEngine.getMode() == Mode.REPLAY && mCommandEngine.getReplay().getMode() != ReplayGame.ReplayMode.REPLAY) {
+                if(mCommandEngine.getReplay().isInPuzzlePrestart()) {
+                    types.remove(Command.Type.VARIATION);
+                    types.remove(Command.Type.REPLAY_JUMP);
                 }
             }
 

@@ -67,6 +67,12 @@ public class MoveAddress {
 
             return rootIndex == other.rootIndex && moveIndex == other.moveIndex;
         }
+
+        public boolean isAfter(Element other) {
+            if(this.rootIndex > other.rootIndex) return true;
+            if(this.rootIndex == other.rootIndex && this.moveIndex > other.moveIndex) return true;
+            return false;
+        }
     }
 
     public MoveAddress() { }
@@ -331,6 +337,7 @@ public class MoveAddress {
         return moveAddress;
     }
 
+    @Override
     public String toString() {
         StringBuilder name = new StringBuilder();
         for(Element element : mElements) {
@@ -339,6 +346,22 @@ public class MoveAddress {
         }
 
         return name.toString();
+    }
+
+    public boolean isOrIsAfter(MoveAddress other) {
+        if(this.equals(other)) return true;
+        if(other == null) return false;
+
+        return this.isAfter(other);
+    }
+
+    public boolean isAfter(MoveAddress other) {
+        for(int i = 0; i < Math.min(mElements.size(), other.getElements().size()); i++) {
+            if(mElements.get(i).isAfter(other.getElements().get(i))) return true;
+        }
+
+        // Sibling variation
+        return false;
     }
 
     @Override

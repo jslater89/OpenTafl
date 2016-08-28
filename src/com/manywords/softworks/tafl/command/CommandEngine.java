@@ -540,7 +540,7 @@ public class CommandEngine {
         else if(command instanceof CommandParser.Annotate) {
             return new CommandResult(Command.Type.ANNOTATE, CommandResult.SUCCESS, "", null);
         }
-        // 20. CLIPBOARD COMMAND
+        // 20. CLIPBOARD-COPY COMMAND
         else if(command instanceof CommandParser.ClipboardCopy) {
             String completePositionString = "";
             if(mMode == UiCallback.Mode.GAME) {
@@ -553,10 +553,11 @@ public class CommandEngine {
             Utilities.pushToClipboard(completePositionString);
             return new CommandResult(Command.Type.CLIPBOARD_COPY, CommandResult.SUCCESS, "Copied position to clipboard", null);
         }
+        // 21. CLIPBOARD-PASTE COMMAND
         else if(command instanceof CommandParser.ClipboardPaste) {
             return new CommandResult(Command.Type.CLIPBOARD_PASTE, CommandResult.SUCCESS, "", null);
         }
-        // 21. CHAT COMMAND
+        // 22. CHAT COMMAND
         else if(command instanceof CommandParser.Chat) {
             CommandParser.Chat c = (CommandParser.Chat) command;
             return new CommandResult(Command.Type.CHAT, CommandResult.SUCCESS, c.message, null);

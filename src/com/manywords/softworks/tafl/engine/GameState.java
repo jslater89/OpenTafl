@@ -237,6 +237,8 @@ public class GameState {
 
     public static String getStringForMoveResult(int result) {
         switch (result) {
+            case GOOD_MOVE:
+                return "";
             case DRAW:
                 return "Draw.";
             case DEFENDER_WIN:
@@ -260,6 +262,8 @@ public class GameState {
         return "Unknown move result! Please report this as a bug.";
     }
 
+    // TODO: refactor to bitwise flag or something
+    // I want to be able to capture e.g. DEFENDER_WIN by GOOD_MOVE_NOT_IN_PUZZLE
     public static final int DRAW = 4;
     public static final int DEFENDER_WIN = 3;
     public static final int ATTACKER_WIN = 2;

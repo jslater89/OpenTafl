@@ -13,10 +13,14 @@ import java.util.*;
  * Created by jay on 3/31/16.
  */
 public class ReplayGame {
-    private enum ReplayMode {
+    public enum ReplayMode {
         REPLAY,
         PUZZLE_LOOSE,
-        PUZZLE_STRICT,
+        PUZZLE_STRICT;
+
+        public boolean isPuzzleMode() {
+            return this == PUZZLE_LOOSE || this == PUZZLE_STRICT;
+        }
     }
     private Game mGame;
     private List<GameState> mFirstStatesByTurn;
@@ -32,8 +36,8 @@ public class ReplayGame {
     private boolean mDirty = false;
 
     private ReplayMode mMode = ReplayMode.REPLAY;
-    private MoveAddress mReplayPrestart = null; // No default prestart position
-    private MoveAddress mReplayStart = MoveAddress.newRootAddress();
+    private MoveAddress mPuzzlePrestart = null; // No default prestart position
+    private MoveAddress mPuzzleStart = MoveAddress.newRootAddress();
 
     /**
      * This constructor takes a game object and plays the given
@@ -127,19 +131,19 @@ public class ReplayGame {
                 if (tagMap.containsKey("puzzle-prestart")) {
                     MoveAddress address = MoveAddress.parseAddress(tagMap.get("puzzle-prestart"));
                     if (address != null) {
-                        mReplayPrestart = address;
-                        mReplayStart = address;
+                        mPuzzlePrestart = address;
+                        mPuzzleStart = address;
                     }
                 }
 
                 if (tagMap.containsKey("puzzle-start")) {
                     MoveAddress address = MoveAddress.parseAddress(tagMap.get("puzzle-start"));
                     if (address != null) {
-                        mReplayStart = address;
+                        mPuzzleStart = address;
                     }
                 }
 
-                MoveAddress startPosition = (mReplayPrestart != null ? mReplayPrestart : mReplayStart);
+                MoveAddress startPosition = (mPuzzlePrestart != null ? mPuzzlePrestart : mPuzzleStart);
                 ReplayGameState state = getStateByAddress(startPosition);
                 if(state != null) {
                     setCurrentState(state);
@@ -147,7 +151,7 @@ public class ReplayGame {
             }
         }
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "mode/prestart/start " + mMode + "/" + mReplayPrestart + "/" + mReplayStart);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "mode/prestart/start " + mMode + "/" + mPuzzlePrestart + "/" + mPuzzleStart);
     }
 
     /**
@@ -177,6 +181,8 @@ public class ReplayGame {
         return mGame;
     }
 
+    public ReplayMode getMode() { return mMode; }
+
     public void markDirty() {
         mDirty = true;
     }
@@ -187,6 +193,19 @@ public class ReplayGame {
 
     public boolean isDirty() {
         return mDirty;
+    }
+
+    public boolean isInPuzzlePrestart() {
+        ReplayGameState currentState = getCurrentState();
+        ReplayGameState puzzlePrestart = (mPuzzlePrestart == null ? null : getStateByAddress(mPuzzlePrestart));
+        ReplayGameState puzzleStart = getStateByAddress(mPuzzleStart);
+
+        if(mMode == ReplayMode.REPLAY) return false; // If we aren't in a puzzle, we aren't in prestart
+        if(puzzlePrestart == null) return false; // If there is no prestart, obviously, we aren't in it
+        if(puzzleStart.getMoveAddress().equals(puzzlePrestart.getMoveAddress())) return false; // If start and prestart are the same, we can't be in the latter
+
+        // If we are or are after the puzzle prestart position, but aren't and aren't after the puzzle start position, we're in prestart.
+        return currentState.getMoveAddress().isOrIsAfter(mPuzzlePrestart) && !currentState.getMoveAddress().isOrIsAfter(mPuzzleStart);
     }
 
     public String getReplayModeInGameHistoryString() {
@@ -289,8 +308,9 @@ public class ReplayGame {
     }
 
     public ReplayGameState makeVariation(MoveRecord move) {
+        boolean moveExists = moveExistsFromCurrentState(move);
         if(mMode == ReplayMode.PUZZLE_STRICT) {
-            if(!moveExistsFromCurrentState(move)) return new ReplayGameState(GameState.STRICT_PUZZLE_MISSING_MOVE);
+            if(!moveExists) return new ReplayGameState(GameState.STRICT_PUZZLE_MISSING_MOVE);
         }
 
         ReplayGameState state = getCurrentState();
@@ -512,6 +532,7 @@ public class ReplayGame {
         return getHistoryString(history, highlightAddress, truncateRootMoves, includeComments, "");
     }
 
+    //TODO: when in puzzle mode, only return the history up to the current state.
     public static String getHistoryString(List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments, String prefix) {
         StringBuilder resultString = new StringBuilder();
         int historyPosition = 0;
