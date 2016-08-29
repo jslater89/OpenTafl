@@ -1,11 +1,8 @@
 package com.manywords.softworks.tafl.command;
 
 import com.manywords.softworks.tafl.OpenTafl;
-import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.Utilities;
+import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
-import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
@@ -333,7 +330,7 @@ public class CommandEngine {
             return new CommandResult(Command.Type.SENT, CommandResult.FAIL, command.mError, null);
         }
         // 3. MOVE COMMAND: RETURN MOVE RECORD (receiver sends to callback after verifying side &c)
-        else if(command instanceof CommandParser.Move) {
+        else if(command.getType() == Command.Type.MOVE) {
             if(!mInGame) {
                 return new CommandResult(Command.Type.MOVE, CommandResult.FAIL, "Game over", null);
             }
@@ -357,15 +354,15 @@ public class CommandEngine {
             return new CommandResult(Command.Type.MOVE, CommandResult.SUCCESS, "", record);
         }
         // 4. INFO COMMAND: SUCCESS (command parser does all the required verification)
-        else if(command instanceof CommandParser.Info) {
+        else if(command.getType() == Command.Type.INFO) {
             return new CommandResult(Command.Type.INFO, CommandResult.SUCCESS, "", null);
         }
         // 5. SHOW COMMAND: SUCCESS
-        else if(command instanceof CommandParser.Show) {
+        else if(command.getType() == Command.Type.SHOW) {
             return new CommandResult(Command.Type.SHOW, CommandResult.SUCCESS, "", null);
         }
         // 6. HISTORY COMMAND: SUCCESS
-        else if(command instanceof CommandParser.History) {
+        else if(command.getType() == Command.Type.HISTORY) {
             String gameRecord;
             if(mMode == UiCallback.Mode.REPLAY) {
                 gameRecord = mReplay.getReplayModeInGameHistoryString();
@@ -377,23 +374,23 @@ public class CommandEngine {
             return new CommandResult(Command.Type.HISTORY, CommandResult.SUCCESS, "", gameRecord);
         }
         // 7. HELP COMMAND: SUCCESS
-        else if(command instanceof CommandParser.Help) {
+        else if(command.getType() == Command.Type.HELP) {
             return new CommandResult(Command.Type.HELP, CommandResult.SUCCESS, "", null);
         }
         // 8. RULES COMMAND: SUCCESS
-        else if(command instanceof CommandParser.Rules) {
+        else if(command.getType() == Command.Type.RULES) {
             return new CommandResult(Command.Type.RULES, CommandResult.SUCCESS, "", HumanReadableRulesPrinter.getHumanReadableRules(getGame().getRules()));
         }
         // 9. SAVE COMMAND: SUCCESS
-        else if(command instanceof CommandParser.Save) {
+        else if(command.getType() == Command.Type.SAVE) {
             return new CommandResult(Command.Type.SAVE, CommandResult.SUCCESS, "", null);
         }
         // 10. QUIT COMMAND: SUCCESS
-        else if(command instanceof CommandParser.Quit) {
+        else if(command.getType() == Command.Type.QUIT) {
             return new CommandResult(Command.Type.QUIT, CommandResult.SUCCESS, "", null);
         }
         // 11. ANALYZE COMMAND
-        else if(command instanceof CommandParser.Analyze) {
+        else if(command.getType() == Command.Type.ANALYZE) {
             CommandParser.Analyze a = (CommandParser.Analyze) command;
 
             if(mAnalysisEngine == null) {
@@ -410,14 +407,14 @@ public class CommandEngine {
             }
         }
         // 12. REPLAY START COMMAND
-        else if(command instanceof CommandParser.ReplayEnter) {
+        else if(command.getType() == Command.Type.REPLAY_ENTER) {
             // TODO: if we already have an mReplay, update that off of the current game state.
             ReplayGame rg = ReplayGame.copyGameToReplay(mGame);
             enterReplay(rg);
             return new CommandResult(Command.Type.REPLAY_ENTER, CommandResult.SUCCESS, "", null);
         }
         // 13. REPLAY PLAY HERE COMMAND
-        else if(command instanceof CommandParser.ReplayPlayHere) {
+        else if(command.getType() == Command.Type.REPLAY_PLAY_HERE) {
             if(mInGame) {
                 finishGame(true);
             }
@@ -442,13 +439,13 @@ public class CommandEngine {
             return new CommandResult(Command.Type.REPLAY_PLAY_HERE, CommandResult.SUCCESS, "", null);
         }
         // 14. REPLAY RETURN COMMAND
-        else if(command instanceof CommandParser.ReplayReturn) {
+        else if(command.getType() == Command.Type.REPLAY_RETURN) {
             leaveReplay();
 
             return new CommandResult(Command.Type.REPLAY_RETURN, CommandResult.SUCCESS, "", null);
         }
         // 15. REPLAY NEXT COMMAND
-        else if(command instanceof CommandParser.ReplayNext) {
+        else if(command.getType() == Command.Type.REPLAY_NEXT) {
             CommandParser.ReplayNext n = ((CommandParser.ReplayNext) command);
             if(n.nextVariation == -1) {
                 return new CommandResult(Command.Type.REPLAY_NEXT, CommandResult.FAIL, "Argument is not a variation index", null);
@@ -473,7 +470,7 @@ public class CommandEngine {
             }
         }
         // 16. REPLAY PREV COMMAND
-        else if(command instanceof CommandParser.ReplayPrevious) {
+        else if(command.getType() == Command.Type.REPLAY_PREVIOUS) {
             ReplayGameState state = null;
             ReplayGame.NavigationResult result = mReplay.previousState();
             state = mReplay.getCurrentState();
@@ -492,7 +489,7 @@ public class CommandEngine {
             }
         }
         // 17. REPLAY JUMP COMMAND
-        else if(command instanceof CommandParser.ReplayJump) {
+        else if(command.getType() == Command.Type.REPLAY_JUMP) {
             CommandParser.ReplayJump j = (CommandParser.ReplayJump) command;
             if(j.moveAddress != null) {
                 ReplayGameState state = null;
@@ -519,7 +516,7 @@ public class CommandEngine {
             return new CommandResult(Command.Type.REPLAY_JUMP, CommandResult.FAIL, "Move address out of bounds.", null);
         }
         // 18. VARIATION COMMAND
-        else if(command instanceof CommandParser.Variation) {
+        else if(command.getType() == Command.Type.VARIATION) {
             CommandParser.Variation v = (CommandParser.Variation) command;
 
             if(v.from == null || v.to == null) {
@@ -548,7 +545,7 @@ public class CommandEngine {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.SUCCESS, "", moveResult);
             }
         }
-        else if(command instanceof CommandParser.Delete) {
+        else if(command.getType() == Command.Type.DELETE) {
             CommandParser.Delete d = (CommandParser.Delete) command;
 
             boolean deleted = mReplay.deleteVariation(d.moveAddress);
@@ -557,11 +554,11 @@ public class CommandEngine {
             else return new CommandResult(Command.Type.DELETE, CommandResult.FAIL, "No variation with address " + d.moveAddress + " to delete.", null);
         }
         // 19. ANNOTATE COMMAND
-        else if(command instanceof CommandParser.Annotate) {
+        else if(command.getType() == Command.Type.ANNOTATE) {
             return new CommandResult(Command.Type.ANNOTATE, CommandResult.SUCCESS, "", null);
         }
         // 20. CLIPBOARD-COPY COMMAND
-        else if(command instanceof CommandParser.ClipboardCopy) {
+        else if(command.getType() == Command.Type.CLIPBOARD_COPY) {
             String completePositionString = "";
             if(mMode == UiCallback.Mode.GAME) {
                 completePositionString = mGame.getCurrentState().getPasteableRulesString();
@@ -574,11 +571,11 @@ public class CommandEngine {
             return new CommandResult(Command.Type.CLIPBOARD_COPY, CommandResult.SUCCESS, "Copied position to clipboard", null);
         }
         // 21. CLIPBOARD-PASTE COMMAND
-        else if(command instanceof CommandParser.ClipboardPaste) {
+        else if(command.getType() == Command.Type.CLIPBOARD_PASTE) {
             return new CommandResult(Command.Type.CLIPBOARD_PASTE, CommandResult.SUCCESS, "", null);
         }
         // 22. CHAT COMMAND
-        else if(command instanceof CommandParser.Chat) {
+        else if(command.getType() == Command.Type.CHAT) {
             CommandParser.Chat c = (CommandParser.Chat) command;
             return new CommandResult(Command.Type.CHAT, CommandResult.SUCCESS, c.message, null);
         }

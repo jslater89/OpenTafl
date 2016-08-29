@@ -53,6 +53,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by jay on 4/2/16.
@@ -830,7 +831,11 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 else {
                     statusText(Ansi.UNDERLINE + "Last move" + Ansi.UNDERLINE_OFF + ": " + m);
                     if(!m.getComment().trim().isEmpty()) {
-                        statusText(m.getComment());
+                        String commentText = m.getComment();
+                        if(mReplay.getMode().isPuzzleMode()) {
+                            commentText = commentText.replaceAll(ReplayGame.hintRegex, "").trim();
+                        }
+                        statusText(commentText);
                     }
                 }
             }

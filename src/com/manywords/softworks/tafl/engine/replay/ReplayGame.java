@@ -9,6 +9,7 @@ import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.Ansi;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by jay on 3/31/16.
@@ -23,6 +24,10 @@ public class ReplayGame {
             return this == PUZZLE_LOOSE || this == PUZZLE_STRICT;
         }
     }
+
+    public static final String hintRegex = "\\(Hint:(.*?)\\)";
+    public static final Pattern hintPattern = Pattern.compile(hintRegex, Pattern.CASE_INSENSITIVE);
+
     private Game mGame;
     private List<GameState> mFirstStatesByTurn;
     private List<DetailedMoveRecord> mMoveHistory;
