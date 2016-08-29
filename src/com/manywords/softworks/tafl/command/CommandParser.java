@@ -55,7 +55,7 @@ public class CommandParser {
         else if(command.startsWith("next")) {
             return new ReplayNext(engine, command);
         }
-        else if(command.startsWith("previous")) {
+        else if(command.startsWith("previous") || command.startsWith("prev")) {
             return new ReplayPrevious(engine, command);
         }
         else if(command.startsWith("jump")) {
@@ -537,6 +537,10 @@ public class CommandParser {
                 return
                         "chat [text]\n" +
                                 "Send a chat message to other players in the current game.\n\n";
+            case TAGS:
+                return
+                        "tags\n" +
+                                "Open a dialog box to edit the game's tags.\n\n";
         }
 
         return "";
