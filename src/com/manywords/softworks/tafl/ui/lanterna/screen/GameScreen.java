@@ -866,6 +866,14 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(Command.Type.ANNOTATE);
             }
 
+            if(mCommandEngine.getMode() == Mode.REPLAY && mCommandEngine.getReplay().getMode().isPuzzleMode()) {
+                if(mCommandEngine.getReplay().isInPuzzlePrestart()) {
+                    types.remove(Command.Type.VARIATION);
+                }
+                types.remove(Command.Type.ANNOTATE);
+                types.add(Command.Type.HINT);
+            }
+
             if(mServerConnection != null) {
                 types.add(Command.Type.CHAT);
             }
@@ -889,12 +897,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                         types.remove(Command.Type.ANALYZE);
                         types.remove(Command.Type.REPLAY_ENTER);
                     }
-                }
-            }
-
-            if(mCommandEngine.getMode() == Mode.REPLAY && mCommandEngine.getReplay().getMode() != ReplayGame.ReplayMode.REPLAY) {
-                if(mCommandEngine.getReplay().isInPuzzlePrestart()) {
-                    types.remove(Command.Type.VARIATION);
                 }
             }
 

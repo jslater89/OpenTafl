@@ -20,6 +20,7 @@ import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngin
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 public class CommandEngine {
     private UiCallback.Mode mMode;
@@ -574,7 +575,26 @@ public class CommandEngine {
         else if(command.getType() == Command.Type.CLIPBOARD_PASTE) {
             return new CommandResult(Command.Type.CLIPBOARD_PASTE, CommandResult.SUCCESS, "", null);
         }
-        // 22. CHAT COMMAND
+        // 22. HINT COMMAND
+        else if(command.getType() == Command.Type.HINT) {
+            if(mReplay != null) {
+                ReplayGameState currentState = mReplay.getCurrentState();
+                DetailedMoveRecord enteringMove = (DetailedMoveRecord) currentState.getEnteringMove();
+
+                if(enteringMove != null) {
+                    String comment = enteringMove.getComment();
+                    Matcher m = ReplayGame.hintPattern.matcher(comment);
+                    if (m.find()) {
+                        String hint = m.group(0);
+                        mPrimaryUiCallback.statusText(hint);
+                        return new CommandResult(Command.Type.HINT, CommandResult.SUCCESS, "", null);
+                    }
+                }
+            }
+
+            return new CommandResult(Command.Type.HINT, CommandResult.FAIL, "No hint available.", null);
+        }
+        // 23. CHAT COMMAND
         else if(command.getType() == Command.Type.CHAT) {
             CommandParser.Chat c = (CommandParser.Chat) command;
             return new CommandResult(Command.Type.CHAT, CommandResult.SUCCESS, c.message, null);

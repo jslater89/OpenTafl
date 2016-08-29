@@ -40,5 +40,6 @@ public abstract class Command {
         CLIPBOARD_COPY,
         CLIPBOARD_PASTE,
         CHAT,
+        HINT,
     }
 }
