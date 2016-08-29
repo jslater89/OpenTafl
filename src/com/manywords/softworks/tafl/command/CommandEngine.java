@@ -599,6 +599,10 @@ public class CommandEngine {
             CommandParser.Chat c = (CommandParser.Chat) command;
             return new CommandResult(Command.Type.CHAT, CommandResult.SUCCESS, c.message, null);
         }
+        // 24. TAGS COMMAND
+        else if(command.getType() == Command.Type.TAGS) {
+            return new CommandResult(Command.Type.TAGS, CommandResult.SUCCESS, "", null);
+        }
 
         return new CommandResult(Command.Type.NONE, CommandResult.FAIL, "Command not recognized", null);
     }

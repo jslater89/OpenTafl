@@ -61,7 +61,7 @@ public class CommandParser {
         else if(command.startsWith("jump")) {
             return new ReplayJump(engine, command);
         }
-        else if(command.startsWith("variation")) {
+        else if(command.startsWith("variation") || command.startsWith("var")) {
             return new Variation(engine, command);
         }
         else if(command.startsWith("delete")) {
@@ -81,6 +81,9 @@ public class CommandParser {
         }
         else if(command.startsWith("hint")) {
             return new Hint(engine, command);
+        }
+        else if(command.startsWith("tags")) {
+            return new Tags(engine, command);
         }
         return null;
     }
@@ -421,6 +424,11 @@ public class CommandParser {
     public static class Hint extends Command {
         public Hint(CommandEngine engine, String command) {
             super(Type.HINT);
+        }
+    }
+    public static class Tags extends Command {
+        public Tags(CommandEngine engine, String command) {
+            super(Type.TAGS);
         }
     }
 

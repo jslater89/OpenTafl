@@ -42,10 +42,7 @@ import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
-import com.manywords.softworks.tafl.ui.lanterna.window.ingame.AnnotationDialog;
-import com.manywords.softworks.tafl.ui.lanterna.window.ingame.BoardWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.ingame.CommandWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.ingame.StatusWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.ingame.*;
 import com.manywords.softworks.tafl.ui.lanterna.window.mainmenu.LoadNotationDialog;
 import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
@@ -551,7 +548,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
             else if(getAvailableCommands().contains(c.getType())) {
                 if (c.getType() == Command.Type.REPLAY_RETURN) {
-                    checkReplaySave();
+                    if(!checkReplaySave()) return;
                 }
             }
 
@@ -675,8 +672,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     }
                 }
                 else {
-                    checkReplaySave();
-                    leaveGameUi();
+                    if(checkReplaySave()) leaveGameUi();
                 }
             }
             else if(r.type == Command.Type.ANALYZE) {
@@ -734,7 +730,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 d.setHints(TerminalThemeConstants.CENTERED_MODAL);
                 d.showDialog(mGui);
 
-                //TODO: check to see if we changed things before marking dirty
                 mCommandEngine.getReplay().markDirty();
 
                 updateComments();
@@ -752,14 +747,19 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 d.setHints(TerminalThemeConstants.CENTERED_MODAL);
                 d.showLoadNotationDialog(mGui);
             }
+            else if (r.type == Command.Type.TAGS) {
+                TagSettingsDialog d = new TagSettingsDialog(mCommandEngine.getReplay());
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+                d.showDialog(mGui);
+            }
             else {
-                if(r.message != null && !r.message.isEmpty()) {
+                if (r.message != null && !r.message.isEmpty()) {
                     statusText(r.message);
                 }
             }
         }
 
-        private void checkReplaySave() {
+        private boolean checkReplaySave() {
             if(mCommandEngine.getReplay() != null && !mCommandEngine.getReplay().getMode().isPuzzleMode() && mCommandEngine.getReplay().isDirty()) {
                 MessageDialogBuilder builder = new MessageDialogBuilder();
                 builder.setTitle("Replay not saved!");
@@ -770,9 +770,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 MessageDialogButton result = dialog.showDialog(mGui);
 
                 if(result.equals(MessageDialogButton.Cancel)) {
-                    return;
+                    return false;
                 }
             }
+            return true;
         }
 
         private void tryTimeUpdate() {
@@ -864,6 +865,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(Command.Type.VARIATION);
                 types.add(Command.Type.DELETE);
                 types.add(Command.Type.ANNOTATE);
+                types.add(Command.Type.TAGS);
             }
 
             if(mCommandEngine.getMode() == Mode.REPLAY && mCommandEngine.getReplay().getMode().isPuzzleMode()) {
@@ -871,6 +873,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     types.remove(Command.Type.VARIATION);
                 }
                 types.remove(Command.Type.ANNOTATE);
+                types.remove(Command.Type.TAGS);
                 types.add(Command.Type.HINT);
             }
 

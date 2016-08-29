@@ -41,5 +41,6 @@ public abstract class Command {
         CLIPBOARD_PASTE,
         CHAT,
         HINT,
+        TAGS,
     }
 }
