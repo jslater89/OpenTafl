@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.engine.replay;
 
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.command.CommandParser;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -8,11 +9,25 @@ import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.ui.Ansi;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by jay on 3/31/16.
  */
 public class ReplayGame {
+    public enum ReplayMode {
+        REPLAY,
+        PUZZLE_LOOSE,
+        PUZZLE_STRICT;
+
+        public boolean isPuzzleMode() {
+            return this == PUZZLE_LOOSE || this == PUZZLE_STRICT;
+        }
+    }
+
+    public static final String hintRegex = "\\(Hint:(.*?)\\)";
+    public static final Pattern hintPattern = Pattern.compile(hintRegex, Pattern.CASE_INSENSITIVE);
+
     private Game mGame;
     private List<GameState> mFirstStatesByTurn;
     private List<DetailedMoveRecord> mMoveHistory;
@@ -25,6 +40,11 @@ public class ReplayGame {
     private Map<GameState, TimeSpec> mDefenderTimeSpecsByState;
 
     private boolean mDirty = false;
+
+    private ReplayMode mMode = ReplayMode.REPLAY;
+    private MoveAddress mPuzzlePrestart = null; // No default prestart position
+    private MoveAddress mPuzzleStart = MoveAddress.newRootAddress();
+    private Set<GameState> mPuzzleStatesExplored = new HashSet<>();
 
     /**
      * This constructor takes a game object and plays the given
@@ -50,11 +70,13 @@ public class ReplayGame {
 
         for(MoveRecord m : movesToPlay) {
             int result = mGame.getCurrentState().makeMove(m);
-            if(result < GameState.GOOD_MOVE) {
+            if(result < GameState.LOWEST_NONERROR_RESULT) {
                 throw new IllegalStateException("Failed to make move " + m + "! Error: " + result);
             }
 
         }
+
+        dumpHistory();
 
         variationsToPlay.sort((o1, o2) -> o1.address.getElements().size() - o2.address.getElements().size());
 
@@ -65,6 +87,9 @@ public class ReplayGame {
             if(v == null) {
                 MoveAddress rootStateAddress = new MoveAddress(container.address.getElementsBefore(container.address.getElements().size() - 2));
                 rootForVariation = getStateByAddress(rootStateAddress);
+                if(rootForVariation.getMoveAddress().getElements().size() == 1) {
+                    rootForVariation = rootForVariation.getParent();
+                }
             }
             else {
                 // make a new variation off of the last thing in this variation.
@@ -75,13 +100,14 @@ public class ReplayGame {
                 ReplayGameState inVariation = rootForVariation;
                 for(DetailedMoveRecord m : container.moves) {
                     ReplayGameState state = inVariation.makeVariation(m);
-                    if(state.getLastMoveResult() >= GameState.GOOD_MOVE) {
+                    if(state.getLastMoveResult() >= GameState.LOWEST_NONERROR_RESULT) {
                         inVariation = state;
                     }
                     else {
                         OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Failed to apply move: " + m + " with result " + state.getLastMoveResult());
                         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Variation container address: " + container.address);
                         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Root state address: " + inVariation.getMoveAddress());
+                        break;
                     }
                 }
             }
@@ -96,15 +122,43 @@ public class ReplayGame {
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Game history after load: " + mGame.getHistory());
         setCurrentState((ReplayGameState) mGame.getHistory().get(0));
 
-        /*
-        for(int i = 0; i < movesToPlay.size(); i++) {
-            mGame.getHistory().get(i).setExitingMove(movesToPlay.get(i));
-            mGame.getHistory().get(i+1).setEnteringMove(movesToPlay.get(i));
-        }
-        */
-
         setupFirstStatesList();
         setupTimeSpecLists();
+
+        Map<String, String> tagMap = game.getTagMap();
+        if(tagMap.containsKey("puzzle-mode")) {
+            if(tagMap.get("puzzle-mode").equals("loose")) {
+                mMode = ReplayMode.PUZZLE_LOOSE;
+            }
+            else if(tagMap.get("puzzle-mode").equals("strict")) {
+                mMode = ReplayMode.PUZZLE_STRICT;
+            }
+
+            if(mMode != ReplayMode.REPLAY) {
+                if (tagMap.containsKey("puzzle-prestart")) {
+                    MoveAddress address = MoveAddress.parseAddress(tagMap.get("puzzle-prestart"));
+                    if (address != null) {
+                        mPuzzlePrestart = address;
+                        mPuzzleStart = address;
+                    }
+                }
+
+                if (tagMap.containsKey("puzzle-start")) {
+                    MoveAddress address = MoveAddress.parseAddress(tagMap.get("puzzle-start"));
+                    if (address != null) {
+                        mPuzzleStart = address;
+                    }
+                }
+
+                MoveAddress startPosition = (mPuzzlePrestart != null ? mPuzzlePrestart : mPuzzleStart);
+                ReplayGameState state = getStateByAddress(startPosition);
+                if(state != null) {
+                    setCurrentState(state);
+                }
+            }
+        }
+
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "mode/prestart/start " + mMode + "/" + mPuzzlePrestart + "/" + mPuzzleStart);
     }
 
     /**
@@ -134,6 +188,12 @@ public class ReplayGame {
         return mGame;
     }
 
+    public ReplayMode getMode() { return mMode; }
+
+    public void setMode(ReplayMode mode) {
+        mMode = mode;
+    }
+
     public void markDirty() {
         mDirty = true;
     }
@@ -146,23 +206,116 @@ public class ReplayGame {
         return mDirty;
     }
 
+    public boolean isInPuzzlePrestart() {
+        ReplayGameState currentState = getCurrentState();
+        ReplayGameState puzzlePrestart = (mPuzzlePrestart == null ? null : getStateByAddress(mPuzzlePrestart));
+        ReplayGameState puzzleStart = getStateByAddress(mPuzzleStart);
+
+        if(mMode == ReplayMode.REPLAY) return false; // If we aren't in a puzzle, we aren't in prestart
+        if(puzzlePrestart == null) return false; // If there is no prestart, obviously, we aren't in it
+        if(puzzleStart.getMoveAddress().equals(puzzlePrestart.getMoveAddress())) return false; // If start and prestart are the same, we can't be in the latter
+
+        // If we are or are after the puzzle prestart position, but aren't and aren't after the puzzle start position, we're in prestart.
+        return currentState.getMoveAddress().isOrIsAfter(mPuzzlePrestart) && currentState.getMoveAddress().isBefore(mPuzzleStart);
+    }
+
     public String getReplayModeInGameHistoryString() {
-        return getHistoryString(mGame.getHistory(), getCurrentState().getMoveAddress(), false, false);
+        if(mMode.isPuzzleMode()) {
+            List<GameState> truncatedHistory = new ArrayList<>();
+            MoveAddress startAddress = (mPuzzlePrestart != null ? mPuzzlePrestart : mPuzzleStart);
+            ReplayGameState state = getStateByAddress(startAddress);
+
+            while(state != null) {
+                MoveAddress address = state.getMoveAddress();
+                if(address.isBetween(mPuzzlePrestart, mPuzzleStart) || mPuzzleStatesExplored.contains(state)) {
+                    truncatedHistory.add(state);
+                }
+                state = state.getCanonicalChild();
+            }
+
+            return getHistoryString(truncatedHistory, getCurrentState().getMoveAddress(), false, false);
+        }
+        else {
+            return getHistoryString(mGame.getHistory(), getCurrentState().getMoveAddress(), false, false);
+        }
     }
 
-    public ReplayGameState nextState() {
+    // Codes for the navigational methods
+    public enum NavigationResult {
+        SUCCESS,
+        INVALID_ARGUMENT,
+        END_OF_GAME,
+        PUZZLE_DISALLOWS_NAVIGATION
+    }
+    public NavigationResult nextState(int childVariation) {
         ReplayGameState state = getCurrentState();
-        if(state.getCanonicalChild() != null) setCurrentState(state.getCanonicalChild());
-        return getCurrentState();
+        ReplayGameState nextState;
+        if(childVariation == CommandParser.ReplayNext.CANONICAL_CHILD) {
+            nextState = state.getCanonicalChild();
+        }
+        else {
+            List<Variation> variations = state.getVariations();
+            if(variations.size() > childVariation - 1) {
+                nextState = variations.get(childVariation - 1).getRoot();
+            }
+            else {
+                nextState = null;
+            }
+        }
+
+        if (nextState != null) {
+            if (mMode.isPuzzleMode()) {
+                if (nextState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(nextState)) {
+                    setCurrentState(nextState);
+                    return NavigationResult.SUCCESS;
+                }
+                else if (nextState.getMoveAddress().isAfter(mPuzzlePrestart) && nextState.getMoveAddress().isOrIsBefore(mPuzzleStart)) {
+                    setCurrentState(nextState);
+                    return NavigationResult.SUCCESS;
+                }
+                else {
+                    return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
+                }
+            }
+            else {
+                setCurrentState(nextState);
+                return NavigationResult.SUCCESS;
+            }
+        }
+        else {
+            return NavigationResult.END_OF_GAME;
+        }
     }
 
-    public GameState previousState() {
+    public NavigationResult previousState() {
         ReplayGameState state = getCurrentState();
-        if(state.getParent() != null) setCurrentState(state.getParent());
-        return getCurrentState();
+        ReplayGameState previousState = state.getParent();
+
+        if(previousState != null) {
+            if(mMode.isPuzzleMode()) {
+                if (previousState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(previousState)) {
+                    setCurrentState(previousState);
+                    return NavigationResult.SUCCESS;
+                }
+                else if (previousState.getMoveAddress().isOrIsAfter(mPuzzlePrestart) && previousState.getMoveAddress().isOrIsBefore(mPuzzleStart)) {
+                    setCurrentState(previousState);
+                    return NavigationResult.SUCCESS;
+                }
+                else {
+                    return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
+                }
+            }
+            else {
+                setCurrentState(previousState);
+                return NavigationResult.SUCCESS;
+            }
+        }
+        else {
+            return NavigationResult.INVALID_ARGUMENT;
+        }
     }
 
-    public GameState setPositionByAddress(MoveAddress address) {
+    public NavigationResult setPositionByAddress(MoveAddress address) {
         if(address.getElements().size() % 2 == 1) {
             // 12. means 12a
             if(address.getLastElement().moveIndex == -1) {
@@ -179,12 +332,27 @@ public class ReplayGame {
             }
         }
 
-        if(state != null) setCurrentState(state);
-        return getCurrentState();
+        // Don't allow jumping to before the puzzle start (or prestart, if present)
+        if(mMode.isPuzzleMode()) {
+            if (mPuzzlePrestart != null && address.isBefore(mPuzzlePrestart)) return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
+            else if (mPuzzlePrestart == null && address.isBefore(mPuzzleStart)) return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
+
+            if(address.isAfter(mPuzzleStart) && !mPuzzleStatesExplored.contains(state)) {
+                return NavigationResult.PUZZLE_DISALLOWS_NAVIGATION;
+            }
+        }
+
+        if(state != null) {
+            setCurrentState(state);
+            return NavigationResult.SUCCESS;
+        }
+        else {
+            return NavigationResult.INVALID_ARGUMENT;
+        }
     }
 
     public void prepareForGameStart() {
-        ReplayGameState state = getStateByAddress("1a");
+        ReplayGameState state = getStateByAddress(MoveAddress.newRootAddress());
         if(state == null) throw new IllegalStateException("Can't start a game from a zero-length replay");
 
         ReplayGameState nextState = null;
@@ -220,6 +388,10 @@ public class ReplayGame {
     public void setCurrentState(ReplayGameState replayGameState) {
         if(replayGameState == null) throw new IllegalArgumentException("Set current state to null");
 
+        if(mMode.isPuzzleMode()) {
+            mPuzzleStatesExplored.add(replayGameState);
+        }
+
         mGame.setCurrentState(replayGameState);
         mCurrentState = replayGameState;
     }
@@ -228,18 +400,46 @@ public class ReplayGame {
         return mCurrentState;
     }
 
+    public boolean moveExistsFromCurrentState(MoveRecord move) {
+        return moveExistsFromState(move, getCurrentState());
+    }
+
+    public boolean moveExistsFromState(MoveRecord move, ReplayGameState state) {
+        boolean moveExists = false;
+
+        if(state.getCanonicalChild() != null && state.getCanonicalChild().getEnteringMove().softEquals(move)) moveExists = true;
+
+        for(Variation v : state.getVariations()) {
+            if(v.getRoot().getEnteringMove().equals(move)) moveExists = true;
+            if(moveExists) break;
+        }
+
+        return moveExists;
+    }
+
     public ReplayGameState makeVariation(MoveRecord move) {
-        ReplayGameState state = (ReplayGameState) getCurrentState();
+        boolean moveExists = moveExistsFromCurrentState(move);
+        if(mMode == ReplayMode.PUZZLE_STRICT) {
+            if(!moveExists) return new ReplayGameState(GameState.STRICT_PUZZLE_MISSING_MOVE);
+        }
+
+        ReplayGameState state = getCurrentState();
 
         // Don't allow variations after a victory
-        if(state.getLastMoveResult() > GameState.GOOD_MOVE) {
+        if(state.getLastMoveResult() > GameState.HIGHEST_NONTERMINAL_RESULT) {
             return state;
         }
 
         ReplayGameState variationState = state.makeVariation(move);
 
-        if(variationState.getLastMoveResult() >= GameState.GOOD_MOVE) {
+        if(variationState.getLastMoveResult() >= GameState.LOWEST_NONERROR_RESULT) {
             // Don't set errors into current state, oy.
+
+            // TODO: when this is flagified, correct the logic
+            if(mMode.isPuzzleMode() && !moveExists && variationState.getLastMoveResult() == GameState.GOOD_MOVE) {
+                variationState.setLastMoveResult(GameState.GOOD_MOVE_NOT_IN_PUZZLE);
+            }
+
             setCurrentState(variationState);
             mDirty = true;
         }
@@ -397,6 +597,9 @@ public class ReplayGame {
         MoveAddress prefix = new MoveAddress(moveAddress.getAllRootElements());
 
         ReplayGameState state = getStateByAddress(prefix);
+        if(state.getMoveAddress().getElements().size() == 1) {
+            state = state.getParent();
+        }
 
         if(state != null) {
             if(state.getVariations().size() > (moveAddress.getLastElement().rootIndex - 1)) {
@@ -421,7 +624,7 @@ public class ReplayGame {
 
         ReplayGameState result = null;
         if(startingPoint != null && moveAddress.getNonRootElements().size() > 0) {
-            result = startingPoint.findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
+            result = startingPoint.getParent().findVariationState(new MoveAddress(moveAddress.getNonRootElements()));
         }
         if(startingPoint != null && startingPoint.getMoveAddress().equals(moveAddress)) {
             result = startingPoint;
@@ -441,56 +644,58 @@ public class ReplayGame {
     public String getCommentedHistoryString(boolean truncateRootMoves) {
         return getHistoryString(mGame.getHistory(), null, truncateRootMoves, true);
     }
-
     public static String getHistoryString(List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments) {
+        return getHistoryString(history, highlightAddress, truncateRootMoves, includeComments, "");
+    }
+
+    public static String getHistoryString(List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments, String prefix) {
         StringBuilder resultString = new StringBuilder();
         int historyPosition = 0;
         ReplayGameState state = (ReplayGameState) history.get(historyPosition);
         List<ReplayGameState> currentTurn = new ArrayList<>();
         List<Variation> currentTurnVariations = new ArrayList<>();
-        int currentTurnIndex = 1;
+        int currentTurnIndex = 0;
 
         while(state != null) {
             // Get all states in a given turn.
             if(state.getMoveAddress().getLastElement().rootIndex == currentTurnIndex) {
                 currentTurn.add(state);
-                currentTurnVariations.addAll(state.getVariations());
+                if(state.getParent() != null && (state.getParent().getMoveAddress().getElements().size() == state.getMoveAddress().getElements().size())) {
+                    currentTurnVariations.addAll(state.getParent().getVariations());
+                }
             }
             else {
-                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments);
+                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments, prefix);
 
                 currentTurn.clear();
                 currentTurnVariations.clear();
                 currentTurnIndex = state.getMoveAddress().getLastElement().rootIndex;
                 currentTurn.add(state);
-                currentTurnVariations.addAll(state.getVariations());
+                if(state.getParent() != null && (state.getParent().getMoveAddress().getElements().size() == state.getMoveAddress().getElements().size())) {
+                    currentTurnVariations.addAll(state.getParent().getVariations());
+                }
             }
 
             historyPosition += 1;
             if(historyPosition == history.size()) {
-                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments);
+                currentTurnVariations.addAll(state.getVariations()); // required for puzzles, where the last known state might have variations
+                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments, prefix);
                 break;
             }
             state = (ReplayGameState) history.get(historyPosition);
         }
 
-        // Print the turn header.
-
-        // For each state, get all variations and place in list.
-
-        // For each variation, do this method.
-
         return resultString.toString();
     }
 
-    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, MoveAddress highlightAddress, StringBuilder resultString, boolean truncateRootMoves, boolean includeComments) {
+    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, MoveAddress highlightAddress, StringBuilder resultString, boolean truncateRootMoves, boolean includeComments, String prefix) {
         boolean first = true;
         boolean emptyTurn = false;
 
         // 1. States in the current turn
         for(ReplayGameState turnState : currentTurn) {
             if(first) {
-                if(turnState.getMoveAddress().getElements().size() == 1 && turnState.getExitingMove() == null) {
+                if(turnState.getEnteringMove() == null) {
                     emptyTurn = true;
                     break;
                 }
@@ -502,10 +707,12 @@ public class ReplayGame {
                 a.getLastElement().moveIndex = 0;
 
                 if(truncateRootMoves && a.getElements().size() == 1) {
+                    if(!includeComments) resultString.append(prefix);
                     resultString.append(a.getLastElement().rootIndex);
                     resultString.append(".");
                 }
                 else {
+                    if(!includeComments) resultString.append(prefix);
                     resultString.append(a);
                 }
 
@@ -521,17 +728,9 @@ public class ReplayGame {
             }
 
             boolean appended = false;
-            if(turnState.getMoveAddress().getElements().size() == 1) {
-                if (turnState.getExitingMove() != null) {
-                    resultString.append(turnState.getExitingMove());
-                    appended = true;
-                }
-            }
-            else {
-                if (turnState.getEnteringMove() != null) {
-                    resultString.append(turnState.getEnteringMove());
-                    appended = true;
-                }
+            if (turnState.getEnteringMove() != null) {
+                resultString.append(turnState.getEnteringMove());
+                appended = true;
             }
 
             if(turnState.getMoveAddress().equals(highlightAddress)) {
@@ -542,20 +741,16 @@ public class ReplayGame {
                 resultString.append(" ");
             }
         }
-        resultString.append("\n");
+        if(!first) resultString.append("\n");
 
         // 2. Comments, if necessary
-        if(includeComments && !emptyTurn) {
+        if(includeComments && !emptyTurn && !first) {
             first = true;
             resultString.append("[");
 
             for(ReplayGameState turnState : currentTurn) {
                 DetailedMoveRecord moveOfInterest = null;
-                if (turnState.getMoveAddress().getElements().size() == 1) {
-                    if (turnState.getExitingMove() != null) moveOfInterest = (DetailedMoveRecord) turnState.getExitingMove();
-                } else {
-                    if (turnState.getEnteringMove() != null) moveOfInterest = (DetailedMoveRecord) turnState.getEnteringMove();
-                }
+                if (turnState.getEnteringMove() != null) moveOfInterest = (DetailedMoveRecord) turnState.getEnteringMove();
 
                 if(moveOfInterest != null) {
 
@@ -580,7 +775,9 @@ public class ReplayGame {
         for(Variation v : currentTurnVariations) {
             List<GameState> variationStates = new ArrayList<>();
             variationStates.addAll(v.getStates());
-            resultString.append(getHistoryString(variationStates, highlightAddress, truncateRootMoves, includeComments));
+            resultString.append(getHistoryString(variationStates, highlightAddress, truncateRootMoves, includeComments, prefix + "   "));
+            if(!includeComments) resultString.append("\n");
+
         }
     }
 

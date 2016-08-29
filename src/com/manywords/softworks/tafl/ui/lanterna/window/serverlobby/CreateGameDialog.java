@@ -192,25 +192,25 @@ public class CreateGameDialog extends DialogWindow {
 
         p.addComponent(rulesButtonPanel);
 
-        p.addComponent(newSpacer());
+        p.addComponent(TerminalUtils.newSpacer());
 
         topGridPanel.addComponent(timeButton);
-        topGridPanel.addComponent(newSpacer());
+        topGridPanel.addComponent(TerminalUtils.newSpacer());
         topGridPanel.addComponent(timeLabel);
 
         p.addComponent(topGridPanel);
 
-        p.addComponent(newSpacer());
+        p.addComponent(TerminalUtils.newSpacer());
 
         p.addComponent(passwordLabel);
         p.addComponent(mPasswordInput);
 
-        p.addComponent(newSpacer());
+        p.addComponent(TerminalUtils.newSpacer());
 
         p.addComponent(sideLabel);
         p.addComponent(sideChooser);
 
-        p.addComponent(newSpacer());
+        p.addComponent(TerminalUtils.newSpacer());
 
         p.addComponent(otherOptionsLabel);
         p.addComponent(optionsChooser);
@@ -220,7 +220,7 @@ public class CreateGameDialog extends DialogWindow {
 
         bottomGridPanel.addComponent(finishButton);
         bottomGridPanel.addComponent(cancelButton);
-        bottomGridPanel.addComponent(newSpacer());
+        bottomGridPanel.addComponent(TerminalUtils.newSpacer());
 
         p.addComponent(bottomGridPanel);
 
@@ -242,9 +242,5 @@ public class CreateGameDialog extends DialogWindow {
             mPasswordInput.setPreferredSize(new TerminalSize(preferredSize.getColumns() - 1, 1));
         }
         return preferredSize;
-    }
-
-    private EmptySpace newSpacer() {
-        return new EmptySpace(new TerminalSize(4, 1));
     }
 }

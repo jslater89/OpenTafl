@@ -1,0 +1,102 @@
+[date:2016.08.27]
+[result:-1]
+[compiler:Jay Slater]
+[annotator:Jay Slater]
+[puzzle-mode:loose]
+[puzzle-prestart:0a]
+[puzzle-start:1b]
+[rules:dim:11 name:Fetlar_Defenders_First atkf:n nj:n cj:n start:/4tt2t2/3tTTT2t1/1t2T3T1t/t2T4T2/t9t/t4K1T1tt/t3TTT3t/t4T1t2t/3t7/5t5/4ttt4/]
+[start-comment:This puzzle is an example of OpenTafl's puzzle features. Any replay may be turned into a puzzle by using the 'tags' command to set its puzzle mode to true; OpenTafl will prompt the user to load the replay as a puzzle in the future. 
+
+Enter 'next' to continue.]
+
+1. Kf6-c6 a8-c8 
+[This position arose during a game between me and my friend Nasa, who plays a sometimes-weekly tafl game with me. At this juncture, I threaten escape in two ways. Nasa, unfortunately, picked the wrong one to block.
+
+Enter 'next' to continue.|The puzzle starts here. Use the 'variation' command to try moves, and 'next', 'previous', and 'jump' to navigate through the tree you have revealed. The 'history' command can be used to view the move tree.
+
+This puzzle uses OpenTafl's loose puzzle mode. You're free to try any line of play you like; OpenTafl will alert you when you're off of the lines of play I have embedded in this puzzle.
+
+When you're in a state which I have foreseen, you can enter 'hint' to get a hint about the next move.
+
+It's the defenders' move. Take it away!
+
+(Hint: In tafl puzzles as well as chess puzzles, it frequently helps to look for the move with the fewest number of responses. Have a look at the king, and where he can move this turn.)]
+
+2. Kc6-c1 b3-b1 
+[The king sails grandly through the hole in the attacking cordon!
+
+As you can see, the attacking player has only one response, b3-b1.
+
+(Hint: I already told you what the attacker's response must be.)|The attacker makes the obvious block, defending the a1 corner.
+
+(Hint: The king is the piece to move here, and he stays in the vicinity of the a1 corner.)]
+
+2a.1.1a. Kc6-c2xd2 
+[Although this move does threaten escape, it allows the attacking player a choice of two moves to counter it. Kc6-c1 leaves the attacker only one response. It's often easier to think a large number of moves ahead when you leave the other player with only one response.
+
+Type 'previous' and try again.]
+
+2a.2.1a. Kc6-b6 
+[Although it may seem tempting at first, since it puts the king on a file with a path to an edge, it's actually a terrible move. It yields tempo to the attacking player, who can simply move a7-b7 and close off the entire a11 corner.
+
+Play it out if you like, or enter 'previous' and try again.]
+
+3. Kc1-c2xd2 b1-b2 
+[Congratulations! You're on the right track.
+
+(Hint: The attacker has two responses here. Both are annotated.)|]
+
+3a.1.1a. Kc1-d1 
+[Clever thinking, but unfortunately, flawed. This can play out two ways:
+
+1. The attackers move b1-c1, and now the king is trapped, and the defenders have to spring him somehow. This takes a while.
+
+2. The attackers move a piece onto the b file, and the defenders move Kd1-c1xb1. The attackers reply with ...b1, and the king has to play out a guillotine. The attackers have at least ten pieces they can sacrifice in this manner.
+
+Enter 'previous' and try again.]
+
+3a.2.1a. Kc1-c3 
+[Another one that looks good, and seems to play out well at first glance, but which turns out being another slog. Don't take my word for it; try it out.
+
+Try 'jump 2b' when you're done to go back to the move just before this one.]
+
+3b.1.1a. ..... a4-a2 
+[This is the second of the attacker's responses. It takes exactly as long to win as does the other line: six more moves for the defender.]
+
+3b.1.2a. e3-a3xa2 b1-b2 
+[|]
+
+3b.1.3a. a3-a2xb2 e1-b1 
+[|]
+
+3b.1.4a. Kc2-b2 a7-b7 
+[|]
+
+3b.1.5a. a2-a3 a5-a4 
+[|]
+
+3b.1.6a. Kb2-a2 b1-b2 
+[|]
+
+3b.1.7a. Ka2-a1 
+[]
+
+4. e3-a3 e1-c1 
+[|]
+
+5. a3-a2xb2 a7-b7 
+[|]
+
+6. Kc2-b2 b7-b3 
+[|]
+
+7. a2-a3 c1-b1 
+[|]
+
+8. Kb2-a2 b1-b2 
+[|]
+
+9. Ka2-a1 
+[]
+

@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.ui.lanterna.window.selfplay;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.window.mainmenu.MainMenuWindow;
 import com.manywords.softworks.tafl.ui.selfplay.MatchResult;
@@ -25,9 +26,9 @@ public class SelfplayResultWindow extends BasicWindow {
         Panel p = new Panel();
         p.setLayoutManager(new GridLayout(3));
         Label l1 = new Label("AI Self-Play Results");
-        p.addComponent(newSpacer());
+        p.addComponent(TerminalUtils.newSpacer());
         p.addComponent(l1);
-        p.addComponent(newSpacer());
+        p.addComponent(TerminalUtils.newSpacer());
 
         Label l = new Label("Winner");
         p.addComponent(l);
@@ -49,14 +50,10 @@ public class SelfplayResultWindow extends BasicWindow {
         Button b = new Button("Main Menu", () -> {
             mTerminalCallback.onMenuNavigation(new MainMenuWindow(mTerminalCallback));
         });
-        p.addComponent(newSpacer());
-        p.addComponent(newSpacer());
+        p.addComponent(TerminalUtils.newSpacer());
+        p.addComponent(TerminalUtils.newSpacer());
         p.addComponent(b);
 
         setComponent(p);
-    }
-
-    private EmptySpace newSpacer() {
-        return new EmptySpace(new TerminalSize(4, 1));
     }
 }
