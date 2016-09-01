@@ -19,7 +19,7 @@ This puzzle uses OpenTafl's loose puzzle mode. You're free to try any line of pl
 
 When you're in a state which I have foreseen, you can enter 'hint' to get a hint about the next move.
 
-It's the defenders' move. Take it away!
+It's the defenders' move, and the king escapes in eight moves. Take it away!
 
 (Hint: In tafl puzzles as well as chess puzzles, it frequently helps to look for the move with the fewest number of responses. Have a look at the king, and where he can move this turn.)]
 
@@ -29,6 +29,8 @@ It's the defenders' move. Take it away!
 As you can see, the attacking player has only one response, b3-b1.
 
 (Hint: I already told you what the attacker's response must be.)|The attacker makes the obvious block, defending the a1 corner.
+
+From here, there are two moves which assure the king of victory, one in five moves and one in six. Each move has two paths. (At least, two paths I've discovered. There may well be more.) See if you can find them both.
 
 (Hint: The king is the piece to move here, and he stays in the vicinity of the a1 corner.)]
 
@@ -43,9 +45,11 @@ Type 'previous' and try again.]
 Play it out if you like, or enter 'previous' and try again.]
 
 3. Kc1-c2xd2 b1-b2 
-[Congratulations! You're on the right track.
+[Congratulations! This is one of the moves which leads to a white victory. It takes six moves from here.
 
-(Hint: The attacker has two responses here. Both are annotated.)|]
+(Hint: The attacker has two responses here. Both are annotated.)|The attackers make the obvious response. White could play Kc2-c1 again, but that leads to a threefold repetition, and white can do better than draw here.
+
+(Hint: How can white remove the blocking piece without moving Kc2-c1?)]
 
 3a.1.1a. Kc1-d1 
 [Clever thinking, but unfortunately, flawed. This can play out two ways:
@@ -56,10 +60,43 @@ Play it out if you like, or enter 'previous' and try again.]
 
 Enter 'previous' and try again.]
 
-3a.2.1a. Kc1-c3 
+3a.2.1a. Kc1-c3 e1-c1 
 [Another one that looks good, and seems to play out well at first glance, but which turns out being another slog. Don't take my word for it; try it out.
 
-Try 'jump 2b' when you're done to go back to the move just before this one.]
+Try 'jump 2b' when you're done to go back to the move just before this one.|]
+
+3a.2.1a.1.1a. ..... b1-b2 
+[]
+
+3a.2.1a.1.2a. Kc3-a3 b2-a2 
+[|]
+
+3a.2.1a.1.3a. Ka3-b3 a2-b2 
+[|]
+
+3a.2.1a.1.4a. Kb3-b11 e11-c11 
+[|]
+
+3a.2.1a.1.5a. Kb11-a11 
+[]
+
+3a.2.2a. Kc3-a3 d2-a2 
+[|]
+
+3a.2.3a. Ka3-b3 a7-b7 
+[You can likely see what a pickle the attackers are in here.|]
+
+3a.2.4a. Kb3-a3xa2 b1-b2 
+[|]
+
+3a.2.5a. Ka3-a1 
+[]
+
+3a.3.1a. e3-a3 d2-a2xa3 
+[|]
+
+3a.3.2a. Kc1-c3 a4-a3 
+[|]
 
 3b.1.1a. ..... a4-a2 
 [This is the second of the attacker's responses. It takes exactly as long to win as does the other line: six more moves for the defender.]
@@ -83,7 +120,28 @@ Try 'jump 2b' when you're done to go back to the move just before this one.]
 []
 
 4. e3-a3 e1-c1 
+[This threatens the piece on b2. The attacker can move b2-a2xa3, but that leaves the king with an escape in three moves instead of six: 1. ..... b2-a2xa3 2. i3-a3xa2 e1-c1 3. Kc2-a2 a7-b7 4. Ka2-a1++|]
+
+4b.1.1a. ..... a7-b7 
+[]
+
+4b.1.2a. d4-b4 e1-c1 
 [|]
+
+4b.1.3a. a3-a2xb2 c8-c3 
+[|]
+
+4b.1.4a. Kc2-b2 c1-b1 
+[|]
+
+4b.1.5a. a2-a3 c3-b3 
+[|]
+
+4b.1.6a. Kb2-a2 a5-b5xb4 
+[|]
+
+4b.1.7a. Ka2-a1 
+[]
 
 5. a3-a2xb2 a7-b7 
 [|]
