@@ -42,7 +42,7 @@ public class OpenTafl {
         SILENT
     }
 
-    public static final String CURRENT_VERSION = "v0.4.3.6b";
+    public static final String CURRENT_VERSION = "v0.4.4.0b";
     public static final int NETWORK_PROTOCOL_VERSION = 7;
 
     public static boolean devMode = false;

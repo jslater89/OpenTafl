@@ -5,11 +5,12 @@ README
 3. The game clock
 4. External engines
 5. Replay mode
-6. AI self-play mode
-7. Network play
-8. Headless AI mode
-9. Links
-10. Version history
+6. Puzzles
+7. AI self-play mode
+8. Network play
+9. Headless AI mode
+10. Links
+11. Version history
 
 1. INTRODUCTION ---------------------------------------------------------------
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
@@ -142,7 +143,44 @@ move), for readability and consistency, and 'jump' will accept either form of
 the address.
 
 
-6. AI SELF-PLAY MODE ----------------------------------------------------------
+6. PUZZLES --------------------------------------------------------------------
+Some tafl puzzles come in the form of OpenTafl Notation rules strings, which
+you can simply paste into the 'Load notation' dialog box and play as an
+ordinary game.
+
+OpenTafl also supports rich puzzles embedded into OpenTafl replay files. To
+play such a puzzle, simply load a replay file containing a puzzle. OpenTafl
+will prompt you to load such a puzzle as a puzzle or as a replay. Select the
+former.
+
+OpenTafl will present to you the game interface. If the puzzle author has
+defined a prologue, you may use the 'next' and 'previous' commands to navigate
+through the prologue. The 'history' command will display your progress in the
+puzzle. You may use the 'jump' command to navigate to any state you have
+revealed in the puzzle.
+
+Once you have finished the prologue, if present, use the 'variation' command to
+explore the puzzle. 'next', 'previous', 'jump', and 'history' may be used to
+navigate.
+
+OpenTafl's built-in tools provide everything you need to author a puzzle.
+First, create a replay. Second, play out and annotate the branches you wish to
+include in the puzzle. Finally, use the 'tags' command to set the puzzle mode,
+selecting from one of the options below.
+
+First: loose puzzles. Loose puzzles contain the principal line of play, along
+with variations, all with annotations to guide and educate the puzzle player.
+OpenTafl supports hints in a puzzle's comments, which will be hidden from the
+player until requested. Loose puzzles allow the player to play out variations
+which are not contained in the puzzle file, while notifying the player that
+they have gone off of the beaten track.
+
+Second: strict puzzles. Strict puzzles contain all lines of play the puzzle
+author thinks are interesting, and the player may only explore those lines.
+Variations off of those lines of play will be disallowed.
+
+
+7. AI SELF-PLAY MODE ----------------------------------------------------------
 For external AI developers, OpenTafl provides a mode by which two AIs, or two
 versions of the same AI, can be made to play each other repeatedly, to judge
 relative strength. Start OpenTafl with the '--dev' switch to enable the AI
@@ -158,7 +196,7 @@ Detailed results, including game records for every game, will be saved in the
 'selfplay-results' subdirectory under the main OpenTafl directory.
 
 
-7. NETWORK PLAY ---------------------------------------------------------------
+8. NETWORK PLAY ---------------------------------------------------------------
 OpenTafl can be played with humans and AIs from around the world, using its
 tafl server functionality. Anyone may run an OpenTafl server by running the
 OpenTafl command with the --server flag. An OpenTafl server is provided by
@@ -213,7 +251,7 @@ games. The 'chat' command may be used to interact with your opponent during a
 game, according to the restrictions given above.
 
 
-8. HEADLESS AI MODE -----------------------------------------------------------
+9. HEADLESS AI MODE -----------------------------------------------------------
 OpenTafl can be started in headless AI mode, connecting an external engine to a
 network server. The AI can be set to join a game already present on the server,
 or to continuously host games. Whether joining games or hosting games, the AI
@@ -221,7 +259,7 @@ must use a game clock. The AI will save records of all games it plays in the
 saved-games/headless-ai directory under the OpenTafl directory.
 
 
-9. LINKS ----------------------------------------------------------------------
+10. LINKS ----------------------------------------------------------------------
 http://softworks.manywords.press/opentafl (official website)
 http://soapbox.manywords.press/tag/tafl (development blog)
 https://bitbucket.org/Fishbreath/opentafl (source code, bug reports)
@@ -230,7 +268,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt (engine
 http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation specification)
 
 
-10. VERSION HISTORY -----------------------------------------------------------
+11. VERSION HISTORY -----------------------------------------------------------
+v0.4.4.0b (released 09/xx/16):
+- New stable release
+-
+
 v0.4.3.6b (released 08/26/16):
 - Release candidate for merge to stable branch
 - Slightly improved move ordering/speed of move ordering
