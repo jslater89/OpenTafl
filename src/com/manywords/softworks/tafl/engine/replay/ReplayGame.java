@@ -45,6 +45,7 @@ public class ReplayGame {
     private MoveAddress mPuzzlePrestart = null; // No default prestart position
     private MoveAddress mPuzzleStart = MoveAddress.newRootAddress();
     private Set<GameState> mPuzzleStatesExplored = new HashSet<>();
+    private Set<GameState> mStartingPuzzleStates = new HashSet<>();
 
     /**
      * This constructor takes a game object and plays the given
@@ -80,6 +81,7 @@ public class ReplayGame {
 
         variationsToPlay.sort((o1, o2) -> o1.address.getElements().size() - o2.address.getElements().size());
 
+        List<ReplayGameState> variationStates = new ArrayList<>();
         for(GameSerializer.VariationContainer container : variationsToPlay) {
             Variation v = getVariationByAddress(new MoveAddress(container.address.getAllRootElements()));
 
@@ -102,6 +104,7 @@ public class ReplayGame {
                     ReplayGameState state = inVariation.makeVariation(m);
                     if(state.getLastMoveResult() >= GameState.LOWEST_NONERROR_RESULT) {
                         inVariation = state;
+                        variationStates.add(inVariation);
                     }
                     else {
                         OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Failed to apply move: " + m + " with result " + state.getLastMoveResult());
@@ -134,7 +137,10 @@ public class ReplayGame {
                 mMode = ReplayMode.PUZZLE_STRICT;
             }
 
-            if(mMode != ReplayMode.REPLAY) {
+            if(mMode.isPuzzleMode()) {
+                mStartingPuzzleStates.addAll(mGame.getHistory());
+                mStartingPuzzleStates.addAll(variationStates);
+
                 if (tagMap.containsKey("puzzle-prestart")) {
                     MoveAddress address = MoveAddress.parseAddress(tagMap.get("puzzle-prestart"));
                     if (address != null) {
@@ -233,10 +239,10 @@ public class ReplayGame {
                 state = state.getCanonicalChild();
             }
 
-            return getHistoryString(truncatedHistory, getCurrentState().getMoveAddress(), false, false);
+            return getHistoryString(this, truncatedHistory, getCurrentState().getMoveAddress(), false, false);
         }
         else {
-            return getHistoryString(mGame.getHistory(), getCurrentState().getMoveAddress(), false, false);
+            return getHistoryString(this, mGame.getHistory(), getCurrentState().getMoveAddress(), false, false);
         }
     }
 
@@ -456,20 +462,19 @@ public class ReplayGame {
         else rootAddress = new MoveAddress(moveAddress.getAllRootElements());
 
         ReplayGameState rootState = getStateByAddress(rootAddress);
+        ReplayGameState variationState = getStateByAddress(moveAddress);
 
         if(rootState == null)  {
             return false;
         }
 
-        boolean deleted = false;
-        if(false && rootState.getMoveAddress().equals(moveAddress) && moveAddress.getElements().size() == 1) {
-            if(rootState.getParent() != null) {
-                deleted = rootState.getParent().deleteCanonicalChild();
-            }
+        // In puzzles, don't allow the user to delete states which are part of the
+        // original tree.
+        if(mMode.isPuzzleMode() && mStartingPuzzleStates.contains(variationState)) {
+            return false;
         }
-        else {
-            deleted = rootState.deleteVariation(moveAddress);
-        }
+
+        boolean deleted = rootState.deleteVariation(moveAddress);
 
         // Is the current state deleted? If so, find the first parent that isn't.
         if(deleted) {
@@ -671,17 +676,17 @@ public class ReplayGame {
     }
 
     public String getUncommentedHistoryString(boolean truncateRootMoves) {
-        return getHistoryString(mGame.getHistory(), null, truncateRootMoves, false);
+        return getHistoryString(this, mGame.getHistory(), null, truncateRootMoves, false);
     }
 
     public String getCommentedHistoryString(boolean truncateRootMoves) {
-        return getHistoryString(mGame.getHistory(), null, truncateRootMoves, true);
+        return getHistoryString(this, mGame.getHistory(), null, truncateRootMoves, true);
     }
-    public static String getHistoryString(List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments) {
-        return getHistoryString(history, highlightAddress, truncateRootMoves, includeComments, "");
+    public static String getHistoryString(ReplayGame replay, List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments) {
+        return getHistoryString(replay, history, highlightAddress, truncateRootMoves, includeComments, "");
     }
 
-    public static String getHistoryString(List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments, String prefix) {
+    public static String getHistoryString(ReplayGame replay, List<GameState> history, MoveAddress highlightAddress, boolean truncateRootMoves, boolean includeComments, String prefix) {
         StringBuilder resultString = new StringBuilder();
         int historyPosition = 0;
         ReplayGameState state = (ReplayGameState) history.get(historyPosition);
@@ -698,7 +703,7 @@ public class ReplayGame {
                 }
             }
             else {
-                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments, prefix);
+                finishHistoryTurn(replay, currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments, prefix);
 
                 currentTurn.clear();
                 currentTurnVariations.clear();
@@ -711,8 +716,14 @@ public class ReplayGame {
 
             historyPosition += 1;
             if(historyPosition == history.size()) {
-                currentTurnVariations.addAll(state.getVariations()); // required for puzzles, where the last known state might have variations
-                finishHistoryTurn(currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments, prefix);
+                // required for puzzles, where the last known state might have variations
+                if(replay.getMode().isPuzzleMode()) {
+                    for (Variation v : state.getVariations()) {
+                        if(replay.mPuzzleStatesExplored.contains(v.getRoot())) currentTurnVariations.add(v);
+                    }
+                }
+
+                finishHistoryTurn(replay, currentTurn, currentTurnVariations, highlightAddress, resultString, truncateRootMoves, includeComments, prefix);
                 break;
             }
             state = (ReplayGameState) history.get(historyPosition);
@@ -721,7 +732,7 @@ public class ReplayGame {
         return resultString.toString();
     }
 
-    private static void finishHistoryTurn(List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, MoveAddress highlightAddress, StringBuilder resultString, boolean truncateRootMoves, boolean includeComments, String prefix) {
+    private static void finishHistoryTurn(ReplayGame replay, List<ReplayGameState> currentTurn, List<Variation> currentTurnVariations, MoveAddress highlightAddress, StringBuilder resultString, boolean truncateRootMoves, boolean includeComments, String prefix) {
         boolean first = true;
         boolean emptyTurn = false;
 
@@ -808,7 +819,7 @@ public class ReplayGame {
         for(Variation v : currentTurnVariations) {
             List<GameState> variationStates = new ArrayList<>();
             variationStates.addAll(v.getStates());
-            resultString.append(getHistoryString(variationStates, highlightAddress, truncateRootMoves, includeComments, prefix + "   "));
+            resultString.append(getHistoryString(replay, variationStates, highlightAddress, truncateRootMoves, includeComments, prefix + "   "));
             if(!includeComments) resultString.append("\n");
 
         }

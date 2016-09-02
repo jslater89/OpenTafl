@@ -552,6 +552,7 @@ public class CommandEngine {
             boolean deleted = mReplay.deleteVariation(d.moveAddress);
 
             if(deleted) return new CommandResult(Command.Type.DELETE, CommandResult.SUCCESS, "", null);
+            else if(mReplay.getMode().isPuzzleMode()) return new CommandResult(Command.Type.DELETE, CommandResult.FAIL, "Either variation with address " + d.moveAddress + " does not exist, or it is part of the puzzle and cannot be deleted.", null);
             else return new CommandResult(Command.Type.DELETE, CommandResult.FAIL, "No variation with address " + d.moveAddress + " to delete.", null);
         }
         // 19. ANNOTATE COMMAND
