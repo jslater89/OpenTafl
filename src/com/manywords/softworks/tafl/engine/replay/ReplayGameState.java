@@ -10,6 +10,7 @@ import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by jay on 7/30/16.
@@ -200,7 +201,10 @@ public class ReplayGameState extends GameState {
         // we have to make sure we aren't referencing a state or, if we are referencing a state, that it's the root of
         // the variation.
         if(v != null && (state == null || v.getRoot().equals(state))) {
-            return getParent().deleteVariationInternal(v.getAddress());
+            ReplayGameState variationParent = this;
+            if(getMoveAddress().getElements().size() == 1 && getParent() != null) variationParent = getParent();
+
+            return variationParent.deleteVariationInternal(v.getAddress());
         }
         else if(state != null) {
             ReplayGameState child = mReplayGame.getStateByAddress(moveAddress);
@@ -212,30 +216,40 @@ public class ReplayGameState extends GameState {
         return false;
     }
 
-    private boolean deleteCanonicalChild() {
+    boolean deleteCanonicalChild() {
 
         if(mCanonicalChild != null) {
-            //System.out.println("Old child: " + mCanonicalChild.getMoveAddress() + " " + mCanonicalChild.getEnteringMove());
+//            System.out.println("Old child: " + mCanonicalChild.getMoveAddress() + " " + mCanonicalChild.getEnteringMove());
             if(mEnclosingVariation != null) {
                 mEnclosingVariation.removeState(mCanonicalChild);
             }
+            boolean deletedFromHistory = mReplayGame.deleteFromHistory(mCanonicalChild);
             mCanonicalChild = null; // This is the easy part.
 
-            if(mVariations.size() > 0) {
+            ReplayGameState variationParent = this;
+            //if(getMoveAddress().getElements().size() == 1 && getParent() != null) variationParent = getParent();
+            List<Variation> variations = variationParent.getVariations();
+
+//            System.out.println("This: " + this.getMoveAddress());
+//            System.out.println("This vars: " + this.getVariations());
+//            System.out.println("Variation parent: " + variationParent);
+//            System.out.println("Variation parent vars: " + variations);
+
+            if(variations.size() > 0) {
                 // Keep the old variation around; we'll want the move list.
-                Variation toRelocate = mVariations.get(0);
-                deleteVariationInternal(toRelocate.getAddress());
+                Variation toRelocate = variations.get(0);
+                variationParent.deleteVariationInternal(toRelocate.getAddress());
 
                 for(ReplayGameState rgs : toRelocate.getStates()) {
                     rgs.mEnclosingVariation = null;
                 }
 
                 mCanonicalChild = toRelocate.getRoot();
-                setExitingMove((DetailedMoveRecord) mCanonicalChild.getEnteringMove());
+                variationParent.setExitingMove((DetailedMoveRecord) mCanonicalChild.getEnteringMove());
 
                 // At this point, this variation subtree is now correctly relocated, but incorrectly
                 // addressed.
-                mCanonicalChild.changeParent(this);
+                mCanonicalChild.changeParent(variationParent, deletedFromHistory);
             }
             //System.out.println("New child: " + mCanonicalChild.getMoveAddress() + " " + mCanonicalChild.getEnteringMove());
             return true;
@@ -251,7 +265,7 @@ public class ReplayGameState extends GameState {
         mLastMoveResult = moveResult;
     }
 
-    private void changeParent(ReplayGameState newParent) {
+    private void changeParent(ReplayGameState newParent, boolean deletedFromHistory) {
         // Keep this around. We'll need it to re-prefix things.
         MoveAddress oldAddress = mMoveAddress;
 
@@ -259,7 +273,7 @@ public class ReplayGameState extends GameState {
         setParent(newParent);
 
         mEnclosingVariation = mParent.mEnclosingVariation;
-        mEnclosingVariation.addState(this);
+        if(mEnclosingVariation != null) mEnclosingVariation.addState(this);
 
         // Variations are as simple as re-prefixing. This method recurses
         // to take care of the rest.
@@ -267,63 +281,49 @@ public class ReplayGameState extends GameState {
             v.changeAddressPrefix(oldAddress, mMoveAddress);
         }
 
+        if(deletedFromHistory) {
+            mGame.getHistory().add(this);
+        }
+
         // This is slight overkill, but it does take care of everything and is the simplest.
         if(mCanonicalChild != null) {
-            mCanonicalChild.changeParent(this);
+            mCanonicalChild.changeParent(this, deletedFromHistory);
         }
     }
 
     private boolean deleteVariationInternal(MoveAddress moveAddress) {
-        MoveAddress variationPrefix = new MoveAddress(getMoveAddress());
-        if(getMoveAddress().getElements().size() == 1) variationPrefix = getMoveAddress().increment(mReplayGame, this);
+        Variation v = mReplayGame.getVariationByAddress(moveAddress);
 
-        // Remove this address from the front of the move address.
-        MoveAddress variationAddress = moveAddress.changePrefix(variationPrefix, new MoveAddress());
-        List<MoveAddress.Element> variationElements = variationAddress.getElements();
-
-        if(variationElements.size() == 1) {
-            // Hooray! a variation!
-            int index = variationElements.get(0).rootIndex - 1;
-
-            // No such variation exists
-            if(index > mVariations.size()) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to delete variation " + moveAddress + " from state " + getMoveAddress());
-                return false;
-            }
-
-            MoveAddress m = mVariations.remove(index).getAddress();
-
-            // Each variation now has index i+2 (because they're one-indexed, not zero-indexed).
-            // Its address is our address, plus a variation number, plus the rest of the address. For each one,
-            // the prefix is our address plus i+2. Change that prefix to our address plus i+1.
-            List<MoveAddress.Element> thisElements = variationPrefix.getElements();
-
-            for(int i = index; i < mVariations.size(); i++) {
-                // Allocate inside the loop to avoid any trickiness with reuse
-                MoveAddress.Element oldVariation = new MoveAddress.Element(i+2, -1);
-                MoveAddress.Element newVariation = new MoveAddress.Element(i+1, -1);
-
-                mVariations.get(i).changeAddressPrefix(new MoveAddress(thisElements, oldVariation), new MoveAddress(thisElements, newVariation));
-            }
-
-            return true;
-        }
-        else if(variationElements.size() > 1) {
-            // Get the next replay state addressed by the move address and call this on that
-            MoveAddress.Element variationElement = variationElements.get(0);
-            MoveAddress.Element nextStateElement = variationElements.get(1);
-
-            ReplayGameState variationState = mVariations.get(variationElement.rootIndex - 1).getDirectChild(nextStateElement);
-            if(variationState != null) {
-                return variationState.deleteVariationInternal(moveAddress);
-            }
-            else {
-                return false;
-            }
-        }
-        else {
+        if(v == null) {
             throw new IllegalArgumentException("Argument to deleteVariation does not address a variation: " + moveAddress);
         }
+
+        int index = mVariations.indexOf(v);
+        if(!mVariations.remove(v)) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to delete variation " + moveAddress);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Variation address: " + moveAddress + " Variation: " + v);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "This address: " + getMoveAddress() + " This variations: " + getVariations());
+            OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, new Exception());
+            return false;
+        }
+
+        MoveAddress m = v.getAddress();
+
+        // Each variation now has index i+2 (because they're one-indexed, not zero-indexed).
+        // Its address is our address, plus a variation number, plus the rest of the address. For each one,
+        // the prefix is our address plus i+2. Change that prefix to our address plus i+1.
+        List<MoveAddress.Element> thisElements = m.getAllRootElements();
+
+        for(int i = index; i < mVariations.size(); i++) {
+            // Allocate inside the loop to avoid any trickiness with reuse
+            MoveAddress.Element oldVariation = new MoveAddress.Element(i+2, -1);
+            MoveAddress.Element newVariation = new MoveAddress.Element(i+1, -1);
+
+            mVariations.get(i).changeAddressPrefix(new MoveAddress(thisElements, oldVariation), new MoveAddress(thisElements, newVariation));
+        }
+
+        return true;
+
     }
 
     public void changeAddressPrefix(MoveAddress oldPrefix, MoveAddress newPrefix) {

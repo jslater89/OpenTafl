@@ -209,12 +209,29 @@ public class ReplayGameTest extends TaflTest {
 
         // Delete the two remaining variations
         rg.deleteVariation(MoveAddress.parseAddress("1a.1"));
+        assert rg.getVariationByAddress(MoveAddress.parseAddress("1a.1")) != null;
+        assert rg.getVariationByAddress(MoveAddress.parseAddress("1a.2")) == null;
+
         rg.deleteVariation(MoveAddress.parseAddress("1a.1"));
+        assert rg.getVariationByAddress(MoveAddress.parseAddress("1a.1")) == null;
 
         // No-op: variation doesn't exist
         rg.deleteVariation(MoveAddress.parseAddress("1a.3"));
 
         assert state.getVariations().size() == 0;
+
+        // Test some deletions in the main line of play
+        assert rg.deleteVariation(MoveAddress.parseAddress("18a"));
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, rg.getUncommentedHistoryString(false));
+        assert rg.getStateByAddress("18a") == null;
+
+        assert rg.deleteVariation(MoveAddress.parseAddress("17b"));
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, rg.getUncommentedHistoryString(false));
+        assert rg.getStateByAddress("18a") == null;
+
+        assert rg.deleteVariation(MoveAddress.parseAddress("17a"));
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, rg.getUncommentedHistoryString(false));
+        assert rg.getStateByAddress("18a") != null;
 
         /*
         Tree to build:

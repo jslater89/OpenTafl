@@ -451,13 +451,25 @@ public class ReplayGame {
     }
 
     public boolean deleteVariation(MoveAddress moveAddress) {
-        ReplayGameState rootState = getStateByAddress(new MoveAddress(new ArrayList<>(), moveAddress.getRootElement()));
+        MoveAddress rootAddress;
+        if(moveAddress.getElements().size() == 1) rootAddress = moveAddress;
+        else rootAddress = new MoveAddress(moveAddress.getAllRootElements());
+
+        ReplayGameState rootState = getStateByAddress(rootAddress);
 
         if(rootState == null)  {
             return false;
         }
 
-        boolean deleted = rootState.deleteVariation(moveAddress);
+        boolean deleted = false;
+        if(false && rootState.getMoveAddress().equals(moveAddress) && moveAddress.getElements().size() == 1) {
+            if(rootState.getParent() != null) {
+                deleted = rootState.getParent().deleteCanonicalChild();
+            }
+        }
+        else {
+            deleted = rootState.deleteVariation(moveAddress);
+        }
 
         // Is the current state deleted? If so, find the first parent that isn't.
         if(deleted) {
@@ -594,10 +606,18 @@ public class ReplayGame {
     }
 
     public Variation getVariationByAddress(MoveAddress moveAddress) {
+        // If a move address only has one element, it can't address a variation.
+        if(moveAddress.getElements().size() == 1) return null;
+
         MoveAddress prefix = new MoveAddress(moveAddress.getAllRootElements());
 
         ReplayGameState state = getStateByAddress(prefix);
-        if(state.getMoveAddress().getElements().size() == 1) {
+
+        if(state == null && prefix.getElements().size() == 1) {
+            // If this condition is true, we're deleting the last canonical element of the tree.
+            state = (ReplayGameState) getGame().getHistory().get(getGame().getHistory().size() - 1);
+        }
+        else if(state != null && state.getMoveAddress().getElements().size() == 1) {
             state = state.getParent();
         }
 
@@ -631,6 +651,19 @@ public class ReplayGame {
         }
 
         return result;
+    }
+
+    public boolean deleteFromHistory(ReplayGameState state) {
+        int index = getGame().getHistory().indexOf(state);
+
+        if(index != -1) {
+            int size = getGame().getHistory().size();
+            for (int i = index; i < size; i++) {
+                getGame().getHistory().remove(index);
+            }
+            return true;
+        }
+        return false;
     }
 
     public ReplayGameState getStateByAddress(String s) {
