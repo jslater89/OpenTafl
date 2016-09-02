@@ -874,6 +874,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 }
                 types.remove(Command.Type.ANNOTATE);
                 types.remove(Command.Type.TAGS);
+                types.remove(Command.Type.DELETE);
                 types.add(Command.Type.HINT);
             }
 
