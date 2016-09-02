@@ -45,9 +45,9 @@ Type 'previous' and try again.]
 Play it out if you like, or enter 'previous' and try again.]
 
 3. Kc1-c2xd2 b1-b2 
-[Congratulations! This is one of the moves which leads to a white victory. It takes six moves from here.
+[Congratulations! This is one of the moves which leads to a white victory. It takes seven moves from here, assuming good play from the attackers. There's another path, too, which takes six moves, but requires the attackers to make a misplay. Both lines are annotated, so feel free to explore.
 
-(Hint: The attacker has two responses here. Both are annotated.)|The attackers make the obvious response. White could play Kc2-c1 again, but that leads to a threefold repetition, and white can do better than draw here.
+(Hint: The attacker has two responses here which don't allow the king to escape trivially.  Both are annotated.)|The attackers make the obvious response. White could play Kc2-c1 again, but that leads to a threefold repetition, and white can do better than draw here.
 
 (Hint: How can white remove the blocking piece without moving Kc2-c1?)]
 
@@ -99,7 +99,7 @@ Try 'jump 2b' when you're done to go back to the move just before this one.|]
 [|]
 
 3b.1.1a. ..... a4-a2 
-[This is the second of the attacker's responses. It takes exactly as long to win as does the other line: six more moves for the defender.]
+[This is the second of the attacker's responses, and is a little less good: the defender wins in six moves instead of seven.]
 
 3b.1.2a. e3-a3xa2 b1-b2 
 [|]
@@ -119,42 +119,26 @@ Try 'jump 2b' when you're done to go back to the move just before this one.|]
 3b.1.7a. Ka2-a1 
 []
 
-4. e3-a3 e1-c1 
-[This threatens the piece on b2. The attacker can move b2-a2xa3, but that leaves the king with an escape in three moves instead of six: 1. ..... b2-a2xa3 2. i3-a3xa2 e1-c1 3. Kc2-a2 a7-b7 4. Ka2-a1++|]
+4. e3-a3 a7-b7 
+[This is the better move for the attackers: the king escapes in seven moves.
 
-4b.1.1a. ..... a7-b7 
-[]
+This threatens the piece on b2. The attacker can move b2-a2xa3, but that leaves the king with an escape in three moves instead of seven: 1. ..... b2-a2xa3 2. i3-a3xa2 e1-c1 3. Kc2-a2 a7-b7 4. Ka2-a1++|]
 
-4b.1.2a. d4-b4 e1-c1 
+5. d4-b4 e1-c1 
 [|]
 
-4b.1.3a. a3-a2xb2 c8-c3 
+6. a3-a2xb2 c8-c3 
 [|]
 
-4b.1.4a. Kc2-b2 c1-b1 
+7. Kc2-b2 c1-b1 
 [|]
 
-4b.1.5a. a2-a3 c3-b3 
+8. a2-a3 c3-b3 
 [|]
 
-4b.1.6a. Kb2-a2 a5-b5xb4 
+9. Kb2-a2 a5-b5xb4 
 [|]
 
-4b.1.7a. Ka2-a1 
-[]
-
-5. a3-a2xb2 a7-b7 
-[|]
-
-6. Kc2-b2 b7-b3 
-[|]
-
-7. a2-a3 c1-b1 
-[|]
-
-8. Kb2-a2 b1-b2 
-[|]
-
-9. Ka2-a1 
+10. Ka2-a1 
 []
 
