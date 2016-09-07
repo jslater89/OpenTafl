@@ -6,12 +6,14 @@
 [puzzle-prestart:0a]
 [puzzle-start:1b]
 [rules:dim:11 name:Fetlar_Defenders_First atkf:n nj:n cj:n start:/4tt2t2/3tTTT2t1/1t2T3T1t/t2T4T2/t9t/t4K1T1tt/t3TTT3t/t4T1t2t/3t7/5t5/4ttt4/]
-[start-comment:This puzzle is an example of OpenTafl's puzzle features. Any replay may be turned into a puzzle by using the 'tags' command to set its puzzle mode to true; OpenTafl will prompt the user to load the replay as a puzzle in the future. 
+[start-comment:This puzzle is based upon a game I played against Nasa, my most frequent tafl partner. The endgame proved to be very interesting, so I took the liberty of turning it into a puzzle. It turned into an endgame analysis as much as a puzzle. Also included with OpenTafl is a puzzle labeled 'Ard Ri Escape'; that one is a more traditional puzzle-style puzzle.
+
+This puzzle is an example of OpenTafl's puzzle features. Any replay may be turned into a puzzle by using the 'tags' command to set its puzzle mode to loose or strict; OpenTafl will prompt the user to load the replay as a puzzle in the future. For more information on playing and authoring puzzles, please have a look at the README file.
 
 Enter 'next' to continue.]
 
 1. Kf6-c6 a8-c8 
-[This position arose during a game between me and my friend Nasa, who plays a sometimes-weekly tafl game with me. At this juncture, I threaten escape in two ways. Nasa, unfortunately, picked the wrong one to block.
+[At this juncture, I threaten escape in two ways. Nasa, unfortunately, picked the wrong one to block.
 
 Enter 'next' to continue.|The puzzle starts here. Use the 'variation' command to try moves, and 'next', 'previous', and 'jump' to navigate through the tree you have revealed. The 'history' command can be used to view the move tree.
 
@@ -19,7 +21,7 @@ This puzzle uses OpenTafl's loose puzzle mode. You're free to try any line of pl
 
 When you're in a state which I have foreseen, you can enter 'hint' to get a hint about the next move.
 
-It's the defender's move. There are several routes by which the king may escape. The fastest I've found is after the defender's fifth move.
+It's the defender's move. There are several routes by which the king may escape. The fastest I've found is after the defender's sixth move. Several lines allow the defender to escape that quickly; I've annotated several options. I've also annotated a line in which the defenders make a mistake; it allows the attackers to hold off the defenders for a full ten turns.
 
 (Hint: In tafl puzzles as well as chess puzzles, it frequently helps to look for the move with the fewest number of responses. Have a look at the king, and where he can move this turn.)]
 
