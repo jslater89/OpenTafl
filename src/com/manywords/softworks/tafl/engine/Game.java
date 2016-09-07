@@ -244,6 +244,7 @@ public class Game {
         return rg.getCommentedHistoryString(true);
     }
 
+    /*
     private String getCommentedStringForMoves(int turnNumber, List<GameState> states) {
 
 
@@ -265,6 +266,7 @@ public class Game {
 
         return commentedString;
     }
+    */
 
     /**
      * Sides do not always go in strict sequence!

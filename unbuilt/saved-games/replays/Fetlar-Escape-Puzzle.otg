@@ -1,0 +1,196 @@
+[date:2016.08.27]
+[result:-1]
+[compiler:Jay Slater]
+[annotator:Jay Slater]
+[puzzle-mode:loose]
+[puzzle-prestart:0a]
+[puzzle-start:1b]
+[rules:dim:11 name:Fetlar_Defenders_First atkf:n nj:n cj:n start:/4tt2t2/3tTTT2t1/1t2T3T1t/t2T4T2/t9t/t4K1T1tt/t3TTT3t/t4T1t2t/3t7/5t5/4ttt4/]
+[start-comment:This puzzle is based upon a game I played against Nasa, my most frequent tafl partner. The endgame proved to be very interesting, so I took the liberty of turning it into a puzzle. It turned into an endgame analysis as much as a puzzle. Also included with OpenTafl is a puzzle labeled 'Ard Ri Escape'; that one is a more traditional puzzle-style puzzle.
+
+This puzzle is an example of OpenTafl's puzzle features. Any replay may be turned into a puzzle by using the 'tags' command to set its puzzle mode to loose or strict; OpenTafl will prompt the user to load the replay as a puzzle in the future. For more information on playing and authoring puzzles, please have a look at the README file.
+
+Enter 'next' to continue.]
+
+1. Kf6-c6 a8-c8 
+[At this juncture, I threaten escape in two ways. Nasa, unfortunately, picked the wrong one to block.
+
+Enter 'next' to continue.|The puzzle starts here. Use the 'variation' command to try moves, and 'next', 'previous', and 'jump' to navigate through the tree you have revealed. The 'history' command can be used to view the move tree.
+
+This puzzle uses OpenTafl's loose puzzle mode. You're free to try any line of play you like; OpenTafl will alert you when you're off of the lines of play I have embedded in this puzzle.
+
+When you're in a state which I have foreseen, you can enter 'hint' to get a hint about the next move.
+
+It's the defender's move. There are several routes by which the king may escape. The fastest I've found is after the defender's sixth move. Several lines allow the defender to escape that quickly; I've annotated several options. I've also annotated a line in which the defenders make a mistake; it allows the attackers to hold off the defenders for a full ten turns.
+
+(Hint: In tafl puzzles as well as chess puzzles, it frequently helps to look for the move with the fewest number of responses. Have a look at the king, and where he can move this turn.)]
+
+2. Kc6-c1 b3-b1 
+[The king sails grandly through the hole in the attacking cordon!
+
+As you can see, the attacking player has only one response, b3-b1.
+
+(Hint: I already told you what the attacker's response must be.)|The attacker makes the obvious block, defending the a1 corner.
+
+From here, there are two moves which assure the king of victory, one in five moves and one in six. Each move has two paths. (At least, two paths I've discovered. There may well be more.) See if you can find them both.
+
+(Hint: The king is the piece to move here, and he stays in the vicinity of the a1 corner.)]
+
+2a.1.1a. Kc6-c2xd2 
+[Although this move does threaten escape, it allows the attacking player a choice of two moves to counter it. Kc6-c1 leaves the attacker only one response. It's often easier to think a large number of moves ahead when you leave the other player with only one response.
+
+There is a victory at the end of this path, but I haven't had time to annotate it. You can try to find it, or type 'previous' and try again.]
+
+2a.2.1a. Kc6-b6 
+[Although it may seem tempting at first, since it puts the king on a file with a path to an edge, it's actually a terrible move. It yields tempo to the attacking player, who can simply move a7-b7 and close off the entire a11 corner.
+
+Play it out if you like, or enter 'previous' and try again.]
+
+3. Kc1-c2xd2 b1-b2 
+[Congratulations! This is one of the moves which leads to a white victory. Boo! It isn't the best one. In fact, it allows a canny attacker to delay you for another eight moves, although I know there are victories in as few as six moves if the attacker makes some mistakes. Feel free to explore, but only the line with the best play for the attacker (or at least, the best play I've discovered) is annotated.
+
+(Hint: The attacker only has one reasonable move here, although he has two options to defend the easy escape by Kc2-a2. Consider the hostile corner and the position of the king.)|The attackers make the obvious response. The other possible move, a4-a2, allows the defender to simply capture the piece on b1 with the king and slip the cordon with ease.
+
+White could play Kc2-c1 again, but that leads to a threefold repetition, and white can do better than draw here.
+
+(Hint: How can white remove the blocking piece without moving Kc2-c1?)]
+
+3a.1.1a. Kc1-d1 
+[Clever thinking, but unfortunately, flawed. This can play out two ways:
+
+1. The attackers move b1-c1, and now the king is trapped, and the defenders have to spring him somehow. This takes a while.
+
+2. The attackers move a piece onto the b file, and the defenders move Kd1-c1xb1. The attackers reply with ...b1, and the king has to play out a guillotine. The attackers have at least ten pieces they can sacrifice in this manner.
+
+Enter 'previous' and try again.]
+
+3a.2.1a. Kc1-c3 e1-c1 
+[This is one of the king's best options: he can win after four more moves, in at least three separate ways.
+
+(Hint: the attacker has several possible blocking moves, using pieces on a4, b1, d2, and e1. All result in a king's victory in at most four moves. There are some attacker moves which lead to a defender victory more quickly, which aren't annotated.)|This move takes away the easy victory available to the king by Kc3-c1xb1, which in this case cannot be blocked. The defender move from here is straightforward.
+
+(Hint: the next move in this line is the move which leaves the attacker only one response.)]
+
+3a.2.1a.1.1a. ..... b1-b2 
+[This seems like a decent move for the attackers: it doesn't allow the defender to make the easy capture of b2, and positions a piece to respond to either of the defender's obvious responses.
+
+(Hint: one of the two obvious responses is the one I'm thinking of.)]
+
+3a.2.1a.1.2a. Kc3-a3 b2-a2 
+[Although there may be a victory at the end of another path, this one has the advantage of being admirably simple. As with all the best plans, the attacker has only one move to delay his inevitable defeat.|That's the one.
+
+(Hint: a strong king can safely move next to a corner, and open files are great places for kings to be generally.)]
+
+3a.2.1a.1.3a. Ka3-b3 a2-b2 
+[This is far enough along to give the king the victory. No matter what the attacker's move, the defender can move the king to one of b1 or b11, which is a victory after two moves. Congratulations! You found the end of a path.|]
+
+3a.2.1a.1.4a. Kb3-b11 e11-c11 
+[|]
+
+3a.2.1a.1.5a. Kb11-a11 
+[]
+
+3a.2.1a.2.1a. ..... a4-a2 
+[Rather a poor choice for the attackers: it allows the defender to move Kc3-c1xb1, and now the attacker has no piece on the b file to prevent the victory. Go back and try again.]
+
+3a.2.1a.2.2a. Kc3-c1xb1 a2-b2 
+[|]
+
+3a.2.1a.2.3a. Kc1-a1 
+[]
+
+3a.2.1a.3.1a. ..... d2-b2 
+[Interesting! The attacker has doubled pieces on the b-file, a formation which, in another place, might allow for some interesting attacking possibilities. Here, it serves to remove the Kc3-c1xb1 move you may have seen elsewhere in this puzzle from consideration: the attacker can simply respond b2-b1, which slows the game down somewhat.
+
+(Hint: there is another threatening move the defender can make, which is the one to make in this scenario.)]
+
+3a.2.1a.3.2a. Kc3-a3 b2-a2 
+[The attackers have one possible response, b2-a2.|This path is equivalent to another path. To view annotations, type 'jump 3a.2.2b'.]
+
+3a.2.1a.3.3a. Ka3-b3 a7-b7 
+[|]
+
+3a.2.1a.3.4a. Kb3-a3xa2 b1-b2 
+[|]
+
+3a.2.1a.3.5a. Ka3-a1 
+[]
+
+3a.2.2a. Kc3-a3 d2-a2 
+[The attacker only has one response to prevent a victory, and that is d2-a2.|The king seems to be in a bit of a tight spot here, but the defenders can win in two moves if they find the right move.
+
+(Hint: there is a move with the king which forks an escape to the corner. Like many good king moves, it involves a rank or file which is mostly open.)]
+
+3a.2.3a. Ka3-b3 a7-b7 
+[You can likely see what a pickle the attackers are in here, having been forked. If the attacker defends the a1 corner by a4-a3 or a2-a3, the defender responds Kb3-b11 ... Kb11-a11++. If the attacker defends the a11 corner by moving a piece onto the b file, the defender responds Kb3-a3xa2 ... Ka3-a2. Congratulations! You've found one of the victories.|]
+
+3a.2.4a. Kb3-a3xa2 b1-b2 
+[|]
+
+3a.2.5a. Ka3-a1 
+[]
+
+3a.3.1a. e3-a3 d2-a2xa3 
+[|]
+
+3a.3.2a. Kc1-c3 a4-a3 
+[|]
+
+3a.3.3a. Kc3-c1xb1 a2-b2 
+[|]
+
+3a.3.4a. Kc1-a1 
+[]
+
+4. e3-a3 e1-b1 
+[This is the better move for the attackers: the king escapes in seven moves.
+
+This threatens the piece on b2. The attacker can move b2-a2xa3, but that leaves the king with an escape in three moves instead of seven: 1. ..... b2-a2xa3 2. i3-a3xa2 e1-c1 3. Kc2-a2 a7-b7 4. Ka2-a1++
+
+The next move requires some thought from the attacker.
+
+(Hint: reinforcing the b file helps the attacking player to delay the game.)|At this stage, the attacking player may realize that he has lost. e1-b1 is a move which is pretty clearly a play for time. a7-b7 is a more tempting move if a king escape is not in the cards, since it nearly seals off the a11 corner while reinforcing the b file, but in this case, it allows the attacker to block the reinforcement with d4-b4.
+
+The defender must now concern himself with removing this block as quickly as possible.
+
+(Hint: What moves does the defender have which force a specific response?)]
+
+5. Kc2-c1xb1 b2-b1 
+[Again, the move with the fewest possible responses is often a good one. In this case, the attacker must respond or lose.|And respond he does.
+
+(Hint: The defender can, again, force a single response with his best move, and in doing so, return the board to a very favorable state for himself.)]
+
+6. Kc1-c2 b1-b2 
+[The king, once again, threatens to escape by Kc2-a2.
+
+(Hint: The attacker, once again, must respond by b1-b2.)|We've seen this board state earlier, except the attacker had more pieces to hold the corner with.
+
+(Hint: You can finally make that capture you've been thinking of.)]
+
+7. a3-a2xb2 a7-b7 
+[A crucial moment for the attacking player. The b file is now wide open, and it must be defended. What's the best way?
+
+(Hint: The correct move is further down the board.)|This one seems a little odd, but it turns out that it's quite good. It puts a piece in position to block the escape to the a11 corner, yes, but it also positions a piece to stop the king simply moving to c1 and leaving by the a1 corner. The alternate move, f1-b1, can be captured immediately; the less aggressive f1-c1 lets the king escape on the open b file.
+
+Now, the defender must get the king out without losing the initiative.
+
+(Hint: The next move shouldn't allow the attacker to gain tempo back, nor should it allow him to make any real gains in position. The king is the piece to move.)]
+
+8. Kc2-b2 f1-b1 
+[The defender solidifies his position on the a file: the attacker can no longer interpose pieces to slow the king down.
+
+Take note of the position from a1 to b4. This is always a very bad situation for the attacker, which will shortly lead to a victory for the defender. The defending taflman on a2 cannot be captured: doing so lets the king reach a space adjacent to a corner. When playing the attackers, you should be very careful to avoid yielding a corner-adjacent space to the defenders if the king is on the same rank and file, unless you already have a piece placed two away from the corner. (In this example, that's a3. If the attacker had pieces on a3 and a4, the a1 corner down the board would look a lot healthier.)
+
+(Hint: The attacker should prevent the king from moving to b1, which is an immediate escape.)|The attacker prevents the king's easy escape by Kb2-b1, but he is still doomed by the weakness of the position around the a1 corner. The defender can utilize the strength of the position described in the previous annotation to clear the way on the a file.
+
+(Hint: By moving a2-a3.)]
+
+9. a2-a3 b7-b3 
+[Here, the game is all but over. The attacker can't prevent the defender's escape by 1. Kb2-a2 ..... 2. Ka2-a1.|]
+
+10. Kb2-a2 b1-b2 
+[|]
+
+11. Ka2-a1 
+[]
+

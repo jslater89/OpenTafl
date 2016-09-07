@@ -78,8 +78,7 @@ public class RulesSerializer {
         defaults = map;
     }
 
-
-    public static String getRulesRecord(Rules rules) {
+    public static String getRulesStringWithoutStart(Rules rules) {
         String otnrString = "";
 
         otnrString += "dim:";
@@ -238,7 +237,12 @@ public class RulesSerializer {
         if(rules.getBerserkMode() != Rules.BERSERK_NONE) {
             otnrString += "ber:" + getStringForBerserkMode(rules.getBerserkMode()) + " ";
         }
+        return otnrString;
+    }
 
+
+    public static String getRulesRecord(Rules rules) {
+        String otnrString = getRulesStringWithoutStart(rules);
         otnrString += "start:" + PositionSerializer.getPositionRecord(rules.getBoard());
 
         return otnrString;

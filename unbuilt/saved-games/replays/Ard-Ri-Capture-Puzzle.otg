@@ -1,0 +1,22 @@
+[date:2016.08.30]
+[result:1]
+[compiler:Jay Slater]
+[rules:dim:7 name:Ard_Ri esc:e surf:n atkf:y ks:w cor: cen: start:/1t5/2t4/2T4/tTKt3/2tT3/t6/Tt1t3/]
+[start-comment:The solution to this puzzle illustrates a certain concept in tafl which you may, if you are a chess player, already have some familiarity with.
+
+The attackers to move, winning in two.
+
+(Hint: The king is invulnerable with the board in its present state. How can the attackers remove a guardian from c3 or b4 so they can capture the king on their next turn?)]
+[annotator:Jay Slater]
+[puzzle-mode:loose]
+[puzzle-start:0a]
+[puzzle-prestart:0a]
+
+1. d7-d6xd5 c3-b3 
+[Correct! The principle at play here is called 'zugzwang' in chess. Zugzwang is German for 'compulsion to move'; put another way, it means, "Man, I really wish I was allowed to pass."
+
+Although the king is still invincible, there's a fatal flaw in a position like this: it only works as long as none of the pieces move. By capturing the only piece which could move without endangering the king, the attackers force a victory.|]
+
+2. c2-c3xKc4 
+[]
+

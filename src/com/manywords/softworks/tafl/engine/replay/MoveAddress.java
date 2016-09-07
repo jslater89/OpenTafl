@@ -67,6 +67,12 @@ public class MoveAddress {
 
             return rootIndex == other.rootIndex && moveIndex == other.moveIndex;
         }
+
+        public boolean isAfter(Element other) {
+            if(this.rootIndex > other.rootIndex) return true;
+            if(this.rootIndex == other.rootIndex && this.moveIndex > other.moveIndex) return true;
+            return false;
+        }
     }
 
     public MoveAddress() { }
@@ -151,6 +157,9 @@ public class MoveAddress {
     }
 
     public MoveAddress increment(ReplayGame game, ReplayGameState current) {
+        // If this is the starting state ("0a"), return "1a"
+        if(this.equals(newRootAddress())) return increment(true);
+
         MoveAddress other;
         Element inQuestion = mElements.get(mElements.size() - 1);
 
@@ -228,8 +237,20 @@ public class MoveAddress {
         return newSibling;
     }
 
-    public MoveAddress nextVariation(int index) {
+    public MoveAddress nextVariation(ReplayGame game, ReplayGameState current, int variationIndex) {
+        MoveAddress variationRoot;
+        if(getElements().size() == 1) {
+            variationRoot = this.increment(game, current);
+        }
+        else {
+            variationRoot = new MoveAddress(this);
+        }
+        return variationRoot.nextVariation(variationIndex);
+    }
+
+    private MoveAddress nextVariation(int index) {
         MoveAddress other = new MoveAddress(this);
+
         Element newVariation = new Element();
         newVariation.rootIndex = index;
         newVariation.moveIndex = -1;
@@ -242,15 +263,10 @@ public class MoveAddress {
     // e.g. 1a.1.1b.1.2a.1.2b...
     public MoveAddress firstChild(ReplayGame game, ReplayGameState state) {
         MoveAddress address = state.getParent().getMoveAddress();
-        if(address.getElements().size() == 1) {
-            return firstChild(1, address.getLastElement().moveIndex);
-        }
-        else {
-            MoveAddress lastElement = new MoveAddress();
-            lastElement.mElements.add(address.getLastElement());
-            MoveAddress incremented = lastElement.increment(game, state);
-            return firstChild(1, incremented.getLastElement().moveIndex);
-        }
+        MoveAddress lastElement = new MoveAddress();
+        lastElement.mElements.add(address.getLastElement());
+        MoveAddress incremented = lastElement.increment(game, state);
+        return firstChild(1, incremented.getLastElement().moveIndex);
     }
 
     public MoveAddress firstChild(int rootIndex, int moveIndex) {
@@ -272,7 +288,7 @@ public class MoveAddress {
 
     public static MoveAddress newRootAddress() {
         Element e = new Element();
-        e.rootIndex = 1;
+        e.rootIndex = 0;
         e.moveIndex = 0;
 
         MoveAddress a = new MoveAddress();
@@ -321,6 +337,7 @@ public class MoveAddress {
         return moveAddress;
     }
 
+    @Override
     public String toString() {
         StringBuilder name = new StringBuilder();
         for(Element element : mElements) {
@@ -329,6 +346,37 @@ public class MoveAddress {
         }
 
         return name.toString();
+    }
+
+    public boolean isOrIsAfter(MoveAddress other) {
+        if(this.equals(other)) return true;
+        if(other == null) return false;
+
+        return this.isAfter(other);
+    }
+
+    public boolean isAfter(MoveAddress other) {
+        for(int i = 0; i < Math.min(mElements.size(), other.getElements().size()); i++) {
+            if(mElements.get(i).isAfter(other.getElements().get(i))) return true;
+        }
+
+        // Sibling variation
+        return false;
+    }
+
+    public boolean isBefore(MoveAddress other) {
+        return !isOrIsAfter(other);
+    }
+
+    public boolean isOrIsBefore(MoveAddress other) {
+        return !isAfter(other);
+    }
+
+    public boolean isBetween(MoveAddress start, MoveAddress end) {
+        boolean afterStart = (start == null || isOrIsAfter(start));
+        boolean beforeEnd = (end == null || isOrIsBefore(end));
+
+        return afterStart && beforeEnd;
     }
 
     @Override

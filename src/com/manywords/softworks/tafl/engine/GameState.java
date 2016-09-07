@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.engine;
 
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
 
 import java.util.ArrayList;
@@ -234,8 +235,10 @@ public class GameState {
         return TaflmanMoveCache.getCachedReachableSpacesForTaflman(mZobristHash, taflman);
     }
 
-    public static final String getStringForMoveResult(int result) {
+    public static String getStringForMoveResult(int result) {
         switch (result) {
+            case GOOD_MOVE:
+                return "";
             case DRAW:
                 return "Draw.";
             case DEFENDER_WIN:
@@ -250,21 +253,32 @@ public class GameState {
                 return "Illegal move.";
             case ILLEGAL_MOVE_BERSERKER:
                 return "The berserking taflman must make a berserk move.";
+            case GOOD_MOVE_NOT_IN_PUZZLE:
+                return "This move does not occur in the puzzle solution.";
+            case STRICT_PUZZLE_MISSING_MOVE:
+                return "This move does not occur in the puzzle solution, and has been ignored.";
         }
 
         return "Unknown move result! Please report this as a bug.";
     }
 
-    public static final int DRAW = 3;
-    public static final int DEFENDER_WIN = 2;
-    public static final int ATTACKER_WIN = 1;
+    // TODO: refactor to bitwise flag or something
+    // I want to be able to capture e.g. DEFENDER_WIN by GOOD_MOVE_NOT_IN_PUZZLE
+    public static final int DRAW = 4;
+    public static final int DEFENDER_WIN = 3;
+    public static final int ATTACKER_WIN = 2;
+    public static final int GOOD_MOVE_NOT_IN_PUZZLE = 1;
     public static final int GOOD_MOVE = 0;
     public static final int ILLEGAL_SIDE = -1;
     public static final int ILLEGAL_SIDE_BERSERKER = -2;
     public static final int ILLEGAL_MOVE = -3;
     public static final int ILLEGAL_MOVE_BERSERKER = -4;
+    public static final int STRICT_PUZZLE_MISSING_MOVE = -5;
     public static final int TRANSPOSITION_HIT = -49;
     public static final int VICTORY_UNCHECKED = -50;
+
+    public static final int HIGHEST_NONTERMINAL_RESULT = GOOD_MOVE_NOT_IN_PUZZLE;
+    public static final int LOWEST_NONERROR_RESULT = GOOD_MOVE;
 
     protected GameState moveTaflman(char taflman, Coord destination) {
         if (mBerserkingTaflman != Taflman.EMPTY && Taflman.getSide(this, taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {
@@ -559,6 +573,22 @@ public class GameState {
         return PositionSerializer.getPositionRecord(getBoard());
     }
 
+    public String getPasteableRulesString() {
+        String otnrString = RulesSerializer.getRulesStringWithoutStart(mGame.getRules());
+        otnrString += "start:" + PositionSerializer.getPositionRecord(getBoard());
+
+        if(getCurrentSide().isAttackingSide() != mGame.getRules().getStartingSide().isAttackingSide()) {
+            if(getCurrentSide().isAttackingSide()) {
+                otnrString = otnrString.replaceFirst("atkf:n", "atkf:y");
+            }
+            else {
+                otnrString = otnrString.replaceFirst("atkf:y", "atkf:n");
+            }
+        }
+
+        return otnrString;
+    }
+
     public long updateZobristHash(long oldZobrist, Board oldBoard, MoveRecord move, boolean changeTurn) {
         long hash = oldZobrist;
         int startIndex = oldBoard.getIndex(move.start);
@@ -646,7 +676,7 @@ public class GameState {
 
     public int makeMove(DetailedMoveRecord nextMove) {
         int result = makeMove((MoveRecord) nextMove);
-        if(result >= GOOD_MOVE) {
+        if(result >= LOWEST_NONERROR_RESULT) {
             mDetailedExitingMove.setTimeRemaining(nextMove.getTimeRemaining());
         }
 
