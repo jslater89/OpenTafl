@@ -271,7 +271,15 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 11. VERSION HISTORY -----------------------------------------------------------
 v0.4.4.0b (released 09/xx/16):
 - New stable release
--
+- Puzzle mode added, along with two puzzles (viewable by 'load replay'); see
+  section in README for more details
+- Improve numbering/addressing of states in replays
+    - In replays, jumping to a move always jumps to the position after that
+      move has been made
+    - Do 'jump 0' to get to the start of a replay
+- Allow copying and pasting of game states to the clipboard for easy sharing
+    - No hotkey support yet, sorry
+    - Probably doesn't work in non-graphical mode
 
 v0.4.3.6b (released 08/26/16):
 - Release candidate for merge to stable branch
