@@ -403,22 +403,6 @@ public class OptionsMenuWindow extends BasicWindow {
 
                     @Override
                     public void run() {
-                        if(attackers) TerminalSettings.attackers = TerminalSettings.HUMAN;
-                        else TerminalSettings.defenders = TerminalSettings.HUMAN;
-
-                        refreshSettings();
-                    }
-
-                    @Override
-                    public String toString() {
-                        return "Network";
-                    }
-                },
-
-                new Runnable() {
-
-                    @Override
-                    public void run() {
                         if(attackers) TerminalSettings.attackers = TerminalSettings.ENGINE;
                         else TerminalSettings.defenders = TerminalSettings.ENGINE;
 
