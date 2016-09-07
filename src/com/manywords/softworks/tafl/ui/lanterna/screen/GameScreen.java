@@ -819,7 +819,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
             statusText("--- Start of replay ---");
             if(tags != null && tags.containsKey(Game.Tag.START_COMMENT)) {
-                statusText(tags.get(Game.Tag.START_COMMENT));
+                String commentText = tags.get(Game.Tag.START_COMMENT);
+                if(!commentText.isEmpty()) {
+                    if(mReplay.getMode().isPuzzleMode()) {
+                        commentText = commentText.replaceAll(ReplayGame.hintRegex, "").trim();
+                    }
+                    statusText(commentText);
+                }
             }
         }
 
