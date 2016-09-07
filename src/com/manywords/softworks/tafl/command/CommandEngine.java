@@ -591,6 +591,15 @@ public class CommandEngine {
                         return new CommandResult(Command.Type.HINT, CommandResult.SUCCESS, "", null);
                     }
                 }
+                else {
+                    String comment = mReplay.getGame().getTagMap().getOrDefault(Game.Tag.START_COMMENT, "");
+                    Matcher m = ReplayGame.hintPattern.matcher(comment);
+                    if (m.find()) {
+                        String hint = m.group(0);
+                        mPrimaryUiCallback.statusText(hint);
+                        return new CommandResult(Command.Type.HINT, CommandResult.SUCCESS, "", null);
+                    }
+                }
             }
 
             return new CommandResult(Command.Type.HINT, CommandResult.FAIL, "No hint available.", null);
