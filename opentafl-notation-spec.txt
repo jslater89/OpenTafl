@@ -376,6 +376,35 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		"start-comment":
 		    a comment to be displayed at the start of the game, or whenever the player navigates
 		    back to the start of the game
+		"puzzle-mode":
+		    <"none"|"loose"|"strict">
+
+		    (optional) whether this game record defines a puzzle. If it does define a puzzle,
+		    OpenTafl will prompt the user, when this game record is loaded, to choose whether
+		    to load it as a replay or a puzzle.
+
+		    A puzzle is a game record which contains, minimally, some number of moves,
+		    potentially including attached commentary.
+
+		    "none" means that the replay will be loaded as a standard replay. "loose" means
+		    that the player may make any move. OpenTafl will alert the player if he makes a
+		    move which is not contained in the game record. "strict" means that OpenTafl
+		    will only accept moves contained in the game record.
+        "puzzle-prestart":
+            <move-address>
+
+            (optional) where the replay should begin displaying this puzzle. Need not be
+            present.
+
+            Between puzzle-prestart and puzzle-start (see below), OpenTafl will only allow
+            the 'next' and 'previous' commands. You can use puzzle-prestart to define a
+            region of introductory commentary before the puzzle begins in earnest.
+        "puzzle-start":
+            <move-address>
+
+            (optional) where the puzzle begins. From puzzle-start, OpenTafl will only
+            allow the 'variation' and 'previous' commands to navigate the game, according
+            to the puzzle mode defined in the puzzle-mode tag.
 
 	rules-tag:
 		<"[rules:"><rules-string><"]">
@@ -436,10 +465,14 @@ dim:9 esc:e ka:n cen: cenhe: cor: start:/3ttt3/4t4/4T4/t3T3t/ttTTKTTtt/t3T3t/4T4
 		text begins with a clock specification string in the same syntax as used
 		for the time-control tag, OpenTafl will omit the clock specification from
 		the displayed commentary, and display the time given by the clock
-		specification in the clock display.
+		specification in the clock display. By additional convention, if the game
+		has been loaded as a puzzle, OpenTafl will hide any text surrounded by
+		"(hint:" and ")" (e.g. "(hint:This is an example hint.)"), displaying it
+		only if the user asks for a hint.
 
-		Comments will be displayed after the move to which they correspond has
-		been played.
+		The comment attached to a move will be displayed after the move has been
+		played. To display a comment at the start of the replay, use the
+		start-comment tag described above.
 
 	more-commentary:
 		comment on the second move of this turn (or on any additional moves this

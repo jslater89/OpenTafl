@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.command.player.external.engine;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -32,6 +33,7 @@ public class ExternalEngineClient implements UiCallback {
         instance.start();
     }
 
+    public AiWorkspace mWorkspace;
     public CommunicationThread mCommThread;
     public CommunicationThread.CommunicationThreadCallback mCommCallback;
 
@@ -43,12 +45,41 @@ public class ExternalEngineClient implements UiCallback {
     private UiWorkerThread mAiThread;
     private boolean mIsAttackingSide;
 
+    private boolean mDebugMode = false;
+    private boolean mEngineDeepening = true;
+    private boolean mEngineContinuation = true;
+    private boolean mEngineHorizon = true;
+    private boolean mEngineMoveOrdering = true;
+    private boolean mEngineTranspositionTable = true;
+    private boolean mEngineKillerMove = true;
+    private int mTranspositionTableSize = 50;
+
+    public void setAiFeatures(int transpositionSize, boolean deepening, boolean continuation, boolean horizon, boolean ordering, boolean transposition, boolean killer) {
+        mTranspositionTableSize = transpositionSize;
+        mEngineDeepening = deepening;
+        mEngineContinuation = continuation;
+        mEngineHorizon = horizon;
+        mEngineMoveOrdering = ordering;
+        mEngineTranspositionTable = transposition;
+        mEngineKillerMove = killer;
+    }
+
+    public void setDebugMode(boolean on) {
+        mDebugMode = on;
+        if(mCommThread != null) mCommThread.setDebugMode(on);
+    }
+
+    public void setThinkTime(int time) {
+        TerminalSettings.aiThinkTime = time;
+    }
+
     public void start() {
         System.setErr(System.out);
         mCommCallback = new CommCallback();
         // We can't get the parent process reliably, and we don't care, either: this is
         // mostly for hosts diagnosing why the clients won't start.
         mCommThread = new CommunicationThread(null, System.out, System.in, mCommCallback);
+        mCommThread.setDebugMode(mDebugMode);
         mCommThread.start();
 
         TerminalSettings.loadFromFile();
@@ -86,30 +117,58 @@ public class ExternalEngineClient implements UiCallback {
             mIsAttackingSide = false;
         }
 
-        final AiWorkspace workspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), 50);
-        if(mClockLength != null) workspace.setTimeRemaining(mClockLength, (mIsAttackingSide ? mAttackerClock : mDefenderClock));
+        mWorkspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), mTranspositionTableSize);
+        mWorkspace.allowIterativeDeepening(mEngineDeepening);
+        mWorkspace.allowContinuation(mEngineContinuation);
+        mWorkspace.allowHorizon(mEngineHorizon);
+        mWorkspace.allowMoveOrdering(mEngineMoveOrdering);
+        mWorkspace.allowTranspositionTable(mEngineTranspositionTable ? AiWorkspace.TRANSPOSITION_TABLE_ON : AiWorkspace.TRANSPOSITION_TABLE_OFF);
+        mWorkspace.allowKillerMoves(mEngineKillerMove);
+
+        if(mClockLength != null) mWorkspace.setTimeRemaining(mClockLength, (mIsAttackingSide ? mAttackerClock : mDefenderClock));
 
         mAiThread = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
             private boolean mRunning = true;
             @Override
             public void cancel() {
-                workspace.crashStop();
+                mWorkspace.crashStop();
                 mRunning = false;
             }
 
             @Override
             public void run() {
-                workspace.chatty = true;
-                workspace.explore(TerminalSettings.aiThinkTime);
-                workspace.stopExploring();
-                GameTreeNode bestMove = workspace.getTreeRoot().getBestChild();
+                mWorkspace.chatty = true;
+                mWorkspace.explore(TerminalSettings.aiThinkTime);
+                mWorkspace.stopExploring();
+                GameTreeNode bestMove = mWorkspace.getTreeRoot().getBestChild();
                 sendMoveCommand(bestMove.getEnteringMove());
                 mGame.getCurrentState().makeMove(bestMove.getEnteringMove());
+                //RawTerminal.renderGameState(mGame.getCurrentState());
 
-                workspace.printSearchStats();
+                mWorkspace.printSearchStats();
             }
         });
         mAiThread.start();
+    }
+
+    private void handleDumpCommand(String command) {
+        command = command.replaceFirst("dump", "");
+
+        int child = 0;
+
+        try {
+            child = Integer.parseInt(command.trim());
+        }
+        catch (Exception e) {
+            System.out.println("Bad arg in dump");
+        }
+
+        AiWorkspace w = GameTreeState.workspace;
+
+        if(w != null) {
+            String debugString = w.dumpEvaluationFor(child);
+            sendDumpCommand("dump " + debugString);
+        }
     }
 
     private void handleClockCommand(String command) {
@@ -266,6 +325,12 @@ public class ExternalEngineClient implements UiCallback {
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
     }
 
+    private void sendDumpCommand(String command) {
+        command = command.replaceAll("\n", "XXXXX");
+        command += "\n";
+        mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
+    }
+
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
         @Override
         public void onCommandReceived(byte[] command) {
@@ -273,10 +338,10 @@ public class ExternalEngineClient implements UiCallback {
             String[] commands = strCommand.split("\n");
 
             for(String cmd : commands) {
-                System.out.println("Client received: " + cmd);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Client received: " + cmd);
                 if (cmd.startsWith("rules")) {
                     handleRulesCommand(cmd);
-                    System.out.println("Client view of rules: " + mRules.getOTRString());
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Client view of rules: " + mRules.getOTRString());
                 }
                 else if (cmd.startsWith("play")) {
                     handlePlayCommand(cmd);
@@ -301,6 +366,9 @@ public class ExternalEngineClient implements UiCallback {
                 }
                 else if(cmd.startsWith("goodbye")) {
                     handleGoodbyeCommand(cmd);
+                }
+                else if(cmd.startsWith("dump")) {
+                    handleDumpCommand(cmd);
                 }
             }
         }

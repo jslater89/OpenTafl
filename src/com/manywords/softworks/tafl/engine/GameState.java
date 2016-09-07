@@ -1,9 +1,8 @@
 package com.manywords.softworks.tafl.engine;
 
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
-import com.manywords.softworks.tafl.engine.replay.ReplayGame;
-import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class GameState {
         }
 
         mZobristHash = zobristHash();
-        mTaflmanMoveCache = new TaflmanMoveCache(getBoard().getBoardDimension(), mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
+        TaflmanMoveCache.reset(getBoard().getBoardDimension(), mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
     }
 
     public GameState(Game game, Rules startingRules, Board board, Side attackers, Side defenders) {
@@ -45,7 +44,7 @@ public class GameState {
         }
 
         mZobristHash = zobristHash();
-        mTaflmanMoveCache = new TaflmanMoveCache(getBoard().getBoardDimension(), mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
+        TaflmanMoveCache.reset(getBoard().getBoardDimension(), mZobristHash, (byte) startingRules.howManyAttackers(), (byte) startingRules.howManyDefenders());
     }
 
     public GameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist) {
@@ -71,7 +70,7 @@ public class GameState {
         mDetailedExitingMove = copyState.mDetailedExitingMove;
         mEnteringMove = copyState.getEnteringMove();
         mBerserkingTaflman = copyState.getBerserkingTaflman();
-        mTaflmanMoveCache = new TaflmanMoveCache(getBoard().getBoardDimension(), mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
+        TaflmanMoveCache.reset(getBoard().getBoardDimension(), mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
     }
 
     public void updateBoard(GameState previousState) {
@@ -80,10 +79,6 @@ public class GameState {
     }
 
     public void updateGameState(Game game, GameState previousState, Board board, Side attackers, Side defenders, boolean updateZobrist, char berserkingTaflman) {
-        if (!((this instanceof GameTreeState) || (this instanceof GameState))) {
-            throw new IllegalArgumentException("Only internal methods may directly call this constructor!");
-        }
-
         mBoard = board.deepCopy();
         mBoard.setState(this);
         mAttackers = attackers.deepCopy(mBoard);
@@ -92,12 +87,9 @@ public class GameState {
         mGameLength = (char)(previousState.mGameLength + 1);
         mEnteringMove = previousState.getExitingMove();
 
-        if(updateZobrist) {
-            mZobristHash = updateZobristHash(previousState.mZobristHash, previousState.getBoard(), previousState.getExitingMove());
-        }
-
-        mTaflmanMoveCache = new TaflmanMoveCache(getBoard().getBoardDimension(), mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
         boolean changeSides = true;
+
+        TaflmanMoveCache.invalidate();
 
         if(berserkingTaflman != Taflman.EMPTY) {
             int x = Taflman.getCurrentSpace(this, berserkingTaflman).x;
@@ -127,6 +119,12 @@ public class GameState {
             }
         }
 
+        if(updateZobrist) {
+            mZobristHash = updateZobristHash(previousState.mZobristHash, previousState.getBoard(), previousState.getExitingMove(), changeSides);
+        }
+
+        TaflmanMoveCache.reset(getBoard().getBoardDimension(), mZobristHash, (byte) mGame.getRules().howManyAttackers(), (byte) mGame.getRules().howManyDefenders());
+
         if (changeSides) {
             if (previousState.getCurrentSide().isAttackingSide()) setCurrentSide(getDefenders());
             else setCurrentSide(getAttackers());
@@ -136,7 +134,6 @@ public class GameState {
         }
     }
 
-    private static final int VICTORY_UNCHECKED = -50;
     public Game mGame;
     public int mLastMoveResult;
     protected int mVictory = VICTORY_UNCHECKED;
@@ -146,7 +143,6 @@ public class GameState {
     private Side mDefenders;
     private Side mCurrentSide;
     private char mBerserkingTaflman;
-    protected TaflmanMoveCache mTaflmanMoveCache;
     protected char mGameLength;
 
     /**
@@ -200,57 +196,49 @@ public class GameState {
     }
 
     public void setCachedAllowableMovesForTaflman(char taflman, List<Coord> moves) {
-        if (mTaflmanMoveCache == null) return;
-        mTaflmanMoveCache.setCachedAllowableMovesForTaflman(mZobristHash, taflman, moves);
+        TaflmanMoveCache.setCachedAllowableMovesForTaflman(mZobristHash, taflman, moves);
     }
 
     public void setCachedAllowableDestinationsForTaflman(char taflman, List<Coord> moves) {
-        if (mTaflmanMoveCache == null) return;
-        mTaflmanMoveCache.setCachedAllowableDestinationsForTaflman(mZobristHash, taflman, moves);
+        TaflmanMoveCache.setCachedAllowableDestinationsForTaflman(mZobristHash, taflman, moves);
     }
 
     public void setCachedJumpsForTaflman(char taflman, List<Coord> jumps) {
-        if(mTaflmanMoveCache == null) return;
-        mTaflmanMoveCache.setCachedJumpsForTaflman(mZobristHash, taflman, jumps);
+        TaflmanMoveCache.setCachedJumpsForTaflman(mZobristHash, taflman, jumps);
     }
 
     public void setCachedCapturingMovesForTaflman(char taflman, List<Coord> moves) {
-        if (mTaflmanMoveCache == null) return;
-        mTaflmanMoveCache.setCachedCapturingMovesForTaflman(mZobristHash, taflman, moves);
+        TaflmanMoveCache.setCachedCapturingMovesForTaflman(mZobristHash, taflman, moves);
     }
 
     public void setCachedReachableSpacesForTaflman(char taflman, List<Coord> moves) {
-        if (mTaflmanMoveCache == null) return;
-        mTaflmanMoveCache.setCachedReachableSpacesForTaflman(mZobristHash, taflman, moves);
+        TaflmanMoveCache.setCachedReachableSpacesForTaflman(mZobristHash, taflman, moves);
     }
 
     public List<Coord> getCachedAllowableMovesForTaflman(char taflman) {
-        if (mTaflmanMoveCache == null) return null;
-        return mTaflmanMoveCache.getCachedAllowableMovesForTaflman(mZobristHash, taflman);
+        return TaflmanMoveCache.getCachedAllowableMovesForTaflman(mZobristHash, taflman);
     }
 
     public List<Coord> getCachedAllowableDestinationsForTaflman(char taflman) {
-        if (mTaflmanMoveCache == null) return null;
-        return mTaflmanMoveCache.getCachedAllowableDestinationsForTaflman(mZobristHash, taflman);
+        return TaflmanMoveCache.getCachedAllowableDestinationsForTaflman(mZobristHash, taflman);
     }
 
     public List<Coord> getCachedJumpsForTaflman(char taflman) {
-        if(mTaflmanMoveCache == null) return null;
-        return mTaflmanMoveCache.getCachedJumpsForTaflman(mZobristHash, taflman);
+        return TaflmanMoveCache.getCachedJumpsForTaflman(mZobristHash, taflman);
     }
 
     public List<Coord> getCachedCapturingMovesForTaflman(char taflman) {
-        if (mTaflmanMoveCache == null) return null;
-        return mTaflmanMoveCache.getCachedCapturingMovesForTaflman(mZobristHash, taflman);
+        return TaflmanMoveCache.getCachedCapturingMovesForTaflman(mZobristHash, taflman);
     }
 
     public List<Coord> getCachedReachableSpacesForTaflman(char taflman) {
-        if (mTaflmanMoveCache == null) return null;
-        return mTaflmanMoveCache.getCachedReachableSpacesForTaflman(mZobristHash, taflman);
+        return TaflmanMoveCache.getCachedReachableSpacesForTaflman(mZobristHash, taflman);
     }
 
-    public static final String getStringForMoveResult(int result) {
+    public static String getStringForMoveResult(int result) {
         switch (result) {
+            case GOOD_MOVE:
+                return "";
             case DRAW:
                 return "Draw.";
             case DEFENDER_WIN:
@@ -265,19 +253,32 @@ public class GameState {
                 return "Illegal move.";
             case ILLEGAL_MOVE_BERSERKER:
                 return "The berserking taflman must make a berserk move.";
+            case GOOD_MOVE_NOT_IN_PUZZLE:
+                return "This move does not occur in the puzzle solution.";
+            case STRICT_PUZZLE_MISSING_MOVE:
+                return "This move does not occur in the puzzle solution, and has been ignored.";
         }
 
         return "Unknown move result! Please report this as a bug.";
     }
 
-    public static final int DRAW = 3;
-    public static final int DEFENDER_WIN = 2;
-    public static final int ATTACKER_WIN = 1;
+    // TODO: refactor to bitwise flag or something
+    // I want to be able to capture e.g. DEFENDER_WIN by GOOD_MOVE_NOT_IN_PUZZLE
+    public static final int DRAW = 4;
+    public static final int DEFENDER_WIN = 3;
+    public static final int ATTACKER_WIN = 2;
+    public static final int GOOD_MOVE_NOT_IN_PUZZLE = 1;
     public static final int GOOD_MOVE = 0;
     public static final int ILLEGAL_SIDE = -1;
     public static final int ILLEGAL_SIDE_BERSERKER = -2;
     public static final int ILLEGAL_MOVE = -3;
     public static final int ILLEGAL_MOVE_BERSERKER = -4;
+    public static final int STRICT_PUZZLE_MISSING_MOVE = -5;
+    public static final int TRANSPOSITION_HIT = -49;
+    public static final int VICTORY_UNCHECKED = -50;
+
+    public static final int HIGHEST_NONTERMINAL_RESULT = GOOD_MOVE_NOT_IN_PUZZLE;
+    public static final int LOWEST_NONERROR_RESULT = GOOD_MOVE;
 
     protected GameState moveTaflman(char taflman, Coord destination) {
         if (mBerserkingTaflman != Taflman.EMPTY && Taflman.getSide(this, taflman).isAttackingSide() != getCurrentSide().isAttackingSide()) {
@@ -367,14 +368,7 @@ public class GameState {
     }
 
     public int countPositionOccurrences() {
-        int repeats = 0;
-        for (GameState state : mGame.getHistory()) {
-            if (this.mZobristHash == state.mZobristHash) {
-                repeats++;
-            }
-        }
-
-        return repeats;
+        return mGame.getRepetitions().getRepetitionCount(this.mZobristHash);
     }
 
     public void winByResignation(boolean isWinnerAttackingSide) {
@@ -394,13 +388,13 @@ public class GameState {
         else if (getDefenders().getTaflmen().size() == 0) return ATTACKER_WIN;
         int threefoldRepetitionResult = mGame.getRules().threefoldRepetitionResult();
         // Threefold repetition cannot occur as the result of a berserk move
-        if(threefoldRepetitionResult != Rules.IGNORE && mBerserkingTaflman == Taflman.EMPTY) {
+        if(threefoldRepetitionResult != Rules.THIRD_REPETITION_IGNORED && mBerserkingTaflman == Taflman.EMPTY) {
             int repeats = countPositionOccurrences();
 
             // If this position has occurred two other times plus this one, do the threefold
             // checks.
-            if(repeats >= 2) {
-                if(threefoldRepetitionResult == Rules.DRAW) {
+            if(repeats > 2) {
+                if(threefoldRepetitionResult == Rules.THIRD_REPETITION_DRAWS) {
                     return DRAW;
                 }
                 else if (threefoldRepetitionResult == Rules.THIRD_REPETITION_LOSES) {
@@ -579,19 +573,41 @@ public class GameState {
         return PositionSerializer.getPositionRecord(getBoard());
     }
 
-    public long updateZobristHash(long oldZobrist, Board oldBoard, MoveRecord move) {
+    public String getPasteableRulesString() {
+        String otnrString = RulesSerializer.getRulesStringWithoutStart(mGame.getRules());
+        otnrString += "start:" + PositionSerializer.getPositionRecord(getBoard());
+
+        if(getCurrentSide().isAttackingSide() != mGame.getRules().getStartingSide().isAttackingSide()) {
+            if(getCurrentSide().isAttackingSide()) {
+                otnrString = otnrString.replaceFirst("atkf:n", "atkf:y");
+            }
+            else {
+                otnrString = otnrString.replaceFirst("atkf:y", "atkf:n");
+            }
+        }
+
+        return otnrString;
+    }
+
+    public long updateZobristHash(long oldZobrist, Board oldBoard, MoveRecord move, boolean changeTurn) {
         long hash = oldZobrist;
         int startIndex = oldBoard.getIndex(move.start);
         int endIndex = oldBoard.getIndex(move.end);
         int oldType = getZobristTypeIndex(oldBoard.getOccupier(move.start));
 
-        hash = hash ^ mGame.mZobristConstants[startIndex][oldType];
-        hash = hash ^ mGame.mZobristConstants[endIndex][oldType];
+        hash = hash ^ mGame.mZobristConstants[Game.ZOBRIST_BOARD][startIndex][oldType];
+        hash = hash ^ mGame.mZobristConstants[Game.ZOBRIST_BOARD][endIndex][oldType];
 
         for(Coord capturedCoord : move.captures) {
             int captureIndex = oldBoard.getIndex(capturedCoord);
             oldType = getZobristTypeIndex(oldBoard.getOccupier(capturedCoord));
-            hash = hash ^ mGame.mZobristConstants[captureIndex][oldType];
+            hash = hash ^ mGame.mZobristConstants[Game.ZOBRIST_BOARD][captureIndex][oldType];
+        }
+
+        // Take out one side, add other side.
+        if(changeTurn) {
+            hash = hash ^ mGame.mZobristConstants[Game.ZOBRIST_STATE][Game.ZOBRIST_TURN][Game.ZOBRIST_TURN_DEFENDERS];
+            hash = hash ^ mGame.mZobristConstants[Game.ZOBRIST_STATE][Game.ZOBRIST_TURN][Game.ZOBRIST_TURN_ATTACKERS];
         }
 
         if(hash == 0) hash = 1;
@@ -605,7 +621,14 @@ public class GameState {
         for (char taflman : getBoard().getCachedTaflmanLocations().getTaflmen()) {
             int typeIndex = getZobristTypeIndex(taflman);
             int coordIndex = Coord.getIndex(getBoard().getBoardDimension(), getBoard().findTaflmanSpace(taflman));
-            hash = hash ^ mGame.mZobristConstants[coordIndex][typeIndex];
+            hash = hash ^ mGame.mZobristConstants[Game.ZOBRIST_BOARD][coordIndex][typeIndex];
+        }
+
+        if(getCurrentSide().isAttackingSide()) {
+            hash = hash ^ mGame.mZobristConstants[Game.ZOBRIST_STATE][Game.ZOBRIST_TURN][Game.ZOBRIST_TURN_ATTACKERS];
+        }
+        else {
+            hash = hash ^ mGame.mZobristConstants[Game.ZOBRIST_STATE][Game.ZOBRIST_TURN][Game.ZOBRIST_TURN_DEFENDERS];
         }
 
         if(hash == 0) hash = 1;
@@ -653,7 +676,7 @@ public class GameState {
 
     public int makeMove(DetailedMoveRecord nextMove) {
         int result = makeMove((MoveRecord) nextMove);
-        if(result >= GOOD_MOVE) {
+        if(result >= LOWEST_NONERROR_RESULT) {
             mDetailedExitingMove.setTimeRemaining(nextMove.getTimeRemaining());
         }
 

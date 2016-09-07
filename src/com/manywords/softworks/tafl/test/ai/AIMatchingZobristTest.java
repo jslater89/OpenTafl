@@ -15,66 +15,6 @@ import com.manywords.softworks.tafl.command.player.Player;
 public class AIMatchingZobristTest extends TaflTest implements UiCallback {
 
     @Override
-    public void gameStarting() {
-
-    }
-
-    @Override
-    public void modeChanging(Mode mode, Object gameObject) {
-
-    }
-
-    @Override
-    public void awaitingMove(Player currentPlayer, boolean isAttackingSide) {
-
-    }
-
-    @Override
-    public void timeUpdate(boolean currentSideAttackers) {
-
-    }
-
-    @Override
-    public void moveResult(CommandResult result, MoveRecord move) {
-
-    }
-
-    @Override
-    public void statusText(String text) {
-        System.out.println(text);
-    }
-
-    @Override
-    public void modalStatus(String title, String text) {
-
-    }
-
-    @Override
-    public void gameStateAdvanced() {
-
-    }
-
-    @Override
-    public void victoryForSide(Side side) {
-
-    }
-
-    @Override
-    public void gameFinished() {
-
-    }
-
-    @Override
-    public MoveRecord waitForHumanMoveInput() {
-        return null;
-    }
-
-    @Override
-    public boolean inGame() {
-        return false;
-    }
-
-    @Override
     public void run() {
         AiWorkspace.resetTranspositionTable();
 
@@ -90,7 +30,8 @@ public class AIMatchingZobristTest extends TaflTest implements UiCallback {
         workspace.explore(1);
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
         long zobrist = workspace.getTreeRoot().getBestChild().getZobrist();
-        long zobrist2 = workspace.getTreeRoot().updateZobristHash(workspace.getTreeRoot().getZobrist(), workspace.getTreeRoot().getBoard(), nextMove);
+        long zobrist2 = workspace.getTreeRoot().updateZobristHash(workspace.getTreeRoot().getZobrist(), workspace.getTreeRoot().getBoard(), nextMove, true);
+
         state.makeMove(nextMove);
 
         state = game.getCurrentState();

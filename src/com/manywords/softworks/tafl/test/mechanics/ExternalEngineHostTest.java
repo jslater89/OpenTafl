@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.test.mechanics;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -65,6 +66,17 @@ public class ExternalEngineHostTest extends TaflTest implements UiCallback {
         }
 
         r.mRunning = false;
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Rules: " + r.mRulesResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Move: " + r.mMoveResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Error: " + r.mErrorResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Analyze: " + r.mAnalyzeResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Side: " + r.mSideResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Position: " + r.mPositionResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Clock: " + r.mClockResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Play: " + r.mPlayResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Opponent Move: " + r.mOpponentMoveResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Finish: " + r.mFinishResponse);
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Goodbye: " + r.mGoodbyeResponse);
         assert r.didTestPass();
     }
 
@@ -124,8 +136,8 @@ public class ExternalEngineHostTest extends TaflTest implements UiCallback {
                     String[] commands = string.split("\n");
 
                     for(String command : commands) {
-                        //System.out.println("Received command: " + command);
-                        if(command.startsWith("rules dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/")) {
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Received command: " + command);
+                        if(command.startsWith("rules dim:7 name:Brandub surf:n atkf:y ks:w cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/")) {
                             mRulesResponse = true;
                         }
                         else if(command.startsWith("move /3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/")) {

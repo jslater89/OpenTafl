@@ -18,6 +18,7 @@ public class CommunicationThread extends Thread {
     private boolean running = true;
     private CommunicationThreadCallback callback;
 
+    private boolean debug = false;
     private boolean log = false;
     private File logFile;
     private FileWriter logFileWriter;
@@ -27,6 +28,10 @@ public class CommunicationThread extends Thread {
         this.output = output;
         this.input = input;
         this.callback = callback;
+    }
+
+    public synchronized void setDebugMode(boolean on) {
+        debug = on;
     }
 
     public void setLog(boolean l) {
@@ -59,17 +64,22 @@ public class CommunicationThread extends Thread {
     public synchronized void sendCommand(byte[] command) {
         logBytes(true, command);
 
-        try {
-            output.write(command);
-            output.flush();
-        } catch (IOException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Exception writing command: " + e);
+        if(!debug) {
+            try {
+                output.write(command);
+                output.flush();
+            } catch (IOException e) {
+                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Exception writing command: " + e);
+            }
+        }
+        else {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, new String(command));
         }
     }
 
     @Override
     public void run() {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[65536];
         while(running) {
             try {
                 int i = input.read(buffer);

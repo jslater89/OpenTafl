@@ -5,6 +5,7 @@ import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.*;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
@@ -65,31 +66,31 @@ public class OptionsMenuWindow extends BasicWindow {
         Button variantSelect = new Button("Variant", this::showVariantSelectDialog);
         mVariantLabel = new Label(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
         optionsPanel.addComponent(variantSelect);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mVariantLabel);
 
 
         Button clockSettingSelect = new Button("Clock setting", this::showTimeSpecDialog);
         mClockLabel = new Label(TerminalSettings.timeSpec.toString());
         optionsPanel.addComponent(clockSettingSelect);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mClockLabel);
 
         Button aiDepthSelect = new Button("AI think time", this::showAiDepthEntryDialog);
         mThinkTimeLabel = new Label("" + TerminalSettings.aiThinkTime);
         optionsPanel.addComponent(aiDepthSelect);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mThinkTimeLabel);
 
         // Blank line
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
 
         Button attackerSelect = new Button("Attackers", () -> showPlayerSelectDialog(true));
         mAttackerLabel = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
         optionsPanel.addComponent(attackerSelect);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mAttackerLabel);
 
         Button attackerFileSelect = new Button("Attacker config", () -> {
@@ -104,18 +105,18 @@ public class OptionsMenuWindow extends BasicWindow {
         }
 
         optionsPanel.addComponent(attackerFileSelect);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mAttackerConfigLabel);
 
         // Blank line
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
 
         Button defenderSelect = new Button("Defenders", () -> showPlayerSelectDialog(false));
         mDefenderLabel = new Label(TerminalSettings.labelForPlayerType(TerminalSettings.defenders));
         optionsPanel.addComponent(defenderSelect);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mDefenderLabel);
 
         Button defenderFileSelect = new Button("Defender config", () -> {
@@ -130,13 +131,13 @@ public class OptionsMenuWindow extends BasicWindow {
         }
 
         optionsPanel.addComponent(defenderFileSelect);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mDefenderConfigLabel);
 
         // Blank line
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
 
         Button analysisButton = new Button("Analysis engine", () -> {
             TerminalSettings.analysisEngine = !TerminalSettings.analysisEngine;
@@ -145,7 +146,7 @@ public class OptionsMenuWindow extends BasicWindow {
         mAnalysisLabel = new Label(TerminalSettings.analysisEngine ? "On" : "Off");
 
         optionsPanel.addComponent(analysisButton);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mAnalysisLabel);
 
         Button analysisFileSelect = new Button("Analysis config", () -> {
@@ -160,13 +161,13 @@ public class OptionsMenuWindow extends BasicWindow {
         }
 
         optionsPanel.addComponent(analysisFileSelect);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mAnalysisConfigLabel);
 
         // Blank line
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
 
         Button shrinkLargeBoardsButton = new Button("Shrink large boards", () -> {
             TerminalSettings.shrinkLargeBoards = !TerminalSettings.shrinkLargeBoards;
@@ -175,7 +176,7 @@ public class OptionsMenuWindow extends BasicWindow {
         mShrinkLabel = new Label(TerminalSettings.shrinkLargeBoards ? "On" : "Off");
 
         optionsPanel.addComponent(shrinkLargeBoardsButton);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mShrinkLabel);
 
         Button destinationButton = new Button("Show destination name", () -> {
@@ -185,20 +186,20 @@ public class OptionsMenuWindow extends BasicWindow {
         mDestinationLabel = new Label(TerminalSettings.advancedDestinationRendering ? "On" : "Off");
 
         optionsPanel.addComponent(destinationButton);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mDestinationLabel);
 
         Button fontSizeButton = new Button("Font size", this::showFontSizeDialog);
         mFontSizeLabel = new Label(TerminalSettings.fontSize + "pt");
 
         optionsPanel.addComponent(fontSizeButton);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mFontSizeLabel);
 
         // Blank line
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
 
         final Button networkAddressButton = new Button("Server address", () -> {
             TerminalSettings.onlineServerHost = TextInputDialog.showDialog(getTextGUI(), "Server address", "Enter server address", TerminalSettings.onlineServerHost);
@@ -207,7 +208,7 @@ public class OptionsMenuWindow extends BasicWindow {
         mNetworkAddressLabel = new Label(TerminalSettings.onlineServerHost);
 
         optionsPanel.addComponent(networkAddressButton);
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mNetworkAddressLabel);
 
         Button backButton = new Button("Back", () -> {
@@ -216,8 +217,8 @@ public class OptionsMenuWindow extends BasicWindow {
         });
         optionsPanel.addComponent(backButton);
 
-        optionsPanel.addComponent(newSpacer());
-        optionsPanel.addComponent(newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
+        optionsPanel.addComponent(TerminalUtils.newSpacer());
 
         p.addComponent(optionsPanel);
 
@@ -261,10 +262,6 @@ public class OptionsMenuWindow extends BasicWindow {
         mFontSizeLabel.setText(TerminalSettings.fontSize + "pt");
 
         mNetworkAddressLabel.setText(TerminalSettings.onlineServerHost);
-    }
-
-    private EmptySpace newSpacer() {
-        return new EmptySpace(new TerminalSize(4, 1));
     }
 
     private void showFileSelectDialog(EngineType type) {
@@ -399,22 +396,6 @@ public class OptionsMenuWindow extends BasicWindow {
                     @Override
                     public String toString() {
                         return "AI";
-                    }
-                },
-
-                new Runnable() {
-
-                    @Override
-                    public void run() {
-                        if(attackers) TerminalSettings.attackers = TerminalSettings.HUMAN;
-                        else TerminalSettings.defenders = TerminalSettings.HUMAN;
-
-                        refreshSettings();
-                    }
-
-                    @Override
-                    public String toString() {
-                        return "Network";
                     }
                 },
 

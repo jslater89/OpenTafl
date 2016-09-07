@@ -21,7 +21,7 @@ public interface GameTreeNode {
 
     public abstract int getVictory();
 
-    public abstract short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool);
+    public abstract short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation);
 
     public abstract short evaluate();
 
@@ -30,6 +30,8 @@ public interface GameTreeNode {
     public abstract MoveRecord getEnteringMove();
 
     public abstract List<MoveRecord> getEnteringMoveSequence();
+
+    public abstract GameTreeNode getChildForPath(List<MoveRecord> moves);
 
     public abstract GameTreeNode getParentNode();
 
@@ -47,7 +49,11 @@ public interface GameTreeNode {
 
     public abstract GameTreeNode getBestChild();
 
+    public abstract List<List<MoveRecord>> getAllEnteringSequences();
+
     public abstract long getZobrist();
 
     public abstract void revalueParent(int depthOfObservation);
+
+    public abstract void printChildEvaluations();
 }

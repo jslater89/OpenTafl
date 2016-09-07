@@ -101,10 +101,12 @@ public class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest implements Ui
             //RawTerminal.renderGameState(state);
             AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
             //workspace.chatty = true;
-            workspace.explore(1);
+            workspace.explore(5);
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             value = workspace.getTreeRoot().getBestChild().getValue();
             List<GameTreeNode> path = workspace.getTreeRoot().getBestPath();
+
+            workspace.printSearchStats();
 
             state.makeMove(nextMove);
             state = game.getCurrentState();

@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
+import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.List;
@@ -13,89 +14,79 @@ import java.util.List;
 /**
  * Created by jay on 2/15/16.
  */
-public class HumanCommandParser {
+public class CommandParser {
     public static Command parseCommand(CommandEngine engine, String command) {
         if(command.startsWith("move")) {
-            return newMoveCommand(engine, command);
+            return new Move(engine, command);
         }
         else if(command.startsWith("info")) {
-            return newInfoCommand(engine, command);
+            return new Info(engine, command);
         }
         else if(command.startsWith("show")) {
-            return newShowCommand(engine, command);
+            return new Show(engine, command);
         }
         else if(command.startsWith("history")) {
-            return newHistoryCommand(engine, command);
+            return new History(engine, command);
         }
         else if(command.startsWith("help")) {
-            return newHelpCommand(engine, command);
+            return new Help(engine, command);
         }
         else if(command.startsWith("rules")) {
-            return newRulesCommand(engine, command);
+            return new Rules(engine, command);
         }
         else if(command.startsWith("save")) {
-            return newSaveCommand(engine, command);
+            return new Save(engine, command);
         }
         else if(command.startsWith("quit")) {
-            return newQuitCommand(engine, command);
+            return new Quit(engine, command);
         }
         else if(command.startsWith("analyze")) {
-            return newAnalyzeCommand(engine, command);
+            return new Analyze(engine, command);
         }
         else if(command.startsWith("replay")) {
-            return newReplayEnterCommand(engine, command);
+            return new ReplayEnter(engine, command);
         }
         else if(command.startsWith("play-here")) {
-            return newReplayPlayHereCommand(engine, command);
+            return new ReplayPlayHere(engine, command);
         }
         else if(command.startsWith("return")) {
-            return newReplayReturnCommand(engine, command);
+            return new ReplayReturn(engine, command);
         }
         else if(command.startsWith("next")) {
-            return newReplayNextCommand(engine, command);
+            return new ReplayNext(engine, command);
         }
-        else if(command.startsWith("previous")) {
-            return newReplayPreviousCommand(engine, command);
+        else if(command.startsWith("previous") || command.startsWith("prev")) {
+            return new ReplayPrevious(engine, command);
         }
         else if(command.startsWith("jump")) {
-            return newReplayJumpCommand(engine, command);
+            return new ReplayJump(engine, command);
         }
-        else if(command.startsWith("variation")) {
-            return newVariationCommand(engine, command);
+        else if(command.startsWith("variation") || command.startsWith("var")) {
+            return new Variation(engine, command);
         }
         else if(command.startsWith("delete")) {
-            return newDeleteCommand(engine, command);
+            return new Delete(engine, command);
         }
         else if(command.startsWith("annotate")) {
-            return newAnnotateCommand(engine, command);
+            return new Annotate(engine, command);
+        }
+        else if(command.startsWith("clipboard-copy")) {
+            return new ClipboardCopy(engine, command);
+        }
+        else if(command.startsWith("clipboard-paste")) {
+            return new ClipboardPaste(engine, command);
         }
         else if(command.startsWith("chat")) {
-            return newChatCommand(engine, command);
+            return new Chat(engine, command);
+        }
+        else if(command.startsWith("hint")) {
+            return new Hint(engine, command);
+        }
+        else if(command.startsWith("tags")) {
+            return new Tags(engine, command);
         }
         return null;
     }
-
-    public static Move newMoveCommand(CommandEngine engine, String command) {
-        return new Move(engine, command);
-    }
-    public static Info newInfoCommand(CommandEngine engine, String command) { return new Info(engine, command); }
-    public static Show newShowCommand(CommandEngine engine, String command) { return new Show(engine, command); }
-    public static History newHistoryCommand(CommandEngine engine, String command) { return new History(engine, command); }
-    public static Help newHelpCommand(CommandEngine engine, String command) { return new Help(engine, command); }
-    public static Rules newRulesCommand(CommandEngine engine, String command) { return new Rules(engine, command); }
-    public static Save newSaveCommand(CommandEngine engine, String command) { return new Save(engine,command); }
-    public static Quit newQuitCommand(CommandEngine engine, String command) { return new Quit(engine, command); }
-    public static Analyze newAnalyzeCommand(CommandEngine engine, String command) { return new Analyze(engine, command); }
-    public static ReplayEnter newReplayEnterCommand(CommandEngine engine, String command) { return new ReplayEnter(engine, command); }
-    public static ReplayPlayHere newReplayPlayHereCommand(CommandEngine engine, String command) { return new ReplayPlayHere(engine, command); }
-    public static ReplayReturn newReplayReturnCommand(CommandEngine engine, String command) { return new ReplayReturn(engine, command); }
-    public static ReplayNext newReplayNextCommand(CommandEngine engine, String command) { return new ReplayNext(engine, command); }
-    public static ReplayPrevious newReplayPreviousCommand(CommandEngine engine, String command) { return new ReplayPrevious(engine, command); }
-    public static ReplayJump newReplayJumpCommand(CommandEngine engine, String command) { return new ReplayJump(engine, command); }
-    public static Variation newVariationCommand(CommandEngine engine, String command) { return new Variation(engine, command); }
-    public static Delete newDeleteCommand(CommandEngine engine, String command) { return new Delete(engine, command); }
-    public static Annotate newAnnotateCommand(CommandEngine engine, String command) { return new Annotate(engine, command); }
-    public static Chat newChatCommand(CommandEngine engine, String command) { return new Chat(engine, command); }
 
     public static class Move extends Command {
         public final Coord from;
@@ -282,6 +273,10 @@ public class HumanCommandParser {
     public static class ReplayNext extends Command {
         public final int nextVariation;
 
+        public static final int NO_VARIATION = 0;
+        public static final int ERROR = -1;
+        public static final int CANONICAL_CHILD = -2;
+
         public ReplayNext(CommandEngine engine, String command) {
             super(Type.REPLAY_NEXT);
             if(engine.getMode() != UiCallback.Mode.REPLAY) {
@@ -290,10 +285,10 @@ public class HumanCommandParser {
 
             String[] elements = command.split(" ");
             if(elements.length > 2) {
-                nextVariation = -1;
+                nextVariation = ERROR;
             }
             else if(elements.length == 2) {
-                int test = -1;
+                int test = ERROR;
                 try {
                     test = Integer.parseInt(elements[1]);
                 }
@@ -301,12 +296,12 @@ public class HumanCommandParser {
                 }
 
                 if(test == 0) {
-                    test = -1;
+                    test = ERROR;
                 }
                 nextVariation = test;
             }
             else {
-                nextVariation = -2;
+                nextVariation = CANONICAL_CHILD;
             }
 
             if(nextVariation == -1) {
@@ -410,11 +405,30 @@ public class HumanCommandParser {
             super(Type.ANNOTATE);
         }
     }
-    public static class Chat extends Command {
-        public final String message;
+    public static class Chat extends Command {public final String message;
         public Chat(CommandEngine engine, String command) {
             super(Type.CHAT);
             message = command.replaceFirst("chat", "").trim();
+        }
+    }
+    public static class ClipboardCopy extends Command {
+        public ClipboardCopy(CommandEngine engine, String command) {
+            super(Type.CLIPBOARD_COPY);
+        }
+    }
+    public static class ClipboardPaste extends Command {
+        public ClipboardPaste(CommandEngine engine, String command) {
+            super(Type.CLIPBOARD_COPY);
+        }
+    }
+    public static class Hint extends Command {
+        public Hint(CommandEngine engine, String command) {
+            super(Type.HINT);
+        }
+    }
+    public static class Tags extends Command {
+        public Tags(CommandEngine engine, String command) {
+            super(Type.TAGS);
         }
     }
 
@@ -428,7 +442,7 @@ public class HumanCommandParser {
         return help.toString();
     }
 
-    public static String getHelpString(Command.Type type) {
+    private static String getHelpString(Command.Type type) {
         switch (type) {
             case NONE:
                 return "";
@@ -510,10 +524,23 @@ public class HumanCommandParser {
             case ANNOTATE:
                 return "annotate\n" +
                                 "Open an editor dialog to modify the annotation displayed when this board position is displayed.\n\n";
+            case CLIPBOARD_COPY:
+                return "clipboard-copy\n" +
+                                "Copy a rules string describing the current position to the clipboard.\n\n";
+            case CLIPBOARD_PASTE:
+                return "clipboard-paste\n" +
+                                "Open a text entry dialog into which a rules string can be pasted.\n\n";
+            case HINT:
+                return "hint\n" +
+                                "Receive a hint from the puzzle author, if one is provided.\n\n";
             case CHAT:
                 return
                         "chat [text]\n" +
                                 "Send a chat message to other players in the current game.\n\n";
+            case TAGS:
+                return
+                        "tags\n" +
+                                "Open a dialog box to edit the game's tags.\n\n";
         }
 
         return "";

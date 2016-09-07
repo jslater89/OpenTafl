@@ -1,6 +1,8 @@
 package com.manywords.softworks.tafl.ui.lanterna;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
+import com.googlecode.lanterna.gui2.EmptySpace;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
@@ -131,6 +133,11 @@ public class TerminalUtils {
         builder.setTitle(title);
         builder.setActionLabel(actionLabel);
         return builder.build().showDialog(gui);
+    }
+
+
+    public static EmptySpace newSpacer() {
+        return new EmptySpace(new TerminalSize(4, 1));
     }
 
     public static PrintStream newDummyPrintStream() {

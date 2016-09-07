@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.engine.collections;
 
+import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 
@@ -12,6 +13,7 @@ import java.util.List;
 public class TaflmanCoordListMap {
     private char[] mTaflmen;
     private TableEntry[] mEntries;
+    private boolean[] mDirty;
 
     private final int mDimension;
     private final short mSize;
@@ -25,6 +27,7 @@ public class TaflmanCoordListMap {
         mDimension = dimension;
         mTaflmen = new char[mSize];
         mEntries = new TableEntry[mSize];
+        mDirty = new boolean[mSize];
 
         for(int i = 0; i < mSize; i++) {
             mEntries[i] = new TableEntry();
@@ -38,9 +41,11 @@ public class TaflmanCoordListMap {
         this.mDimension = other.mDimension;
         mTaflmen = new char[mSize];
         mEntries = new TableEntry[mSize];
+        mDirty = new boolean[mSize];
 
         for(int i = 0; i < mSize; i++) {
             mTaflmen[i] = other.mTaflmen[i];
+            mDirty[i] = other.mDirty[i];
 
             mEntries[i].coords = new char[other.mEntries[i].coords.length];
             for(int j = 0; j < other.mEntries[i].coords.length; j++) {
@@ -57,25 +62,23 @@ public class TaflmanCoordListMap {
 
         // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
         int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
-        char[] coords = mEntries[index].coords;
+        if(mDirty[index]) return null;
 
-        if(coords.length > 0) {
+        char[] coords = mEntries[index].coords;
+        if(coords != null && coords.length > 0) {
             ArrayList<Coord> list = new ArrayList<Coord>(coords.length);
             for(int i = 0; i < coords.length; i++) {
                 list.add(Coord.getCoordForIndex(mDimension, coords[i]));
             }
             return list;
         }
-        else {
-            return null;
-        }
+
+        return null;
     }
 
     public void reset() {
-        for(int i = 0; i < mSize; i++) {
-            mEntries[i].coords = new char[0];
-            mTaflmen[i] = Taflman.EMPTY;
-        }
+        Utilities.fillArray(mTaflmen, Taflman.EMPTY);
+        Utilities.fillArray(mDirty, true);
     }
 
     public void remove(char taflman) {
@@ -86,6 +89,7 @@ public class TaflmanCoordListMap {
         int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
         mEntries[index].coords = new char[0];
         mTaflmen[index] = Taflman.EMPTY;
+        mDirty[index] = false;
     }
 
     public void put(char taflman, List<Coord> spaces) {
@@ -103,6 +107,7 @@ public class TaflmanCoordListMap {
 
         mEntries[index].coords = coords;
         mTaflmen[index] = taflman;
+        mDirty[index] = false;
     }
 
     public char[] getTaflmen() {
@@ -110,6 +115,6 @@ public class TaflmanCoordListMap {
     }
 
     private class TableEntry {
-        char[] coords = {};
+        char[] coords;
     }
 }

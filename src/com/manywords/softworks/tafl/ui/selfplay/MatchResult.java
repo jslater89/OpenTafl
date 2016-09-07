@@ -50,21 +50,19 @@ public class MatchResult {
         if(games[0] == null || games[1] == null) throw new IllegalStateException();
         if(engines[0] == null || engines[1] == null) throw new IllegalStateException();
 
-        if(games[0].getCurrentState().checkVictory() == GameState.DRAW && games[1].getCurrentState().checkVictory() == GameState.DRAW) {
-            return null;
-        }
-        else if (games[0].getCurrentState().checkVictory() == GameState.DRAW) {
-            return winners[1];
-        }
-        else if (games[1].getCurrentState().checkVictory() == GameState.DRAW) {
-            return winners[0];
+        int wonByFirstEngine = 0;
+        int wonBySecondEngine = 0;
+
+        for(EngineSpec winner : winners) {
+            if(winner != null) {
+                if(winner == engines[0]) wonByFirstEngine++;
+                else if(winner == engines[1]) wonBySecondEngine++;
+            }
         }
 
-        // If the same engine won both games, that one wins.
-        if(winners[0] == winners[1] && winners[0] != null) {
-            return winners[0];
-        }
-        else {
+        if(wonByFirstEngine > wonBySecondEngine) return engines[0];
+        else if(wonBySecondEngine > wonByFirstEngine) return engines[1];
+        else if (winners[0] != null && winners[1] != null) {
             if(gameLengths[0] < gameLengths[1]) {
                 return winners[0];
             }
@@ -75,5 +73,6 @@ public class MatchResult {
                 return null;
             }
         }
+        else return null;
     }
 }

@@ -16,6 +16,9 @@ import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
+import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
@@ -33,22 +36,21 @@ import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.command.Command;
 import com.manywords.softworks.tafl.command.CommandEngine;
 import com.manywords.softworks.tafl.command.CommandResult;
-import com.manywords.softworks.tafl.command.HumanCommandParser;
+import com.manywords.softworks.tafl.command.CommandParser;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
-import com.manywords.softworks.tafl.ui.lanterna.window.ingame.AnnotationDialog;
-import com.manywords.softworks.tafl.ui.lanterna.window.ingame.BoardWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.ingame.CommandWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.ingame.StatusWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.ingame.*;
+import com.manywords.softworks.tafl.ui.lanterna.window.mainmenu.LoadNotationDialog;
 import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by jay on 4/2/16.
@@ -199,6 +201,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     public void gameStarting() {
         statusText("Game starting");
         mInGame = true;
+
+        if(mSelfplayWindow != null) {
+
+            mStatusWindow.setTitle("Information " + mSelfplayWindow.getRunner().getTitle());
+
+        }
     }
 
     @Override
@@ -255,11 +263,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         if(!mInReplay) {
             // Notify the player if this is a victory on move repetition
-            int repeats = mGame.getCurrentState().countPositionOccurrences();
-            repeats++;
-            if (repeats > 2) {
-                statusText("This position has repeated " + repeats + " times!");
-            }
         }
 
         if(side == null) {
@@ -482,38 +485,70 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void handleInGameCommand(String command) {
+            if(command.startsWith("dumptree")) {
+                AiWorkspace w = GameTreeState.workspace;
+                if(w != null) {
+                    w.getTreeRoot().printTree("");
+                }
 
-            if(command.startsWith("dump")) {
-                if(mInReplay) {
+                return;
+            }
+            else if(command.startsWith("dumphistory")) {
+                if(mReplay != null) {
                     mReplay.dumpHistory();
+                }
+
+                return;
+            }
+            else if(command.startsWith("dumpeval")) {
+                ExternalEnginePlayer analysisPlayer = mCommandEngine.getAnalysisPlayer();
+                if(analysisPlayer != null) {
+                    String[] parts = command.split(" ");
+                    int child = 0;
+                    if(parts.length == 2) {
+                        try {
+                            child = Integer.parseInt(parts[1]);
+                        }
+                        catch(Exception e) {
+
+                        }
+                    }
+
+                    if(child < 0) {
+                        FishyEvaluator fe = new FishyEvaluator();
+                        fe.debug = true;
+
+                        if(mCommandEngine.getReplay() != null) {
+                            fe.evaluate(mCommandEngine.getReplay().getCurrentState(), 0, 0);
+                        }
+                        else {
+                            fe.evaluate(mCommandEngine.getGame().getCurrentState(), 0, 0);
+                        }
+
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, fe.debugString);
+                    }
+                    else {
+                        mCommandEngine.getAnalysisPlayer().getExternalEngineHost().dumpEvaluation(child);
+                    }
+                }
+                else {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "No AI workspace");
                 }
                 return;
             }
 
 
-            Command c = HumanCommandParser.parseCommand(mCommandEngine, command);
+            Command c = CommandParser.parseCommand(mCommandEngine, command);
             if(c == null){
                 // This is handled below.
             }
-            else if(!getCurrentCommands().contains(c.getType())) {
+            else if(!getAvailableCommands().contains(c.getType())) {
                 statusText("Command not available at this time.");
                 return;
             }
-            else if(getCurrentCommands().contains(c.getType())) {
+            else if(getAvailableCommands().contains(c.getType())) {
                 if (c.getType() == Command.Type.REPLAY_RETURN) {
-                    if (mCommandEngine.getReplay() != null && mCommandEngine.getReplay().isDirty()) {
-                        MessageDialogBuilder builder = new MessageDialogBuilder();
-                        builder.setTitle("Replay not saved!");
-                        builder.setText("This replay has been changed, but not yet saved.\nContinuing will exit the replay and discard\nchanges.");
-                        builder.addButton(MessageDialogButton.Continue);
-                        builder.addButton(MessageDialogButton.Cancel);
-                        MessageDialog dialog = builder.build();
-                        MessageDialogButton result = dialog.showDialog(mGui);
-
-                        if (result.equals(MessageDialogButton.Cancel)) {
-                            return;
-                        }
-                    }
+                    if(!checkReplaySave()) return;
                 }
             }
 
@@ -543,7 +578,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 }
             }
             else if (r.type == Command.Type.INFO) {
-                HumanCommandParser.Info infoCommand = (HumanCommandParser.Info) c;
+                CommandParser.Info infoCommand = (CommandParser.Info) c;
                 mBoardWindow.rerenderBoard(infoCommand.location, infoCommand.stops, infoCommand.moves, infoCommand.captures);
             }
             else if (r.type == Command.Type.SHOW) {
@@ -554,7 +589,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 statusText(gameRecord);
             }
             else if (r.type == Command.Type.HELP) {
-                String helpString = HumanCommandParser.getHelpString(getCurrentCommands());
+                String helpString = CommandParser.getHelpString(getAvailableCommands());
 
                 ScrollingMessageDialog dialog = new ScrollingMessageDialog("OpenTafl " + OpenTafl.CURRENT_VERSION + " Help", helpString, MessageDialogButton.Close);
                 dialog.setSize(new TerminalSize(Math.min(70, mGui.getScreen().getTerminalSize().getColumns() - 2), 30));
@@ -572,7 +607,9 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     saveReplay = false;
                 }
 
-                File saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games"));
+                File saveFile;
+                if(mCommandEngine.getMode() == Mode.GAME) saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games"));
+                else saveFile = TerminalUtils.showFileChooserDialog(mGui, title, "Save", new File("saved-games/replays"));
 
                 if(saveFile == null) {
                     return;
@@ -635,20 +672,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     }
                 }
                 else {
-                    if(mCommandEngine.getReplay() != null && mCommandEngine.getReplay().isDirty()) {
-                        MessageDialogBuilder builder = new MessageDialogBuilder();
-                        builder.setTitle("Replay not saved!");
-                        builder.setText("This replay has been changed, but not yet saved.\nContinuing will quit and discard changes.");
-                        builder.addButton(MessageDialogButton.Continue);
-                        builder.addButton(MessageDialogButton.Cancel);
-                        MessageDialog dialog = builder.build();
-                        MessageDialogButton result = dialog.showDialog(mGui);
-
-                        if(result.equals(MessageDialogButton.Cancel)) {
-                            return;
-                        }
-                    }
-                    leaveGameUi();
+                    if(checkReplaySave()) leaveGameUi();
                 }
             }
             else if(r.type == Command.Type.ANALYZE) {
@@ -672,7 +696,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 updateComments();
 
                 int result = (Integer) r.extra;
-                if(result > GameState.GOOD_MOVE) {
+                if(result > GameState.GOOD_MOVE) { // All results > GOOD_MOVE are special, and should have some status
                     statusText(GameState.getStringForMoveResult(result));
                 }
             }
@@ -692,7 +716,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 mBoardWindow.rerenderBoard();
 
                 int result = (Integer) r.extra;
-                if(result > GameState.GOOD_MOVE) {
+                if(result > GameState.GOOD_MOVE) { // All results > GOOD_MOVE are special, and should have some status
                     statusText(GameState.getStringForMoveResult(result));
                 }
             }
@@ -706,7 +730,6 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 d.setHints(TerminalThemeConstants.CENTERED_MODAL);
                 d.showDialog(mGui);
 
-                //TODO: check to see if we changed things before marking dirty
                 mCommandEngine.getReplay().markDirty();
 
                 updateComments();
@@ -719,6 +742,38 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     mServerConnection.sendChatMessage(type, mServerConnection.getUsername(), r.message);
                 }
             }
+            else if(r.type == Command.Type.CLIPBOARD_PASTE) {
+                LoadNotationDialog d = new LoadNotationDialog(mTerminalCallback, GameScreen.this);
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+                d.showLoadNotationDialog(mGui);
+            }
+            else if (r.type == Command.Type.TAGS) {
+                TagSettingsDialog d = new TagSettingsDialog(mCommandEngine.getReplay());
+                d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+                d.showDialog(mGui);
+            }
+            else {
+                if (r.message != null && !r.message.isEmpty()) {
+                    statusText(r.message);
+                }
+            }
+        }
+
+        private boolean checkReplaySave() {
+            if(mCommandEngine.getReplay() != null && !mCommandEngine.getReplay().getMode().isPuzzleMode() && mCommandEngine.getReplay().isDirty()) {
+                MessageDialogBuilder builder = new MessageDialogBuilder();
+                builder.setTitle("Replay not saved!");
+                builder.setText("This replay has been changed, but not yet saved.\nContinuing will quit and discard changes.");
+                builder.addButton(MessageDialogButton.Continue);
+                builder.addButton(MessageDialogButton.Cancel);
+                MessageDialog dialog = builder.build();
+                MessageDialogButton result = dialog.showDialog(mGui);
+
+                if(result.equals(MessageDialogButton.Cancel)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void tryTimeUpdate() {
@@ -764,7 +819,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
             statusText("--- Start of replay ---");
             if(tags != null && tags.containsKey(Game.Tag.START_COMMENT)) {
-                statusText(tags.get(Game.Tag.START_COMMENT));
+                String commentText = tags.get(Game.Tag.START_COMMENT);
+                if(!commentText.isEmpty()) {
+                    if(mReplay.getMode().isPuzzleMode()) {
+                        commentText = commentText.replaceAll(ReplayGame.hintRegex, "").trim();
+                    }
+                    statusText(commentText);
+                }
             }
         }
 
@@ -777,27 +838,21 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 else {
                     statusText(Ansi.UNDERLINE + "Last move" + Ansi.UNDERLINE_OFF + ": " + m);
                     if(!m.getComment().trim().isEmpty()) {
-                        statusText(m.getComment());
+                        String commentText = m.getComment();
+                        if(mReplay.getMode().isPuzzleMode()) {
+                            commentText = commentText.replaceAll(ReplayGame.hintRegex, "").trim();
+                        }
+                        statusText(commentText);
                     }
                 }
             }
         }
 
-        private List<Command.Type> getCurrentCommands() {
+        private List<Command.Type> getAvailableCommands() {
             List<Command.Type> types = new ArrayList<>();
 
             if(mInGame) {
                 types.add(Command.Type.MOVE);
-            }
-
-            if(mInReplay) {
-                types.add(Command.Type.VARIATION);
-                types.add(Command.Type.DELETE);
-                types.add(Command.Type.ANNOTATE);
-                types.add(Command.Type.REPLAY_NEXT);
-                types.add(Command.Type.REPLAY_PREVIOUS);
-                types.add(Command.Type.REPLAY_JUMP);
-                types.add(Command.Type.REPLAY_RETURN);
             }
 
             if(mInReplay && mServerConnection == null) {
@@ -806,6 +861,26 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
             if(mInGame || mPostGame) {
                 types.add(Command.Type.REPLAY_ENTER);
+            }
+
+            if(mInReplay) {
+                types.add(Command.Type.REPLAY_NEXT);
+                types.add(Command.Type.REPLAY_PREVIOUS);
+                types.add(Command.Type.REPLAY_JUMP);
+                types.add(Command.Type.REPLAY_RETURN);
+                types.add(Command.Type.VARIATION);
+                types.add(Command.Type.DELETE);
+                types.add(Command.Type.ANNOTATE);
+                types.add(Command.Type.TAGS);
+            }
+
+            if(mCommandEngine.getMode() == Mode.REPLAY && mCommandEngine.getReplay().getMode().isPuzzleMode()) {
+                if(mCommandEngine.getReplay().isInPuzzlePrestart()) {
+                    types.remove(Command.Type.VARIATION);
+                }
+                types.remove(Command.Type.ANNOTATE);
+                types.remove(Command.Type.TAGS);
+                types.add(Command.Type.HINT);
             }
 
             if(mServerConnection != null) {
@@ -820,6 +895,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 types.add(Command.Type.HELP);
                 types.add(Command.Type.RULES);
                 types.add(Command.Type.SAVE);
+                types.add(Command.Type.CLIPBOARD_COPY);
                 types.add(Command.Type.QUIT);
             }
 
