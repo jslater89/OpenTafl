@@ -242,7 +242,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
     @Override
     public void statusText(String text) {
-        mStatusWindow.addStatus(text);
+        if(mStatusWindow != null) mStatusWindow.addStatus(text);
     }
 
     @Override
