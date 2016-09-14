@@ -307,24 +307,44 @@ public abstract class BoardImpl extends Board {
 
         // Some short-circuit optimizations: I need at least two pieces on the edge to form a shieldwall.
         // The other side needs at least two pieces on the edge to be shieldwalled.
-        int myTaflmenOnEdge = 0;
-        int otherTaflmenOnEdge = 0;
+        int attackersOnEdge = 0;
+        int defendersOnEdge = 0;
 
-        for(char taflman : surrounders.getTaflmen()) {
-            Coord space = findTaflmanSpace(taflman);
-            if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) myTaflmenOnEdge++;
+        // Check defenders first: they're less likely to be on the edge
+        if(surrounders.isAttackingSide()) {
+            for(char taflman : surrounded.getTaflmen()) {
+                Coord space = findTaflmanSpace(taflman);
+                if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) defendersOnEdge++;
 
-            if(myTaflmenOnEdge >= 2) break;
+                if(defendersOnEdge >= 2) break;
+            }
+            if(defendersOnEdge < 2) return shieldwallPositions;
+
+            for(char taflman : surrounders.getTaflmen()) {
+                Coord space = findTaflmanSpace(taflman);
+                if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) attackersOnEdge++;
+
+                if(attackersOnEdge >= 2) break;
+            }
+            if(attackersOnEdge < 2) return shieldwallPositions;
         }
+        else {
+            for(char taflman : surrounders.getTaflmen()) {
+                Coord space = findTaflmanSpace(taflman);
+                if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) defendersOnEdge++;
 
-        for(char taflman : surrounded.getTaflmen()) {
-            Coord space = findTaflmanSpace(taflman);
-            if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) otherTaflmenOnEdge++;
+                if(defendersOnEdge >= 2) break;
+            }
+            if(defendersOnEdge < 2) return shieldwallPositions;
 
-            if(otherTaflmenOnEdge >= 2) break;
+            for(char taflman : surrounded.getTaflmen()) {
+                Coord space = findTaflmanSpace(taflman);
+                if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) attackersOnEdge++;
+
+                if(attackersOnEdge >= 2) break;
+            }
+            if(attackersOnEdge < 2) return shieldwallPositions;
         }
-
-        if(myTaflmenOnEdge < 2 || otherTaflmenOnEdge < 2) return shieldwallPositions;
 
         Coord startPosition = null;
         Coord endPosition = null;
