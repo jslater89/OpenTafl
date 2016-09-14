@@ -305,8 +305,8 @@ public class GameState {
             List<Coord> captures = move.captures;
 
             if (getBoard().getRules().allowShieldWallCaptures() > 0) {
-                List<ShieldwallPosition> shieldwallPositionsAttackers = nextState.getBoard().detectShieldwallPositionsForSide(getAttackers());
-                List<ShieldwallPosition> shieldwallPositionsDefenders = nextState.getBoard().detectShieldwallPositionsForSide(getDefenders());
+                List<ShieldwallPosition> shieldwallPositionsAttackers = nextState.getBoard().detectShieldwallPositionsForSide(getAttackers(), getDefenders());
+                List<ShieldwallPosition> shieldwallPositionsDefenders = nextState.getBoard().detectShieldwallPositionsForSide(getDefenders(), getAttackers());
 
 
                 for (ShieldwallPosition position : shieldwallPositionsAttackers) {
@@ -449,7 +449,7 @@ public class GameState {
 
 		/* Handle edge fort escapes */
         if (getBoard().getRules().allowEdgeFortEscapes()) {
-            List<ShieldwallPosition> defenderShieldwalls = getBoard().detectShieldwallPositionsForSide(getDefenders());
+            List<ShieldwallPosition> defenderShieldwalls = getBoard().detectShieldwallPositionsForSide(getDefenders(), getAttackers());
 
             // A shieldwall shape is a subset of all invincible shapes, so don't bother checking them for
             // invincibility
