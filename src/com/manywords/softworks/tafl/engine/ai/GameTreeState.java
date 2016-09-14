@@ -4,11 +4,9 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
-import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.*;
 
@@ -246,12 +244,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
         if(extension && mDepth < overallMaxDepth) {
-            if(workspace.mNoTime) return mValue;
-            if(mVictory > HIGHEST_NONTERMINAL_RESULT) return mValue;
-
-            continuationOnChildren(currentMaxDepth, overallMaxDepth);
-
-            return mValue;
+            if(workspace.mNoTime && mValue != Evaluator.NO_VALUE) return mValue; // If we don't have a value, we'll fall out elsewhere
+            else if(mVictory > HIGHEST_NONTERMINAL_RESULT) return mValue;
+            else {
+                continuationOnChildren(currentMaxDepth, overallMaxDepth);
+                return mValue;
+            }
         }
 
         short cachedValue = Evaluator.NO_VALUE;
@@ -319,8 +317,14 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // Explore our children
             exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
 
+            if(mValue == Evaluator.NO_VALUE) {
+                throw new IllegalStateException("Unvalued state after search");
+            }
+
             // This state has not occurred in the history for not-our-children
             workspace.getRepetitions().decrement(this.getZobrist());
+
+            minifyState();
 
             // Continuation search runs through the whole tree again, so only horizon search (i.e. extension, but not
             // continuation) needs to revalue a parent. Put another way, only revalue parent if we don't start at the
@@ -331,7 +335,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return mValue;
     }
 
-    public static GameTreeState getStateForMinimalNode(GameTreeState rootNode, MinimalGameTreeNode minimalGameTreeNode) {
+    public static GameTreeState getStateForNode(GameTreeState rootNode, GameTreeNode minimalGameTreeNode) {
         GameTreeState desiredState = rootNode;
         for (MoveRecord m : minimalGameTreeNode.getEnteringMoveSequence()) {
             desiredState = desiredState.considerMove(m.start, m.end);
@@ -435,8 +439,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
         // TODO: try putting continuation search/extension search into the transposition table at a depth penalty, since
         // they're useful but not exact.
         if(!continuation && !extension) AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
-
-        minifyState();
     }
 
     public void continuationOnChildren(int currentMaxDepth, int overallMaxDepth) {
@@ -770,7 +772,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         for(GameTreeNode n : getBranches()) {
             GameTreeState s;
             if(n instanceof MinimalGameTreeNode) {
-                s = GameTreeState.getStateForMinimalNode(workspace.getTreeRoot(), (MinimalGameTreeNode) n);
+                s = GameTreeState.getStateForNode(workspace.getTreeRoot(), (MinimalGameTreeNode) n);
             }
             else {
                 s = (GameTreeState) n;
