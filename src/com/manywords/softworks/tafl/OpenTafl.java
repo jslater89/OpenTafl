@@ -107,12 +107,13 @@ public class OpenTafl {
 
         switch(runMode) {
             case SERVER:
-                // Blocks here
                 int threads = 4;
                 if(mapArgs.containsKey("threads")) {
                     threads = Integer.parseInt(mapArgs.get("threads"));
                 }
                 NetworkServer ns = new NetworkServer(threads);
+
+                // Blocks here
                 ns.start();
                 break;
             case HEADLESS_AI:

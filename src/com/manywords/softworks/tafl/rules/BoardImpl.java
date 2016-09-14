@@ -285,7 +285,7 @@ public abstract class BoardImpl extends Board {
     }
 
     @Override
-    public List<ShieldwallPosition> detectShieldwallPositionsForSide(Side side) {
+    public List<ShieldwallPosition> detectShieldwallPositionsForSide(Side surrounders, Side surrounded) {
         // Algorithm thought: the simplest way to find shieldwalls is to search
         // exhaustively.
         //
@@ -304,6 +304,47 @@ public abstract class BoardImpl extends Board {
         //    12. Then add space to surrounded list and continue.
         //    13. Else clear start space and surrounded spaces list.
         List<ShieldwallPosition> shieldwallPositions = new ArrayList<ShieldwallPosition>();
+
+        // Some short-circuit optimizations: I need at least two pieces on the edge to form a shieldwall.
+        // The other side needs at least two pieces on the edge to be shieldwalled.
+        int attackersOnEdge = 0;
+        int defendersOnEdge = 0;
+
+        // Check defenders first: they're less likely to be on the edge
+        if(surrounders.isAttackingSide()) {
+            for(char taflman : surrounded.getTaflmen()) {
+                Coord space = findTaflmanSpace(taflman);
+                if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) defendersOnEdge++;
+
+                if(defendersOnEdge >= 2) break;
+            }
+            if(defendersOnEdge < 2) return shieldwallPositions;
+
+            for(char taflman : surrounders.getTaflmen()) {
+                Coord space = findTaflmanSpace(taflman);
+                if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) attackersOnEdge++;
+
+                if(attackersOnEdge >= 2) break;
+            }
+            if(attackersOnEdge < 2) return shieldwallPositions;
+        }
+        else {
+            for(char taflman : surrounders.getTaflmen()) {
+                Coord space = findTaflmanSpace(taflman);
+                if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) defendersOnEdge++;
+
+                if(defendersOnEdge >= 2) break;
+            }
+            if(defendersOnEdge < 2) return shieldwallPositions;
+
+            for(char taflman : surrounded.getTaflmen()) {
+                Coord space = findTaflmanSpace(taflman);
+                if(space != null && isEdgeSpace(findTaflmanSpace(taflman))) attackersOnEdge++;
+
+                if(attackersOnEdge >= 2) break;
+            }
+            if(attackersOnEdge < 2) return shieldwallPositions;
+        }
 
         Coord startPosition = null;
         Coord endPosition = null;
@@ -334,7 +375,7 @@ public abstract class BoardImpl extends Board {
                 }
                 // If start position is null and this space is occupied, this is a potential
                 // start position.
-                else if (startPosition == null && getOccupier(space) != 0 && Taflman.getPackedSide(getOccupier(space)) == side.getSideChar()) {
+                else if (startPosition == null && getOccupier(space) != 0 && Taflman.getPackedSide(getOccupier(space)) == surrounders.getSideChar()) {
                     startPosition = space;
                     surroundingTaflmen.add(getOccupier(space));
                     continue;
@@ -363,17 +404,17 @@ public abstract class BoardImpl extends Board {
                     // piece.) We don't need to catch bigger arrangements like that; any larger
                     // 'imperfect shieldwall' of this sort just look like the minimum size shieldwall,
                     // and that's okay from a rules perspective.
-                    if (getOccupier(space) != 0 && Taflman.getPackedSide(getOccupier(space)) == side.getSideChar()) {
+                    if (getOccupier(space) != 0 && Taflman.getPackedSide(getOccupier(space)) == surrounders.getSideChar()) {
                         if (getOccupier(edge.get(index + 1)) != 0
-                                && Taflman.getPackedSide(getOccupier(edge.get(index + 1))) == side.getSideChar()
+                                && Taflman.getPackedSide(getOccupier(edge.get(index + 1))) == surrounders.getSideChar()
                                 && getOccupier(getEdgeAdjacentSpace(direction, space)) != 0
-                                && Taflman.getPackedSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == side.getSideChar()) {
+                                && Taflman.getPackedSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == surrounders.getSideChar()) {
                             surroundingTaflmen.add(getOccupier(getEdgeAdjacentSpace(direction, space)));
                             surroundedSpaces.add(space);
                             continue;
                         } else if (getOccupier(space) != 0 && Taflman.isKing(getOccupier(space))
                                 && getOccupier(getEdgeAdjacentSpace(direction, space)) != 0
-                                && Taflman.getPackedSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == side.getSideChar()) {
+                                && Taflman.getPackedSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == surrounders.getSideChar()) {
                             surroundingTaflmen.add(getOccupier(getEdgeAdjacentSpace(direction, space)));
                             surroundedSpaces.add(space);
                             continue;
@@ -393,7 +434,7 @@ public abstract class BoardImpl extends Board {
                     }
 
                     if (getOccupier(getEdgeAdjacentSpace(direction, space)) != 0
-                            && Taflman.getPackedSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == side.getSideChar()) {
+                            && Taflman.getPackedSide(getOccupier(getEdgeAdjacentSpace(direction, space))) == surrounders.getSideChar()) {
                         surroundingTaflmen.add(getOccupier(getEdgeAdjacentSpace(direction, space)));
                         surroundedSpaces.add(space);
                     } else {

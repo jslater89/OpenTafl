@@ -43,8 +43,8 @@ public class StrictShieldwallTest extends TaflTest {
         //RawTerminal.renderGameState(state);
         //println("Attacker shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getAttackers()));
         //println("Defender shieldwalls: " + state.getBoard().detectShieldwallPositionsForSide(state.getDefenders()));
-        assert 2 == state.getBoard().detectShieldwallPositionsForSide(state.getAttackers()).size();
-        assert 2 == state.getBoard().detectShieldwallPositionsForSide(state.getDefenders()).size();
+        assert 2 == state.getBoard().detectShieldwallPositionsForSide(state.getAttackers(), state.getDefenders()).size();
+        assert 2 == state.getBoard().detectShieldwallPositionsForSide(state.getDefenders(), state.getAttackers()).size();
 
         assert state.checkVictory() == GameState.DEFENDER_WIN;
         assert state.getPieceAt(5, 0) != Taflman.EMPTY;

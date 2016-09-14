@@ -112,7 +112,7 @@ public abstract class Board {
 
     public abstract boolean isSideEncircled(Side side);
 
-    public abstract List<ShieldwallPosition> detectShieldwallPositionsForSide(Side side);
+    public abstract List<ShieldwallPosition> detectShieldwallPositionsForSide(Side surrounders, Side surrounded);
 
     public abstract List<Coord> getTopEdge();
 

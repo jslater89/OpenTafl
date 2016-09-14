@@ -3,14 +3,7 @@ Tafl To-Do
 v0.4.x features:
 
 AI stuff:
--2. History hash table for detecting repetitions. (If position occurs 1 or more times in history, search instead of hitting TT.)
-    put zobrist before exploring children
-    remove after
-    if hit, search rather than hitting TT
--1. Do I need to revalue parents during continuation search? I lean no, but I'm not sure.
 0. Evaluation function work: underpins all further heuristics work
-1. Draw reports position repeated 4 times when it's clearly only done three
-2. History heuristic (array indexed by: fromindex, toindex to track counts, list of: move for moves)
 3. Leaf states not being minified
 
 AI evaluation function to-do:
