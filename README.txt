@@ -269,7 +269,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 11. VERSION HISTORY -----------------------------------------------------------
-v0.4.4.0b (released 09/xx/16):
+v0.4.4.1b (released 09/13/16):
+- Fix an occasional crash in the OpenTafl AI with certain time settings and
+  horizon search
+
+v0.4.4.0b (released 09/07/16):
 - New stable release
 - Puzzle mode added, along with two puzzles (viewable by 'load replay'); see
   section in README for more details
