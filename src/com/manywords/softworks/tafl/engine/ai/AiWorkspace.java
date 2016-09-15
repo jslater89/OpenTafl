@@ -567,7 +567,7 @@ public class AiWorkspace extends Game {
                     if (currentHorizonDepth > deepestSearch) deepestSearch = currentHorizonDepth;
 
                     if (certainVictory) {
-                        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: certain victory");
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: certain victory");
                         break;
                     }
                     horizonIterations++;
