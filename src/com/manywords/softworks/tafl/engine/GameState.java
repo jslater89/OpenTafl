@@ -304,7 +304,7 @@ public class GameState {
             MoveRecord move = Taflman.moveTo(nextState, taflman, destination, detailed);
             List<Coord> captures = move.captures;
 
-            if (getBoard().getRules().allowShieldWallCaptures() > 0) {
+            if (getBoard().getRules().allowShieldWallCaptures() > Rules.NO_SHIELDWALL) {
                 List<ShieldwallPosition> shieldwallPositionsAttackers = nextState.getBoard().detectShieldwallPositionsForSide(getAttackers(), getDefenders());
                 List<ShieldwallPosition> shieldwallPositionsDefenders = nextState.getBoard().detectShieldwallPositionsForSide(getDefenders(), getAttackers());
 
