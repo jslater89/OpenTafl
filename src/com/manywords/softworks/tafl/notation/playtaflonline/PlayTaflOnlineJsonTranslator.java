@@ -7,10 +7,10 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
-import net.maritimecloud.internal.core.javax.json.Json;
-import net.maritimecloud.internal.core.javax.json.JsonArray;
-import net.maritimecloud.internal.core.javax.json.JsonObject;
-import net.maritimecloud.internal.core.javax.json.JsonReader;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
