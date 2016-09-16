@@ -28,12 +28,11 @@ import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.notation.TaflmanCodes;
-import com.manywords.softworks.tafl.rules.*;
-
-import java.util.List;
-
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
+import com.manywords.softworks.tafl.rules.Taflman;
+
+import java.util.List;
 
 public class DetailedMoveRecord extends MoveRecord {
     private static final byte MOVE_TYPE_MASK = 16 + 32;
@@ -58,6 +57,13 @@ public class DetailedMoveRecord extends MoveRecord {
 
     private String mComment = "";
     private TimeSpec mTimeRemaining;
+
+    public DetailedMoveRecord(MoveRecord move) {
+        super(move.start, move.end);
+        flags = 0;
+        captureArray = new char[0];
+        dimension = 0;
+    }
 
     public DetailedMoveRecord(int dimension, Coord start, Coord end, char mover) {
         super(start, end);

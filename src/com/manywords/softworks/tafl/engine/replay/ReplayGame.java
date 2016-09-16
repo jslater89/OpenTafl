@@ -48,6 +48,21 @@ public class ReplayGame {
     private Set<GameState> mStartingPuzzleStates = new HashSet<>();
 
     /**
+     * This constructor is used by the JSON translator.
+     * @param game
+     * @param movesToPlay
+     */
+    public static ReplayGame loadJsonGame(Game game, List<MoveRecord> movesToPlay) {
+        List<DetailedMoveRecord> detailedMoveRecords = new ArrayList<>(movesToPlay.size());
+
+        for(MoveRecord move : movesToPlay) {
+            detailedMoveRecords.add(new DetailedMoveRecord(move));
+        }
+
+        return new ReplayGame(game, detailedMoveRecords, new ArrayList<>());
+    }
+
+    /**
      * This constructor takes a game object and plays the given
      * moves on top of it.
      * @param game

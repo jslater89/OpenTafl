@@ -120,7 +120,7 @@ public class GameSerializer {
     private static String getTagString(Game g) {
         String tagString = "";
 
-        if(g.getTagMap().containsKey("rules")) {
+        if(g.getTagMap() != null && g.getTagMap().containsKey("rules")) {
             for(Map.Entry<String, String> entry : g.getTagMap().entrySet()) {
                 tagString += "[" + entry.getKey() + ":" + entry.getValue() + "]\n";
             }
