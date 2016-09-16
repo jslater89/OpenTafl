@@ -63,7 +63,7 @@ public class PlayTaflOnlineJsonTranslator {
 
         // Translate rules to OTNR
         String openTaflRules = "dim:" + getDimensionForName(gameObject.getString(PTOConstants.KEY_LAYOUT)) + " ";
-        openTaflRules += "name:" + gameObject.getString(PTOConstants.KEY_LAYOUT) + " ";
+        openTaflRules += "name:" + getNotationNameForName(gameObject.getString(PTOConstants.KEY_LAYOUT)) + " ";
 
         switch(gameObject.getInt(PTOConstants.KEY_OBJECTIVE)) {
             case PTOConstants.OBJECTIVE_CORNER: openTaflRules += "esc:c "; break;
@@ -195,5 +195,30 @@ public class PlayTaflOnlineJsonTranslator {
         else if(name.equals("coppergate1")) return PTOConstants.SERIF_CROSS_15_LAYOUT;
         else if(name.equals("papillon")) return PTOConstants.PAPILLON_LAYOUT;
         else return null;
+    }
+
+    private static String getNotationNameForName(String name) {
+        name = name.toLowerCase();
+        if(name.equals("hhtablut")) return "H.H_Tablut";
+        else if(name.equals("tablut")) return "Custom_Tablut";
+        else if(name.equals("hhgokstad")) return "H.H._Gokstad";
+        else if(name.equals("gokstad1") || name.equals("gokstad2")) return "Custom_Gokstad";
+        else if(name.equals("seabattlegokstad") || name.equals("seabattlecircle") || name.equals("seabattlecross")) return "Sea_Battle";
+        else if(name.equals("hhcoppergate")) return "H.H._Coppergate";
+        else if(name.equals("coppergate1") || name.equals("coppergate2")) return "Custom_Coppergate";
+        else if(name.equals("hhbrandubh")) return "H.H_Brandubh";
+        else if(name.equals("brandubh")) return "Custom_Brandubh";
+        else if(name.equals("hhtawlbwrdd")) return "H.H._Tawlbwrdd";
+        else if(name.equals("tawlbwrdd")) return "Custom_Tawlbwrdd";
+        else if(name.equals("hhardri")) return "H.H._Ard_Ri";
+        else if(name.equals("ardri")) return "Custom_Ard_Ri";
+        else if(name.equals("magpie")) return "Magpie";
+        else if(name.equals("fetlar")) return "Fetlar";
+        else if(name.equals("copenhagen")) return "Copenhagen";
+        else if(name.equals("hnefatafl")) return "Custom_Hnefatafl";
+        else if(name.equals("jarlshofcircle")) return "Custom_Jarlshof";
+        else if(name.equals("trondheimcross")) return "Custom_Trondheim";
+        else if(name.equals("papillon")) return "Custom_Papillon's_Escape";
+        else return name;
     }
 }
