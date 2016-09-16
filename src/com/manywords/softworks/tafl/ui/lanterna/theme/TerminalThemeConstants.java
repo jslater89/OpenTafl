@@ -40,6 +40,7 @@ public class TerminalThemeConstants {
     public static final ArrayList<Window.Hint> BOARD_WINDOW = new ArrayList<Window.Hint>();
     static {
         BOARD_WINDOW.add(Window.Hint.FIXED_POSITION);
+        BOARD_WINDOW.add(Window.Hint.FIXED_SIZE);
         BOARD_WINDOW.add(Window.Hint.NO_FOCUS);
     }
 
