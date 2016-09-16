@@ -269,6 +269,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 11. VERSION HISTORY -----------------------------------------------------------
+v0.4.4.3b (released 09/16/16):
+- Fix bug which caused bad play, strange capturing behavior, and crashes in
+  Copenhagen games
+
 v0.4.4.2b (released 09/16/16):
 - Add a command-line translator for PlayTaflOnline json game records
 - Fix 'rules' command output for speed limits
