@@ -23,14 +23,15 @@ package com.manywords.softworks.tafl.notation;
 
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.replay.MoveAddress;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Rules;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -120,40 +121,15 @@ public class GameSerializer {
     private static String getTagString(Game g) {
         String tagString = "";
 
-        if(g.getTagMap() != null && g.getTagMap().containsKey("rules")) {
-            for(Map.Entry<String, String> entry : g.getTagMap().entrySet()) {
-                tagString += "[" + entry.getKey() + ":" + entry.getValue() + "]\n";
-            }
-
-            tagString += "\n";
+        if(g.getTagMap() == null || !g.getTagMap().containsKey("rules")) {
+            g.setDefaultTags();
         }
-        else {
-            tagString += "[date:";
-            String date = new SimpleDateFormat("yyyy.MM.dd").format(new Date());
-            tagString += date + "]\n";
 
-            tagString += "[result:";
-            if (g.getCurrentState().checkVictory() == GameState.ATTACKER_WIN) tagString += "1";
-            else if (g.getCurrentState().checkVictory() == GameState.DEFENDER_WIN) tagString += "-1";
-            else if (g.getCurrentState().checkVictory() == GameState.DRAW) tagString += "0";
-            else tagString += "?";
-            tagString += "]\n";
-
-            tagString += "[compiler:OpenTafl]\n";
-
-            if (g.getClock() != null) {
-                String timeString = g.getClock().toTimeSpec().toString();
-                tagString += "[time-control:" + timeString + "]\n";
-
-                String timeRemainingString =
-                        g.getClock().getClockEntry(g.getCurrentState().getAttackers()).toTimeSpec().toGameNotationString() + ", " +
-                                g.getClock().getClockEntry(g.getCurrentState().getDefenders()).toTimeSpec().toGameNotationString();
-                tagString += "[time-remaining:" + timeRemainingString + "]\n";
-            }
-
-            tagString += "[rules:" + g.getRules().getOTRString() + "]\n\n";
-
+        for(Map.Entry<String, String> entry : g.getTagMap().entrySet()) {
+            tagString += "[" + entry.getKey() + ":" + entry.getValue() + "]\n";
         }
+
+        tagString += "\n";
 
         return tagString;
     }

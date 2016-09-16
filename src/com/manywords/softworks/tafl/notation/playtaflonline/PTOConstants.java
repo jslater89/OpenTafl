@@ -23,6 +23,9 @@ public class PTOConstants {
     static final String KEY_MOVE_X_TO = "MoveXTo";
     static final String KEY_MOVE_Y_TO = "MoveYTo";
     static final String KEY_LAYOUT = "Layout";
+    static final String KEY_ATTACKER = "Attacker";
+    static final String KEY_DEFENDER = "Defender";
+    static final String KEY_START_DATE = "StartDate";
 
     static final String KEY_OBJECTIVE = "Objective";
     static final int OBJECTIVE_EDGE = 0;

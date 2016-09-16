@@ -85,7 +85,7 @@ public class OpenTafl {
                 logLevel = SILENT;
                 runMode = Mode.BENCHMARK;
             }
-            else if(arg.contains("--read-json") && runMode == Mode.GRAPHICAL_TERMINAL) {
+            else if(arg.contains("--pto-json") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.READ_JSON;
             }
             else if(arg.contains("--help")) {
@@ -181,7 +181,8 @@ public class OpenTafl {
                 new Benchmark().run();
                 break;
             case READ_JSON:
-                String filename = mapArgs.get("--read-json");
+                String filename = mapArgs.get("--pto-json");
+                System.out.println(filename);
                 Game g = PlayTaflOnlineJsonTranslator.readJsonFile(new File(filename));
 
                 if(g == null) {
@@ -388,7 +389,7 @@ public class OpenTafl {
         System.out.println("\t--threads [#]: number of worker threads to spawn");
         System.out.println("--engine: run as external engine");
         System.out.println("--test: run the built-in tests");
-        System.out.println("--read-json [filename]: read a PlayTaflOnline.com JSON game record and output an OpenTafl saved game with the same name.");
+        System.out.println("--pto-json [filename]: read a PlayTaflOnline.com JSON game record and output an OpenTafl saved game with the same name.");
         System.out.println("--headless: run as a headless AI client");
         System.out.println("\t--server [address]: server address");
         System.out.println("\t--username [name]: server login username");

@@ -7,14 +7,15 @@ import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 import net.maritimecloud.internal.core.javax.json.Json;
 import net.maritimecloud.internal.core.javax.json.JsonArray;
 import net.maritimecloud.internal.core.javax.json.JsonObject;
 import net.maritimecloud.internal.core.javax.json.JsonReader;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,6 +63,7 @@ public class PlayTaflOnlineJsonTranslator {
 
         // Translate rules to OTNR
         String openTaflRules = "dim:" + getDimensionForName(gameObject.getString(PTOConstants.KEY_LAYOUT)) + " ";
+        openTaflRules += "name:" + gameObject.getString(PTOConstants.KEY_LAYOUT) + " ";
 
         switch(gameObject.getInt(PTOConstants.KEY_OBJECTIVE)) {
             case PTOConstants.OBJECTIVE_CORNER: openTaflRules += "esc:c "; break;
@@ -125,9 +127,18 @@ public class PlayTaflOnlineJsonTranslator {
 
         // Apply moves
         for(MoveRecord m : moves) {
-            RawTerminal.renderGameState(g.getCurrentState());
             int moveResult = g.getCurrentState().makeMove(m);
             OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Move: " + m + " Result: " + GameState.getStringForMoveResult(moveResult));
+        }
+
+        g.setDefaultTags();
+        g.getTagMap().put(Game.Tag.ATTACKERS, gameObject.getString(PTOConstants.KEY_ATTACKER, ""));
+        g.getTagMap().put(Game.Tag.DEFENDERS, gameObject.getString(PTOConstants.KEY_DEFENDER, ""));
+        g.getTagMap().put(Game.Tag.SITE, "playtaflonline.com");
+
+        if(gameObject.getInt(PTOConstants.KEY_START_DATE, -1) != -1) {
+            long timestamp = gameObject.getJsonNumber(PTOConstants.KEY_START_DATE).longValue() * 1000;
+            g.getTagMap().put(Game.Tag.DATE, new SimpleDateFormat("yyyy.MM.dd").format(new Date(timestamp)));
         }
 
         return g;
