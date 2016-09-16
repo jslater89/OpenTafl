@@ -182,7 +182,6 @@ public class OpenTafl {
                 break;
             case READ_JSON:
                 String filename = mapArgs.get("--pto-json");
-                System.out.println(filename);
                 Game g = PlayTaflOnlineJsonTranslator.readJsonFile(new File(filename));
 
                 if(g == null) {
