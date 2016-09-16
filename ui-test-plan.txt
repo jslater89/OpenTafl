@@ -1,0 +1,11 @@
+OpenTafl UI Test Plan
+
+Required for stable release.
+
+1. Play a game against a local human, using replay mode at least once.
+2. Play a game against the local AI, using replay mode at least once.
+3. Play a game against an external engine, using replay mode at least once.
+4. View a replay with variations, testing each command.
+5. Play a puzzle.
+6. Use AI selfplay mode.
+7. Play two external engines against each other over the network, using headless AI mode.
