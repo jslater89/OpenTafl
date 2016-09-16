@@ -19,6 +19,6 @@
     <orderEntry type="library" exported="" name="org.ini4j:ini4j:0.5.4" level="project" />
     <orderEntry type="library" exported="" name="jline:jline:2.14.2" level="project" />
     <orderEntry type="library" name="lanterna" level="project" />
-    <orderEntry type="library" name="net.maritimecloud.3rdparty:org.glassfish.javax.json:1.0.4" level="project" />
+    <orderEntry type="library" exported="" name="net.maritimecloud.3rdparty:org.glassfish.javax.json:1.0.4" level="project" />
   </component>
 </module>
