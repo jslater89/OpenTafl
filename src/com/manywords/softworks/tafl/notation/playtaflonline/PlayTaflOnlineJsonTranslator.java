@@ -168,9 +168,9 @@ public class PlayTaflOnlineJsonTranslator {
         if(name.equals("hhtablut") || name.equals("tablut")) return 9;
         else if(name.equals("hhgokstad") || name.equals("seabattlegokstad") || name.equals("gokstad2")) return 13;
         else if(name.equals("hhcoppergate") || name.equals("coppergate2")) return 15;
-        else if(name.equals("hhbrandubh") || name.equals("brandubh")) return 7;
+        else if(name.equals("hhbrandubh") || name.equals("brandubh") || name.equals("hhardri") || name.equals("magpie")) return 7;
         else if(name.equals("hhtawlbwrdd") || name.equals("tawlbwrdd")) return 11;
-        else if(name.equals("hhardri") || name.equals("ardri") || name.equals("magpie")) return 7;
+        else if(name.equals("ardri")) return 7;
         else if(name.equals("fetlar") || name.equals("copenhagen") || name.equals("hnefatafl")) return 11;
         else if(name.equals("seabattlecircle") || name.equals("jarlshofcircle")) return 9;
         else if(name.equals("seabattlecross") || name.equals("trondheimcross")) return 11;
@@ -185,9 +185,9 @@ public class PlayTaflOnlineJsonTranslator {
         if(name.equals("hhtablut") || name.equals("tablut")) return PTOConstants.TABLUT_LAYOUT;
         else if(name.equals("hhgokstad") || name.equals("seabattlegokstad") || name.equals("gokstad2")) return PTOConstants.PARLETT_LAYOUT;
         else if(name.equals("hhcoppergate") || name.equals("coppergate2")) return PTOConstants.COPPERGATE_II_LAYOUT;
-        else if(name.equals("hhbrandubh") || name.equals("brandubh")) return PTOConstants.BRANDUB_LAYOUT;
+        else if(name.equals("hhbrandubh") || name.equals("brandubh") || name.equals("hhardri") || name.equals("magpie")) return PTOConstants.BRANDUB_LAYOUT;
         else if(name.equals("hhtawlbwrdd") || name.equals("tawlbwrdd")) return PTOConstants.TAWLBWRDD_LAYOUT;
-        else if(name.equals("hhardri") || name.equals("ardri") || name.equals("magpie")) return PTOConstants.ARD_RI_LAYOUT;
+        else if(name.equals("ardri")) return PTOConstants.ARD_RI_LAYOUT;
         else if(name.equals("fetlar") || name.equals("copenhagen") || name.equals("hnefatafl")) return PTOConstants.COPENHAGEN_LAYOUT;
         else if(name.equals("seabattlecircle") || name.equals("jarlshofcircle")) return PTOConstants.JARLSHOF_LAYOUT;
         else if(name.equals("seabattlecross") || name.equals("trondheimcross")) return PTOConstants.SERIF_CROSS_11_LAYOUT;
