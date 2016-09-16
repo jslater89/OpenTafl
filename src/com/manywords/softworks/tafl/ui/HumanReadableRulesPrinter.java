@@ -484,20 +484,22 @@ public class HumanReadableRulesPrinter {
 
                 int speedLimit = r.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[i]);
 
+                String speedLimitString = (speedLimit == -1 ? "any number of spaces. " : "up to " + speedLimit + " spaces. ");
+
                 if(taflmanType == Taflman.TYPE_KING) {
-                    if(!isAttacking) rules += "The king moves up to " + speedLimit + " spaces.";
+                    if(!isAttacking) rules += "The king moves " + speedLimitString;
                 }
                 else if(taflmanType == Taflman.TYPE_COMMANDER) {
-                    if(isAttacking && r.getAttackers().hasCommanders()) rules += "Attacking commanders move up to " + speedLimit + " spaces. ";
-                    else if(!isAttacking && r.getDefenders().hasCommanders()) rules += "Defending commanders move up to " + speedLimit + " spaces. ";
+                    if(isAttacking && r.getAttackers().hasCommanders()) rules += "Attacking commanders move " + speedLimitString;
+                    else if(!isAttacking && r.getDefenders().hasCommanders()) rules += "Defending commanders move " + speedLimitString;
                 }
                 else if(taflmanType == Taflman.TYPE_KNIGHT) {
-                    if(isAttacking && r.getAttackers().hasKnights()) rules += "Attacking knights move up to " + speedLimit + " spaces. ";
-                    else if(!isAttacking && r.getDefenders().hasKnights()) rules += "Defending knights move up to " + speedLimit + " spaces. ";
+                    if(isAttacking && r.getAttackers().hasKnights()) rules += "Attacking knights move up to " + speedLimitString;
+                    else if(!isAttacking && r.getDefenders().hasKnights()) rules += "Defending knights move up to " + speedLimitString;
                 }
                 else {
                     side = Character.toUpperCase(side.charAt(0)) + side.substring(1);
-                    rules += side + " taflmen move up to " + speedLimit + " spaces";
+                    rules += side + " taflmen move " + speedLimitString;
                 }
             }
 
