@@ -544,7 +544,7 @@ public class GameState {
         //    (Try it yourself on a piece of paper if you don't believe me.)
 
         for(char taflman : edgefortTaflmen) {
-            List<Coord> adjacent = getBoard().getAdjacentSpaces(Taflman.getCurrentSpace(this, taflman));
+            List<Coord> adjacent = new ArrayList<>(getBoard().getAdjacentSpaces(Taflman.getCurrentSpace(this, taflman)));
             adjacent.removeAll(fortSpaces);
 
             int friendlySpaces = 0;
