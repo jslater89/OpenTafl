@@ -5,7 +5,6 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.BasicTextImage;
-import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
 import com.manywords.softworks.tafl.rules.Board;
@@ -89,7 +88,7 @@ public class TerminalBoardImage extends BasicTextImage {
         int xFarLeft = mLeftPad;
         int xFarRight = mLeftPad + boardDimension * mColWidth;
 
-        for (int row = 0; row < boardDimension; row++) {
+        for (int row = boardDimension; row >= 0; row--) {
             int yTop = row * mRowHeight;
             int yBottom = row * mRowHeight + mRowHeight;
             int rowLabelIdx = ((yTop + yBottom) / 2);
@@ -99,7 +98,7 @@ public class TerminalBoardImage extends BasicTextImage {
                 int xRight = col * mColWidth + mColWidth + mLeftPad;
                 int colLabelIdx = ((xLeft + xRight) / 2);
 
-                for (int y = yTop; y < yBottom + 1; y++) {
+                for (int y = 0; y < yBottom + 1; y++) {
                     for (int x = xLeft; x < xRight + 1; x++) {
                         // Draw the top or bottom of a space
                         if (y % mRowHeight == 0) {
@@ -114,7 +113,7 @@ public class TerminalBoardImage extends BasicTextImage {
                         }
                         // Draw the middle of a space
                         else {
-                            String rowLabel = "" + (row + 1);
+                            String rowLabel = "" + (boardDimension - row);
                             if (x == xFarLeft && y == rowLabelIdx) {
                                 if (mRowHeight == 2 && rowLabel.length() > 1) {
                                     setCharacterAt(xLeft - 1, y, new TextCharacter(rowLabel.charAt(0)));
@@ -325,7 +324,7 @@ public class TerminalBoardImage extends BasicTextImage {
 
     private TerminalPosition getSpaceTopLeftForCoord(Coord c) {
 
-        int yStart = c.y * mRowHeight + 1;
+        int yStart = getSize().getRows() - ((c.y + 1) * mRowHeight);
         int xStart = c.x * mColWidth + 1;
         return new TerminalPosition(xStart, yStart);
     }
