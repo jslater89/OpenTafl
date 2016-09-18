@@ -45,7 +45,9 @@ public class EdgeFortEscapeTest extends TaflTest {
         //RawTerminal.renderGameState(state);
         assert state.checkVictory() == GameState.DEFENDER_WIN;
 
-        // Edge fort escape tests
+        // This test catches a case where checkEdgeFortEscape would, in the course of checking
+        // whether the fort is invincible, remove spaces inside the fort from the adjacency
+        // lists. Obviously, this is catastrophically bad.
         assert state.getBoard().getAdjacentSpaces(Coord.get(1, 8)).contains(Coord.get(2,8));
     }
 
