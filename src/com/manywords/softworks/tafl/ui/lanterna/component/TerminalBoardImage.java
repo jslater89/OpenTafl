@@ -88,7 +88,7 @@ public class TerminalBoardImage extends BasicTextImage {
         int xFarLeft = mLeftPad;
         int xFarRight = mLeftPad + boardDimension * mColWidth;
 
-        for (int row = boardDimension; row >= 0; row--) {
+        for (int row = 0; row < boardDimension; row++) {
             int yTop = row * mRowHeight;
             int yBottom = row * mRowHeight + mRowHeight;
             int rowLabelIdx = ((yTop + yBottom) / 2);
@@ -98,7 +98,7 @@ public class TerminalBoardImage extends BasicTextImage {
                 int xRight = col * mColWidth + mColWidth + mLeftPad;
                 int colLabelIdx = ((xLeft + xRight) / 2);
 
-                for (int y = 0; y < yBottom + 1; y++) {
+                for (int y = yTop; y < yBottom + 1; y++) {
                     for (int x = xLeft; x < xRight + 1; x++) {
                         // Draw the top or bottom of a space
                         if (y % mRowHeight == 0) {
