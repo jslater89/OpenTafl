@@ -462,7 +462,7 @@ public class AiWorkspace extends Game {
                 // already searched most of it, we'll get some nodes out of the search if we have
                 // even a little time remaining.
                 if (timeRemaining < timeRequired) {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Skipping continuation search: " + timeRemaining + "msec left, " + timeRequired + " required");
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Skipping continuation search to depth " + continuationDepth + ": " + timeRemaining + "msec left, " + timeRequired + " required");
                     break;
                 }
 
@@ -566,9 +566,13 @@ public class AiWorkspace extends Game {
 
                     if (currentHorizonDepth > deepestSearch) deepestSearch = currentHorizonDepth;
 
-                    if (certainVictory) break;
+                    if (certainVictory) {
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: certain victory");
+                        break;
+                    }
                     horizonIterations++;
                 } else {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: out of time");
                     break;
                 }
             }
@@ -650,7 +654,7 @@ public class AiWorkspace extends Game {
         FishyEvaluator e = (FishyEvaluator) evaluator;
         for(GameTreeNode n: sequence) {
             if(n instanceof MinimalGameTreeNode) {
-                GameTreeState s = GameTreeState.getStateForMinimalNode(getTreeRoot(), (MinimalGameTreeNode) n);
+                GameTreeState s = GameTreeState.getStateForNode(getTreeRoot(), (MinimalGameTreeNode) n);
                 s.mCurrentMaxDepth = depth;
                 evaluator.evaluate(s, s.mCurrentMaxDepth, s.mDepth);
                 debugString += e.debugString + "\n-------------------------------------------\n";

@@ -2,7 +2,9 @@ package com.manywords.softworks.tafl.engine.ai;
 
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
@@ -96,6 +98,15 @@ public class GameTreeNodeMethods {
 
         if(bestMove != null && bestMove.getValue() == Evaluator.NO_VALUE) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Chose an unvalued node as the best move!");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Entering path: " + root.getEnteringMoveSequence());
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Best move: " + bestMove.getEnteringMove());
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Best move has children? " + bestMove.getBranches());
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Reported evaluation: " + bestMove.getValue());
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Best move is a TT hit? " + AiWorkspace.transpositionTable.getData(bestMove.getZobrist()));
+            GameTreeState state = GameTreeState.getStateForNode(root.getRootNode(), root);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Actual evaluation: " + new FishyEvaluator().evaluate(state, state.mCurrentMaxDepth, state.getDepth()));
+            RawTerminal.renderGameState(state);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, state.getPasteableRulesString());
             throw new IllegalStateException();
         }
 

@@ -7,7 +7,6 @@ import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.test.TaflTest;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 public class EdgeFortEscapeTest extends TaflTest {
 
@@ -45,6 +44,9 @@ public class EdgeFortEscapeTest extends TaflTest {
         state = game.getCurrentState();
         //RawTerminal.renderGameState(state);
         assert state.checkVictory() == GameState.DEFENDER_WIN;
+
+        // Edge fort escape tests
+        assert state.getBoard().getAdjacentSpaces(Coord.get(1, 8)).contains(Coord.get(2,8));
     }
 
 }

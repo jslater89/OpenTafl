@@ -10,8 +10,8 @@ import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class Game {
     public static class Tag {
@@ -158,6 +158,31 @@ public class Game {
 
     public Map<String, String> getTagMap() {
         return mTagMap;
+    }
+
+    public void setDefaultTags() {
+        mTagMap.put(Tag.DATE, new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
+
+        String resultString = "";
+        if (getCurrentState().checkVictory() == GameState.ATTACKER_WIN) resultString += "1";
+        else if (getCurrentState().checkVictory() == GameState.DEFENDER_WIN) resultString += "-1";
+        else if (getCurrentState().checkVictory() == GameState.DRAW) resultString += "0";
+        else resultString += "?";
+        mTagMap.put(Tag.RESULT, resultString);
+
+        mTagMap.put(Tag.COMPILER, "OpenTafl");
+
+        if (getClock() != null) {
+            String timeString = getClock().toTimeSpec().toString();
+            mTagMap.put(Tag.TIME_CONTROL, timeString);
+
+            String timeRemainingString =
+                    getClock().getClockEntry(getCurrentState().getAttackers()).toTimeSpec().toGameNotationString() + ", " +
+                            getClock().getClockEntry(getCurrentState().getDefenders()).toTimeSpec().toGameNotationString();
+            mTagMap.put(Tag.TIME_REMAINING, timeRemainingString);
+        }
+
+        mTagMap.put(Tag.RULES, getRules().getOTRString());
     }
 
     public UiCallback getUiCallback() {

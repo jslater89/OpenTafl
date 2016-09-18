@@ -11,6 +11,10 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.command.Command;
+import com.manywords.softworks.tafl.command.CommandEngine;
+import com.manywords.softworks.tafl.command.CommandParser;
+import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.*;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
@@ -21,10 +25,10 @@ import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
-import com.manywords.softworks.tafl.network.packet.ClientInformation;
-import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection.ClientServerCallback;
+import com.manywords.softworks.tafl.network.packet.ClientInformation;
+import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.notation.GameSerializer;
@@ -33,10 +37,6 @@ import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.UiCallback;
-import com.manywords.softworks.tafl.command.Command;
-import com.manywords.softworks.tafl.command.CommandEngine;
-import com.manywords.softworks.tafl.command.CommandResult;
-import com.manywords.softworks.tafl.command.CommandParser;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
@@ -50,7 +50,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Created by jay on 4/2/16.
@@ -142,31 +141,34 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         mBoardWindow.setPosition(new TerminalPosition(0, 0));
         int leftoverRight = screenSize.getColumns() - boardWindowSize.getColumns();
-        int leftoverBottom = screenSize.getRows() - boardWindowSize.getRows();
-        int boardWindowHeight = boardWindowSize.getRows();
-        int boardWindowWidth = boardWindowSize.getColumns();
         TerminalPosition statusPosition, commandPosition;
         TerminalSize statusSize, commandSize;
 
+        int boardWindowWidth = boardWindowSize.getColumns();
+        commandSize = new TerminalSize(boardWindowWidth, 4);
+
+        int boardWindowHeight = Math.max(boardWindowSize.getRows(), screenSize.getRows() - commandSize.getRows() - 4);
+
         if(leftoverRight < 20) {
+            boardWindowHeight = boardWindowSize.getRows();
+
+            int leftoverBottom = screenSize.getRows() - 2 - boardWindowHeight - 2;
+
             // status and command stacked beneath the board window
             statusPosition = new TerminalPosition(0, boardWindowHeight + 2);
             statusSize = new TerminalSize(boardWindowWidth, leftoverBottom - 6);
-
-            leftoverBottom -= statusSize.getRows();
-            leftoverBottom -= 4;
-
+            
             commandPosition = new TerminalPosition(0, boardWindowHeight + 2 + statusSize.getRows() + 2);
-            commandSize = new TerminalSize(boardWindowWidth, leftoverBottom);
         }
         else {
             // command beneath the board window, status to the right
             statusPosition = new TerminalPosition(boardWindowWidth + 2, 0);
-            statusSize = new TerminalSize(leftoverRight - 4, boardWindowHeight + 2 + 4);
+            statusSize = new TerminalSize(leftoverRight - 4, screenSize.getRows() - 2);
 
             commandPosition = new TerminalPosition(0, boardWindowHeight + 2);
-            commandSize = new TerminalSize(boardWindowWidth, 4);
         }
+
+        mBoardWindow.setSize(new TerminalSize(boardWindowWidth, boardWindowHeight));
 
         mStatusWindow.setPosition(statusPosition);
         mStatusWindow.setSize(statusSize);

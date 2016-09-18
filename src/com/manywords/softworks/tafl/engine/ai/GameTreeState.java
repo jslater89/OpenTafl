@@ -4,13 +4,14 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
-import com.manywords.softworks.tafl.engine.ai.tables.KillerMoveTable;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static com.manywords.softworks.tafl.rules.Taflman.EMPTY;
 
@@ -32,6 +33,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
     private boolean mContinuation = false;
 
     private String debugOutputString = null;
+
+    private GameTreeState(int errorMoveResult) {
+        super(errorMoveResult);
+        mDepth = 0;
+    }
 
     public GameTreeState(AiWorkspace workspace, GameState copyState) {
         super(copyState);
@@ -61,19 +67,19 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public GameTreeState considerMove(Coord start, Coord end) {
         char toMove = getBoard().getOccupier(start);
         GameState nextGameState = moveTaflman(toMove, end);
+        GameTreeState nextState;
 
         // result should be good move except in cases like berserk,
         // where most moves on a berserk turn are illegal.
-        if(nextGameState.getLastMoveResult() >= GOOD_MOVE) {
+        if(nextGameState.getLastMoveResult() >= LOWEST_NONERROR_RESULT) {
             mGame.advanceState(this, nextGameState, nextGameState.getBerserkingTaflman() == EMPTY, nextGameState.getBerserkingTaflman(), true);
-            GameTreeState nextState = new GameTreeState(workspace, nextGameState, this);
-
-            return nextState;
+            nextState = new GameTreeState(workspace, nextGameState, this);
         }
         else {
-            //System.out.println("Bad move " + result);
-            return null;
+            nextState = new GameTreeState(nextGameState.getLastMoveResult());
         }
+
+        return nextState;
     }
 
     public GameTreeState(AiWorkspace workspace, GameState advanceFrom, GameTreeState realParent) {
@@ -246,12 +252,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
         if(extension && mDepth < overallMaxDepth) {
-            if(workspace.mNoTime) return mValue;
-            if(mVictory > HIGHEST_NONTERMINAL_RESULT) return mValue;
-
-            continuationOnChildren(currentMaxDepth, overallMaxDepth);
-
-            return mValue;
+            if(workspace.mNoTime && mValue != Evaluator.NO_VALUE) return mValue; // If we don't have a value, we'll fall out elsewhere
+            else if(mVictory > HIGHEST_NONTERMINAL_RESULT) return mValue;
+            else {
+                continuationOnChildren(currentMaxDepth, overallMaxDepth);
+                return mValue;
+            }
         }
 
         short cachedValue = Evaluator.NO_VALUE;
@@ -296,7 +302,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
 
             minifyState();
-        } else if (mDepth != 0 && (checkVictory() != GOOD_MOVE || mDepth >= currentMaxDepth || (workspace.mNoTime) || (!extension && workspace.mExtensionTime) || (extension && continuation && workspace.mExtensionTime))) {
+        } else if (mDepth != 0 && (checkVictory() > HIGHEST_NONTERMINAL_RESULT || mDepth >= currentMaxDepth || (workspace.mNoTime) || (!extension && workspace.mExtensionTime) || (extension && continuation && workspace.mExtensionTime))) {
             // If this is a victory, evaluate and stop exploring.
             // If we've hit the target depth, evaluate and stop exploring.
             // If we're out of time and this isn't the root node, stop exploring.
@@ -319,8 +325,14 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // Explore our children
             exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
 
+            if(mValue == Evaluator.NO_VALUE) {
+                throw new IllegalStateException("Unvalued state after search");
+            }
+
             // This state has not occurred in the history for not-our-children
             workspace.getRepetitions().decrement(this.getZobrist());
+
+            minifyState();
 
             // Continuation search runs through the whole tree again, so only horizon search (i.e. extension, but not
             // continuation) needs to revalue a parent. Put another way, only revalue parent if we don't start at the
@@ -331,23 +343,31 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return mValue;
     }
 
-    public static GameTreeState getStateForMinimalNode(GameTreeState rootNode, MinimalGameTreeNode minimalGameTreeNode) {
-        GameTreeState desiredState = rootNode;
-        for (MoveRecord m : minimalGameTreeNode.getEnteringMoveSequence()) {
-            desiredState = desiredState.considerMove(m.start, m.end);
+    public static GameTreeState getStateForNode(GameTreeState rootNode, GameTreeNode nodeToReplace) {
+        GameTreeState desiredState = new GameTreeState(rootNode);
+        for (MoveRecord m : nodeToReplace.getEnteringMoveSequence()) {
+            GameTreeState nextState = desiredState.considerMove(m.start, m.end);
+
+            if(nextState.getLastMoveResult() < LOWEST_NONERROR_RESULT) {
+                RawTerminal.renderGameState(desiredState);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Last move result: " + m + "(" +nodeToReplace.getEnteringMoveSequence() + ") " + GameState.getStringForMoveResult(nextState.getLastMoveResult()));
+                throw new IllegalStateException("Illegal move somehow!");
+            }
+
+            desiredState = nextState;
         }
 
-        desiredState.mParent = minimalGameTreeNode.getParentNode();
-        desiredState.mAlpha = minimalGameTreeNode.getAlpha();
-        desiredState.mBeta = minimalGameTreeNode.getBeta();
-        desiredState.mValue = minimalGameTreeNode.getValue();
-        desiredState.mBranches = minimalGameTreeNode.getBranches();
-        desiredState.mVictory = minimalGameTreeNode.getVictory();
+        desiredState.mParent = nodeToReplace.getParentNode();
+        desiredState.mAlpha = nodeToReplace.getAlpha();
+        desiredState.mBeta = nodeToReplace.getBeta();
+        desiredState.mValue = nodeToReplace.getValue();
+        desiredState.mBranches = nodeToReplace.getBranches();
+        desiredState.mVictory = nodeToReplace.getVictory();
 
-        for(GameTreeNode node : minimalGameTreeNode.getBranches()) {
+        for(GameTreeNode node : nodeToReplace.getBranches()) {
             node.setParent(desiredState);
         }
-        desiredState.getParentNode().replaceChild(minimalGameTreeNode, desiredState);
+        desiredState.getParentNode().replaceChild(nodeToReplace, desiredState);
         return desiredState;
     }
 
@@ -362,7 +382,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return false;
     }
 
-    public void exploreChildren(int currentMaxDepth, int overallMaxDepth, boolean continuation, boolean extension) {
+    private void exploreChildren(int currentMaxDepth, int overallMaxDepth, boolean continuation, boolean extension) {
         List<MoveRecord> successorMoves = new ArrayList<>();
 
         if(!continuation || getBranches().size() == 0) {
@@ -380,7 +400,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // according to the movement rules, but not legal according to
             // special rules, like the berserk rule.
             // TODO: account for threefold repetition forbidden?
-            if(node == null) {
+            if(node.getLastMoveResult() < LOWEST_NONERROR_RESULT) {
                 continue;
             }
 
@@ -435,11 +455,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
         // TODO: try putting continuation search/extension search into the transposition table at a depth penalty, since
         // they're useful but not exact.
         if(!continuation && !extension) AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, currentMaxDepth - mDepth, mGameLength);
-
-        minifyState();
     }
 
-    public void continuationOnChildren(int currentMaxDepth, int overallMaxDepth) {
+    private void continuationOnChildren(int currentMaxDepth, int overallMaxDepth) {
         List<GameTreeNode> successorStates = getBranches();
 
         List<MoveRecord> successorMoves = generateSuccessorMoves(currentMaxDepth);
@@ -487,7 +505,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 // Node will be null in e.g. berserk tafl, where moves are legal
                 // according to the movement rules, but not legal according to
                 // special rules, like the berserk rule.
-                if(node == null) {
+                if(node.getLastMoveResult() < LOWEST_NONERROR_RESULT) {
                     continue;
                 }
 
@@ -770,7 +788,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         for(GameTreeNode n : getBranches()) {
             GameTreeState s;
             if(n instanceof MinimalGameTreeNode) {
-                s = GameTreeState.getStateForMinimalNode(workspace.getTreeRoot(), (MinimalGameTreeNode) n);
+                s = GameTreeState.getStateForNode(workspace.getTreeRoot(), (MinimalGameTreeNode) n);
             }
             else {
                 s = (GameTreeState) n;

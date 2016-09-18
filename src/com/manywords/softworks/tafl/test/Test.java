@@ -86,6 +86,7 @@ public class Test {
 
         // AI tests TODO: uncomment these at the end of this branch, remove the copies up top.
         tests.add(new AIMatchingZobristTest());
+        tests.add(new AIMoveConsiderationCrashTest());
         tests.add(new AISearchEquivalenceTest());
         tests.add(new AICertainKingEscapeTest());
         tests.add(new AICertainKingCaptureTest());

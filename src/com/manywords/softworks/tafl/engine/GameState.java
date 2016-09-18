@@ -304,7 +304,7 @@ public class GameState {
             MoveRecord move = Taflman.moveTo(nextState, taflman, destination, detailed);
             List<Coord> captures = move.captures;
 
-            if (getBoard().getRules().allowShieldWallCaptures() > 0) {
+            if (getBoard().getRules().allowShieldWallCaptures() > Rules.NO_SHIELDWALL) {
                 List<ShieldwallPosition> shieldwallPositionsAttackers = nextState.getBoard().detectShieldwallPositionsForSide(getAttackers(), getDefenders());
                 List<ShieldwallPosition> shieldwallPositionsDefenders = nextState.getBoard().detectShieldwallPositionsForSide(getDefenders(), getAttackers());
 
@@ -544,7 +544,7 @@ public class GameState {
         //    (Try it yourself on a piece of paper if you don't believe me.)
 
         for(char taflman : edgefortTaflmen) {
-            List<Coord> adjacent = getBoard().getAdjacentSpaces(Taflman.getCurrentSpace(this, taflman));
+            List<Coord> adjacent = new ArrayList<>(getBoard().getAdjacentSpaces(Taflman.getCurrentSpace(this, taflman)));
             adjacent.removeAll(fortSpaces);
 
             int friendlySpaces = 0;

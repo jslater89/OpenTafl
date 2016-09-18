@@ -2,16 +2,20 @@ package com.manywords.softworks.tafl;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.terminal.swing.*;
+import com.googlecode.lanterna.terminal.swing.AWTTerminalFontConfiguration;
+import com.googlecode.lanterna.terminal.swing.SwingTerminalFontConfiguration;
+import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
+import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.network.client.HeadlessAIClient;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
+import com.manywords.softworks.tafl.notation.GameSerializer;
+import com.manywords.softworks.tafl.notation.playtaflonline.PlayTaflOnlineJsonTranslator;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.test.Benchmark;
 import com.manywords.softworks.tafl.test.Test;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.SwingWindow;
-import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.awt.*;
@@ -33,7 +37,7 @@ public class OpenTafl {
         SERVER,
         HEADLESS_AI,
         BENCHMARK,
-        HELP
+        READ_JSON, HELP
     }
 
     public static enum LogLevel {
@@ -42,7 +46,7 @@ public class OpenTafl {
         SILENT
     }
 
-    public static final String CURRENT_VERSION = "v0.4.4.0b";
+    public static final String CURRENT_VERSION = "v0.4.4.3b";
     public static final int NETWORK_PROTOCOL_VERSION = 7;
 
     public static boolean devMode = false;
@@ -80,6 +84,9 @@ public class OpenTafl {
             else if(arg.contains("--benchmark") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 logLevel = SILENT;
                 runMode = Mode.BENCHMARK;
+            }
+            else if(arg.contains("--pto-json") && runMode == Mode.GRAPHICAL_TERMINAL) {
+                runMode = Mode.READ_JSON;
             }
             else if(arg.contains("--help")) {
                 runMode = Mode.HELP;
@@ -172,6 +179,27 @@ public class OpenTafl {
                 break;
             case BENCHMARK:
                 new Benchmark().run();
+                break;
+            case READ_JSON:
+                String filename = mapArgs.get("--pto-json");
+                Game g = PlayTaflOnlineJsonTranslator.readJsonFile(new File(filename));
+
+                if(g == null) {
+                    OpenTafl.logPrintln(SILENT, "Failed to load json file.");
+                    System.exit(1);
+                }
+                else {
+                    if(filename.endsWith(".json")) {
+                        filename = filename.replaceFirst("\\.json$", ".otg");
+                    }
+                    else {
+                        filename = filename + ".otg";
+                    }
+
+                    File f = new File(filename);
+                    GameSerializer.writeGameToFile(g, f, false);
+                }
+
                 break;
             case HELP:
                 printHelpMessage();
@@ -360,6 +388,7 @@ public class OpenTafl {
         System.out.println("\t--threads [#]: number of worker threads to spawn");
         System.out.println("--engine: run as external engine");
         System.out.println("--test: run the built-in tests");
+        System.out.println("--pto-json [filename]: read a PlayTaflOnline.com JSON game record and output an OpenTafl saved game with the same name.");
         System.out.println("--headless: run as a headless AI client");
         System.out.println("\t--server [address]: server address");
         System.out.println("\t--username [name]: server login username");
