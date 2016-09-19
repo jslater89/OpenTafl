@@ -28,7 +28,6 @@ import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.notation.TaflmanCodes;
-import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 
@@ -179,7 +178,7 @@ public class DetailedMoveRecord extends MoveRecord {
         int index = (captureEntry & LOCATION_MASK) >> 4;
         Coord location = Coord.getCoordForIndex(dimension, index);
 
-        captureRecord += (taflmanChar != 0 ? taflmanChar : "") + Board.getChessString(location);
+        captureRecord += (taflmanChar != 0 ? taflmanChar : "") + Coord.getChessString(location);
 
         return captureRecord;
     }

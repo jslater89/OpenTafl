@@ -1,6 +1,5 @@
 package com.manywords.softworks.tafl.engine;
 
-import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 
 import java.util.*;
@@ -13,8 +12,8 @@ public class MoveRecord {
 
     public static MoveRecord getMoveRecordFromSimpleString(String simpleMoveRecord) {
         String[] coordStrings = simpleMoveRecord.split("-");
-        Coord start = Board.getCoordFromChessNotation(coordStrings[0]);
-        Coord end = Board.getCoordFromChessNotation(coordStrings[1]);
+        Coord start = Coord.get(coordStrings[0]);
+        Coord end = Coord.get(coordStrings[1]);
 
         return new MoveRecord(start, end);
     }
@@ -34,25 +33,25 @@ public class MoveRecord {
     }
 
     public String toSimpleString() {
-        Map<String, String> start = Board.getChessNotation(this.start);
-        Map<String, String> end = Board.getChessNotation(this.end);
+        Map<String, String> start = Coord.getChessNotation(this.start);
+        Map<String, String> end = Coord.getChessNotation(this.end);
         return start.get("file") + start.get("rank") + "-" + end.get("file") + end.get("rank");
     }
 
     public boolean isDetailed() { return false; }
 
     public String toString() {
-        Map<String, String> start = Board.getChessNotation(this.start);
-        Map<String, String> end = Board.getChessNotation(this.end);
+        Map<String, String> start = Coord.getChessNotation(this.start);
+        Map<String, String> end = Coord.getChessNotation(this.end);
         String move = start.get("file") + start.get("rank") + "-" + end.get("file") + end.get("rank");
 
         if (captures != null && captures.size() > 0) {
             Coord capture = captures.get(0);
             move += "x";
-            move += Board.getChessNotation(capture).get("file") + Board.getChessNotation(capture).get("rank");
+            move += Coord.getChessNotation(capture).get("file") + Coord.getChessNotation(capture).get("rank");
             for(int i = 1; i < captures.size(); i++) {
                 capture = captures.get(i);
-                move += "/" + Board.getChessNotation(capture).get("file") + Board.getChessNotation(capture).get("rank");
+                move += "/" + Coord.getChessNotation(capture).get("file") + Coord.getChessNotation(capture).get("rank");
             }
         }
 
