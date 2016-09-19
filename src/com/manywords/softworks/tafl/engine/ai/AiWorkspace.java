@@ -17,6 +17,8 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class AiWorkspace extends Game {
+    private static final long POST_SEARCH_PAD = 250;
+
     private static String lastRulesString = "";
     public static TranspositionTable transpositionTable = null;
     public static KillerMoveTable killerMoveTable = null;
@@ -33,6 +35,7 @@ public class AiWorkspace extends Game {
     private TimeSpec mTimeRemaining;
     private GameTreeState mStartingState;
     private GameTreeState mPreviousStartingState;
+    private GameTreeNode mBestStatePreHorizon;
 
     public long[] mAlphaCutoffs;
     public long[] mAlphaCutoffDistances;
@@ -328,12 +331,13 @@ public class AiWorkspace extends Game {
 
     private boolean isTimeCritical() {
         long timeLeft = mStartTime + mThinkTime - System.currentTimeMillis();
-        return timeLeft < (long) Math.min(mThinkTime * 0.05, 250);
+        return timeLeft < (long) Math.min(mThinkTime * 0.05, POST_SEARCH_PAD);
     }
 
     public void explore(int maxThinkTime) {
         transpositionTable.resetTableStats();
         mRepetitionsIgnoreTranspositionTable = 0;
+        mBestStatePreHorizon = null;
 
         if(maxThinkTime == 0) maxThinkTime = 86400;
         mMaxThinkTime = maxThinkTime * 1000;
@@ -349,7 +353,7 @@ public class AiWorkspace extends Game {
 
         // Spend 85% of the time on main search, and 10% on continuation searches (implicitly), and 5% on horizon searches.
         mMainMillis = (long) (mThinkTime * 0.85);
-        mHorizonMillis = Math.max((long) (mThinkTime * 0.05) - 250, (long) 750);
+        mHorizonMillis = Math.max((long) (mThinkTime * 0.05) - POST_SEARCH_PAD, (long) 750);
 
         if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec, desired " + desiredTime);
 
@@ -386,7 +390,7 @@ public class AiWorkspace extends Game {
                     mNoTime = true;
                 };
             }
-        }, mThinkTime - 250);
+        }, mThinkTime - POST_SEARCH_PAD);
 
         boolean firstExtension = true;
         boolean firstHorizon = true;
@@ -524,11 +528,23 @@ public class AiWorkspace extends Game {
         // Do the horizon search, looking quickly at the current best moves in the hopes of catching any dumb
         // refutations.
 
-
         if(mUseHorizonSearch) {
-            // Can we afford a search to depth 3?
+            /*
+            Can we afford a search to depth 3?
+            */
+
+            final boolean isAttackingSide = mStartingState.getCurrentSide().isAttackingSide();
+            getTreeRoot().getBranches().sort((o1, o2) -> {
+                if(o1.getValue() > o2.getValue()) return isAttackingSide ? -1 : 1;
+                if(o1.getValue() < o2.getValue()) return isAttackingSide ? 1 : -1;
+                return 0;
+            });
+
+            mBestStatePreHorizon = getTreeRoot().getBranches().get(0);
+
             currentHorizonDepth = deepestSearch;
             while (true) {
+                long timeRemaining = (mThinkTime - (System.currentTimeMillis() - mStartTime - POST_SEARCH_PAD));
                 if (!isTimeCritical()) {
                     if (firstHorizon) {
                         firstHorizon = false;
@@ -537,9 +553,6 @@ public class AiWorkspace extends Game {
                         }
                     }
 
-                    long horizonStartTime = System.currentTimeMillis();
-                    long timeSpent = horizonStartTime - mStartTime;
-                    long timeRemaining = mThinkTime - timeSpent - 250;
                     if(timeRemaining > estimatedTimeToDepth(3)) horizonDepth = 3;
                     else horizonDepth = 2;
 
@@ -582,7 +595,8 @@ public class AiWorkspace extends Game {
                         if (e > horizonStart + horizonCount) break;
                     }
 
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Ran horizon search at depth: " + currentHorizonDepth + " starting index " + horizonStart + " ending index " + (horizonStart + horizonCount));
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Ran horizon search at depth: " + currentHorizonDepth
+                            + " starting index " + horizonStart + " ending index " + (horizonStart + horizonCount) + " with " + timeRemaining + "msec");
 
                     if (currentHorizonDepth > deepestSearch) deepestSearch = currentHorizonDepth;
 
@@ -592,7 +606,7 @@ public class AiWorkspace extends Game {
                     }
                     horizonIterations++;
                 } else {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: out of time: " + (mThinkTime - (System.currentTimeMillis() - mStartTime)) + "msec left");
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: out of time: " + timeRemaining + "msec left");
                     break;
                 }
             }
@@ -649,6 +663,8 @@ public class AiWorkspace extends Game {
             mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, extension searches " + (fullNodes - nodes) + " nodes");
             mUiCallback.statusText("Overall speed: " + (fullNodes / ((mEndTime - mStartTime)/ 1000d)) + " nodes/sec");
             mUiCallback.statusText("Transposition table stats: " + transpositionTable.getTableStats());
+
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Best state == best state pre-horizon? " + getTreeRoot().getBestChild().equals(mBestStatePreHorizon));
         }
     }
 
