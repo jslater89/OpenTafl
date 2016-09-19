@@ -279,7 +279,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
             cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), remainingDepth, mGameLength);
         }
 
-
         if (cachedValue != Evaluator.NO_VALUE && mDepth > 0) {
             mValue = cachedValue;
 
@@ -302,12 +301,18 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
 
             minifyState();
-        } else if (mDepth != 0 && (checkVictory() > HIGHEST_NONTERMINAL_RESULT || mDepth >= currentMaxDepth || (workspace.mNoTime) || (!extension && workspace.mExtensionTime) || (extension && continuation && workspace.mExtensionTime))) {
+        } else if (mDepth != 0
+                && (checkVictory() > HIGHEST_NONTERMINAL_RESULT
+                || mDepth >= currentMaxDepth
+                || (workspace.mNoTime)
+                || (!extension && workspace.mContinuationTime)
+                || (extension && continuation && workspace.mHorizonTime))) {
+            // If we're at depth 0, go explore another level, just to be safe.
             // If this is a victory, evaluate and stop exploring.
             // If we've hit the target depth, evaluate and stop exploring.
-            // If we're out of time and this isn't the root node, stop exploring.
-            // If we're in extension time and not in extension search, stop exploring.
-            // If we're at depth 0, go explore another level, just to be safe.
+            // If we're out of time, stop exploring.
+            // If we're in continuation time and not in continuation search, stop exploring.
+            // If we're in continuation search, in horizon time, and not in horizon search, stop exploring.
             mValue = evaluate();
 
             // Leaf nodes we don't get to finish are always in the transposition table at depth 0.
@@ -469,6 +474,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
         boolean savedDistanceToFirstCutoff = false;
 
         for(GameTreeNode node : successorStates) {
+            if (workspace.mHorizonTime) break;
+
             if (cutoff) {
                 break;
             }

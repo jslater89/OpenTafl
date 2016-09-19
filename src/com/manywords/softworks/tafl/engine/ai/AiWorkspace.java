@@ -70,11 +70,12 @@ public class AiWorkspace extends Game {
      */
     private long mThinkTime = -1;
     private long mMainMillis = -1;
-    private long mExtensionMillis = -1;
+    private long mHorizonMillis = -1;
     private long mMaxThinkTime = -1;
 
     public boolean mNoTime = false;
-    public boolean mExtensionTime = false;
+    public boolean mContinuationTime = false;
+    public boolean mHorizonTime = false;
     private boolean mBenchmarkMode = false;
 
     private final Object mTimeLock = new Object();
@@ -345,20 +346,38 @@ public class AiWorkspace extends Game {
         }
         long desiredTime = planTimeUsage(mGame, mTimeRemaining);
         mThinkTime = Math.min(desiredTime, mMaxThinkTime);
+
+        // Spend 85% of the time on main search, and 10% on continuation searches (implicitly), and 5% on horizon searches.
+        mMainMillis = (long) (mThinkTime * 0.85);
+        mHorizonMillis = Math.max((long) (mThinkTime * 0.05) - 250, (long) 750);
+
         if(chatty && mUiCallback != null) mUiCallback.statusText("Using " + mThinkTime + "msec, desired " + desiredTime);
 
-        //mThreadPool.start();
-        mMainMillis = (long) (mThinkTime * 0.85);
-        mExtensionMillis = (long) (mThinkTime * 0.15) - 250;
         Timer t = new Timer();
+
+        // Main search happens here
+
         t.schedule(new TimerTask() {
             @Override
             public void run() {
                 synchronized (mTimeLock) {
-                    mExtensionTime = true;
+                    mContinuationTime = true;
                 }
             }
         }, mMainMillis);
+
+        // Continuation search happens here
+
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (mTimeLock) {
+                    mHorizonTime = true;
+                }
+            }
+        }, mThinkTime - mHorizonMillis);
+
+        // Horizon search happens here
 
         t.schedule(new TimerTask() {
             @Override
@@ -394,7 +413,7 @@ public class AiWorkspace extends Game {
             mLastDepth = depth;
 
             if (canSearchToDepth(depth)) {
-                if (isTimeCritical() || mNoTime || mExtensionTime) {
+                if (isTimeCritical() || mNoTime || mHorizonTime) {
                     break;
                 }
 
@@ -412,7 +431,7 @@ public class AiWorkspace extends Game {
 
                 // If we aren't out of time, we can save this tree as a known good tree.
                 // Otherwise, we should restore the previous tree.
-                if (!mExtensionTime && !mNoTime) {
+                if (!mHorizonTime && !mContinuationTime && !mNoTime) {
                     mPreviousStartingState = mStartingState;
                     mLastTimeToDepth[depth] = finish - start;
                     mTimeToDepthAge[depth] = 0;
@@ -451,25 +470,26 @@ public class AiWorkspace extends Game {
 
 
         continuationDepth = deepestSearch;
+        // If extension searches are allowed,
         if(mUseContinuationSearch) {
             long continuationStart = System.currentTimeMillis();
             while (true) {
-                long timeSpent = continuationStart - mStartTime;
-                long timeRemaining = mMainMillis - timeSpent;
+                long continuationTime = mThinkTime - mHorizonMillis;
+                long timeSpent = System.currentTimeMillis() - mStartTime;
+                long timeRemaining = continuationTime - timeSpent;
                 long timeRequired = estimatedTimeToDepth(continuationDepth - 1) / 2;
 
                 // We have to go through the whole tree again in continuation search, but since we've
                 // already searched most of it, we'll get some nodes out of the search if we have
                 // even a little time remaining.
-                if (timeRemaining < timeRequired) {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Skipping continuation search to depth " + continuationDepth + ": " + timeRemaining + "msec left, " + timeRequired + " required");
+                if (timeRemaining < timeRequired || isTimeCritical() || mNoTime || mHorizonTime) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY,
+                            "Skipping continuation search to depth " + continuationDepth + ": " + timeRemaining + "msec left, " + timeRequired
+                                    + " required, critical/no/horizon time: " + isTimeCritical() + " " + mNoTime + " " + mHorizonTime);
                     break;
                 }
 
-                if (isTimeCritical() || mNoTime || mExtensionTime) {
-                    break;
-                }
-                else if (firstExtension) {
+                if (firstExtension) {
                     firstExtension = false;
                     if (chatty && mUiCallback != null) {
                         mUiCallback.statusText("Running continuation search to fill time...");
@@ -572,7 +592,7 @@ public class AiWorkspace extends Game {
                     }
                     horizonIterations++;
                 } else {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: out of time");
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: out of time: " + (mThinkTime - (System.currentTimeMillis() - mStartTime)) + "msec left");
                     break;
                 }
             }
