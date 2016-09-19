@@ -21,7 +21,6 @@ Copyright 2015 Jay Slater
 package com.manywords.softworks.tafl.notation;
 
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
-import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 
@@ -35,8 +34,8 @@ import java.util.regex.Pattern;
  */
 public class MoveSerializer {
     public static String getMoveRecord(DetailedMoveRecord record) {
-        String startString = Board.getChessString(record.start);
-        String endString = Board.getChessString(record.end);
+        String startString = Coord.getChessString(record.start);
+        String endString = Coord.getChessString(record.end);
 
         String moveSeparator = "-";
         if(record.wasJump() && record.wasBerserk()) moveSeparator = "^=";
@@ -86,8 +85,8 @@ public class MoveSerializer {
 
         boolean wasJump = groups[MOVE_TYPE].contains("^");
         boolean wasBerserk = groups[MOVE_TYPE].contains("=");
-        Coord start = Board.getCoordFromChessNotation(groups[START_SPACE]);
-        Coord end = Board.getCoordFromChessNotation(groups[END_SPACE]);
+        Coord start = Coord.get(groups[START_SPACE]);
+        Coord end = Coord.get(groups[END_SPACE]);
 
         List<Character> capturedTaflmen = new ArrayList<Character>();
         List<Coord> capturedSpaces = new ArrayList<Coord>();
@@ -101,7 +100,7 @@ public class MoveSerializer {
             boolean capturedAttacker = TaflmanCodes.isCodeAttackingSide(capturedCode);
             char capturedType = TaflmanCodes.getTaflmanTypeForCode(capturedCode);
             char captured = (char)((capturedAttacker ? Taflman.SIDE_ATTACKERS : Taflman.SIDE_DEFENDERS) | capturedType);
-            Coord capturedSpace = Board.getCoordFromChessNotation(groups[CAPTURE_SPACES[i]]);
+            Coord capturedSpace = Coord.get(groups[CAPTURE_SPACES[i]]);
 
             capturedTaflmen.add(captured);
             capturedSpaces.add(capturedSpace);

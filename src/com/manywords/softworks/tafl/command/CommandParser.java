@@ -3,10 +3,8 @@ package com.manywords.softworks.tafl.command;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.replay.MoveAddress;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
-import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
-import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.util.List;
@@ -110,15 +108,15 @@ public class CommandParser {
                 String fromString = commandParts[1].toLowerCase();
                 String toString = commandParts[2].toLowerCase();
 
-                if (!Board.validateChessNotation(fromString, boardSize) || !Board.validateChessNotation(toString, boardSize)) {
+                if (!Coord.validateChessNotation(fromString, boardSize) || !Coord.validateChessNotation(toString, boardSize)) {
                     mError = "Incorrect space format: " + fromString + " " + toString;
                     from = null;
                     to = null;
                     return;
                 }
 
-                from = Board.getCoordFromChessNotation(fromString);
-                to = Board.getCoordFromChessNotation(toString);
+                from = Coord.get(fromString);
+                to = Coord.get(toString);
             }
         }
     }
@@ -142,7 +140,7 @@ public class CommandParser {
                 int boardSize = engine.getGame().getRules().getBoard().getBoardDimension();
                 String chessString = commandParts[1].toLowerCase();
 
-                if (!Board.validateChessNotation(chessString, boardSize)) {
+                if (!Coord.validateChessNotation(chessString, boardSize)) {
                     mError = "Incorrect space format: " + chessString;
                     location = null;
                     stops = null;
@@ -151,8 +149,8 @@ public class CommandParser {
                     return;
                 }
 
-                int x = Board.getCoordMapFromChessNotation(chessString).get("x");
-                int y = Board.getCoordMapFromChessNotation(chessString).get("y");
+                int x = Coord.getCoordMapFromChessNotation(chessString).get("x");
+                int y = Coord.getCoordMapFromChessNotation(chessString).get("y");
 
                 char piece = engine.getGame().getCurrentState().getPieceAt(x, y);
                 if (piece != Taflman.EMPTY) {
@@ -365,15 +363,15 @@ public class CommandParser {
                 String fromString = commandParts[1].toLowerCase();
                 String toString = commandParts[2].toLowerCase();
 
-                if (!Board.validateChessNotation(fromString, boardSize) || !Board.validateChessNotation(toString, boardSize)) {
+                if (!Coord.validateChessNotation(fromString, boardSize) || !Coord.validateChessNotation(toString, boardSize)) {
                     mError = "Incorrect space format: " + fromString + " " + toString;
                     from = null;
                     to = null;
                     return;
                 }
 
-                from = Board.getCoordFromChessNotation(fromString);
-                to = Board.getCoordFromChessNotation(toString);
+                from = Coord.get(fromString);
+                to = Coord.get(toString);
             }
         }
     }

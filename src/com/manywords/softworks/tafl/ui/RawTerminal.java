@@ -603,7 +603,7 @@ public class RawTerminal implements UiCallback {
         String allowableSpaceFill = "-";
         String allowableStopFill = ".";
         String captureSpaceFill = "/";
-        String rankString = Board.getChessNotation(Coord.get(0, rank)).get("rank");
+        String rankString = Coord.getChessNotation(Coord.get(0, rank)).get("rank");
 
         if (board.getBoardDimension() > 9) SPACER = " ";
 
@@ -611,7 +611,7 @@ public class RawTerminal implements UiCallback {
         if (rank == 0) {
             rowString += SPACER + ANSI_BLUE;
             for (int i = 0; i < board.getBoardDimension(); i++) {
-                String fileString = Board.getChessNotation(Coord.get(i, rank)).get("file");
+                String fileString = Coord.getChessNotation(Coord.get(i, rank)).get("file");
                 /*
 				if(i + 1 >= 10) {
 					rowString += "+-" + ANSI_CYAN + "${i + 1}" + ANSI_BLUE;

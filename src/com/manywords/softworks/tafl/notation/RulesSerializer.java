@@ -638,7 +638,7 @@ public class RulesSerializer {
 
         for(String coordString : coords) {
             if(coordString.length() == 0) continue;
-            Coord c = Board.getCoordFromChessNotation(coordString);
+            Coord c = Coord.get(coordString);
             coordList.add(c);
         }
 
