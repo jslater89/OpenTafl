@@ -177,6 +177,8 @@ public class PlayTaflOnlineJsonTranslator {
         else if(name.equals("gokstad1")) return 13;
         else if(name.equals("coppergate1")) return 15;
         else if(name.equals("papillon")) return 9;
+        else if(name.equals("alfheim1")) return 17;
+        else if(name.equals("alfheim2")) return 17;
         else return -1;
     }
 
@@ -194,6 +196,8 @@ public class PlayTaflOnlineJsonTranslator {
         else if(name.equals("gokstad1")) return PTOConstants.SERIF_CROSS_13_LAYOUT;
         else if(name.equals("coppergate1")) return PTOConstants.SERIF_CROSS_15_LAYOUT;
         else if(name.equals("papillon")) return PTOConstants.PAPILLON_LAYOUT;
+        else if(name.equals("alfheim1")) return PTOConstants.ALFHEIM_LAYOUT;
+        else if(name.equals("alfheim2")) return PTOConstants.ALFHEIM_II_LAYOUT;
         else return null;
     }
 
@@ -219,6 +223,7 @@ public class PlayTaflOnlineJsonTranslator {
         else if(name.equals("jarlshofcircle")) return "Custom_Jarlshof";
         else if(name.equals("trondheimcross")) return "Custom_Trondheim";
         else if(name.equals("papillon")) return "Custom_Papillon's_Escape";
+        else if(name.equals("alfheim1") || name.equals("alfheim2")) return "Custom_Alfheim";
         else return name;
     }
 }

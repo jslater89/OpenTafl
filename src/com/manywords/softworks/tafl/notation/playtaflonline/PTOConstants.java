@@ -16,6 +16,8 @@ public class PTOConstants {
     static final String PARLETT_LAYOUT = "start:/4ttttt4/5t1t5/6t6/6T6/t3T3T3t/tt3TTT3tt/t1tT1TKT1Tt1t/tt3TTT3tt/t3T3T3t/6T6/6t6/5t1t5/4ttttt4/";
     static final String SERIF_CROSS_15_LAYOUT = "/3ttttttttt3/7t7/7T7/t6T6t/t6T6t/t6T6t/t6T6t/ttTTTTTKTTTTTtt/t6T6t/t6T6t/t6T6t/t6T6t/7T7/7t7/3ttttttttt3/";
     static final String COPPERGATE_II_LAYOUT = "start:/5ttttt5/6ttt6/7t7/7t7/7T7/t5TTT5t/tt3T1T1T3tt/ttttTTTKTTTtttt/tt3T1T1T3tt/t5TTT5t/7T7/7t7/7t7/6ttt6/5ttttt5/";
+    static final String ALFHEIM_LAYOUT = "start:/5ttttttt5/7ttt7/8t8/8t8/8T8/t7T7t/t5T1T1T5t/tt5TTT5tt/ttttTTTTKTTTTtttt/tt5TTT5tt/t5T1T1T5t/t7T7t/8T8/8t8/8t8/7ttt7/5ttttttt5/";
+    static final String ALFHEIM_II_LAYOUT = "start:/6ttttt6/6t1t1t6/7t1t7/8t8/8t8/8T8/tt5TTT5tt/t1t3TTTTT3t1t/tt1ttTTTKTTTtt1tt/t1t3TTTTT3t1t/tt5TTT5tt/8T8/8t8/8t8/7t1t7/6t1t1t6/6ttttt6/";
 
     static final String KEY_MOVES = "Move";
     static final String KEY_MOVE_X_FROM = "MoveX";
