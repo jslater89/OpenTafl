@@ -1,0 +1,46 @@
+[date:2016.09.25]
+[result:-1]
+[compiler:OpenTafl]
+[rules:dim:7 name:H.H._Ard_Ri esc:e atkf:y ks:w cor: cen: cens:tcnkTCNK cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/]
+[attackers:tuireann]
+[defenders:opentaflbot]
+[site:playtaflonline.com]
+[annotator:Jay Slater]
+[puzzle-mode:loose]
+[puzzle-start:6a]
+
+1. d2-e2 d3-d2 
+[|]
+
+2. f4-f3 d2-d3 
+[|]
+
+3. a4-a3 c4-c6 
+[|]
+
+4. b4-c4 d5-b5 
+[|]
+
+5. c4-a4 b5-b4 
+[|]
+
+6. f3-f5 Kd4-c4 
+[It's the defenders' turn, and they can force a victory in five moves. Can you find it?|]
+
+7. e2-c2 e4-e6xd6 
+[|]
+
+8. g4-e4 Kc4-c5 
+[|]
+
+9. a4-a5 c6-a6 
+[|]
+
+10. d7-c7 b4-a4xa5 
+[|]
+
+11. c2-c4 Kc5-a5 
+[|This puzzle demonstrates the importance of forced moves. Especially in edge-escape endgames, the king has a unique power to force moves, since his objective is ordinarily so near at hand.
+
+The crucial move in this puzzle was 9b. c6-a6. Aas with so many good tafl moves, it secures a tempo advantage by doing two things at once. It forces the attacker to respond to the revealed escape thread Kc5-c7, while also threatening c4-a4xa5, which reveals another escape threat. The attacker has no choice but to block Kc5-c7, leaving the defender to win on the following turn.]
+
