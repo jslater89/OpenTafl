@@ -34,13 +34,19 @@
 [|]
 
 9. e6-c6 b4-b3xc3 
-[|]
+[Defenders to play, winning in four moves.|]
 
 10. e1-c1 Kc5-e5 
 [|]
 
+10a.1.1a. d2-c2 
+[This move is equally good (or equally bad, as the case may be) for the attackers, but I can't be bothered to play all the various equivalent lines out. Go back one step, then do e1-c1 instead.]
+
 11. c6-e6 e4-a4xa5 
-[|]
+[|The defender has won at this point, requiring one more move to escape. We see in this puzzle that you need not move the king onto an empty rank or file to guarantee an escape: a revealed attack and a capture will also do the trick.]
+
+11a.1.1a. c7-e7 
+[This is an equivalent line to c6-e6. Go back and play that move instead.]
 
 12. c7-c5 Ke5-e1 
 [|]
