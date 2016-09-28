@@ -254,6 +254,12 @@ public class ReplayGame {
         else return false;
     }
 
+    public boolean puzzleContains(ReplayGameState state) {
+        MoveAddress address = state.getMoveAddress();
+
+        return mMode.isPuzzleMode() && (address.isBetween(mPuzzlePrestart, mPuzzleStart) || address.equals(mPuzzleStart) || mPuzzleStatesExplored.contains(state));
+    }
+
     public String getReplayModeInGameHistoryString() {
         if(mMode.isPuzzleMode()) {
             List<GameState> truncatedHistory = new ArrayList<>();
@@ -328,7 +334,11 @@ public class ReplayGame {
 
         if(previousState != null) {
             if(mMode.isPuzzleMode()) {
-                if (previousState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(previousState)) {
+                if (mPuzzleStart != null && previousState.getMoveAddress().equals(mPuzzleStart)) {
+                    setCurrentState(previousState);
+                    return NavigationResult.SUCCESS;
+                }
+                else if (previousState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(previousState)) {
                     setCurrentState(previousState);
                     return NavigationResult.SUCCESS;
                 }
@@ -727,6 +737,7 @@ public class ReplayGame {
             // Get all states in a given turn.
             if(state.getMoveAddress().getLastElement().rootIndex == currentTurnIndex) {
                 currentTurn.add(state);
+
                 if(state.getParent() != null && (state.getParent().getMoveAddress().getElements().size() == state.getMoveAddress().getElements().size())) {
                     currentTurnVariations.addAll(state.getParent().getVariations());
                 }
@@ -767,6 +778,10 @@ public class ReplayGame {
 
         // 1. States in the current turn
         for(ReplayGameState turnState : currentTurn) {
+            if(replay.getMode().isPuzzleMode() && !replay.puzzleContains(turnState)) {
+                continue;
+            }
+
             if(first) {
                 if(turnState.getEnteringMove() == null) {
                     emptyTurn = true;
