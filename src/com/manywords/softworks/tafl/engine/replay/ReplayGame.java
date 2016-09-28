@@ -240,6 +240,26 @@ public class ReplayGame {
         return currentState.getMoveAddress().isOrIsAfter(mPuzzlePrestart) && currentState.getMoveAddress().isBefore(mPuzzleStart);
     }
 
+    public boolean isAtPuzzleStart() {
+        ReplayGameState currentState = getCurrentState();
+
+
+        if(!mMode.isPuzzleMode()) return false; // If we aren't in a puzzle, we aren't at the starting state
+        if(mPuzzlePrestart == null && mPuzzleStart == null) return false; // If there are no starting states, we can't be in them.
+
+        // If there's a prestart and we're there, we're at the start. Otherwise, if there's a start and we're there,
+        // we're at the start.
+        if(mPuzzlePrestart != null && currentState.getMoveAddress().equals(mPuzzlePrestart)) return true;
+        else if(mPuzzleStart != null && currentState.getMoveAddress().equals(mPuzzleStart)) return true;
+        else return false;
+    }
+
+    public boolean puzzleContains(ReplayGameState state) {
+        MoveAddress address = state.getMoveAddress();
+
+        return mMode.isPuzzleMode() && (address.isBetween(mPuzzlePrestart, mPuzzleStart) || address.equals(mPuzzleStart) || mPuzzleStatesExplored.contains(state));
+    }
+
     public String getReplayModeInGameHistoryString() {
         if(mMode.isPuzzleMode()) {
             List<GameState> truncatedHistory = new ArrayList<>();
@@ -286,11 +306,11 @@ public class ReplayGame {
 
         if (nextState != null) {
             if (mMode.isPuzzleMode()) {
-                if (nextState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(nextState)) {
+                if (mPuzzleStart != null && nextState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(nextState)) {
                     setCurrentState(nextState);
                     return NavigationResult.SUCCESS;
                 }
-                else if (nextState.getMoveAddress().isAfter(mPuzzlePrestart) && nextState.getMoveAddress().isOrIsBefore(mPuzzleStart)) {
+                else if (mPuzzlePrestart != null && nextState.getMoveAddress().isAfter(mPuzzlePrestart) && nextState.getMoveAddress().isOrIsBefore(mPuzzleStart)) {
                     setCurrentState(nextState);
                     return NavigationResult.SUCCESS;
                 }
@@ -314,7 +334,11 @@ public class ReplayGame {
 
         if(previousState != null) {
             if(mMode.isPuzzleMode()) {
-                if (previousState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(previousState)) {
+                if (mPuzzleStart != null && previousState.getMoveAddress().equals(mPuzzleStart)) {
+                    setCurrentState(previousState);
+                    return NavigationResult.SUCCESS;
+                }
+                else if (previousState.getMoveAddress().isAfter(mPuzzleStart) && mPuzzleStatesExplored.contains(previousState)) {
                     setCurrentState(previousState);
                     return NavigationResult.SUCCESS;
                 }
@@ -713,6 +737,7 @@ public class ReplayGame {
             // Get all states in a given turn.
             if(state.getMoveAddress().getLastElement().rootIndex == currentTurnIndex) {
                 currentTurn.add(state);
+
                 if(state.getParent() != null && (state.getParent().getMoveAddress().getElements().size() == state.getMoveAddress().getElements().size())) {
                     currentTurnVariations.addAll(state.getParent().getVariations());
                 }
@@ -753,6 +778,10 @@ public class ReplayGame {
 
         // 1. States in the current turn
         for(ReplayGameState turnState : currentTurn) {
+            if(replay.getMode().isPuzzleMode() && !replay.puzzleContains(turnState)) {
+                continue;
+            }
+
             if(first) {
                 if(turnState.getEnteringMove() == null) {
                     emptyTurn = true;

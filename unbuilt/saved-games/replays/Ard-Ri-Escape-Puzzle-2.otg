@@ -1,0 +1,53 @@
+[date:2016.09.24]
+[result:-1]
+[compiler:OpenTafl]
+[rules:dim:7 name:H.H._Ard_Ri esc:e atkf:y ks:w cor: cen: cens:tcnkTCNK cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/]
+[attackers:tuireann]
+[defenders:opentaflbot]
+[site:playtaflonline.com]
+[annotator:Jay Slater]
+[puzzle-mode:loose]
+[puzzle-start:9a]
+
+1. d1-e1 d3-b3 
+[|]
+
+2. b4-b5 c4-c6 
+[|]
+
+3. d6-e6 b3-b4 
+[|]
+
+4. f4-f3 c6-b6xb5 
+[|]
+
+5. f3-c3 Kd4-c4 
+[|]
+
+6. d7-c7 Kc4-c5 
+[|]
+
+7. a4-a5 d5-d3 
+[|]
+
+8. g4-g5 b6-a6 
+[|]
+
+9. e6-c6 b4-b3xc3 
+[Defenders to play, winning in four moves.|]
+
+10. e1-c1 Kc5-e5 
+[|]
+
+10a.1.1a. d2-c2 
+[This move is equally good (or equally bad, as the case may be) for the attackers, but I can't be bothered to play all the various equivalent lines out. Go back one step, then do e1-c1 instead.]
+
+11. c6-e6 e4-a4xa5 
+[|The defender has won at this point, requiring one more move to escape. We see in this puzzle that you need not move the king onto an empty rank or file to guarantee an escape: a revealed attack and a capture will also do the trick.]
+
+11a.1.1a. c7-e7 
+[This is an equivalent line to c6-e6. Go back and play that move instead.]
+
+12. c7-c5 Ke5-e1 
+[|]
+

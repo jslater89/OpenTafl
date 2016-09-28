@@ -100,6 +100,10 @@ public class MoveAddress {
         return elements;
     }
 
+    public int size() {
+        return getElements().size();
+    }
+
     public Element getRootElement() {
         return mElements.get(0);
     }

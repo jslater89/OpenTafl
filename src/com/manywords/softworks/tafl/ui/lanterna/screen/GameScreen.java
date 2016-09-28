@@ -468,7 +468,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             mReplay = rg;
 
             tryTimeUpdate();
-            tryStartingComments(rg);
+            updateComments();
 
             mBoardWindow.enterReplay(rg);
             mBoardWindow.rerenderBoard();
@@ -838,6 +838,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                     tryStartingComments(mReplay);
                 }
                 else {
+                    if(mReplay.isAtPuzzleStart()) {
+                        tryStartingComments(mReplay);
+                    }
+
                     statusText(Ansi.UNDERLINE + "Last move" + Ansi.UNDERLINE_OFF + ": " + m);
                     if(!m.getComment().trim().isEmpty()) {
                         String commentText = m.getComment();

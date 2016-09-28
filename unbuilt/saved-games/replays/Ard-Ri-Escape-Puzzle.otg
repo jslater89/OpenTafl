@@ -1,0 +1,49 @@
+[date:2016.09.24]
+[result:-1]
+[compiler:OpenTafl]
+[rules:dim:7 name:H.H._Ard_Ri esc:e atkf:y ks:w cor: cen: cens:tcnkTCNK cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/]
+[attackers:tuireann]
+[defenders:opentaflbot]
+[site:playtaflonline.com]
+[annotator:Jay Slater]
+[puzzle-mode:loose]
+[puzzle-start:6a]
+
+1. d2-c2 d3-d2 
+[|]
+
+2. b4-b3 Kd4-d3 
+[|]
+
+3. f4-f3 e4-f4 
+[|]
+
+4. d6-e6 d2-f2xf3 
+[|]
+
+5. g4-g3 f4-f6 
+[|]
+
+6. b3-c3 Kd3-e3 
+[The king escapes in four moves. Defenders to play.|]
+
+7. c2-e2 d5-d6xe6 
+[|]
+
+7a.1.1a. d1-e1 d5-d6xe6 
+[|]
+
+7a.1.2a. d7-e7 Ke3-e5 
+[|The defender has won here. To view endgame commentary, jump 6b, then play out the variation of this line of moves which begins with c2-e2 instead of d1-e1.]
+
+7a.1.3a. g3-g5 Ke5-a5 
+[|Enter 'jump 7a.1.2b' to view instructions on how to view the endgame commentary.]
+
+8. d7-e7 Ke3-e5 
+[|The defender has won here. Make the response g3-g5 Ke5-a5 to see the endgame commentary.]
+
+9. g3-g5 Ke5-a5 
+[|Small tafl games have a certain flavor to them: although the relative material balance is the same as larger games, the absolute amount of material on the board is too small to support traditional large-board strategy. The attacker must play as though he is in the endgame from the very beginning.
+
+In this replay, however, it didn't matter: the aggressive response to 6b (7a. d2-e2) and the defensive response (7a.1. d1-e1) both feature the same flaw: the position at the top of the board is weak, and the attacker has no time to reinforce.]
+
