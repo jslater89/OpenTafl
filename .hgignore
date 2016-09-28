@@ -29,6 +29,8 @@ rules-dump.otr
 
 syntax: regexp
 
+^[a-zA-Z0-9_-]+.otg$
+^[a-zA-Z0-9_-]+.json$
 ^lib/.*\.jar
 ^saved-games/.*
 ^engines/.*
