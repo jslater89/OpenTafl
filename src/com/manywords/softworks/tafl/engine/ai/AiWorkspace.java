@@ -14,7 +14,10 @@ import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class AiWorkspace extends Game {
     private static final long POST_SEARCH_PAD = 250;
@@ -321,7 +324,10 @@ public class AiWorkspace extends Game {
         if(mTimeToDepthAge[depth] > 3) mLastTimeToDepth[depth] = 0;
         if(mLastTimeToDepth[depth] != 0) return mLastTimeToDepth[depth];
 
-        return (long) (mLastTimeToDepth[depth - 1] * ((depth) % 2 == 0 ? 10 : 19));
+        long result = (mLastTimeToDepth[depth - 1] * ((depth) % 2 == 0 ? 10 : 19));
+
+        if(result == 0) return estimatedTimeToDepth(depth - 1);
+        else return result;
     }
 
     private boolean canSearchToDepth(int depth) {
@@ -475,6 +481,7 @@ public class AiWorkspace extends Game {
 
 
 
+        int deepestMainSearch = deepestSearch;
         continuationDepth = deepestSearch;
         // If extension searches are allowed,
         if(mUseContinuationSearch) {
@@ -483,7 +490,7 @@ public class AiWorkspace extends Game {
                 long continuationTime = mThinkTime - mHorizonMillis;
                 long timeSpent = System.currentTimeMillis() - mStartTime;
                 long timeRemaining = continuationTime - timeSpent;
-                long timeRequired = estimatedTimeToDepth(continuationDepth - 1) / 2;
+                long timeRequired = estimatedTimeToDepth(continuationDepth - 1) / 4;
 
                 // We have to go through the whole tree again in continuation search, but since we've
                 // already searched most of it, we'll get some nodes out of the search if we have
@@ -493,6 +500,11 @@ public class AiWorkspace extends Game {
                             "Skipping continuation search to depth " + continuationDepth + ": " + timeRemaining + "msec left, " + timeRequired
                                     + " required, critical/no/horizon time: " + isTimeCritical() + " " + mNoTime + " " + mHorizonTime);
                     break;
+                }
+                else {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY,
+                            "Doing continuation search to depth " + continuationDepth + ": " + timeRemaining + "msec left, " + timeRequired
+                                    + " required, critical/no/horizon time: " + isTimeCritical() + " " + mNoTime + " " + mHorizonTime);
                 }
 
                 if (firstExtension) {
@@ -591,6 +603,9 @@ public class AiWorkspace extends Game {
                             n.explore(currentHorizonDepth, continuationDepth, n.getAlpha(), n.getBeta(), mThreadPool, false);
                             certainVictory = false;
                             n.revalueParent(n.getDepth());
+                        }
+                        else {
+                            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Victory at depth " + n.getDepth() + " by " + n.getEnteringMoveSequence() + ": " + n.getVictory());
                         }
 
                         e++;

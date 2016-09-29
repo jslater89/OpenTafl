@@ -252,7 +252,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
         if(extension && mDepth < overallMaxDepth) {
-            if(workspace.mNoTime && mValue != Evaluator.NO_VALUE) return mValue; // If we don't have a value, we'll fall out elsewhere
+            if(workspace.mNoTime) return mValue; // If we don't have a value, we'll fall out elsewhere
             else if(mVictory > HIGHEST_NONTERMINAL_RESULT) return mValue;
             else {
                 continuationOnChildren(currentMaxDepth, overallMaxDepth);
@@ -443,6 +443,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     break;
                 }
             }
+            else {
+                if(!workspace.mNoTime || !workspace.mHorizonTime) throw new IllegalStateException("Got a no-value state without being out of time!");
+            }
         }
 
         // If we have no legal moves, the other side wins
@@ -534,6 +537,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
                         AiWorkspace.killerMoveTable.putMove(mDepth, move);
                     }
                 }
+                else {
+                    if(!workspace.mNoTime || !workspace.mHorizonTime) throw new IllegalStateException("Got a no-value state without being out of time!");
+
+                    mBranches.remove(node);
+                }
             }
         }
 
@@ -602,15 +610,18 @@ public class GameTreeState extends GameState implements GameTreeNode {
         // All moves explored; minify this state
         if(mDepth != 0) {
             if(mValue == Evaluator.NO_VALUE) {
-                short evaluation = workspace.transpositionTable.getValue(mValue, mCurrentMaxDepth - mDepth, mGameLength);
+                short evaluation = AiWorkspace.transpositionTable.getValue(mValue, mCurrentMaxDepth - mDepth, mGameLength);
                 if(evaluation != Evaluator.NO_VALUE) {
                     setValue(evaluation);
                 }
                 else {
-                    setValue(workspace.evaluator.evaluate(GameTreeState.this, mCurrentMaxDepth, mDepth));
+                    setValue(AiWorkspace.evaluator.evaluate(GameTreeState.this, mCurrentMaxDepth, mDepth));
                 }
                 OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
             }
+
+            if(mVictory == VICTORY_UNCHECKED) checkVictory();
+
             MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
             if (mParent != null) {
                 mParent.replaceChild(GameTreeState.this, minifiedNode);

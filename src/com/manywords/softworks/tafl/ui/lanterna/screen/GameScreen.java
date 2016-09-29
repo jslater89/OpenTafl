@@ -527,6 +527,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             fe.evaluate(mCommandEngine.getGame().getCurrentState(), 0, 0);
                         }
 
+                        fe.debug = false;
                         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, fe.debugString);
                     }
                     else {
@@ -535,6 +536,20 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 }
                 else {
                     OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "No AI workspace");
+                    FishyEvaluator fe = new FishyEvaluator();
+                    fe.initialize(mCommandEngine.getGame().getRules());
+                    fe.debug = true;
+
+                    if(mCommandEngine.getReplay() != null) {
+                        fe.evaluate(mCommandEngine.getReplay().getCurrentState(), 0, 0);
+                    }
+                    else {
+                        fe.evaluate(mCommandEngine.getGame().getCurrentState(), 0, 0);
+                    }
+
+                    fe.debug = false;
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, fe.debugString);
+
                 }
                 return;
             }
