@@ -92,6 +92,7 @@ public class OpenTafl {
                 runMode = Mode.HELP;
             }
             else if(arg.contains("--dev") || arg.contains("--debug")) {
+                //runMode = Mode.DEBUG;
                 logLevel = LogLevel.CHATTY;
                 devMode = true;
             }

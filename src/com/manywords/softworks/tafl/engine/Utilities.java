@@ -13,6 +13,30 @@ import java.io.IOException;
  * Created by jay on 8/16/16.
  */
 public class Utilities {
+    public static void printArray(Object[] array) {
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "[");
+        for(Object o : array) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, o + ",");
+        }
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "]");
+    }
+
+    public static void printArray(int[] array) {
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "[");
+        for(int o : array) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, o + ",");
+        }
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "]");
+    }
+
+    public static void printArray(short[] array) {
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "[");
+        for(short o : array) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, o + ",");
+        }
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "]");
+    }
+
     public static void fillArray(byte[] array, byte value) {
         int len = array.length;
 
