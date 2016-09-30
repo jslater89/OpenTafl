@@ -174,7 +174,16 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public void replaceChild(GameTreeNode oldNode, GameTreeNode newNode) {
-        mBranches.set(mBranches.indexOf(oldNode), newNode);
+        int index = mBranches.indexOf(oldNode);
+        if(index != -1) {
+            mBranches.set(mBranches.indexOf(oldNode), newNode);
+        }
+        else if(mContinuation) {
+            mBranches.add(newNode);
+        }
+        else {
+            throw new IllegalStateException("Tried to replace a non-existent state!");
+        }
     }
 
     public void setParent(GameTreeNode newParent) {
@@ -251,13 +260,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
             extension = true;
         }
 
-        if(extension && mDepth < overallMaxDepth) {
+        if(extension && mDepth <= overallMaxDepth) {
             if(workspace.mNoTime && mValue != Evaluator.NO_VALUE) return mValue; // If we don't have a value, we'll fall out elsewhere
             else if(mVictory > HIGHEST_NONTERMINAL_RESULT) return mValue;
-            else {
-                continuationOnChildren(currentMaxDepth, overallMaxDepth);
-                return mValue;
-            }
         }
 
         short cachedValue = Evaluator.NO_VALUE;
@@ -322,13 +327,18 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // Replace small child
             minifyState();
         } else {
-            this.mValue = Evaluator.NO_VALUE;
-
             // This state has occurred in the history for our children
             workspace.getRepetitions().increment(this.getZobrist());
 
             // Explore our children
-            exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
+            if(extension && continuation && mDepth < overallMaxDepth) {
+                // In continuation search, we don't want to change values.
+                continuationOnChildren(currentMaxDepth, overallMaxDepth);
+            }
+            else {
+                this.mValue = Evaluator.NO_VALUE;
+                exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
+            }
 
             if(mValue == Evaluator.NO_VALUE) {
                 throw new IllegalStateException("Unvalued state after search");
@@ -463,7 +473,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     private void continuationOnChildren(int currentMaxDepth, int overallMaxDepth) {
-        List<GameTreeNode> successorStates = getBranches();
+        List<GameTreeNode> successorStates = new ArrayList<>(getBranches());
 
         List<MoveRecord> successorMoves = generateSuccessorMoves(currentMaxDepth);
 
@@ -710,8 +720,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 long o1Zobrist = updateZobristHash(mZobristHash, getBoard(), o1, o1ChangeTurn);
                 int o1Rating = AiWorkspace.transpositionTable.getValue(o1Zobrist, currentMaxDepth - mDepth, mGameLength);
 
-                boolean o2ChangeTurn = (berserkMode != Rules.BERSERK_ANY_MOVE || o1.captures.size() == 0);
-                long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o1, o2ChangeTurn);
+                boolean o2ChangeTurn = (berserkMode != Rules.BERSERK_ANY_MOVE || o2.captures.size() == 0);
+                long o2Zobrist = updateZobristHash(mZobristHash, getBoard(), o2, o2ChangeTurn);
                 int o2Rating = AiWorkspace.transpositionTable.getValue(o2Zobrist, currentMaxDepth - mDepth, mGameLength);
 
                 if(isMaximizingNode()) {

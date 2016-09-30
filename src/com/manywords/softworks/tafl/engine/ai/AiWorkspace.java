@@ -93,8 +93,6 @@ public class AiWorkspace extends Game {
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory(), startingGame.getRepetitions());
 
-        evaluator.initialize(startingGame.getRules());
-
         if(mLastTimeToDepth == null || mLastTimeToDepth.length != (mMaxDepth + 1)) {
             mLastTimeToDepth = new long[mMaxDepth + 1];
             mTimeToDepthAge = new int[mMaxDepth + 1];
@@ -321,7 +319,10 @@ public class AiWorkspace extends Game {
         if(mTimeToDepthAge[depth] > 3) mLastTimeToDepth[depth] = 0;
         if(mLastTimeToDepth[depth] != 0) return mLastTimeToDepth[depth];
 
-        return (long) (mLastTimeToDepth[depth - 1] * ((depth) % 2 == 0 ? 10 : 19));
+        long result = (mLastTimeToDepth[depth - 1] * ((depth) % 2 == 0 ? 10 : 19));
+
+        if(result == 0) return estimatedTimeToDepth(depth - 1) * ((depth) % 2 == 0 ? 10 : 19);
+        else return result;
     }
 
     private boolean canSearchToDepth(int depth) {
@@ -449,8 +450,8 @@ public class AiWorkspace extends Game {
                         mUiCallback.statusText("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
                     }
 
-                    depth++;
                     deepestSearch = depth;
+                    depth++;
                 }
                 else {
                     if(mPreviousStartingState != null) mStartingState = mPreviousStartingState;
@@ -475,7 +476,7 @@ public class AiWorkspace extends Game {
 
 
 
-        continuationDepth = deepestSearch;
+        continuationDepth = deepestSearch + 1;
         // If extension searches are allowed,
         if(mUseContinuationSearch) {
             long continuationStart = System.currentTimeMillis();
@@ -555,8 +556,14 @@ public class AiWorkspace extends Game {
                         }
                     }
 
-                    if(timeRemaining > estimatedTimeToDepth(3)) horizonDepth = 3;
-                    else horizonDepth = 2;
+                    horizonDepth = 2;
+                    while(timeRemaining > estimatedTimeToDepth(horizonDepth) * 2) {
+                        horizonDepth++;
+                    }
+                    // Horizon depth -1 because it gets incremented before it fails the test.
+                    horizonDepth = Math.min(horizonDepth - 1, deepestSearch - 1);
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Extra horizon depth: " + horizonDepth + " (in " + estimatedTimeToDepth(horizonDepth) + "/" + timeRemaining + ")");
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Current deepest search: " + deepestSearch);
 
 
                     // Do an extension search on the best known moves.
