@@ -93,6 +93,8 @@ public class AiWorkspace extends Game {
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory(), startingGame.getRepetitions());
 
+        evaluator.initialize(startingGame.getRules());
+
         if(mLastTimeToDepth == null || mLastTimeToDepth.length != (mMaxDepth + 1)) {
             mLastTimeToDepth = new long[mMaxDepth + 1];
             mTimeToDepthAge = new int[mMaxDepth + 1];
