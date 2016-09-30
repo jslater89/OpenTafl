@@ -379,14 +379,14 @@ public class FishyEvaluator implements Evaluator {
 
         // If the king has fewer destinations than boardSize, the attackers are doing well. If he has fewer
         // destinations than boardSize / 2, they're doing very well.
-
-        if(kingDestinations.size() < boardSize) {
-            value += changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has few destinations: 0.25 FREEDOM");
-        }
-
-        if(kingDestinations.size() < (boardSize / 2)) {
-            value += changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has very few destinations: 0.25 FREEDOM");
-        }
+//
+//        if(kingDestinations.size() < boardSize) {
+//            value += changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has few destinations: 0.25 FREEDOM");
+//        }
+//
+//        if(kingDestinations.size() < (boardSize / 2)) {
+//            value += changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has very few destinations: 0.25 FREEDOM");
+//        }
 
         // ==================== 2. KING RISK ====================
         // If the king is in check, an enemy taflman can close the trap, and
@@ -478,10 +478,10 @@ public class FishyEvaluator implements Evaluator {
                 value += changeEvaluation(ATTACKER, RANK_AND_FILE_INDEX, attackerPerRankFile, "Attacker file control: ");
 
             // It's good for the defenders to be the high or low pieces on a rank or file, outside the attacker cordon.
-            if(rankHighLowTaflmen[HIGH][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
-            if(rankHighLowTaflmen[LOW][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
-            if(fileHighLowTaflmen[HIGH][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
-            if(fileHighLowTaflmen[LOW][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
+//            if(rankHighLowTaflmen[HIGH][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
+//            if(rankHighLowTaflmen[LOW][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
+//            if(fileHighLowTaflmen[HIGH][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
+//            if(fileHighLowTaflmen[LOW][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
         }
 
         if(debug) {

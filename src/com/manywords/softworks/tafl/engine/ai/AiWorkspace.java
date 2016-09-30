@@ -56,7 +56,7 @@ public class AiWorkspace extends Game {
 
     // These are only used internally
     private boolean mIterativeDeepening = true;
-    private boolean mUseContinuationSearch = false;
+    private boolean mUseContinuationSearch = true;
     private boolean mUseHorizonSearch = true;
     private boolean mUseKillerMoves = true; // sets table size to 0, so it ignores puts
     private int mUseTranspositionTable = TRANSPOSITION_TABLE_ON; // sets table size to 0, so it ignores puts
@@ -326,7 +326,7 @@ public class AiWorkspace extends Game {
 
         long result = (mLastTimeToDepth[depth - 1] * ((depth) % 2 == 0 ? 10 : 19));
 
-        if(result == 0) return estimatedTimeToDepth(depth - 1) * ((depth) % 2 == 0 ? 10 : 19);
+        if(result == 0) return estimatedTimeToDepth(depth - 1);
         else return result;
     }
 
@@ -455,8 +455,8 @@ public class AiWorkspace extends Game {
                         mUiCallback.statusText("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
                     }
 
-                    deepestSearch = depth;
                     depth++;
+                    deepestSearch = depth;
                 }
                 else {
                     if(mPreviousStartingState != null) mStartingState = mPreviousStartingState;
@@ -543,12 +543,18 @@ public class AiWorkspace extends Game {
         // refutations.
 
         if(mUseHorizonSearch) {
+            /*
+            Can we afford a search to depth 3?
+            */
+
             final boolean isAttackingSide = mStartingState.getCurrentSide().isAttackingSide();
             getTreeRoot().getBranches().sort((o1, o2) -> {
                 if(o1.getValue() > o2.getValue()) return isAttackingSide ? -1 : 1;
                 if(o1.getValue() < o2.getValue()) return isAttackingSide ? 1 : -1;
                 return 0;
             });
+
+            mBestStatePreHorizon = getTreeRoot().getBranches().get(0);
 
             currentHorizonDepth = deepestSearch;
             while (true) {
@@ -561,14 +567,9 @@ public class AiWorkspace extends Game {
                         }
                     }
 
-                    horizonDepth = 2;
-                    while(timeRemaining > estimatedTimeToDepth(horizonDepth) * 2) {
-                        horizonDepth++;
-                    }
-                    // Horizon depth -1 because it gets incremented before it fails the test.
-                    horizonDepth = Math.min(horizonDepth - 1, deepestSearch - 1);
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Extra horizon depth: " + horizonDepth + " (in " + estimatedTimeToDepth(horizonDepth) + "/" + timeRemaining + ")");
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Current deepest search: " + deepestSearch);
+                    if(timeRemaining > estimatedTimeToDepth(3)) horizonDepth = 3;
+                    else horizonDepth = 2;
+
 
                     // Do an extension search on the best known moves.
                     getTreeRoot().getBranches().sort((o1, o2) -> {
@@ -590,8 +591,6 @@ public class AiWorkspace extends Game {
 
                     boolean certainVictory = true;
                     int e = 0;
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Doing horizon search at depth: " + currentHorizonDepth
-                            + " starting index " + horizonStart + " ending index " + (horizonStart + horizonCount) + " with " + timeRemaining + "msec");
                     for (GameTreeNode branch : getTreeRoot().getBranches()) {
                         if (e < horizonStart) {
                             e++;
@@ -602,7 +601,6 @@ public class AiWorkspace extends Game {
                         GameTreeNode n = nodes.get(nodes.size() - 1);
                         if (n.getVictory() == GameState.GOOD_MOVE) {
                             n.explore(currentHorizonDepth, n.getDepth(), n.getAlpha(), n.getBeta(), mThreadPool, false);
-                            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Finished step, time left? " + !mNoTime);
                             certainVictory = false;
                             n.revalueParent(n.getDepth());
                         }
@@ -682,6 +680,8 @@ public class AiWorkspace extends Game {
             mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, extension searches " + (fullNodes - nodes) + " nodes");
             mUiCallback.statusText("Overall speed: " + (fullNodes / ((mEndTime - mStartTime)/ 1000d)) + " nodes/sec");
             mUiCallback.statusText("Transposition table stats: " + transpositionTable.getTableStats());
+
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Best state == best state pre-horizon? " + getTreeRoot().getBestChild().equals(mBestStatePreHorizon));
         }
     }
 

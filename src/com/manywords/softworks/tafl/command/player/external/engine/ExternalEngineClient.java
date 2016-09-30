@@ -47,7 +47,7 @@ public class ExternalEngineClient implements UiCallback {
 
     private boolean mDebugMode = false;
     private boolean mEngineDeepening = true;
-    private boolean mEngineContinuation = false;
+    private boolean mEngineContinuation = true;
     private boolean mEngineHorizon = true;
     private boolean mEngineMoveOrdering = true;
     private boolean mEngineTranspositionTable = true;
