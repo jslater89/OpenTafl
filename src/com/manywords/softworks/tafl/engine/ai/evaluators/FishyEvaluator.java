@@ -35,11 +35,10 @@ public class FishyEvaluator implements Evaluator {
     private final int KING_RISK_INDEX = 1;
     private final int RANK_AND_FILE_INDEX = 2;
     private final int MATERIAL_INDEX = 3;
-    private final int KING_FREEDOM_VALUE = 1200;
-    private final int KING_RISK_VALUE = 1150;
-    private final int RANK_AND_FILE_VALUE = 500;
-    private final int MATERIAL_VALUE = 500;
-    // 1400 for unused TAFLMAN_RISK
+    private final int KING_FREEDOM_VALUE = 1600;
+    private final int KING_RISK_VALUE = 1500;
+    private final int RANK_AND_FILE_VALUE = 850;
+    private final int MATERIAL_VALUE = 850;
 
     // Losing fewer than taflman-count * LIGHT_LOSSES is not a tragedy.
     // Losing in between LIGHT and HEAVY is getting bad.
@@ -377,14 +376,14 @@ public class FishyEvaluator implements Evaluator {
 
         // If the king has fewer destinations than boardSize, the attackers are doing well. If he has fewer
         // destinations than boardSize / 2, they're doing very well.
-//
-//        if(kingDestinations.size() < boardSize) {
-//            value += changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has few destinations: 0.25 FREEDOM");
-//        }
-//
-//        if(kingDestinations.size() < (boardSize / 2)) {
-//            value += changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has very few destinations: 0.25 FREEDOM");
-//        }
+
+        if(kingDestinations.size() < boardSize) {
+            value += changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has few destinations: 0.25 FREEDOM");
+        }
+
+        if(kingDestinations.size() < (boardSize / 2)) {
+            value += changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has very few destinations: 0.25 FREEDOM");
+        }
 
         // ==================== 2. KING RISK ====================
         // If the king is in check, an enemy taflman can close the trap, and
@@ -400,7 +399,7 @@ public class FishyEvaluator implements Evaluator {
         if (mArmedKing && kingCurrentlyStrong) { // block max: defender 1, attacker 1
             if (enemyKingAdjacentTaflmen.size() <= 2) {
                 // There's value in having an armed, strong king next to one or two enemy taflmen--leads to captures.
-                value += changeEvaluation(DEFENDER, KING_RISK_INDEX, 0.1f * enemyKingAdjacentTaflmen.size(), "Strong armed king adjacent to attackers at -0.1 RISK per.");
+                value += changeEvaluation(DEFENDER, KING_RISK_INDEX, 0.1f * enemyKingAdjacentTaflmen.size(), "Strong armed king adjacent to " + enemyKingAdjacentTaflmen.size() + " attackers at -0.1 RISK.");
             }
             else if (enemyKingAdjacentTaflmen.size() > 2) {
                 // Having a king in check is risky.
@@ -461,25 +460,25 @@ public class FishyEvaluator implements Evaluator {
         // attacker max: 0.4
         // defender max: 0.8
         float attackerPerRankFile = 0.4f / boardSize / 2; // ranks and files
-        float defenderPerRankFile = 0.8f / boardSize / 2; // ranks and files
+        float defenderPerRankFile = 0.4f / boardSize / 2; // ranks and files
         float defenderPerOutsideCordon = 0.4f / boardSize / 4; // ranks and files, high and low
 
         for(int i = 0; i < boardSize; i++) {
             if(rankPresence[DEFENDER][i] && rankControl[i] == DEFENDER && !rankPresence[ATTACKER][i])
-                value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerRankFile, "Defender rank control: ");
+                value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerRankFile, "Defender rank control: -" + defenderPerRankFile + "  RANK-FILE");
             else if(rankControl[i] == ATTACKER)
-                value += changeEvaluation(ATTACKER, RANK_AND_FILE_INDEX, attackerPerRankFile, "Attacker rank control: ");
+                value += changeEvaluation(ATTACKER, RANK_AND_FILE_INDEX, attackerPerRankFile, "Attacker rank control: " + attackerPerRankFile + " RANK-FILE");
 
             if(filePresence[DEFENDER][i] && fileControl[i] == DEFENDER && !filePresence[ATTACKER][i])
-                value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerRankFile, "Defender file control: ");
+                value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerRankFile, "Defender file control: -" + defenderPerRankFile + "  RANK-FILE");
             else if(fileControl[i] == ATTACKER)
-                value += changeEvaluation(ATTACKER, RANK_AND_FILE_INDEX, attackerPerRankFile, "Attacker file control: ");
+                value += changeEvaluation(ATTACKER, RANK_AND_FILE_INDEX, attackerPerRankFile, "Attacker file control: " + attackerPerRankFile + " RANK-FILE");
 
             // It's good for the defenders to be the high or low pieces on a rank or file, outside the attacker cordon.
-//            if(rankHighLowTaflmen[HIGH][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
-//            if(rankHighLowTaflmen[LOW][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
-//            if(fileHighLowTaflmen[HIGH][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
-//            if(fileHighLowTaflmen[LOW][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: ");
+            if(rankHighLowTaflmen[HIGH][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: -" + defenderPerOutsideCordon + " RANK-FILE");
+            if(rankHighLowTaflmen[LOW][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: -" + defenderPerOutsideCordon + " RANK-FILE");
+            if(fileHighLowTaflmen[HIGH][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: -" + defenderPerOutsideCordon + " RANK-FILE");
+            if(fileHighLowTaflmen[LOW][i] < 0) value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, defenderPerOutsideCordon, "Defender outside cordon: -" + defenderPerOutsideCordon + " RANK-FILE");
         }
 
         if(debug) {
@@ -509,8 +508,8 @@ public class FishyEvaluator implements Evaluator {
         }
 
         // It's better to develop pieces, but not at the expense of doing anything more interesting.
-        value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, fractionPerDefender * defenderDeveloped, "Defender development: ");
-        value += changeEvaluation(ATTACKER, RANK_AND_FILE_INDEX, fractionPerAttacker * attackerDeveloped, "Attacker development: ");
+        value += changeEvaluation(DEFENDER, RANK_AND_FILE_INDEX, fractionPerDefender * defenderDeveloped, "Defender development: -" + fractionPerDefender * defenderDeveloped + " RANK-FILE");
+        value += changeEvaluation(ATTACKER, RANK_AND_FILE_INDEX, fractionPerAttacker * attackerDeveloped, "Attacker development: " + fractionPerAttacker * attackerDeveloped + " RANK-FILE");
 
         if(debug) {
             debugString += "Taflman development: " + (value - debugValue) + "\n";
@@ -521,16 +520,13 @@ public class FishyEvaluator implements Evaluator {
         int defendersLost = mStartingDefenderCount - defendingTaflmenCount;
         int attackersLost = mStartingAttackerCount - attackingTaflmenCount;
 
-        float attackerValue = 0.7f / mStartingAttackerCount;
-        float defenderValue = 0.8f / mStartingDefenderCount;
+        float attackerValue = MATERIAL_VALUE * 0.7f / mStartingAttackerCount;
+        float defenderValue = MATERIAL_VALUE * 0.8f / mStartingDefenderCount;
 
         int defenderLossLevel = 0;
         int attackerLossLevel = 0;
 
         // The actual material count: 1/8, because expressing it in raw terms is super hard
-        value += changeEvaluation(DEFENDER, MATERIAL_INDEX, attackerValue * attackersLost, "Attacker losses: ");
-        value += changeEvaluation(ATTACKER, MATERIAL_INDEX, defenderValue * defendersLost, "Defender losses: ");
-
         if(defendersLost > mStandardTaflmanCount[DEFENDER]) defenderLossLevel = 2;
         else if(defendersLost > mLightTaflmanCount[DEFENDER]) defenderLossLevel = 1;
 
