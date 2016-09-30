@@ -447,8 +447,8 @@ public class AiWorkspace extends Game {
                         mUiCallback.statusText("Depth " + depth + " explored " + size + " states in " + timeTaken + " sec at " + doubleFormat.format(statesPerSec) + "/sec");
                     }
 
-                    depth++;
                     deepestSearch = depth;
+                    depth++;
                 }
                 else {
                     if(mPreviousStartingState != null) mStartingState = mPreviousStartingState;
@@ -473,7 +473,7 @@ public class AiWorkspace extends Game {
 
 
 
-        continuationDepth = deepestSearch;
+        continuationDepth = deepestSearch + 1;
         // If extension searches are allowed,
         if(mUseContinuationSearch) {
             long continuationStart = System.currentTimeMillis();
