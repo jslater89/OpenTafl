@@ -1,8 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai.evaluators;
 
-import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
-import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
@@ -34,7 +32,6 @@ public class FishyEvaluator implements Evaluator {
     private final int KING_FREEDOM_INDEX = 0;
     private final int KING_RISK_INDEX = 1;
     private final int RANK_AND_FILE_INDEX = 2;
-    private final int MATERIAL_INDEX = 3;
     private final int KING_FREEDOM_VALUE = 1000;
     private final int KING_RISK_VALUE = 1000;
     private final int RANK_AND_FILE_VALUE = 500;
@@ -69,7 +66,6 @@ public class FishyEvaluator implements Evaluator {
     private short mAssignedKingFreedom = 0;
     private short mAssignedKingRisk = 0;
     private short mAssignedRankAndFile = 0;
-    private short mAssignedMaterial = 0;
 
     @Override
     public void initialize(Rules rules) {
@@ -125,8 +121,6 @@ public class FishyEvaluator implements Evaluator {
                 return KING_RISK_VALUE;
             case RANK_AND_FILE_INDEX:
                 return RANK_AND_FILE_VALUE;
-            case MATERIAL_INDEX:
-                return MATERIAL_VALUE;
         }
 
         throw new IllegalArgumentException("Bad category index");
@@ -140,8 +134,6 @@ public class FishyEvaluator implements Evaluator {
                 return mAssignedKingRisk;
             case RANK_AND_FILE_INDEX:
                 return mAssignedRankAndFile;
-            case MATERIAL_INDEX:
-                return mAssignedMaterial;
         }
 
         throw new IllegalArgumentException("Bad category index");
@@ -156,26 +148,20 @@ public class FishyEvaluator implements Evaluator {
         switch(category) {
             case KING_FREEDOM_INDEX:
                 mAssignedKingFreedom += actualAmount;
-                break;
             case KING_RISK_INDEX:
                 mAssignedKingRisk += actualAmount;
-                break;
             case RANK_AND_FILE_INDEX:
                 mAssignedRankAndFile += actualAmount;
-                break;
-            case MATERIAL_INDEX:
-                mAssignedMaterial += actualAmount;
-                break;
         }
 
         return actualAmount;
     }
 
-    private short taflmanValue(int side, int category, float taflmanFraction) {
+    private short taflmanValue(int side, int category, double taflmanFraction) {
         return taflmanValue(side, category, taflmanFraction, "");
     }
 
-    private short taflmanValue(int side, int category, float taflmanFraction, String debugMessage) {
+    private short taflmanValue(int side, int category, double taflmanFraction, String debugMessage) {
         if(debug && debugMessage != null) debugString += debugMessage + "\n";
         short preferredValue = (short) (mStandardTaflmanValue[side] * taflmanFraction * (side == ATTACKER ? 1 : -1));
         return assignValue(side, category, preferredValue);
@@ -267,8 +253,8 @@ public class FishyEvaluator implements Evaluator {
         // each rank and file, positive for attacker and negative
         // for defender. e.g. rankControlTmp[LOW][0] == -1 means that
         // the low piece on rank 0 is a defender on file 1.
-        byte[][] rankHighLowTaflmen = new byte[2][board.getBoardDimension()];
-        byte[][] fileHighLowTaflmen = new byte[2][board.getBoardDimension()];
+        byte[][] rankControlTmp = new byte[2][board.getBoardDimension()];
+        byte[][] fileControlTmp = new byte[2][board.getBoardDimension()];
 
         byte[] rankControl = new byte[board.getBoardDimension()];
         byte[] fileControl = new byte[board.getBoardDimension()];
@@ -282,11 +268,11 @@ public class FishyEvaluator implements Evaluator {
             rankPresence[side][coord.y] = true;
             filePresence[side][coord.x] = true;
 
-            if(coord.x < rankHighLowTaflmen[LOW][coord.y]) rankHighLowTaflmen[LOW][coord.y] = (byte)(coord.x * mul);
-            else if(coord.x > rankHighLowTaflmen[HIGH][coord.y]) rankHighLowTaflmen[HIGH][coord.y] = (byte)(coord.x * mul);
+            if(coord.x < rankControlTmp[LOW][coord.y]) rankControlTmp[LOW][coord.y] = (byte)(coord.x * mul);
+            else if(coord.x > rankControlTmp[HIGH][coord.y]) rankControlTmp[HIGH][coord.y] = (byte)(coord.x * mul);
 
-            if(coord.y < fileHighLowTaflmen[LOW][coord.x]) fileHighLowTaflmen[LOW][coord.x] = (byte)(coord.y * mul);
-            else if(coord.y > fileHighLowTaflmen[HIGH][coord.x]) fileHighLowTaflmen[HIGH][coord.x] = (byte)(coord.y * mul);
+            if(coord.y < fileControlTmp[LOW][coord.x]) fileControlTmp[LOW][coord.x] = (byte)(coord.y * mul);
+            else if(coord.y > fileControlTmp[HIGH][coord.x]) fileControlTmp[HIGH][coord.x] = (byte)(coord.y * mul);
 
 
             if(king == Taflman.EMPTY && Taflman.isKing(taflman)) {
@@ -296,11 +282,11 @@ public class FishyEvaluator implements Evaluator {
 
 
         for(int i = 0; i < board.getBoardDimension(); i++) {
-            if (rankHighLowTaflmen[LOW][i] > 0 && rankHighLowTaflmen[HIGH][i] > 0) rankControl[i] = ATTACKER;
-            else if (rankHighLowTaflmen[LOW][i] < 0 && rankHighLowTaflmen[HIGH][i] < 0) rankControl[i] = DEFENDER;
+            if (rankControlTmp[LOW][i] > 0 && rankControlTmp[HIGH][i] > 0) rankControl[i] = ATTACKER;
+            else if (rankControlTmp[LOW][i] < 0 && rankControlTmp[HIGH][i] < 0) rankControl[i] = DEFENDER;
 
-            if (fileHighLowTaflmen[LOW][i] > 0 && fileHighLowTaflmen[HIGH][i] > 0) fileControl[i] = ATTACKER;
-            else if (fileHighLowTaflmen[LOW][i] < 0 && fileHighLowTaflmen[HIGH][i] < 0) fileControl[i] = DEFENDER;
+            if (fileControlTmp[LOW][i] > 0 && fileControlTmp[HIGH][i] > 0) fileControl[i] = ATTACKER;
+            else if (fileControlTmp[LOW][i] < 0 && fileControlTmp[HIGH][i] < 0) fileControl[i] = DEFENDER;
         }
 
         Coord kingCoord = board.findTaflmanSpace(king);
@@ -331,7 +317,7 @@ public class FishyEvaluator implements Evaluator {
             }
 
             if (kingEdges == 1) {
-                value += taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1.5f, "King edges: -1.5 taflmen");
+                value += taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1.5, "King edges: -1.5 taflmen");
             }
         } else if (mCornerEscape) {
             if (kingCorners >= 2) {
@@ -342,31 +328,31 @@ public class FishyEvaluator implements Evaluator {
             }
 
             if (kingCorners == 1) {
-                value += taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 0.5f, "King one corner: -0.5 taflmen");
+                value += taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 0.5, "King one corner: -0.5 taflmen");
             }
 
             if (kingEdges >= 1) {
-                value +=  taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 0.25f, "King edge access: -0.25 taflmen");
+                value +=  taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 0.25, "King edge access: -0.25 taflmen");
             }
         }
 
         // If the king is on a rank or file controlled by us, that's good.
         if(rankControl[kingCoord.y] == DEFENDER) {
-            value += taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 0.1f, "King on our rank: -0.1 taflmen");
+            value += taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 0.1, "King on our rank: -0.1 taflmen");
         }
         if(fileControl[kingCoord.x] == DEFENDER) {
-            value += taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 0.1f, "King on our file: -0.1 taflmen");
+            value += taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 0.1, "King on our file: -0.1 taflmen");
         }
 
         // If the king has fewer destinations than boardSize, the attackers are doing well. If he has fewer
         // destinations than boardSize / 2, they're doing very well.
 
         if(kingDestinations.size() < boardSize) {
-            value += taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has few destinations: 0.25 taflmen");
+            value += taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 0.25, "King has few destinations: 0.25 taflmen");
         }
 
         if(kingDestinations.size() < (boardSize / 2)) {
-            value += taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 0.25f, "King has very few destinations: 0.5 taflmen");
+            value += taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 0.25, "King has very few destinations: 0.5 taflmen");
         }
 
         // ==================== 2. KING RISK ====================
@@ -383,7 +369,7 @@ public class FishyEvaluator implements Evaluator {
         if (mArmedKing && kingCurrentlyStrong) { // block max: defender 1, attacker 1
             if (enemyKingAdjacentTaflmen.size() <= 2) {
                 // There's value in having an armed, strong king next to one or two enemy taflmen--leads to captures.
-                value += taflmanValue(DEFENDER, KING_RISK_INDEX, 0.1f * enemyKingAdjacentTaflmen.size(), "Strong armed king adjacent to " + enemyKingAdjacentTaflmen.size() + " attackers at -0.1 ea.");
+                value += taflmanValue(DEFENDER, KING_RISK_INDEX, 0.1 * enemyKingAdjacentTaflmen.size(), "Strong armed king adjacent to " + enemyKingAdjacentTaflmen.size() + " attackers at -0.1 ea.");
             }
             else if (enemyKingAdjacentTaflmen.size() > 2) {
                 // Having a king in check is risky.
@@ -391,7 +377,7 @@ public class FishyEvaluator implements Evaluator {
             }
 
             if (kingAdjacentTaflmen.size() > enemyKingAdjacentTaflmen.size()) {
-                value += taflmanValue(DEFENDER, KING_RISK_INDEX, 0.75f, "Strong armed king has bodyguard: -0.75 taflmen");
+                value += taflmanValue(DEFENDER, KING_RISK_INDEX, 0.75, "Strong armed king has bodyguard: -0.75 taflmen");
             }
         }
         else if (kingCurrentlyStrong) { // block max: defender 1, attacker 1
@@ -402,7 +388,7 @@ public class FishyEvaluator implements Evaluator {
             }
 
             if (kingAdjacentTaflmen.size() > enemyKingAdjacentTaflmen.size()) {
-                value += taflmanValue(DEFENDER, KING_RISK_INDEX, 0.75f, "Strong armed king has bodyguard: -0.75 taflmen");
+                value += taflmanValue(DEFENDER, KING_RISK_INDEX, 0.75, "Strong armed king has bodyguard: -0.75 taflmen");
             }
         }
         else { // block max: defender 0.0, attacker 1
@@ -430,7 +416,7 @@ public class FishyEvaluator implements Evaluator {
         for (Coord cornerPoint : cornerPoints) {
             char occupier = board.getOccupier(cornerPoint);
             if (occupier != Taflman.EMPTY && Taflman.getPackedSide(occupier) == Taflman.SIDE_ATTACKERS) {
-                value += taflmanValue(ATTACKER, RANK_AND_FILE_INDEX, 0.25f, "Corner point control: 0.25 taflmen");
+                value += taflmanValue(ATTACKER, RANK_AND_FILE_INDEX, 0.25, "Corner point control: 0.25 taflmen");
             }
         }
 
@@ -444,19 +430,13 @@ public class FishyEvaluator implements Evaluator {
         // attacker max: 0.4
         // defender max: 0.8
         for(int i = 0; i < boardSize; i++) {
-            if(rankPresence[DEFENDER][i] && rankControl[i] == DEFENDER && !rankPresence[ATTACKER][i]) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.25f, "Defender rank control: -0.25 taflmen");
-            else if(rankControl[i] == ATTACKER) value += taflmanValue(ATTACKER, RANK_AND_FILE_INDEX, 0.5f, "Attacker rank control: 0.5 taflmen");
-            else if(!rankPresence[DEFENDER][i] && !rankPresence[ATTACKER][i]) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.1f, "Empty rank: -0.1 taflmen");
+            if(rankPresence[DEFENDER][i] && rankControl[i] == DEFENDER && !rankPresence[ATTACKER][i]) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.25, "Defender rank control: -0.25 taflmen");
+            else if(rankControl[i] == ATTACKER) value += taflmanValue(ATTACKER, RANK_AND_FILE_INDEX, 0.5, "Attacker rank control: 0.5 taflmen");
+            else if(!rankPresence[DEFENDER][i] && !rankPresence[ATTACKER][i]) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.1, "Empty rank: -0.1 taflmen");
 
-            if(filePresence[DEFENDER][i] && fileControl[i] == DEFENDER && !filePresence[ATTACKER][i]) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.25f, "Defender file control: -0.25 taflmen");
-            else if(fileControl[i] == ATTACKER) value += taflmanValue(ATTACKER, RANK_AND_FILE_INDEX, 0.5f, "Attacker file control: 0.5 taflmen");
-            else if(!filePresence[DEFENDER][i] && !filePresence[ATTACKER][i]) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.1f, "Empty file: -0.1 taflmen");
-
-            // It's good for the defenders to be the high or low pieces on a rank or file, outside the attacker cordon.
-            if(rankHighLowTaflmen[HIGH][i] < 0) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.5f, "Defender outside cordon");
-            if(rankHighLowTaflmen[LOW][i] < 0) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.5f, "Defender outside cordon");
-            if(fileHighLowTaflmen[HIGH][i] < 0) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.5f, "Defender outside cordon");
-            if(fileHighLowTaflmen[LOW][i] < 0) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.5f, "Defender outside cordon");
+            if(filePresence[DEFENDER][i] && fileControl[i] == DEFENDER && !filePresence[ATTACKER][i]) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.25, "Defender file control: -0.25 taflmen");
+            else if(fileControl[i] == ATTACKER) value += taflmanValue(ATTACKER, RANK_AND_FILE_INDEX, 0.5, "Attacker file control: 0.5 taflmen");
+            else if(!filePresence[DEFENDER][i] && !filePresence[ATTACKER][i]) value += taflmanValue(DEFENDER, RANK_AND_FILE_INDEX, 0.1, "Empty file: -0.1 taflmen");
         }
 
         if(debug) {
@@ -494,29 +474,22 @@ public class FishyEvaluator implements Evaluator {
         // 5. ==================== MATERIAL COMPARISON ====================
         int defendersLost = mStartingDefenderCount - defendingTaflmenCount;
         int attackersLost = mStartingAttackerCount - attackingTaflmenCount;
-        int defenderLossLevel = 0;
-        int attackerLossLevel = 0;
 
-        // The actual material count: 1/8, because expressing it in raw terms is super hard
         if(defendersLost > mStandardTaflmanCount[DEFENDER]) {
-            value += mLightTaflmanCount[DEFENDER] * mLightTaflmanValue[DEFENDER] / 8;
-            value += mStandardTaflmanCount[DEFENDER] * mStandardTaflmanValue[DEFENDER] / 8;
+            value += mLightTaflmanCount[DEFENDER] * mLightTaflmanValue[DEFENDER];
+            value += mStandardTaflmanCount[DEFENDER] * mStandardTaflmanValue[DEFENDER];
 
             defendersLost -= (mLightTaflmanCount[DEFENDER] + mStandardTaflmanCount[DEFENDER]);
-            value += mHeavyTaflmanValue[DEFENDER] * defendersLost / 8;
-
-            defenderLossLevel = 2;
+            value += mHeavyTaflmanValue[DEFENDER] * defendersLost;
         }
         else if(defendersLost > mLightTaflmanCount[DEFENDER]) {
-            value += mLightTaflmanCount[DEFENDER] * mLightTaflmanValue[DEFENDER] / 8;
+            value += mLightTaflmanCount[DEFENDER] * mLightTaflmanValue[DEFENDER];
 
             defendersLost -= mLightTaflmanCount[DEFENDER];
-            value += mStandardTaflmanValue[DEFENDER] * defendersLost / 8;
-
-            defenderLossLevel = 1;
+            value += mStandardTaflmanValue[DEFENDER] * defendersLost;
         }
         else {
-            value += defendersLost * mLightTaflmanValue[DEFENDER] / 8;
+            value += defendersLost * mLightTaflmanValue[DEFENDER];
         }
 
         if(attackersLost > mStandardTaflmanCount[ATTACKER]) {
@@ -525,35 +498,15 @@ public class FishyEvaluator implements Evaluator {
 
             attackersLost -= (mLightTaflmanCount[ATTACKER] + mStandardTaflmanCount[ATTACKER]);
             value += mHeavyTaflmanValue[ATTACKER] * attackersLost;
-
-            attackerLossLevel = 2;
         }
         else if(attackersLost > mLightTaflmanCount[ATTACKER]) {
             value += mLightTaflmanCount[ATTACKER] * mLightTaflmanValue[ATTACKER];
 
             attackersLost -= mLightTaflmanCount[ATTACKER];
             value += mStandardTaflmanValue[ATTACKER] * attackersLost;
-
-            attackerLossLevel = 1;
         }
         else {
             value += attackersLost * mLightTaflmanValue[ATTACKER];
-        }
-
-        // Relative material is worth a few taflmen, though
-
-        // It's bad for the defenders if they've lost more than 20% more than the attackers
-        if(defendersLost > (1.2 * attackersLost)) {
-            value += taflmanValue(ATTACKER, MATERIAL_INDEX, 2, "Defender has lost 20% more taflmen than attacker: 2 taflmen");
-        }
-
-        // It's bad for the attackers to be behind on the material race.
-        if(attackerLossLevel > defenderLossLevel) {
-            value += taflmanValue(DEFENDER, MATERIAL_INDEX, 3, "Attacker is behind on material: -3 taflmen");
-        }
-
-        if(attackerLossLevel == 2) {
-            value += taflmanValue(DEFENDER, MATERIAL_INDEX, 1.5f, "Attacker is on heavy losses: -1.5 taflmen");
         }
 
         if(debug) {
@@ -587,52 +540,6 @@ public class FishyEvaluator implements Evaluator {
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
-    }
 
-    public boolean test() {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Heavy taflmen counts, values, defender/attacker");
-        Utilities.printArray(mHeavyTaflmanCount);
-        Utilities.printArray(mHeavyTaflmanValue);
-
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Standard taflmen counts, values, defender/attacker");
-        Utilities.printArray(mStandardTaflmanCount);
-        Utilities.printArray(mStandardTaflmanValue);
-
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Light taflmen counts, values, defender/attacker");
-        Utilities.printArray(mLightTaflmanCount);
-        Utilities.printArray(mLightTaflmanValue);
-
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(DEFENDER, KING_FREEDOM_INDEX, 1));
-
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + taflmanValue(ATTACKER, KING_FREEDOM_INDEX, 1));
-
-
-
-        return true;
     }
 }
