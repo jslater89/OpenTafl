@@ -7,3 +7,11 @@ Tablut 9: finished in 14.689 sec, searching 1127203 nodes to depth 5
 Copenhagen 11: finished in 2.807 sec, searching 23562 nodes to depth 4
 Tablut 15: finished in 8.32 sec, searching 113556 nodes to depth 4
 
+2. v0.4.4.6pre
+OpenTafl v0.4.4.5b log from Thu Sep 29 00:17:41 EDT 2016 on sif
+Java version: 1.8.0_101
+Brandub 7: finished in 10.69 sec, searching 542312 nodes to depth 6
+Tablut 9: finished in 15.127 sec, searching 926465 nodes to depth 5
+Copenhagen 11: finished in 3.022 sec, searching 21083 nodes to depth 4
+Tablut 15: finished in 5.118 sec, searching 90254 nodes to depth 4
+
