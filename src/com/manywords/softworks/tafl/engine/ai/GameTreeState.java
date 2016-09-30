@@ -255,7 +255,14 @@ public class GameTreeState extends GameState implements GameTreeNode {
             if(workspace.mNoTime) return mValue; // If we don't have a value, we'll fall out elsewhere
             else if(mVictory > HIGHEST_NONTERMINAL_RESULT) return mValue;
             else {
+                // This state has occurred in the history for our children
+                workspace.getRepetitions().increment(this.getZobrist());
+
                 continuationOnChildren(currentMaxDepth, overallMaxDepth);
+
+                // This state has not occurred in the history for not-our-children
+                workspace.getRepetitions().decrement(this.getZobrist());
+
                 return mValue;
             }
         }
@@ -322,6 +329,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // Replace small child
             minifyState();
         } else {
+            short savedValue = this.mValue;
+
+            if (extension && mDepth < overallMaxDepth && savedValue == Evaluator.NO_VALUE)
+                throw new IllegalStateException("Extension search on unvalued node! Depth " + mDepth + "/" + mCurrentMaxDepth + "/" + overallMaxDepth);
+
             this.mValue = Evaluator.NO_VALUE;
 
             // This state has occurred in the history for our children
@@ -329,6 +341,21 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             // Explore our children
             exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
+
+            if(extension) {
+                // If we failed to finish an extension search, we can't trust the result of this
+                // search, and should return the saved value if we have one, or an evaluation
+                // if we've searched a productive amount deeper.
+                if(workspace.mNoTime) {
+                    if(savedValue == Evaluator.NO_VALUE && mDepth > overallMaxDepth) {
+                        savedValue = evaluate();
+                    }
+
+                    if(savedValue != Evaluator.NO_VALUE) {
+                        mValue = savedValue;
+                    }
+                }
+            }
 
             if(mValue == Evaluator.NO_VALUE) {
                 throw new IllegalStateException("Unvalued state after search");
