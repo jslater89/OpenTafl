@@ -600,7 +600,7 @@ public class AiWorkspace extends Game {
                         List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
                         GameTreeNode n = nodes.get(nodes.size() - 1);
                         if (n.getVictory() == GameState.GOOD_MOVE) {
-                            n.explore(currentHorizonDepth, n.getDepth(), n.getAlpha(), n.getBeta(), mThreadPool, false);
+                            n.explore(currentHorizonDepth, continuationDepth, n.getAlpha(), n.getBeta(), mThreadPool, false);
                             certainVictory = false;
                             n.revalueParent(n.getDepth());
                         }

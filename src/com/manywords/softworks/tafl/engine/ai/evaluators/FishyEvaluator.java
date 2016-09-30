@@ -186,8 +186,6 @@ public class FishyEvaluator implements Evaluator {
     }
 
     public short evaluate(GameState state, int maxDepth, int depth) {
-        mAssignedKingRisk = mAssignedKingFreedom = mAssignedRankAndFile = mAssignedMaterial = 0;
-
         short value = 0;
         debugString = "";
 
