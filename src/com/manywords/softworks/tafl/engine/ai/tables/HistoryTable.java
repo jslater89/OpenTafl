@@ -8,30 +8,38 @@ import com.manywords.softworks.tafl.rules.Coord;
  */
 public class HistoryTable {
     // Indexed by: side to move (0 or 1), from-square (0-coord-index), to-square.
-    private final int[][][] mTable;
+    private final int[][][] mCutoffTable;
+    private final int[][][] mOccurrenceTable;
     private final int mDimension;
 
     private static final int ATTACKER_INDEX = 0;
     private static final int DEFENDER_INDEX = 1;
 
     public HistoryTable(int dimension) {
-        mTable = new int[2][dimension * dimension][dimension * dimension];
+        mCutoffTable = new int[2][dimension * dimension][dimension * dimension];
+        mOccurrenceTable = new int[2][dimension * dimension][dimension * dimension];
         mDimension = dimension;
     }
 
-    public void putMove(boolean isAttackingSide, int remainingDepth, MoveRecord move) {
+    public void putMove(boolean isAttackingSide, int remainingDepth, MoveRecord move, boolean cutoff) {
         int sideIndex = (isAttackingSide ? ATTACKER_INDEX : DEFENDER_INDEX);
         int firstMoveIndex = Coord.getIndex(mDimension, move.start);
         int secondMoveIndex = Coord.getIndex(mDimension, move.end);
-        mTable[sideIndex][firstMoveIndex][secondMoveIndex] += (remainingDepth * remainingDepth);
+        mOccurrenceTable[sideIndex][firstMoveIndex][secondMoveIndex] += 1;
+
+        if(cutoff)
+            mCutoffTable[sideIndex][firstMoveIndex][secondMoveIndex] += remainingDepth * remainingDepth;
     }
 
-    public int getRating(boolean isAttackingSide, MoveRecord move) {
+    public float getRating(boolean isAttackingSide, MoveRecord move) {
         int sideIndex = (isAttackingSide ? ATTACKER_INDEX : DEFENDER_INDEX);
         int firstMoveIndex = Coord.getIndex(mDimension, move.start);
         int secondMoveIndex = Coord.getIndex(mDimension, move.end);
 
-        return mTable[sideIndex][firstMoveIndex][secondMoveIndex];
+        int occurrences = mOccurrenceTable[sideIndex][firstMoveIndex][secondMoveIndex];
+        if(occurrences == 0) return 0;
+        else
+            return mCutoffTable[sideIndex][firstMoveIndex][secondMoveIndex] / occurrences;
     }
 
     public int getDimension() {

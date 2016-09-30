@@ -439,12 +439,17 @@ public class GameTreeState extends GameState implements GameTreeNode {
                     AiWorkspace.killerMoveTable.putMove(mDepth, move);
 
                     if(workspace.isHistoryTableAllowed()) {
-                        AiWorkspace.historyTable.putMove(getCurrentSide().isAttackingSide(), currentMaxDepth - mDepth, move);
+                        AiWorkspace.historyTable.putMove(getCurrentSide().isAttackingSide(), currentMaxDepth - mDepth, move, true);
                     }
 
                     if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
                     if(DEBUG) System.out.println("Cutoff at depth " + mDepth + " with value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
                     break;
+                }
+                else {
+                    if(workspace.isHistoryTableAllowed()) {
+                        AiWorkspace.historyTable.putMove(getCurrentSide().isAttackingSide(), currentMaxDepth - mDepth, move, false);
+                    }
                 }
             }
         }
@@ -680,7 +685,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             for(MoveRecord m : successorMoves) {
                 if(AiWorkspace.killerMoveTable.rateMove(mDepth, m) > 0) killerMoves.add(m);
                 else if(workspace.isHistoryTableAllowed()) {
-                    int rating = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), m);
+                    float rating = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), m);
                     if(rating > 0) {
                         historyMoves.add(m);
                     }
@@ -702,10 +707,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
             successorMoves.removeAll(transpositionMoves);
 
             historyMoves.sort((o1, o2) -> {
-                int o1HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o1);
-                int o2HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o2);
+                float o1HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o1);
+                float o2HistoryValue = AiWorkspace.historyTable.getRating(getCurrentSide().isAttackingSide(), o2);
 
-                return o2HistoryValue - o1HistoryValue;
+                if(o2HistoryValue > o1HistoryValue) return 1;
+                else if(o2HistoryValue < o1HistoryValue) return -1;
+                else return 0;
             });
 
             transpositionMoves.sort((o1, o2) -> {
