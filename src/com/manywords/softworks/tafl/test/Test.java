@@ -23,7 +23,7 @@ public class Test {
         // AI tests: up here while I'm doing AI stuff for ease of use
 //        // Tactics tests
         tests.add(new AISearchEquivalenceTest());
-//        tests.add(new AITacticsEscapeTest());
+        tests.add(new AITacticsEscapeTest());
 //
 //        // AI tests
 //        tests.add(new AIMatchingZobristTest());

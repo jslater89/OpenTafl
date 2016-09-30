@@ -308,7 +308,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
 
             minifyState();
-        } else if (mDepth != 0
+        }
+        else if (mDepth != 0
                 && (checkVictory() > HIGHEST_NONTERMINAL_RESULT
                 || mDepth >= currentMaxDepth
                 || (workspace.mNoTime)
@@ -328,7 +329,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             // Replace small child
             minifyState();
-        } else {
+        }
+        else {
             short savedValue = this.mValue;
 
             if (extension && mDepth < overallMaxDepth && savedValue == Evaluator.NO_VALUE)
