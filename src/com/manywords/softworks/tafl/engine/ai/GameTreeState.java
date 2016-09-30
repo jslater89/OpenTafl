@@ -22,13 +22,14 @@ public class GameTreeState extends GameState implements GameTreeNode {
     public static final int DEFENDER = -1;
     public static final int ATTACKER = 1;
 
-    public GameTreeNode mParent;
-    public final int mDepth;
-    public int mCurrentMaxDepth;
-    public short mAlpha;
-    public short mBeta;
-    public short mValue = Evaluator.NO_VALUE;
-    public List<GameTreeNode> mBranches = new ArrayList<GameTreeNode>();
+    private GameTreeNode mParent;
+    final int mDepth;
+    int mCurrentMaxDepth;
+    private short mAlpha;
+    private short mBeta;
+    private short mValue = Evaluator.NO_VALUE;
+    List<GameTreeNode> mBranches = new ArrayList<GameTreeNode>();
+    private GameTreeNode mInflatedFrom;
 
     private boolean mContinuation = false;
 
@@ -174,17 +175,9 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public void replaceChild(GameTreeNode oldNode, GameTreeNode newNode) {
-        int index = mBranches.indexOf(oldNode);
-        if(index != -1) {
-            mBranches.set(mBranches.indexOf(oldNode), newNode);
-        }
-        else if(mContinuation) {
-            mBranches.add(newNode);
-        }
-        else {
-            throw new IllegalStateException("Tried to replace a non-existent state!");
-        }
+        mBranches.set(mBranches.indexOf(oldNode), newNode);
     }
+
 
     public void setParent(GameTreeNode newParent) {
         mParent = newParent;
@@ -372,6 +365,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             desiredState = nextState;
         }
 
+        desiredState.mInflatedFrom = nodeToReplace;
         desiredState.mParent = nodeToReplace.getParentNode();
         desiredState.mAlpha = nodeToReplace.getAlpha();
         desiredState.mBeta = nodeToReplace.getBeta();
@@ -557,9 +551,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
             mValue = evaluate();
         }
-        
-        minifyState();
-/*
+
+        /*
         System.out.println("CONTINUATION");
         System.out.println("My depth: " + mDepth);
         System.out.println("My children: " + mBranches.size());
