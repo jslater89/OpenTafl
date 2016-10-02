@@ -20,8 +20,9 @@ public class MinimalGameTreeNode implements GameTreeNode {
     public final long mZobrist;
     public final int mVictory;
     public final int mGameLength;
+    public final boolean mValueFromTransposition;
 
-    public MinimalGameTreeNode(GameTreeNode root, int depth, int maxDepth, MoveRecord enteringMove, short alpha, short beta, short evaluation, List<GameTreeNode> branches, boolean currentSideAttackers, long zobrist, int victory, int gameLength) {
+    public MinimalGameTreeNode(GameTreeNode root, int depth, int maxDepth, MoveRecord enteringMove, short alpha, short beta, short evaluation, boolean valueFromTransposition, List<GameTreeNode> branches, boolean currentSideAttackers, long zobrist, int victory, int gameLength) {
         mParent = root;
         mDepth = depth;
         mEnteringMove = enteringMove;
@@ -32,6 +33,7 @@ public class MinimalGameTreeNode implements GameTreeNode {
         mBeta = beta;
         mVictory = victory;
         mGameLength = gameLength;
+        mValueFromTransposition = valueFromTransposition;
 
         // This is a leaf
         if (evaluation != Evaluator.NO_VALUE) {
@@ -76,11 +78,10 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     @Override
-    public short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation) {
+    public GameTreeNode explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation) {
         // First, we have to get a full game tree state for this node:
         GameTreeState thisState = GameTreeState.getStateForNode(getRootNode(), this);
-        thisState.explore(currentMaxDepth, overallMaxDepth, alpha, beta, threadPool, continuation);
-        return thisState.getValue();
+        return thisState.explore(currentMaxDepth, overallMaxDepth, alpha, beta, threadPool, continuation);
     }
 
     @Override
@@ -127,6 +128,11 @@ public class MinimalGameTreeNode implements GameTreeNode {
             if (state.getParentNode() == null) return (GameTreeState) state;
             else state = state.getParentNode();
         }
+    }
+
+    @Override
+    public boolean valueFromTransposition() {
+        return mValueFromTransposition;
     }
 
     @Override
