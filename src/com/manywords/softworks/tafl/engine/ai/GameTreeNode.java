@@ -21,7 +21,7 @@ public interface GameTreeNode {
 
     public abstract int getVictory();
 
-    public abstract short explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation);
+    public abstract GameTreeNode explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation);
 
     public abstract short evaluate();
 
@@ -36,6 +36,8 @@ public interface GameTreeNode {
     public abstract GameTreeNode getParentNode();
 
     public abstract GameTreeState getRootNode();
+
+    public abstract boolean valueFromTransposition();
 
     public abstract void replaceChild(GameTreeNode oldNode, GameTreeNode newNode);
 
