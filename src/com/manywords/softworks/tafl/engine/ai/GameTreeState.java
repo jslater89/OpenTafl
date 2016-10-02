@@ -176,6 +176,11 @@ public class GameTreeState extends GameState implements GameTreeNode {
     }
 
     public void replaceChild(GameTreeNode oldNode, GameTreeNode newNode) {
+        if(mBranches.indexOf(oldNode) == -1) {
+            System.out.println(oldNode);
+            System.out.println(newNode);
+            System.out.println(getBranches());
+        }
         mBranches.set(mBranches.indexOf(oldNode), newNode);
     }
 
@@ -368,7 +373,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 short preExtensionValue = mValue;
                 // In horizon search, since we aren't changing the tree until the very end, we don't need to do as
                 // much bookkeeping.
-                unvaluedChildren = continuationOnChildren(currentMaxDepth, overallMaxDepth);
+                unvaluedChildren = exploreChildren(currentMaxDepth, overallMaxDepth, false, true);
 
                 // If I'm the root node of the horizon search (i.e., I had a value beforehand), and I had unvalued
                 // children (i.e. my search did not complete), go back to the cached value. Otherwise, be unvalued, so
@@ -407,7 +412,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
         */
 
-        return minifyState();
+        GameTreeNode minified = minifyState();
+        return minified;
     }
 
     public static GameTreeState getStateForNode(GameTreeState rootNode, GameTreeNode nodeToReplace) {
@@ -478,15 +484,13 @@ public class GameTreeState extends GameState implements GameTreeNode {
             if(DEBUG) for(int i = 0; i < mDepth; i++) System.out.print("\t");
             if(DEBUG) System.out.println(mDepth + " exploring child " + node.getEnteringMoveSequence() + " with value/alpha/beta " + mValue + "/" + mAlpha + "/" + mBeta);
 
-
-
-            node.explore(currentMaxDepth, overallMaxDepth, mAlpha, mBeta, null, mContinuation);
-            GameTreeNode minified = node.explore(currentMaxDepth, overallMaxDepth, mAlpha, mBeta, null, mContinuation);
+            GameTreeNode minified = node.explore(currentMaxDepth, overallMaxDepth, mAlpha, mBeta, null, false);
             distanceToFirstCutoff++;
 
             short evaluation = node.getValue();
 
             // evaluation might be unvalued for unfinished continuations
+
             if(evaluation == Evaluator.INTENTIONALLY_UNVALUED) {
                 unvaluedChild = true;
                 mBranches.remove(minified);
@@ -705,7 +709,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
             MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mValueFromTransposition, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
             if (mParent != null) {
-                mParent.replaceChild(GameTreeState.this, minifiedNode);
+                mParent.replaceChild(this, minifiedNode);
             }
             for (GameTreeNode branch : mBranches) {
                 branch.setParent(minifiedNode);
