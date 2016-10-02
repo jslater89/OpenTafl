@@ -19,18 +19,15 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
-
-        // AI tests: up here while I'm doing AI stuff for ease of use
-//        // Tactics tests
-//        tests.add(new AISearchEquivalenceTest());
-//        tests.add(new AITacticsEscapeTest());
-//
-//        // AI tests
-//        tests.add(new AIMatchingZobristTest());
-//        tests.add(new AICertainKingEscapeTest());
-//        tests.add(new AICertainKingCaptureTest());
-//        tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
-//        tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
+        //AI tests
+        tests.add(new AIMatchingZobristTest());
+        tests.add(new AIMoveConsiderationCrashTest());
+        tests.add(new AIIncompleteContinuationTest());
+        tests.add(new AISearchEquivalenceTest());
+        tests.add(new AICertainKingEscapeTest());
+        tests.add(new AICertainKingCaptureTest());
+        tests.add(new AITwoCornerEscapeAndRulesLoadingTest());
+        tests.add(new AITwoEdgeEscapeAndRulesLoadingTest());
 
         // Mechanics tests
         tests.add(new RepetitionHashTableTest());
@@ -84,9 +81,10 @@ public class Test {
         tests.add(new LoadServerGameTest());
         tests.add(new HeadlessAITest()); // also tests client connection somewhat
 
-        // AI tests TODO: uncomment these at the end of this branch, remove the copies up top.
+        // AI tests
         tests.add(new AIMatchingZobristTest());
         tests.add(new AIMoveConsiderationCrashTest());
+        tests.add(new AIIncompleteContinuationTest());
         tests.add(new AISearchEquivalenceTest());
         tests.add(new AICertainKingEscapeTest());
         tests.add(new AICertainKingCaptureTest());
