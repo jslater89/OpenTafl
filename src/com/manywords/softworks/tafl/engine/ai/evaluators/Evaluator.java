@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.engine.GameState;
  */
 public interface Evaluator {
     public static final short NO_VALUE = -11541;
+    public static final short INTENTIONALLY_UNVALUED = -11542;
     public static final short ATTACKER_WIN = 5050;
     public static final short DEFENDER_WIN = -5050;
 

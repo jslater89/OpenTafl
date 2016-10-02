@@ -379,7 +379,7 @@ public class AiWorkspace extends Game {
             @Override
             public void run() {
                 synchronized (mTimeLock) {
-                    mHorizonTime = true;
+                    if(mUseHorizonSearch) mHorizonTime = true;
                 }
             }
         }, mThinkTime - mHorizonMillis);
@@ -489,11 +489,16 @@ public class AiWorkspace extends Game {
                 // We have to go through the whole tree again in continuation search, but since we've
                 // already searched most of it, we'll get some nodes out of the search if we have
                 // even a little time remaining.
-                if (timeRemaining < timeRequired || isTimeCritical() || mNoTime || mHorizonTime) {
+                if (isTimeCritical() || mNoTime || (mUseHorizonSearch && (timeRemaining < timeRequired || mHorizonTime))) {
                     OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY,
                             "Skipping continuation search to depth " + continuationDepth + ": " + timeRemaining + "msec left, " + timeRequired
                                     + " required, critical/no/horizon time: " + isTimeCritical() + " " + mNoTime + " " + mHorizonTime);
                     break;
+                }
+                else {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY,
+                            "Doing continuation search to depth " + continuationDepth + ": " + timeRemaining + "msec left, " + timeRequired
+                                    + " required, critical/no/horizon time: " + isTimeCritical() + " " + mNoTime + " " + mHorizonTime);
                 }
 
                 if (firstExtension) {
@@ -592,7 +597,7 @@ public class AiWorkspace extends Game {
                             continue;
                         }
 
-                        List<GameTreeNode> nodes = GameTreeState.getPathForChild(branch);
+                        List<GameTreeNode> nodes = GameTreeState.getPathStartingWithNode(branch);
                         GameTreeNode n = nodes.get(nodes.size() - 1);
                         if (n.getVictory() == GameState.GOOD_MOVE) {
                             n.explore(currentHorizonDepth, continuationDepth, n.getAlpha(), n.getBeta(), mThreadPool, false);
@@ -661,6 +666,17 @@ public class AiWorkspace extends Game {
             mUiCallback.statusText("Best move: " + bestMove.getRootMove() + " with path...");
 
             List<GameTreeNode> bestPath = getTreeRoot().getBestPath();
+
+            /* Saving this: handy for debugging issues with searches not getting to the bottom of trees
+            for(GameTreeNode child : getTreeRoot().getBranches()) {
+                List<GameTreeNode> pathForChild = GameTreeState.getPathStartingWithNode(child);
+                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "" +  child.getEnteringMove() + ": " + pathForChild.size());
+
+                String modifier = (pathForChild.get(pathForChild.size() - 1).valueFromTransposition() ? "T" : "");
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, modifier);
+            }
+            */
+
 
             for (GameTreeNode node : bestPath) {
                 mUiCallback.statusText("\t" + node.getEnteringMove());

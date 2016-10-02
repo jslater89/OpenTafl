@@ -304,7 +304,7 @@ public class ExternalEngineClient implements UiCallback {
 
         for(GameTreeNode node : bestNodes) {
             String moveList = " ";
-            for(GameTreeNode pathNode : GameTreeState.getPathForChild(node)) {
+            for(GameTreeNode pathNode : GameTreeState.getPathStartingWithNode(node)) {
                 moveList += "|" + pathNode.getEnteringMove();
             }
             moveList = moveList.replaceFirst("\\|", "");
