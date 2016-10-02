@@ -269,6 +269,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 11. VERSION HISTORY -----------------------------------------------------------
+v0.4.4.6b (released 10/02/16):
+- Fix some AI bugs relating to incomplete extension searches which could lead
+  to dumb moves
+
+
 v0.4.4.5b (released 09/28/16):
 - Fix a number of bugs with replays and puzzles
 - Add two new puzzles, remove one cooked puzzle
