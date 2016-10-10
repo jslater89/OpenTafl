@@ -10,6 +10,14 @@ being defined.
 
 1. Positional Records
 
+Position records record the arrangement of pieces as part of a board state. Position
+records always start at the 'a' file on the first rank, no matter how the board is
+displayed. If a given board shows a1 at the bottom left, the position record for that
+board will appear upside-down: the first row record in the position record will be for
+the first rank, even though the first rank is displayed on the bottom of the board.
+Similarly, if a board shows a1 at the top right, the position record will appear flipped
+horizontally.
+
 	<"/"><<row-record><"/">>...
 
 	row-record: [empty-space-count][taflman-symbol]
