@@ -148,7 +148,7 @@ public class OpenTafl {
                 preferredFonts[6] = new Font("Unifont", Font.PLAIN, TerminalSettings.fontSize);
 
                 preferredFonts = AWTTerminalFontConfiguration.filterMonospaced(preferredFonts);
-                if(preferredFonts.length == 0) throw new IllegalStateException("No monospaced fonts available");
+                if(preferredFonts.length == 0) throw new IllegalStateException("No monospaced fonts available. Try running OpenTafl with the --fallback option to use text-only mode.");
 
                 SwingTerminalFontConfiguration font = SwingTerminalFontConfiguration.newInstance(preferredFonts);
 
