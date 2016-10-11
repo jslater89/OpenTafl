@@ -502,40 +502,23 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                 return;
             }
-            else if(command.startsWith("dumpeval")) {
-                ExternalEnginePlayer analysisPlayer = mCommandEngine.getAnalysisPlayer();
-                if(analysisPlayer != null) {
-                    String[] parts = command.split(" ");
-                    int child = 0;
-                    if(parts.length == 2) {
-                        try {
-                            child = Integer.parseInt(parts[1]);
-                        }
-                        catch(Exception e) {
+            else if(command.startsWith("dumplasteval")) {
+                Player lastPlayer = (mCommandEngine.getCurrentPlayer().isAttackingSide() ? mCommandEngine.getDefendingPlayer() : mCommandEngine.getAttackingPlayer());
+                if(lastPlayer instanceof ExternalEnginePlayer) {
+                    ExternalEnginePlayer lastExternalPlayer = (ExternalEnginePlayer) lastPlayer;
 
-                        }
-                    }
-
-                    if(child < 0) {
-                        FishyEvaluator fe = new FishyEvaluator();
-                        fe.debug = true;
-
-                        if(mCommandEngine.getReplay() != null) {
-                            fe.evaluate(mCommandEngine.getReplay().getCurrentState(), 0, 0);
-                        }
-                        else {
-                            fe.evaluate(mCommandEngine.getGame().getCurrentState(), 0, 0);
-                        }
-
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, fe.debugString);
-                    }
-                    else {
-                        mCommandEngine.getAnalysisPlayer().getExternalEngineHost().dumpEvaluation(child);
-                    }
+                    lastExternalPlayer.getExternalEngineHost().dumpEvaluation(0);
                 }
                 else {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "No AI workspace");
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Last player not external engine");
                 }
+                return;
+            }
+            else if(command.startsWith("dumpcureval")) {
+                FishyEvaluator.debug = true;
+                AiWorkspace.evaluator.evaluate(mGame.getCurrentState(), 0, 0);
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, FishyEvaluator.debugString);
+                FishyEvaluator.debug = false;
                 return;
             }
 

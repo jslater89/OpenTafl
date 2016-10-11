@@ -1,12 +1,14 @@
 package com.manywords.softworks.tafl.command;
 
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.command.player.ExternalEnginePlayer;
+import com.manywords.softworks.tafl.command.player.Player;
+import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineHost;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
-import com.manywords.softworks.tafl.engine.replay.Variation;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Side;
@@ -14,9 +16,6 @@ import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.HumanReadableRulesPrinter;
 import com.manywords.softworks.tafl.ui.UiCallback;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.command.player.ExternalEnginePlayer;
-import com.manywords.softworks.tafl.command.player.Player;
-import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineHost;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -680,4 +679,6 @@ public class CommandEngine {
     public ExternalEnginePlayer getAnalysisPlayer() {
         return mDummyAnalysisPlayer;
     }
+    public Player getAttackingPlayer() { return mAttacker; }
+    public Player getDefendingPlayer() { return mDefender; }
 }
