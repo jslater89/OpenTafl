@@ -516,6 +516,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
             else if(command.startsWith("dumpcureval")) {
                 FishyEvaluator.debug = true;
+                AiWorkspace.evaluator.initialize(mGame.getRules());
                 AiWorkspace.evaluator.evaluate(mGame.getCurrentState(), 0, 0);
                 OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, FishyEvaluator.debugString);
                 FishyEvaluator.debug = false;
