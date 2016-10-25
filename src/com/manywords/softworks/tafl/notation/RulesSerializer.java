@@ -21,7 +21,6 @@ Copyright 2015 Jay Slater
 package com.manywords.softworks.tafl.notation;
 
 import com.manywords.softworks.tafl.rules.*;
-import com.sun.istack.internal.NotNull;
 
 import java.util.*;
 
@@ -249,7 +248,6 @@ public class RulesSerializer {
         return otnrString;
     }
 
-    @NotNull
     public static Rules loadRulesRecord(String otnrString) throws NotationParseException {
         List<List<Side.TaflmanHolder>> startingTaflmen;
 
