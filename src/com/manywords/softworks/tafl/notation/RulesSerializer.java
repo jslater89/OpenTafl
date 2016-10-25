@@ -21,6 +21,7 @@ Copyright 2015 Jay Slater
 package com.manywords.softworks.tafl.notation;
 
 import com.manywords.softworks.tafl.rules.*;
+import com.sun.istack.internal.NotNull;
 
 import java.util.*;
 
@@ -248,12 +249,13 @@ public class RulesSerializer {
         return otnrString;
     }
 
-    public static Rules loadRulesRecord(String otnrString) {
+    @NotNull
+    public static Rules loadRulesRecord(String otnrString) throws NotationParseException {
         List<List<Side.TaflmanHolder>> startingTaflmen;
 
         Map<String, String> config = getRulesMap(otnrString);
         if(config.get("dim") == null || config.get("start") == null) {
-            return null;
+            throw new NotationParseException(-1, "", "Missing dim/start");
         }
 
         config.putIfAbsent("name", "Unknown Tafl");

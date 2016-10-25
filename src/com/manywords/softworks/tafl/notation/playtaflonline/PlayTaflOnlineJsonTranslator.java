@@ -4,14 +4,15 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
+
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -121,7 +122,16 @@ public class PlayTaflOnlineJsonTranslator {
         // Load rules, create game, set up some default tag values
         String otnrString = openTaflRules + openTaflLayout;
         OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Generated rules from JSON: " + otnrString);
-        Rules r = RulesSerializer.loadRulesRecord(otnrString);
+
+        Rules r = null;
+        try {
+            r = RulesSerializer.loadRulesRecord(otnrString);
+        }
+        catch(NotationParseException e) {
+            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to load rules string: " + e.toString());
+            return null;
+        }
+
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Generated rules re-serialized: " + RulesSerializer.getRulesRecord(r));
         Game g = new Game(r, null);
 

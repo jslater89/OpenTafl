@@ -6,6 +6,7 @@ import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.command.player.ExternalEnginePlayer;
@@ -279,9 +280,14 @@ public class ExternalEngineHost {
 
     public void handleMoveCommand(String command) {
         command = command.replace("move ", "");
-        MoveRecord move = MoveSerializer.loadMoveRecord(mGame.getRules().boardSize, command);
 
-        mPlayer.onMoveDecided(move);
+        try {
+            MoveRecord move = MoveSerializer.loadMoveRecord(mGame.getRules().boardSize, command);
+            mPlayer.onMoveDecided(move);
+        }
+        catch(NotationParseException e) {
+            throw new IllegalStateException(e.toString());
+        }
     }
 
     public void handleStatusCommand(String command) {
@@ -311,8 +317,13 @@ public class ExternalEngineHost {
                 List<MoveRecord> moves = new ArrayList<>(moveArray.length);
 
                 for(String move : moveArray) {
-                    MoveRecord record = MoveSerializer.loadMoveRecord(mGame.getRules().boardSize, move);
-                    moves.add(record);
+                    try {
+                        MoveRecord record = MoveSerializer.loadMoveRecord(mGame.getRules().boardSize, move);
+                        moves.add(record);
+                    }
+                    catch(NotationParseException e) {
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to parse analysis move record: " + e.toString());
+                    }
                 }
 
                 mPlayer.statusText(moves.get(0).toString() + ": " + f.format(analysis));

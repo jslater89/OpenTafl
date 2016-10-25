@@ -3,6 +3,7 @@ package com.manywords.softworks.tafl.network.packet.ingame;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 
 /**
  * Created by jay on 5/26/16.
@@ -13,7 +14,13 @@ public class MovePacket extends NetworkPacket {
 
     public static MovePacket parse(int dimension, String data) {
         data = data.replaceFirst(PREFIX, "").trim();
-        MoveRecord m = MoveSerializer.loadMoveRecord(dimension, data);
+        MoveRecord m = null;
+        try {
+            m = MoveSerializer.loadMoveRecord(dimension, data);
+        }
+        catch(NotationParseException e) {
+            throw new IllegalStateException(e.toString());
+        }
         return new MovePacket(m);
     }
 

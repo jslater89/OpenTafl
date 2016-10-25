@@ -8,9 +8,9 @@ import com.manywords.softworks.tafl.engine.replay.MoveAddress;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
 import com.manywords.softworks.tafl.notation.GameSerializer;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.test.TaflTest;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.io.File;
 
@@ -23,7 +23,14 @@ public class ReplayGameTest extends TaflTest {
         File f = new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg");
         assert f.exists();
 
-        GameSerializer.GameContainer container = GameSerializer.loadGameRecordFile(f);
+        GameSerializer.GameContainer container = null;
+        try {
+            container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
+
         assert container != null;
         assert container.game != null;
         assert container.moves != null;
@@ -48,7 +55,12 @@ public class ReplayGameTest extends TaflTest {
         assert replayState.getEnteringMove().isDetailed();
         assert !((DetailedMoveRecord) replayState.getEnteringMove()).getComment().isEmpty();
 
-        container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
+        try {
+            container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
         rg = new ReplayGame(container.game, container.moves, container.variations);
 
         MoveAddress lastMoveAddress = null;
@@ -373,7 +385,13 @@ public class ReplayGameTest extends TaflTest {
         assert gameRecord.contains("1a.3.6a");
 
         // And see if the game loads them right.
-        rg = getReplay(GameSerializer.loadGameRecord(gameRecord));
+        try {
+            container = GameSerializer.loadGameRecord(gameRecord);
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
+        rg = getReplay(container);
         assert rg.getStateByAddress("1a.1.1a.1.1b") != null;
         assert rg.getStateByAddress("1a.2.1a") != null;
         assert rg.getStateByAddress("1a.3.6a") != null;

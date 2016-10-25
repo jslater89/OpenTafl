@@ -3,12 +3,11 @@ package com.manywords.softworks.tafl.test.mechanics;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
-import com.manywords.softworks.tafl.rules.Taflman;
-import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
 import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.RawTerminal;
@@ -39,7 +38,13 @@ public class KingMissingPositionRecordTest extends TaflTest {
 
         assert PositionSerializer.getPositionRecord(state.getBoard()).contains("K");
 
-        rules = RulesSerializer.loadRulesRecord("dim:11 name:Fetlar atkf:y nj:n cj:n start:/4tttt3/5t5/3t7/t4T4t/t3TTT3t/tt1TTKTT1tt/t1T3T3t/t4T4t/4Tt5/11/3ttttt3/");
+        try {
+            rules = RulesSerializer.loadRulesRecord("dim:11 name:Fetlar atkf:y nj:n cj:n start:/4tttt3/5t5/3t7/t4T4t/t3TTT3t/tt1TTKTT1tt/t1T3T3t/t4T4t/4Tt5/11/3ttttt3/");
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
+
         game = new Game(rules, null);
         state = game.getCurrentState();
         state.setCurrentSide(state.getDefenders());

@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -17,7 +18,13 @@ public class AIMoveConsiderationCrashTest extends TaflTest {
     public void run() {
         AiWorkspace.resetTranspositionTable();
 
-        Rules rules = RulesSerializer.loadRulesRecord("dim:5 name:Copenhagen atkf:n tfr:w cor:a1, cen: sw:s efe:y start:/1tTTt/tKt2/t2T1/5/1T3/");
+        Rules rules = null;
+        try {
+            rules = RulesSerializer.loadRulesRecord("dim:5 name:Copenhagen atkf:n tfr:w cor:a1, cen: sw:s efe:y start:/1tTTt/tKt2/t2T1/5/1T3/");
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
         state.makeMove(new MoveRecord(Coord.get(3, 2), Coord.get(2, 2)));
