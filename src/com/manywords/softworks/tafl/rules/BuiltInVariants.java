@@ -1,6 +1,7 @@
 package com.manywords.softworks.tafl.rules;
 
 import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
@@ -79,12 +80,17 @@ public class BuiltInVariants {
 
             String line = "";
             while((line = r.readLine()) != null) {
-                Rules rules = RulesSerializer.loadRulesRecord(line);
-                if(rules == null) continue;
+                try {
+                    Rules rules = RulesSerializer.loadRulesRecord(line);
+                    if (rules == null) continue;
 
-                String description = rulesDescriptions.size() + 1 + ". " + rules.getName() + " " + rules.boardSize + "x" + rules.boardSize;
-                availableRules.add(rules);
-                rulesDescriptions.add(description);
+                    String description = rulesDescriptions.size() + 1 + ". " + rules.getName() + " " + rules.boardSize + "x" + rules.boardSize;
+                    availableRules.add(rules);
+                    rulesDescriptions.add(description);
+                }
+                catch(NotationParseException e) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to load rules: " + e);
+                }
             }
         } catch (FileNotFoundException e) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Couldn't read file: not found");

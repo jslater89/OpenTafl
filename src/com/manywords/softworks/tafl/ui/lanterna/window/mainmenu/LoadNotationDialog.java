@@ -5,10 +5,10 @@ import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
-import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
@@ -20,6 +20,7 @@ import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
  */
 public class LoadNotationDialog extends DialogWindow {
     private boolean mSuccess = true;
+    private NotationParseException mFailReason = null;
 
     public LoadNotationDialog(LogicalScreen.TerminalCallback terminalCallback, GameScreen gameScreen) {
         super("Load notation");
@@ -52,27 +53,25 @@ public class LoadNotationDialog extends DialogWindow {
         });
 
         Button loadButton = new Button("Load", () -> {
+            Rules r = null;
             try {
-                Rules r = RulesSerializer.loadRulesRecord(box.getText());
-                if(r == null) {
-                    mSuccess = false;
-                    close();
-                    return;
-                }
-                Game g = new Game(r, gameScreen);
-                ReplayGame rg = ReplayGame.copyGameToReplay(g);
-
-                if(gameScreen != null) {
-                    terminalCallback.onEnteringGameScreen(g, r.getName());
-                }
-                else {
-                    TerminalUtils.startSavedGame(rg, getTextGUI(), terminalCallback);
-                }
+                r = RulesSerializer.loadRulesRecord(box.getText());
             }
-            catch(Exception e) {
+            catch(NotationParseException e) {
                 mSuccess = false;
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Encountered exception loading notation");
-                OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+                mFailReason = e;
+                close();
+                return;
+            }
+
+            Game g = new Game(r, gameScreen);
+            ReplayGame rg = ReplayGame.copyGameToReplay(g);
+
+            if(gameScreen != null) {
+                terminalCallback.onEnteringGameScreen(g, r.getName());
+            }
+            else {
+                TerminalUtils.startSavedGame(rg, getTextGUI(), terminalCallback);
             }
 
             close();
@@ -92,7 +91,8 @@ public class LoadNotationDialog extends DialogWindow {
     public boolean showLoadNotationDialog(WindowBasedTextGUI textGUI) {
         super.showDialog(textGUI);
         if(!mSuccess) {
-            MessageDialog.showMessageDialog(textGUI, "Failed to load notation", "Unable to read notation string.");
+            MessageDialog.showMessageDialog(textGUI, "Failed to load notation", "Unable to read notation string.\n" +
+                    mFailReason.toString());
         }
         return mSuccess;
     }

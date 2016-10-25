@@ -7,7 +7,9 @@ import com.manywords.softworks.tafl.network.server.GameRole;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.network.server.ServerClient;
 import com.manywords.softworks.tafl.network.server.thread.PriorityTaskQueue;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
+import com.manywords.softworks.tafl.rules.Rules;
 
 /**
  * Created by jay on 5/26/16.
@@ -26,11 +28,20 @@ public class CreateGameTask implements Runnable {
     @Override
     public void run() {
         boolean result;
+        Rules rules = null;
+        try {
+            rules = RulesSerializer.loadRulesRecord(mPacket.otnRulesString);
+        }
+        catch(NotationParseException e) {
+            mServer.sendPacketToClient(mClient, new ErrorPacket(ErrorPacket.BAD_SAVE), PriorityTaskQueue.Priority.LOW);
+            return;
+
+        }
         if(mPacket.timeSpec.isEnabled()) {
-            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide, mPacket.combineChat, mPacket.allowReplay, mPacket.timeSpec);
+            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, rules, mPacket.attackingSide, mPacket.combineChat, mPacket.allowReplay, mPacket.timeSpec);
         }
         else {
-            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, RulesSerializer.loadRulesRecord(mPacket.otnRulesString), mPacket.attackingSide, mPacket.combineChat, mPacket.allowReplay);
+            result = mServer.createGame(mClient, mPacket.uuid, mPacket.passwordHash, rules, mPacket.attackingSide, mPacket.combineChat, mPacket.allowReplay);
         }
 
         if(result) {

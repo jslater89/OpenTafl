@@ -1,10 +1,9 @@
 package com.manywords.softworks.tafl.network.packet.pregame;
 
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
-import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 
@@ -22,9 +21,12 @@ public class StartGamePacket extends NetworkPacket {
 
     public static StartGamePacket parse(String data) {
         String rulesOnly = data.replaceFirst("history.*", "");
-        Rules r = RulesSerializer.loadRulesRecord(rulesOnly.replaceFirst("start-game", "").trim());
 
-        if(r == null) {
+        Rules r = null;
+        try {
+            r = RulesSerializer.loadRulesRecord(rulesOnly.replaceFirst("start-game", "").trim());
+        }
+        catch(NotationParseException e) {
             throw new IllegalArgumentException("Start game packet rules tag failed to parse");
         }
 

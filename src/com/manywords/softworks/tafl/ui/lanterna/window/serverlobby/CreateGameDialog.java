@@ -4,14 +4,13 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialog;
-import com.googlecode.lanterna.terminal.Terminal;
-import com.manywords.softworks.tafl.OpenTafl;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
-import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
-import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.notation.GameSerializer;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
@@ -23,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import static com.manywords.softworks.tafl.OpenTafl.LogLevel.CHATTY;
 
 /**
  * Created by jay on 5/23/16.
@@ -79,7 +76,20 @@ public class CreateGameDialog extends DialogWindow {
                 return;
             }
 
-            GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
+            GameSerializer.GameContainer g = null;
+            try {
+                 g = GameSerializer.loadGameRecordFile(gameFile);
+            }
+            catch(NotationParseException e) {
+                MessageDialogBuilder builder = new MessageDialogBuilder();
+                builder.setTitle("Failed to load game record");
+                builder.setText("Game record parsing failed at index: " + e.index + "\n" +
+                        "With context: " + e.context);
+                builder.addButton(MessageDialogButton.OK);
+                builder.build().showDialog(getTextGUI());
+                return;
+            }
+
             rules = g.game.getRules();
             history = new ArrayList<>(g.moves);
 

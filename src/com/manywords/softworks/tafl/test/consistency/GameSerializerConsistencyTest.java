@@ -6,15 +6,13 @@ import com.manywords.softworks.tafl.engine.XorshiftRandom;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.engine.replay.ReplayGameState;
 import com.manywords.softworks.tafl.notation.GameSerializer;
-import com.manywords.softworks.tafl.notation.RulesSerializer;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.test.TaflTest;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -49,7 +47,7 @@ public class GameSerializerConsistencyTest extends TaflTest {
         //RawTerminal.renderGameState(g.getCurrentState());
         //System.out.println(record1);
 
-        g = makeMoves(GameSerializer.loadGameRecord(record1));
+        try { g = makeMoves(GameSerializer.loadGameRecord(record1)); } catch(NotationParseException e) { assert false; }
         String record2 = GameSerializer.getGameRecord(g, true);
         //RawTerminal.renderGameState(g.getCurrentState());
         //System.out.println(record2);
@@ -57,7 +55,7 @@ public class GameSerializerConsistencyTest extends TaflTest {
         assert record1.equals(record2);
 
         record1 = GameSerializer.getGameRecord(g, false);
-        g = makeMoves(GameSerializer.loadGameRecord(record1));
+        try { g = makeMoves(GameSerializer.loadGameRecord(record1)); } catch(NotationParseException e) { assert false; }
         record2 = GameSerializer.getGameRecord(g, false);
 
         //System.out.println(rules1);
@@ -111,7 +109,7 @@ public class GameSerializerConsistencyTest extends TaflTest {
 
         record1 = GameSerializer.getReplayGameRecord(rg, true);
 
-        rg = getReplay(GameSerializer.loadGameRecord(record1));
+        try { rg = getReplay(GameSerializer.loadGameRecord(record1)); } catch(NotationParseException e) { assert false; }
 
         record2 = GameSerializer.getReplayGameRecord(rg, true);
 

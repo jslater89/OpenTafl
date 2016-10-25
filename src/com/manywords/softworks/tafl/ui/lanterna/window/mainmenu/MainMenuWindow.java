@@ -8,6 +8,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.notation.GameSerializer;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.ServerLobbyScreen;
@@ -55,7 +56,19 @@ public class MainMenuWindow extends BasicWindow {
                 return;
             }
 
-            GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
+            GameSerializer.GameContainer g = null;
+            try {
+                g = GameSerializer.loadGameRecordFile(gameFile);
+            }
+            catch(NotationParseException e) {
+                MessageDialogBuilder builder = new MessageDialogBuilder();
+                builder.setTitle("Failed to load game record");
+                builder.setText("Game record parsing failed at index: " + e.index + "\n" +
+                        "With context: " + e.context);
+                builder.addButton(MessageDialogButton.OK);
+                builder.build().showDialog(getTextGUI());
+                return;
+            }
             ReplayGame rg = new ReplayGame(g.game, g.moves, g.variations);
             TerminalUtils.startSavedGame(rg, getTextGUI(), mTerminalCallback);
 
@@ -68,7 +81,20 @@ public class MainMenuWindow extends BasicWindow {
                 return;
             }
 
-            GameSerializer.GameContainer g = GameSerializer.loadGameRecordFile(gameFile);
+            GameSerializer.GameContainer g = null;
+            try {
+                g = GameSerializer.loadGameRecordFile(gameFile);
+            }
+            catch(NotationParseException e) {
+                MessageDialogBuilder builder = new MessageDialogBuilder();
+                builder.setTitle("Failed to load game record");
+                builder.setText("Game record parsing failed at index: " + e.index + "\n" +
+                        "With context: " + e.context);
+                builder.addButton(MessageDialogButton.OK);
+                builder.build().showDialog(getTextGUI());
+                return;
+            }
+
             ReplayGame rg = new ReplayGame(g.game, g.moves, g.variations);
 
             if(rg.getMode().isPuzzleMode()) {

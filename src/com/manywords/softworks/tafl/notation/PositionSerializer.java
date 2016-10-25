@@ -62,11 +62,11 @@ public class PositionSerializer {
         return otnString;
     }
 
-    public static char[][] loadPositionRecord(String otnPosition) {
+    public static char[][] loadPositionRecord(String otnPosition) throws NotationParseException {
         String[] rawRows = otnPosition.split("/");
         List<String> rows = new ArrayList<String>();
-        for(String row : rawRows) {
-            if(row.length() > 0) rows.add(row);
+        for (String row : rawRows) {
+            if (row.length() > 0) rows.add(row);
         }
 
         char[][] board = new char[rows.size()][rows.size()];
@@ -75,55 +75,59 @@ public class PositionSerializer {
         int currentDefenderId = 0;
 
         int currentRow = 0;
-        for(String row : rows) {
-            boolean inNumber = false;
-            String numberSoFar = "";
+        for (String row : rows) {
+            try {
+                boolean inNumber = false;
+                String numberSoFar = "";
 
-            int currentCol = 0;
-            for(int i = 0; i < row.length(); i++) {
-                char c = row.charAt(i);
+                int currentCol = 0;
+                for (int i = 0; i < row.length(); i++) {
+                    char c = row.charAt(i);
 
-                // Catch multi-number digits
-                if(Character.isDigit(c)) {
-                    inNumber = true;
-                    numberSoFar += c;
-                    continue;
+                    // Catch multi-number digits
+                    if (Character.isDigit(c)) {
+                        inNumber = true;
+                        numberSoFar += c;
+                        continue;
+                    }
+                    else if (inNumber && !Character.isDigit(c)) {
+                        currentCol += Integer.parseInt(numberSoFar);
+                        numberSoFar = "";
+                        inNumber = false;
+                    }
+
+                    char side = 0;
+                    char id = 0;
+                    char type = 0;
+
+                    if (Character.isUpperCase(c)) {
+                        side = Taflman.SIDE_DEFENDERS;
+                        id = (char) currentDefenderId++;
+                    }
+                    else {
+                        side = Taflman.SIDE_ATTACKERS;
+                        id = (char) currentAttackerId++;
+                    }
+
+                    type = TaflmanCodes.getTaflmanTypeForCode(c);
+
+                    char taflman = Taflman.encode(id, type, side);
+                    Coord coord = Coord.get(currentCol, currentRow);
+
+                    board[coord.y][coord.x] = taflman;
+                    currentCol++;
                 }
-                else if(inNumber && !Character.isDigit(c)) {
-                    currentCol += Integer.parseInt(numberSoFar);
-                    numberSoFar = "";
-                    inNumber = false;
-                }
 
-                char side = 0;
-                char id = 0;
-                char type = 0;
-
-                if(Character.isUpperCase(c)) {
-                    side = Taflman.SIDE_DEFENDERS;
-                    id = (char) currentDefenderId++;
-                }
-                else {
-                    side = Taflman.SIDE_ATTACKERS;
-                    id = (char) currentAttackerId++;
-                }
-
-                type = TaflmanCodes.getTaflmanTypeForCode(c);
-
-                char taflman = Taflman.encode(id, type, side);
-                Coord coord = Coord.get(currentCol, currentRow);
-
-                board[coord.y][coord.x] = taflman;
-                currentCol++;
+                currentRow++;
             }
-
-            currentRow++;
+            catch(Exception e) {
+                throw new NotationParseException(currentRow, row, "Failed to parse row: " + e.toString());
+            }
         }
-
         return board;
     }
 
-    public static GameState loadPositionRecord(Rules rules, String otnPosition, Game g) {
+    public static GameState loadPositionRecord(Rules rules, String otnPosition, Game g) throws NotationParseException {
         //char[][] board = loadPositionRecord(otnPosition);
         Board b = new GenericBoard(rules);
         List<List<Side.TaflmanHolder>> positionTaflmen = parseTaflmenFromPosition(otnPosition);
@@ -134,7 +138,7 @@ public class PositionSerializer {
         return new GameState(g, g.getRules(), b, attackers, defenders);
     }
 
-    public static List<List<Side.TaflmanHolder>> parseTaflmenFromPosition(String startPosition) {
+    public static List<List<Side.TaflmanHolder>> parseTaflmenFromPosition(String startPosition) throws NotationParseException {
         List<Side.TaflmanHolder> attackers = new ArrayList<Side.TaflmanHolder>();
         List<Side.TaflmanHolder> defenders = new ArrayList<Side.TaflmanHolder>();
         List<List<Side.TaflmanHolder>> taflmen = new ArrayList<>();

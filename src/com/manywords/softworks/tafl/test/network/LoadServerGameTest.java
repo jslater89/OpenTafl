@@ -2,7 +2,6 @@ package com.manywords.softworks.tafl.test.network;
 
 
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
-import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
@@ -10,6 +9,7 @@ import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
 import com.manywords.softworks.tafl.notation.GameSerializer;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 
@@ -24,7 +24,14 @@ import java.util.UUID;
 public class LoadServerGameTest extends ServerTest {
     @Override
     public void run() {
-        GameSerializer.GameContainer container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
+        GameSerializer.GameContainer container = null;
+        try {
+            container = GameSerializer.loadGameRecordFile(new File("saved-games/replays/Fish-Nasa-2015-Fetlar.otg"));
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
+
         List<DetailedMoveRecord> moves = new ArrayList<>(10);
         long startZobrist = container.game.getCurrentState().mZobristHash;
         assert startZobrist != 0;

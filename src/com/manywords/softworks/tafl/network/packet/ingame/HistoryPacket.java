@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +38,17 @@ public class HistoryPacket extends NetworkPacket {
         for(String record : records) {
             recordParts = record.split(" ");
 
-            DetailedMoveRecord move = MoveSerializer.loadMoveRecord(dimension, recordParts[0]);
-            if(recordParts.length == 2) {
-                move.setTimeRemaining(TimeSpec.parseMachineReadableString(recordParts[1]));
-            }
+            try {
+                DetailedMoveRecord move = MoveSerializer.loadMoveRecord(dimension, recordParts[0]);
+                if(recordParts.length == 2) {
+                    move.setTimeRemaining(TimeSpec.parseMachineReadableString(recordParts[1]));
+                }
 
-            moves.add(move);
+                moves.add(move);
+            }
+            catch(NotationParseException e) {
+                throw new IllegalStateException(e.toString());
+            }
         }
 
         return new HistoryPacket(moves, dimension);

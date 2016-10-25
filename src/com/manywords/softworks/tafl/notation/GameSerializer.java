@@ -134,7 +134,7 @@ public class GameSerializer {
         return tagString;
     }
 
-    public static GameContainer loadGameRecordFile(File gameFile) {
+    public static GameContainer loadGameRecordFile(File gameFile) throws NotationParseException {
         String gameString = "";
         try {
             BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(gameFile)));
@@ -152,7 +152,7 @@ public class GameSerializer {
         }
     }
 
-    public static GameContainer loadGameRecord(String gameRecord) {
+    public static GameContainer loadGameRecord(String gameRecord) throws NotationParseException {
         Map<String, String> tagMap = parseTags(gameRecord);
         //System.out.println(tagMap);
 
@@ -166,7 +166,7 @@ public class GameSerializer {
         return new GameContainer(g, result.moves, result.variations);
     }
 
-    public static MoveParseResult parseMoves(int dimension, String gameRecord) {
+    public static MoveParseResult parseMoves(int dimension, String gameRecord) throws NotationParseException {
         List<DetailedMoveRecord> moves = new ArrayList<>();
         List<VariationContainer> variations = new ArrayList<>();
         String moveStart = "1. ";
@@ -190,138 +190,145 @@ public class GameSerializer {
         Pattern variationStartPattern = Pattern.compile("([0-9]+[a-z]\\.)([0-9]+\\.[0-9]+[a-z]\\.)+");
 
         for(int i = 0; i < gameRecord.length(); i++) {
-            if(inGame && !inMove && !inComment && !inVariation) {
-                String remainingRecord = gameRecord.substring(i, gameRecord.length());
-                Matcher variationMatcher = variationStartPattern.matcher(remainingRecord);
-                boolean isVariationStart = variationMatcher.lookingAt();
+            try {
+                if (inGame && !inMove && !inComment && !inVariation) {
+                    String remainingRecord = gameRecord.substring(i, gameRecord.length());
+                    Matcher variationMatcher = variationStartPattern.matcher(remainingRecord);
+                    boolean isVariationStart = variationMatcher.lookingAt();
 
-                if(isVariationStart) {
-                    variationStart = variationMatcher.group(0);
-                }
-            }
-
-            // If not in anything, and now in a move
-            if(!inComment && !inMove && !inVariation && gameRecord.regionMatches(i, moveStart, 0, moveStart.length())) {
-                lastMatchIndex = matchIndex;
-                matchIndex = i;
-
-                inGame = true;
-                inMove = true;
-                currentMove++;
-                moveStart = currentMove + ".";
-                lastTurn.clear();
-            }
-            // If in a move and leaving
-            else if(inGame && !inComment && !inVariation && inMove && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
-                lastMatchIndex = matchIndex;
-                matchIndex = i;
-
-                String moveString = gameRecord.substring(lastMatchIndex, matchIndex).replace(currentMove - 1 + ". ", "").trim();
-                String[] moveStrings = moveString.split(" ");
-                lastMovesAdded = 0;
-                commentIndex = 0;
-                for(String move : moveStrings) {
-                    DetailedMoveRecord m = MoveSerializer.loadMoveRecord(dimension, move);
-                    moves.add(m);
-                    lastTurn.add(m);
-                    lastMovesAdded++;
+                    if (isVariationStart) {
+                        variationStart = variationMatcher.group(0);
+                    }
                 }
 
-                lastMoveWasVariation = false;
-                inMove = false;
-            }
-            // If nowhere and entering a comment
-            else if(inGame && !inComment && gameRecord.regionMatches(i, commentStart, 0, commentStart.length())) {
-                lastMatchIndex = matchIndex;
-                matchIndex = i;
+                // If not in anything, and now in a move
+                if (!inComment && !inMove && !inVariation && gameRecord.regionMatches(i, moveStart, 0, moveStart.length())) {
+                    lastMatchIndex = matchIndex;
+                    matchIndex = i;
 
-                inComment = true;
-            }
-            // If in a comment and encountering a comment separator
-            else if(inGame && inComment && gameRecord.regionMatches(i, commentMid, 0, commentMid.length())) {
-                lastMatchIndex = matchIndex;
-                matchIndex = i;
-
-                List<DetailedMoveRecord> commentMoves;
-                if(lastMoveWasVariation) {
-                    commentMoves = variations.get(variations.size() - 1).moves;
+                    inGame = true;
+                    inMove = true;
+                    currentMove++;
+                    moveStart = currentMove + ".";
+                    lastTurn.clear();
                 }
-                else {
-                    commentMoves = lastTurn;
-                }
+                // If in a move and leaving
+                else if (inGame && !inComment && !inVariation && inMove && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
+                    lastMatchIndex = matchIndex;
+                    matchIndex = i;
 
-                if(commentIndex < commentMoves.size()) {
-                    DetailedMoveRecord m = commentMoves.get(commentIndex++);
-
-                    // last match index + 1 to skip the opening brace
-                    m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
-                }
-
-            }
-            // If in a comment and finishing a comment
-            else if(inGame && inComment && gameRecord.regionMatches(i, commentEnd, 0, commentEnd.length())) {
-                lastMatchIndex = matchIndex;
-                matchIndex = i;
-
-                List<DetailedMoveRecord> commentMoves;
-                if(lastMoveWasVariation) {
-                    commentMoves = variations.get(variations.size() - 1).moves;
-                }
-                else {
-                    commentMoves = lastTurn;
-                }
-
-                if(commentIndex < commentMoves.size()) {
-                    DetailedMoveRecord m = commentMoves.get(commentIndex++);
-
-                    // last match index + 1 to skip the separator pipe
-                    m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
-                }
-
-                inComment = false;
-            }
-            // If nowhere and entering a variation
-            else if(inGame && !inComment && !inVariation && !variationStart.isEmpty() && gameRecord.regionMatches(i, variationStart, 0, variationStart.length())) {
-                lastMatchIndex = matchIndex;
-                matchIndex = i;
-
-                //variationStart is set by the regex at the top
-                inVariation = true;
-                lastTurn.clear();
-            }
-            // If in a variation and leaving
-            else if(inGame && !inComment && !inMove && inVariation && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
-                lastMatchIndex = matchIndex;
-                matchIndex = i;
-
-                String moveString = gameRecord.substring(lastMatchIndex, matchIndex).replace(variationStart, "").trim();
-                String[] moveStrings = moveString.split(" ");
-                lastMovesAdded = 0;
-                commentIndex = 0;
-                int variationStartOffset = 0;
-                for(String move : moveStrings) {
-                    // If the move matches this pattern, then it's a ..... dummy move, used to make the typesetting
-                    // for variations beginning on the second or later move in a turn make a little more sense.
-                    if(!move.matches("\\.+")) {
+                    String moveString = gameRecord.substring(lastMatchIndex, matchIndex).replace(currentMove - 1 + ". ", "").trim();
+                    String[] moveStrings = moveString.split(" ");
+                    lastMovesAdded = 0;
+                    commentIndex = 0;
+                    for (String move : moveStrings) {
                         DetailedMoveRecord m = MoveSerializer.loadMoveRecord(dimension, move);
+                        moves.add(m);
                         lastTurn.add(m);
                         lastMovesAdded++;
                     }
-                    else {
-                        variationStartOffset++;
+
+                    lastMoveWasVariation = false;
+                    inMove = false;
+                }
+                // If nowhere and entering a comment
+                else if (inGame && !inComment && gameRecord.regionMatches(i, commentStart, 0, commentStart.length())) {
+                    lastMatchIndex = matchIndex;
+                    matchIndex = i;
+
+                    inComment = true;
+                }
+                // If in a comment and encountering a comment separator
+                else if (inGame && inComment && gameRecord.regionMatches(i, commentMid, 0, commentMid.length())) {
+                    lastMatchIndex = matchIndex;
+                    matchIndex = i;
+
+                    List<DetailedMoveRecord> commentMoves;
+                    if (lastMoveWasVariation) {
+                        commentMoves = variations.get(variations.size() - 1).moves;
                     }
+                    else {
+                        commentMoves = lastTurn;
+                    }
+
+                    if (commentIndex < commentMoves.size()) {
+                        DetailedMoveRecord m = commentMoves.get(commentIndex++);
+
+                        // last match index + 1 to skip the opening brace
+                        m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
+                    }
+
                 }
+                // If in a comment and finishing a comment
+                else if (inGame && inComment && gameRecord.regionMatches(i, commentEnd, 0, commentEnd.length())) {
+                    lastMatchIndex = matchIndex;
+                    matchIndex = i;
 
-                MoveAddress a = MoveAddress.parseAddress(variationStart);
-                for(int j = 0; j < variationStartOffset; j++) {
-                    a.increment(false);
+                    List<DetailedMoveRecord> commentMoves;
+                    if (lastMoveWasVariation) {
+                        commentMoves = variations.get(variations.size() - 1).moves;
+                    }
+                    else {
+                        commentMoves = lastTurn;
+                    }
+
+                    if (commentIndex < commentMoves.size()) {
+                        DetailedMoveRecord m = commentMoves.get(commentIndex++);
+
+                        // last match index + 1 to skip the separator pipe
+                        m.setComment(gameRecord.substring(lastMatchIndex + 1, matchIndex));
+                    }
+
+                    inComment = false;
                 }
+                // If nowhere and entering a variation
+                else if (inGame && !inComment && !inVariation && !variationStart.isEmpty() && gameRecord.regionMatches(i, variationStart, 0, variationStart.length())) {
+                    lastMatchIndex = matchIndex;
+                    matchIndex = i;
 
-                VariationContainer v = new VariationContainer(a, new ArrayList<>(lastTurn));
-                variations.add(v);
+                    //variationStart is set by the regex at the top
+                    inVariation = true;
+                    lastTurn.clear();
+                }
+                // If in a variation and leaving
+                else if (inGame && !inComment && !inMove && inVariation && gameRecord.regionMatches(i, moveEnd, 0, moveEnd.length())) {
+                    lastMatchIndex = matchIndex;
+                    matchIndex = i;
 
-                lastMoveWasVariation = true;
-                inVariation = false;
+                    String moveString = gameRecord.substring(lastMatchIndex, matchIndex).replace(variationStart, "").trim();
+                    String[] moveStrings = moveString.split(" ");
+                    lastMovesAdded = 0;
+                    commentIndex = 0;
+                    int variationStartOffset = 0;
+                    for (String move : moveStrings) {
+                        // If the move matches this pattern, then it's a ..... dummy move, used to make the typesetting
+                        // for variations beginning on the second or later move in a turn make a little more sense.
+                        if (!move.matches("\\.+")) {
+                            DetailedMoveRecord m = MoveSerializer.loadMoveRecord(dimension, move);
+                            lastTurn.add(m);
+                            lastMovesAdded++;
+                        }
+                        else {
+                            variationStartOffset++;
+                        }
+                    }
+
+                    MoveAddress a = MoveAddress.parseAddress(variationStart);
+                    for (int j = 0; j < variationStartOffset; j++) {
+                        a.increment(false);
+                    }
+
+                    VariationContainer v = new VariationContainer(a, new ArrayList<>(lastTurn));
+                    variations.add(v);
+
+                    lastMoveWasVariation = true;
+                    inVariation = false;
+                }
+            }
+            catch(Exception e) {
+                int index = i;
+                String context = gameRecord.substring(Math.max(index - 10, 0), Math.min(index + 10, gameRecord.length()));
+                throw new NotationParseException(index, context, "Failed to parse game record");
             }
         }
 

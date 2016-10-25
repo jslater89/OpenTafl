@@ -3,13 +3,13 @@ package com.manywords.softworks.tafl.test.rules;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.test.TaflTest;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 public class KingHammerAnvilTest extends TaflTest {
 
@@ -18,7 +18,12 @@ public class KingHammerAnvilTest extends TaflTest {
         Rules rules = Fetlar.newFetlarTest();
         String rulesString = rules.getOTRString();
         rulesString += " ka:h";
-        rules = RulesSerializer.loadRulesRecord(rulesString);
+        try {
+            rules = RulesSerializer.loadRulesRecord(rulesString);
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
 
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
@@ -42,7 +47,12 @@ public class KingHammerAnvilTest extends TaflTest {
         rules = Fetlar.newFetlarTest();
         rulesString = rules.getOTRString();
         rulesString += " ka:a";
-        rules = RulesSerializer.loadRulesRecord(rulesString);
+        try {
+            rules = RulesSerializer.loadRulesRecord(rulesString);
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
 
         game = new Game(rules, null);
 

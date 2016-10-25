@@ -57,7 +57,7 @@ public class MoveSerializer {
         return move;
     }
 
-    public static DetailedMoveRecord loadMoveRecord(int dimension, String record) {
+    public static DetailedMoveRecord loadMoveRecord(int dimension, String record) throws NotationParseException {
         final int MOVER_TYPE = 1;
         final int START_SPACE = 2;
         final int MOVE_TYPE = 3;
@@ -67,7 +67,7 @@ public class MoveSerializer {
         final int STATUS_CODE = 18;
         Pattern p = Pattern.compile(getMoveRegex());
         Matcher m = p.matcher(record);
-        if(!m.matches()) throw new IllegalArgumentException("Bad move record: " + record);
+        if(!m.matches()) throw new NotationParseException(-1, record, "Incorrect move record");
 
         String[] groups = new String[19];
 

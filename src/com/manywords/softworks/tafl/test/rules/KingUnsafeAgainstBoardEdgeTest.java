@@ -3,13 +3,13 @@ package com.manywords.softworks.tafl.test.rules;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
 import com.manywords.softworks.tafl.test.TaflTest;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 public class KingUnsafeAgainstBoardEdgeTest extends TaflTest {
 
@@ -19,7 +19,12 @@ public class KingUnsafeAgainstBoardEdgeTest extends TaflTest {
 
         String rulesString = rules.getOTRString();
         rulesString += " ks:m";
-        rules = RulesSerializer.loadRulesRecord(rulesString);
+        try {
+            rules = RulesSerializer.loadRulesRecord(rulesString);
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
 
         assert rules.getKingStrengthMode() == Rules.KING_MIDDLEWEIGHT;
 

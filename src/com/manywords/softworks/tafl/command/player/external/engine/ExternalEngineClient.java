@@ -9,6 +9,7 @@ import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -88,14 +89,24 @@ public class ExternalEngineClient implements UiCallback {
 
     private void handleRulesCommand(String command) {
         command = command.replace("rules ", "");
-        mRules = RulesSerializer.loadRulesRecord(command);
-        mGame = new Game(mRules, this);
+        try {
+            mRules = RulesSerializer.loadRulesRecord(command);
+            mGame = new Game(mRules, this);
+        }
+        catch(NotationParseException e) {
+            sendErrorCommand(true, "Failed to load rules record: " + e.toString());
+        }
     }
 
     private void handlePositionCommand(String command) {
         command = command.replace("position ", "");
-        GameState state = PositionSerializer.loadPositionRecord(mRules, command, mGame);
-        mGame.setCurrentState(state);
+        try {
+            GameState state = PositionSerializer.loadPositionRecord(mRules, command, mGame);
+            mGame.setCurrentState(state);
+        }
+        catch(NotationParseException e) {
+            sendErrorCommand(true, "Failed to load position record: " + e.toString());
+        }
     }
 
     private void handleSideCommand(String command) {
@@ -221,7 +232,12 @@ public class ExternalEngineClient implements UiCallback {
         String[] moves = commandParts[0].split("\\|");
 
         for(String move : moves) {
-            mGame.getCurrentState().makeMove(MoveSerializer.loadMoveRecord(mGame.getRules().boardSize, move));
+            try {
+                mGame.getCurrentState().makeMove(MoveSerializer.loadMoveRecord(mGame.getRules().boardSize, move));
+            }
+            catch(NotationParseException e) {
+                sendErrorCommand(true, "Failed to apply move: " + e);
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.test.TaflTest;
@@ -21,8 +22,13 @@ public class AIIncompleteContinuationTest extends TaflTest {
     @Override
     public void run() {
         AiWorkspace.resetTranspositionTable();
-
-        Rules inflatedRules = RulesSerializer.loadRulesRecord("dim:7 name:Brandub surf:n atkf:y ks:w cenh: cenhe: start:/7/3t3/7/t1T1t1t/7/2tTK2/4T2/");
+        Rules inflatedRules = null;
+        try {
+            inflatedRules = RulesSerializer.loadRulesRecord("dim:7 name:Brandub surf:n atkf:y ks:w cenh: cenhe: start:/7/3t3/7/t1T1t1t/7/2tTK2/4T2/");
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
         Game game = new Game(inflatedRules, null);
         GameState state = game.getCurrentState();
 

@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.test.consistency;
 
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.berserk.Berserk;
@@ -9,14 +10,17 @@ public class PositionSerializerConsistencyTest extends TaflTest {
 
     @Override
     public void run() {
-        Rules rules = Berserk.newCommanderCornerCaptureKingTest();
-        char[][] boardArray = rules.getBoard().getBoardArray();
-        String positionRecord = PositionSerializer.getPositionRecord(rules.getBoard());
+        try {
+            Rules rules = Berserk.newCommanderCornerCaptureKingTest();
+            char[][] boardArray = rules.getBoard().getBoardArray();
+            String positionRecord = PositionSerializer.getPositionRecord(rules.getBoard());
 
-        char[][] newBoardArray = PositionSerializer.loadPositionRecord(positionRecord);
-        String serializedPosition = PositionSerializer.getPositionRecord(newBoardArray);
+            char[][] newBoardArray = PositionSerializer.loadPositionRecord(positionRecord);
+            String serializedPosition = PositionSerializer.getPositionRecord(newBoardArray);
 
-        assert positionRecord.equals(serializedPosition);
+            assert positionRecord.equals(serializedPosition);
+        }
+        catch(NotationParseException e) { assert false; }
     }
 
 }

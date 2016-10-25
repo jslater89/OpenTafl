@@ -6,10 +6,10 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.test.TaflTest;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.List;
 
@@ -27,7 +27,14 @@ public class AITacticsEscapeTest extends TaflTest {
 
     @Override
     public void run() {
-        Rules r = RulesSerializer.loadRulesRecord("dim:7 name:Brandub_Test surf:n atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/1t1t3/3T3/4tt1/2T1K2/3TT1t/2t4/");
+        Rules r = null;
+        try {
+            r = RulesSerializer.loadRulesRecord("dim:7 name:Brandub_Test surf:n atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/1t1t3/3T3/4tt1/2T1K2/3TT1t/2t4/");
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
+
         Game game = new Game(r, this);
 
         GameState state = game.getCurrentState();

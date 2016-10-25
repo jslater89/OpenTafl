@@ -92,7 +92,6 @@ public class OpenTafl {
                 runMode = Mode.HELP;
             }
             else if(arg.contains("--dev") || arg.contains("--debug")) {
-                //runMode = Mode.DEBUG;
                 logLevel = LogLevel.CHATTY;
                 devMode = true;
             }
@@ -144,10 +143,12 @@ public class OpenTafl {
                 preferredFonts[1] = new Font("Monaco", Font.PLAIN, TerminalSettings.fontSize);
                 preferredFonts[2] = new Font("Courier New", Font.PLAIN, TerminalSettings.fontSize);
                 preferredFonts[3] = new Font("Courier", Font.PLAIN, TerminalSettings.fontSize);
-                preferredFonts[4] = new Font("Courier New", Font.PLAIN, TerminalSettings.fontSize);
+                preferredFonts[4] = new Font("Ubuntu Mono", Font.PLAIN, TerminalSettings.fontSize);
+                preferredFonts[5] = new Font("Terminus", Font.PLAIN, TerminalSettings.fontSize);
+                preferredFonts[6] = new Font("Unifont", Font.PLAIN, TerminalSettings.fontSize);
 
                 preferredFonts = AWTTerminalFontConfiguration.filterMonospaced(preferredFonts);
-                if(preferredFonts.length == 0) throw new IllegalStateException("No monospaced fonts available");
+                if(preferredFonts.length == 0) throw new IllegalStateException("No monospaced fonts available. Try running OpenTafl with the --fallback option to use text-only mode.");
 
                 SwingTerminalFontConfiguration font = SwingTerminalFontConfiguration.newInstance(preferredFonts);
 

@@ -1,28 +1,18 @@
 package com.manywords.softworks.tafl.test.ai;
 
 import com.manywords.softworks.tafl.OpenTafl;
-import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
-import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineHost;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
-import com.manywords.softworks.tafl.engine.ai.GameTreeState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
-import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
+import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
-import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
-import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.test.TaflTest;
-import com.manywords.softworks.tafl.test.mechanics.ExternalEngineHostTest;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -37,7 +27,14 @@ public class AISearchEquivalenceTest extends TaflTest {
     @Override
     public void run() {
         //Rules r = RulesSerializer.loadRulesRecord("rules dim:5 name:MiniTafl surf:n spd:1 atkf:y ks:w nj:n cj:n cens:tcnkTCNK cenh: cenhe: start:/1t3/t1T2/2K2/5/3t1/");
-        Rules r = RulesSerializer.loadRulesRecord("rules dim:7 name:Brandub_Test surf:n atkf:n ks:w nj:n cj:n cens:tcnkTCNK cenh: cenhe: start:/4t2/3t3/3T3/ttTKTtt/3T3/3t3/3t3/");
+        Rules r = null;
+        try {
+            r = RulesSerializer.loadRulesRecord("rules dim:7 name:Brandub_Test surf:n atkf:n ks:w nj:n cj:n cens:tcnkTCNK cenh: cenhe: start:/4t2/3t3/3T3/ttTKTtt/3T3/3t3/3t3/");
+        }
+        catch(NotationParseException e) {
+            assert false;
+        }
+
         MoveRecord move = null;
         short bestValue = Evaluator.NO_VALUE;
         List<MoveRecord> equivalentMoves = new ArrayList<>();
