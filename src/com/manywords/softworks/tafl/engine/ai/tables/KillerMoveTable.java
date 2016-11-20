@@ -21,7 +21,7 @@ public class KillerMoveTable {
 
     public void reset() {
         for(int i = 0; i < killers.length; i++) {
-            for(int j = 0; j < killers[j].length; j++) {
+            for(int j = 0; j < killers[i].length; j++) {
                 killers[i][j] = null;
             }
         }
