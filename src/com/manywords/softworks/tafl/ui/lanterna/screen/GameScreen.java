@@ -509,6 +509,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                     lastExternalPlayer.getExternalEngineHost().dumpEvaluation(0);
                 }
+                else if(lastPlayer instanceof LocalAi) {
+                    LocalAi lastAi = (LocalAi) lastPlayer;
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, lastAi.getWorkspace().dumpEvaluationFor(0));
+                }
                 else {
                     OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Last player not external engine");
                 }

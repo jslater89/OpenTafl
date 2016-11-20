@@ -6,12 +6,10 @@ import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
-import java.util.List;
-
 public class LocalAi extends Player {
     private PlayerCallback mCallback;
     private UiWorkerThread mWorker;
-
+    private AiWorkspace mWorkspace;
     @Override
     public void setCallback(PlayerCallback c) {
         mCallback = c;
@@ -22,30 +20,33 @@ public class LocalAi extends Player {
         ui.statusText("Waiting for computer move.");
 
         mWorker = new UiWorkerThread(new UiWorkerThread.UiWorkerRunnable() {
-            AiWorkspace workspace = new AiWorkspace(ui, game, game.getCurrentState(), 50);
-
             private boolean mRunning = true;
 
             @Override
             public void cancel() {
-                workspace.crashStop();
+                mWorkspace.crashStop();
                 mRunning = false;
             }
 
             @Override
             public void run() {
-                workspace.chatty = true;
+                mWorkspace = new AiWorkspace(ui, game, game.getCurrentState(), 50);
+                mWorkspace.chatty = true;
 
-                workspace.explore(thinkTime);
-                //while(!workspace.isThreadPoolIdle()) { continue; }
-                workspace.stopExploring();
+                mWorkspace.explore(thinkTime);
+                //while(!mWorkspace.isThreadPoolIdle()) { continue; }
+                mWorkspace.stopExploring();
 
-                GameTreeNode bestMove = workspace.getTreeRoot().getBestChild();
+                GameTreeNode bestMove = mWorkspace.getTreeRoot().getBestChild();
                 onMoveDecided(bestMove.getRootMove());
-                workspace.printSearchStats();
+                mWorkspace.printSearchStats();
             }
         });
         mWorker.start();
+    }
+
+    public AiWorkspace getWorkspace() {
+        return mWorkspace;
     }
 
     @Override
