@@ -138,7 +138,7 @@ public class OpenTafl {
             case GRAPHICAL_TERMINAL:
                 DefaultTerminalFactory factory = new DefaultTerminalFactory();
 
-                Font[] preferredFonts = new Font[5];
+                Font[] preferredFonts = new Font[7];
                 preferredFonts[0] = new Font("Monospace", Font.PLAIN, TerminalSettings.fontSize);
                 preferredFonts[1] = new Font("Monaco", Font.PLAIN, TerminalSettings.fontSize);
                 preferredFonts[2] = new Font("Courier New", Font.PLAIN, TerminalSettings.fontSize);
