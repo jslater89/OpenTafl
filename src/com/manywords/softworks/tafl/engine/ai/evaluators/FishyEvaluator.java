@@ -10,8 +10,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by jay on 12/24/15.
@@ -29,16 +28,29 @@ public class FishyEvaluator implements Evaluator {
     private static final int DEFENDER = 0;
     private static final int ATTACKER = 1;
 
+    // System.arraycopy is faster than Arrays.fill(): arraycopy uses memcpy
+    // where available
+    private static final boolean[] TRUE_ARRAY = {true, true, true, true,
+                                                 true, true, true, true,
+                                                 true, true, true, true,
+                                                 true, true, true, true,
+                                                 true, true, true, true};
+    private static final boolean[] FALSE_ARRAY = {false, false, false, false,
+                                                  false, false, false, false,
+                                                  false, false, false, false,
+                                                  false, false, false, false,
+                                                  false, false, false, false};
+
     // Values add to 5000--if everything is going one team's way, it's as good
     // as a win (except not really).
     private final int KING_FREEDOM_INDEX = 0;
     private final int KING_RISK_INDEX = 1;
     private final int RANK_AND_FILE_INDEX = 2;
     private final int MATERIAL_INDEX = 3;
-    private final int KING_FREEDOM_VALUE = 1200;
-    private final int KING_RISK_VALUE = 1150;
+    private final int KING_FREEDOM_VALUE = 1000;
+    private final int KING_RISK_VALUE = 1000;
     private final int RANK_AND_FILE_VALUE = 500;
-    private final int MATERIAL_VALUE = 500;
+    private final int MATERIAL_VALUE = 900;
     // 1400 for unused TAFLMAN_RISK
 
     // Losing fewer than taflman-count * LIGHT_LOSSES is not a tragedy.
@@ -186,6 +198,7 @@ public class FishyEvaluator implements Evaluator {
     }
 
     public short evaluate(GameState state, int maxDepth, int depth) {
+        mTaflmanThreatCache.clear();
         mAssignedKingRisk = mAssignedKingFreedom = mAssignedRankAndFile = mAssignedMaterial = 0;
 
         short value = 0;
@@ -284,26 +297,68 @@ public class FishyEvaluator implements Evaluator {
         byte[] rankControl = new byte[boardSize];
         byte[] fileControl = new byte[boardSize];
 
+//        byte[][] boardArray = new byte[boardSize][boardSize];
+//        byte[] lastTaflmanRankIndex = new byte[boardSize];
+//        byte[] lastTaflmanFileIndex = new byte[boardSize];
+//
+//        boolean[][] attackersCanMoveTo = new boolean[boardSize][boardSize];
+//        boolean[][] defendersCanMoveTo = new boolean[boardSize][boardSize];
+
+        Set<Coord> defenderMoves = new HashSet<>(boardSize * boardSize);
+        Set<Coord> attackerMoves = new HashSet<>(boardSize * boardSize);
+
+        for(char taflman: allTaflmen) {
+            if(Taflman.getPackedSide(taflman) > 0)
+                attackerMoves.addAll(Taflman.getAllowableDestinations(state, taflman));
+            else
+                defenderMoves.addAll(Taflman.getAllowableDestinations(state, taflman));
+        }
+
+        // Set up some lists to help us figure out who can move where
         for(char taflman : allTaflmen) {
 
             int side = (Taflman.getPackedSide(taflman) > 0 ? ATTACKER : DEFENDER);
             int mul = (side == ATTACKER ? 1 : -1);
             Coord coord = board.findTaflmanSpace(taflman);
 
+//            boardArray[coord.y][coord.x] = (byte) mul;
+
             rankPresence[side][coord.y] = true;
             filePresence[side][coord.x] = true;
 
-            if(coord.x < Math.abs(rankHighLowTaflmen[LOW][coord.y])) rankHighLowTaflmen[LOW][coord.y] = (byte)(coord.x * mul);
-            if(coord.x > Math.abs(rankHighLowTaflmen[HIGH][coord.y])) rankHighLowTaflmen[HIGH][coord.y] = (byte)(coord.x * mul);
+            boolean taflmanThreatened = isTaflmanThreatened(coord, side, board, defenderMoves, attackerMoves);
 
-            if(coord.y < Math.abs(fileHighLowTaflmen[LOW][coord.x])) fileHighLowTaflmen[LOW][coord.x] = (byte)(coord.y * mul);
-            if(coord.y > Math.abs(fileHighLowTaflmen[HIGH][coord.x])) fileHighLowTaflmen[HIGH][coord.x] = (byte)(coord.y * mul);
+            if(!taflmanThreatened) {
+                if (coord.x < Math.abs(rankHighLowTaflmen[LOW][coord.y]))
+                    rankHighLowTaflmen[LOW][coord.y] = (byte) (coord.x * mul);
+                if (coord.x > Math.abs(rankHighLowTaflmen[HIGH][coord.y]))
+                    rankHighLowTaflmen[HIGH][coord.y] = (byte) (coord.x * mul);
+
+                if (coord.y < Math.abs(fileHighLowTaflmen[LOW][coord.x]))
+                    fileHighLowTaflmen[LOW][coord.x] = (byte) (coord.y * mul);
+                if (coord.y > Math.abs(fileHighLowTaflmen[HIGH][coord.x]))
+                    fileHighLowTaflmen[HIGH][coord.x] = (byte) (coord.y * mul);
+            }
 
 
             if(king == Taflman.EMPTY && Taflman.isKing(taflman)) {
                 king = taflman;
             }
+
         }
+
+        // For each space along each rank and file,
+        /*
+        for(int rankFile = 0; rankFile < boardSize; rankFile++) {
+            for(int space = 0; space < boardSize; space++) {
+                // along the rank
+                // boardArray[rankFile][space];
+
+                // along the file
+                // boardArray[space][rankFile];
+            }
+        }
+        */
 
 
         for(int i = 0; i < boardSize; i++) {
@@ -399,34 +454,35 @@ public class FishyEvaluator implements Evaluator {
             if (Taflman.getPackedSide(c) == Taflman.SIDE_ATTACKERS) enemyKingAdjacentTaflmen.add(c);
         }
 
+        boolean kingThreatened = isTaflmanThreatened(kingCoord,DEFENDER, board, defenderMoves, attackerMoves);
         if (mArmedKing && kingCurrentlyStrong) { // block max: defender 1, attacker 1
             if (enemyKingAdjacentTaflmen.size() <= 2) {
                 // There's value in having an armed, strong king next to one or two enemy taflmen--leads to captures.
                 value += changeEvaluation(DEFENDER, KING_RISK_INDEX, 0.1f * enemyKingAdjacentTaflmen.size(), "Strong armed king adjacent to attackers at -0.1 RISK per.");
             }
-            else if (enemyKingAdjacentTaflmen.size() > 2) {
+            else if (enemyKingAdjacentTaflmen.size() > 2 && kingThreatened) {
                 // Having a king in check is risky.
                 value += changeEvaluation(ATTACKER, KING_RISK_INDEX, 1, "Strong armed king in check: 1 RISK");
             }
 
             if (kingAdjacentTaflmen.size() > enemyKingAdjacentTaflmen.size()) {
-                value += changeEvaluation(DEFENDER, KING_RISK_INDEX, 0.75f, "Strong armed king has bodyguard: -0.75 RISK");
+                value += changeEvaluation(DEFENDER, KING_RISK_INDEX, 0.1f, "Strong armed king has bodyguard: -0.1 RISK");
             }
         }
         else if (kingCurrentlyStrong) { // block max: defender 1, attacker 1
             // if unarmed strong king, or weak armed or unarmed king
-            if (enemyKingAdjacentTaflmen.size() > 2) {
+            if (enemyKingAdjacentTaflmen.size() > 2 && kingThreatened) {
                 // Having a king in check is risky.
-                value += changeEvaluation(ATTACKER, KING_RISK_INDEX, 1, "Strong armed king in check: 1 RISK");
+                value += changeEvaluation(ATTACKER, KING_RISK_INDEX, 1, "Strong unarmed king in check: 1 RISK");
             }
 
             if (kingAdjacentTaflmen.size() > enemyKingAdjacentTaflmen.size()) {
-                value += changeEvaluation(DEFENDER, KING_RISK_INDEX, 0.75f, "Strong armed king has bodyguard: -0.75 RISK");
+                value += changeEvaluation(DEFENDER, KING_RISK_INDEX, 0.1f, "Strong unarmed king has bodyguard: -0.1 RISK");
             }
         }
         else { // block max: defender 0.0, attacker 1
             // armed/unarmed weak kings
-            if (enemyKingAdjacentTaflmen.size() == 1) {
+            if (enemyKingAdjacentTaflmen.size() == 1 && kingThreatened) {
                 // Having a king in check is risky.
                 value += changeEvaluation(ATTACKER, KING_RISK_INDEX, 1, "Weak king in check: 1 RISK");
             }
@@ -568,6 +624,43 @@ public class FishyEvaluator implements Evaluator {
         return mRules.getBoard().getCenterAndAdjacentSpaces().contains(coord);
     }
 
+    private HashMap<Coord, Boolean> mTaflmanThreatCache = new HashMap<>(60);
+
+    public boolean isTaflmanThreatened(Coord taflmanCoord, int side, Board board, Set<Coord> defenderMoves, Set<Coord> attackerMoves) {
+        if(mTaflmanThreatCache.containsKey(taflmanCoord)) return mTaflmanThreatCache.get(taflmanCoord);
+
+        int boardSize = board.getBoardDimension();
+        List<Character> neighbors = board.getAdjacentNeighbors(taflmanCoord);
+
+        if(neighbors.size() > 0) {
+            List<Coord> toCheck = new ArrayList<Coord>();
+            for(char neighbor : neighbors) {
+                if(Taflman.getPackedSide(neighbor) != side) {
+                    Coord hostileCoord = board.findTaflmanSpace(neighbor);
+                    toCheck.add(Coord.getCoordAcrossFrom(boardSize, taflmanCoord, hostileCoord));
+                }
+            }
+
+            if(toCheck.size() > 0) {
+                for(Coord check : toCheck) {
+                    if (side == ATTACKER) {
+                        if (defenderMoves.contains(check)) {
+                            mTaflmanThreatCache.put(taflmanCoord, true);
+                            return true;
+                        }
+                    }
+                    else {
+                        if (attackerMoves.contains(check)) {
+                            mTaflmanThreatCache.put(taflmanCoord, true);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private static void printDebug(short value, boolean isAttackingSide, int depth) {
         debugString += "\n\nFinal evaluation " + value + "\n";
 
@@ -629,7 +722,6 @@ public class FishyEvaluator implements Evaluator {
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-
 
 
         return true;
