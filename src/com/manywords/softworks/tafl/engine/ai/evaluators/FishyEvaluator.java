@@ -12,6 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+import static com.manywords.softworks.tafl.rules.Taflman.EMPTY;
+
 /**
  * Created by jay on 12/24/15.
  */
@@ -272,7 +274,7 @@ public class FishyEvaluator implements Evaluator {
         allTaflmen.addAll(defendingTaflmen);
         allTaflmen.addAll(attackingTaflmen);
 
-        char king = Taflman.EMPTY;
+        char king = EMPTY;
 
         // precalc rank/file information
 
@@ -341,7 +343,7 @@ public class FishyEvaluator implements Evaluator {
             }
 
 
-            if(king == Taflman.EMPTY && Taflman.isKing(taflman)) {
+            if(king == EMPTY && Taflman.isKing(taflman)) {
                 king = taflman;
             }
 
@@ -504,7 +506,7 @@ public class FishyEvaluator implements Evaluator {
 
         for (Coord cornerPoint : cornerPoints) {
             char occupier = board.getOccupier(cornerPoint);
-            if (occupier != Taflman.EMPTY && Taflman.getPackedSide(occupier) == Taflman.SIDE_ATTACKERS) {
+            if (occupier != EMPTY && Taflman.getPackedSide(occupier) == Taflman.SIDE_ATTACKERS) {
                 value += changeEvaluation(ATTACKER, RANK_AND_FILE_INDEX, 0.1f, "Corner point control: 0.1 RANK-FILE");
             }
         }
@@ -629,20 +631,37 @@ public class FishyEvaluator implements Evaluator {
     public boolean isTaflmanThreatened(Coord taflmanCoord, int side, Board board, Set<Coord> defenderMoves, Set<Coord> attackerMoves) {
         if(mTaflmanThreatCache.containsKey(taflmanCoord)) return mTaflmanThreatCache.get(taflmanCoord);
 
+        char taflman = board.getOccupier(taflmanCoord);
         int boardSize = board.getBoardDimension();
-        List<Character> neighbors = board.getAdjacentNeighbors(taflmanCoord);
+        List<Coord> adjacent = board.getAdjacentSpaces(taflmanCoord);
 
-        if(neighbors.size() > 0) {
+        int currentKingStrength = mRules.getKingStrengthMode();
+
+        if(Taflman.isKing(taflman) && mKingStrength == Rules.KING_STRONG_CENTER) {
+            if(board.getCenterAndAdjacentSpaces().contains(taflmanCoord)) {
+                currentKingStrength = Rules.KING_STRONG;
+            }
+            else currentKingStrength = Rules.KING_WEAK;
+        }
+
+        if(!Taflman.isKing(taflman) || currentKingStrength == Rules.KING_WEAK) {
             List<Coord> toCheck = new ArrayList<Coord>();
-            for(char neighbor : neighbors) {
-                if(Taflman.getPackedSide(neighbor) != side) {
-                    Coord hostileCoord = board.findTaflmanSpace(neighbor);
-                    toCheck.add(Coord.getCoordAcrossFrom(boardSize, taflmanCoord, hostileCoord));
+            for (Coord space : adjacent) {
+                char neighbor = EMPTY;
+                if (board.getOccupier(space) != EMPTY) {
+                    neighbor = board.getOccupier(space);
+                }
+
+                if (neighbor != EMPTY && Taflman.getPackedSide(neighbor) != side) {
+                    toCheck.add(Coord.getCoordAcrossFrom(boardSize, taflmanCoord, space));
+                }
+                else if (board.isSpaceHostileTo(space, board.getOccupier(taflmanCoord))) {
+                    toCheck.add(Coord.getCoordAcrossFrom(boardSize, taflmanCoord, space));
                 }
             }
 
-            if(toCheck.size() > 0) {
-                for(Coord check : toCheck) {
+            if (toCheck.size() > 0) {
+                for (Coord check : toCheck) {
                     if (side == ATTACKER) {
                         if (defenderMoves.contains(check)) {
                             mTaflmanThreatCache.put(taflmanCoord, true);
@@ -657,6 +676,28 @@ public class FishyEvaluator implements Evaluator {
                     }
                 }
             }
+        }
+        else if(Taflman.isKing(taflman) && currentKingStrength == Rules.KING_MIDDLEWEIGHT) {
+            int currentlyHostile = 0;
+            int threatened = 0;
+            for(Coord space : adjacent) {
+                if(board.isSpaceHostileTo(space, taflman)) currentlyHostile++;
+                else if(attackerMoves.contains(space)) threatened++;
+            }
+
+            return (currentlyHostile == adjacent.size() - 1) && threatened == 1;
+        }
+        else if(Taflman.isKing(taflman) && currentKingStrength == Rules.KING_STRONG) {
+            if(adjacent.size() != 4) return false;
+
+            int currentlyHostile = 0;
+            int threatened = 0;
+            for(Coord space : adjacent) {
+                if(board.isSpaceHostileTo(space, taflman)) currentlyHostile++;
+                else if(attackerMoves.contains(space)) threatened++;
+            }
+
+            return (currentlyHostile == 3) && threatened == 1;
         }
         return false;
     }
