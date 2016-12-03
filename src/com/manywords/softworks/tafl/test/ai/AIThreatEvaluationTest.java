@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Created by jay on 11/20/16.
  */
-public class AiThreatEvaluationTest extends TaflTest {
+public class AIThreatEvaluationTest extends TaflTest {
     @Override
     public void run() {
         String otnrString = "dim:7 name:Brandub surf:n atkf:y ks:w cenh: cenhe: start:/3t3/3t3/3T3/tTTKt1t/3T3/3t3/2T1t2/";

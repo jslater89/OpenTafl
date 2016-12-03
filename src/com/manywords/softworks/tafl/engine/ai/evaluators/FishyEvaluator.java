@@ -309,12 +309,12 @@ public class FishyEvaluator implements Evaluator {
         Set<Coord> defenderMoves = new HashSet<>(boardSize * boardSize);
         Set<Coord> attackerMoves = new HashSet<>(boardSize * boardSize);
 
-        for(char taflman: allTaflmen) {
-            if(Taflman.getPackedSide(taflman) > 0)
-                attackerMoves.addAll(Taflman.getAllowableDestinations(state, taflman));
-            else
-                defenderMoves.addAll(Taflman.getAllowableDestinations(state, taflman));
-        }
+//        for(char taflman: allTaflmen) {
+//            if(Taflman.getPackedSide(taflman) > 0)
+//                attackerMoves.addAll(Taflman.getAllowableDestinations(state, taflman));
+//            else
+//                defenderMoves.addAll(Taflman.getAllowableDestinations(state, taflman));
+//        }
 
         // Set up some lists to help us figure out who can move where
         for(char taflman : allTaflmen) {
@@ -328,7 +328,7 @@ public class FishyEvaluator implements Evaluator {
             rankPresence[side][coord.y] = true;
             filePresence[side][coord.x] = true;
 
-            boolean taflmanThreatened = isTaflmanThreatened(coord, side, board, defenderMoves, attackerMoves);
+            boolean taflmanThreatened = false; //isTaflmanThreatened(coord, side, board, defenderMoves, attackerMoves);
 
             if(!taflmanThreatened) {
                 if (coord.x < Math.abs(rankHighLowTaflmen[LOW][coord.y]))
@@ -456,7 +456,7 @@ public class FishyEvaluator implements Evaluator {
             if (Taflman.getPackedSide(c) == Taflman.SIDE_ATTACKERS) enemyKingAdjacentTaflmen.add(c);
         }
 
-        boolean kingThreatened = isTaflmanThreatened(kingCoord,DEFENDER, board, defenderMoves, attackerMoves);
+        boolean kingThreatened = true; //isTaflmanThreatened(kingCoord,DEFENDER, board, defenderMoves, attackerMoves);
         if (mArmedKing && kingCurrentlyStrong) { // block max: defender 1, attacker 1
             if (enemyKingAdjacentTaflmen.size() <= 2) {
                 // There's value in having an armed, strong king next to one or two enemy taflmen--leads to captures.
