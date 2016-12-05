@@ -49,10 +49,12 @@ public class FishyEvaluator implements Evaluator {
     private final int KING_RISK_INDEX = 1;
     private final int RANK_AND_FILE_INDEX = 2;
     private final int MATERIAL_INDEX = 3;
-    private final int KING_FREEDOM_VALUE = 1000;
-    private final int KING_RISK_VALUE = 1000;
-    private final int RANK_AND_FILE_VALUE = 500;
-    private final int MATERIAL_VALUE = 900;
+    private final int PIECE_SQUARE_INDEX = 4;
+    private final int KING_FREEDOM_VALUE = 900;
+    private final int KING_RISK_VALUE = 900;
+    private final int RANK_AND_FILE_VALUE = 400;
+    private final int MATERIAL_VALUE = 800;
+    private final int PIECE_SQUARE_VALUE = 700;
     // 1400 for unused TAFLMAN_RISK
 
     // Losing fewer than taflman-count * LIGHT_LOSSES is not a tragedy.
@@ -85,9 +87,13 @@ public class FishyEvaluator implements Evaluator {
     private short mAssignedKingRisk = 0;
     private short mAssignedRankAndFile = 0;
     private short mAssignedMaterial = 0;
+    private short mAssignedPieceSquare = 0;
+
+    private PieceSquareTable mPieceSquareTable;
 
     @Override
     public void initialize(Rules rules) {
+        mPieceSquareTable = new PieceSquareTable(rules, null);
         mStartingAttackerCount = rules.getAttackers().getStartingTaflmen().size();
         mStartingDefenderCount = rules.getDefenders().getStartingTaflmen().size();
 
@@ -142,6 +148,8 @@ public class FishyEvaluator implements Evaluator {
                 return RANK_AND_FILE_VALUE;
             case MATERIAL_INDEX:
                 return MATERIAL_VALUE;
+            case PIECE_SQUARE_INDEX:
+                return PIECE_SQUARE_VALUE;
         }
 
         throw new IllegalArgumentException("Bad category index");
@@ -157,6 +165,8 @@ public class FishyEvaluator implements Evaluator {
                 return mAssignedRankAndFile;
             case MATERIAL_INDEX:
                 return mAssignedMaterial;
+            case PIECE_SQUARE_INDEX:
+                return PIECE_SQUARE_INDEX;
         }
 
         throw new IllegalArgumentException("Bad category index");
@@ -180,6 +190,9 @@ public class FishyEvaluator implements Evaluator {
                 break;
             case MATERIAL_INDEX:
                 mAssignedMaterial += actualAmount;
+                break;
+            case PIECE_SQUARE_INDEX:
+                mAssignedPieceSquare += actualAmount;
                 break;
         }
 
@@ -611,6 +624,20 @@ public class FishyEvaluator implements Evaluator {
 
         if(attackerLossLevel == 2) {
             value += changeEvaluation(DEFENDER, MATERIAL_INDEX, 0.1f, "Attacker is on heavy losses: -0.1 MATERIAL");
+        }
+
+        // 5. ==================== PIECE-SQUARE TABLE =====================
+        attackerValue = PIECE_SQUARE_VALUE / mStartingAttackerCount;
+        defenderValue = PIECE_SQUARE_VALUE / (mStartingDefenderCount  - 2);
+        float kingValue = (PIECE_SQUARE_VALUE / (mStartingDefenderCount - 2)) * 3;
+
+        for(char taflman : attackingTaflmen) {
+            value += changeEvaluation(ATTACKER, PIECE_SQUARE_INDEX, attackerValue * mPieceSquareTable.getMultiplier(taflman, board.findTaflmanSpace(taflman)));
+        }
+
+        for(char taflman: defendingTaflmen) {
+            if(Taflman.isKing(taflman)) value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, kingValue * mPieceSquareTable.getMultiplier(taflman, board.findTaflmanSpace(taflman)));
+            else value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, defenderValue * mPieceSquareTable.getMultiplier(taflman, board.findTaflmanSpace(taflman)));
         }
 
         if(debug) {

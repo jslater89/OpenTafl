@@ -2,18 +2,31 @@ package com.manywords.softworks.tafl;
 
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
+import com.manywords.softworks.tafl.engine.ai.evaluators.PieceSquareTable;
+import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
-import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
-import com.manywords.softworks.tafl.network.server.NetworkServer;
 import jline.console.ConsoleReader;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Map;
 
 public class Debug {
     public static void run(Map<String, String> args) {
+        Rules r = BuiltInVariants.rulesForNameAndDimension("Fetlar", 11);
+        PieceSquareTable table = new PieceSquareTable(r, null);
+
+        table.logTable(0);
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "\n");
+        table.logTable(1);
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "\n");
+        table.logTable(2);
+
         if(args.containsKey("--engine")) {
             ExternalEngineClient.run();
         }
@@ -21,7 +34,7 @@ public class Debug {
             DefaultTerminalFactory factory = new DefaultTerminalFactory();
             Terminal t = null;
 
-            if(args.containsKey("--text-terminal")) {
+            if(args.containsKey("--fallback")) {
                 factory.setForceTextTerminal(true);
                 try {
                     t = factory.createTerminal();

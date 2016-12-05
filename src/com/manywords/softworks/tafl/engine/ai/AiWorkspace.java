@@ -14,7 +14,10 @@ import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class AiWorkspace extends Game {
     private static final long POST_SEARCH_PAD = 250;

@@ -93,6 +93,7 @@ public class OpenTafl {
             }
             else if(arg.contains("--dev") || arg.contains("--debug")) {
                 logLevel = LogLevel.CHATTY;
+                //runMode = Mode.DEBUG;
                 devMode = true;
             }
             else if (arg.contains("--chatty")) {
