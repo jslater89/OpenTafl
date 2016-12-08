@@ -590,12 +590,9 @@ public class AiWorkspace extends Game {
                     currentHorizonDepth += horizonDepth;
 
                     if (currentHorizonDepth > continuationDepth + horizonLimit) {
-                        currentHorizonDepth = continuationDepth + horizonDepth;
+                        currentHorizonDepth = continuationDepth + horizonLimit;
                         horizonStart += horizonCount;
                     }
-
-                    // Fall out early if we've searched too deep
-                    if (currentHorizonDepth > continuationDepth * 2) break;
 
                     boolean certainVictory = true;
                     int e = 0;
@@ -623,7 +620,7 @@ public class AiWorkspace extends Game {
                     if (currentHorizonDepth > deepestSearch) deepestSearch = currentHorizonDepth;
 
                     if (certainVictory) {
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: certain victory");
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Quitting horizon search: no nodes left to search, or certain victory");
                         break;
                     }
                     horizonIterations++;
