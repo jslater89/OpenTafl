@@ -4,6 +4,7 @@ import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
+import com.manywords.softworks.tafl.rules.Taflman;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -224,6 +225,18 @@ public class PieceSquareTable {
     }
 
     public float getMultiplier(char taflman, Coord space) {
-        return 0;
+        switch(Taflman.getPackedType(taflman)) {
+            case Taflman.TYPE_TAFLMAN:
+                if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
+                    return mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(mRules.boardSize, space)];
+                }
+                else {
+                    return mTable[PIECE_DEFENDING_TAFLMAN][Coord.getIndex(mRules.boardSize, space)];
+                }
+            case Taflman.TYPE_KING:
+                return mTable[PIECE_KING][Coord.getIndex(mRules.boardSize, space)];
+            default:
+                return 0;
+        }
     }
 }

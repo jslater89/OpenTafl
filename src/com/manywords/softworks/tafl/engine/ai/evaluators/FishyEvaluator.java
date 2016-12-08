@@ -178,6 +178,8 @@ public class FishyEvaluator implements Evaluator {
         short available = (short) (multiplier * getMaxFor(category) - getAssignedFor(category));
         short actualAmount = (short) (Math.min(Math.abs(amount), Math.abs(available)) * multiplier);
 
+        if((amount < 0 && actualAmount > 0) || (amount > 0 && actualAmount < 0)) actualAmount = (short) -actualAmount;
+
         switch(category) {
             case KING_FREEDOM_INDEX:
                 mAssignedKingFreedom += actualAmount;
@@ -205,6 +207,7 @@ public class FishyEvaluator implements Evaluator {
 
     private short changeEvaluation(int side, int category, float fraction, String debugMessage) {
         short preferredValue = (short) (getMaxFor(category) * fraction * (side == ATTACKER ? 1 : -1));
+
         short assignedValue = assignValue(side, category, preferredValue);
 
         if(debug && debugMessage != null) debugString += debugMessage + " (" + assignedValue + "/" + preferredValue + ")\n";
@@ -594,15 +597,15 @@ public class FishyEvaluator implements Evaluator {
         int defendersLost = mStartingDefenderCount - defendingTaflmenCount;
         int attackersLost = mStartingAttackerCount - attackingTaflmenCount;
 
-        float attackerValue = 0.7f / mStartingAttackerCount;
-        float defenderValue = 0.8f / mStartingDefenderCount;
+        float attackerFraction = 0.7f / mStartingAttackerCount;
+        float defenderFraction = 0.8f / mStartingDefenderCount;
 
         int defenderLossLevel = 0;
         int attackerLossLevel = 0;
 
         // The actual material count: 1/8, because expressing it in raw terms is super hard
-        value += changeEvaluation(DEFENDER, MATERIAL_INDEX, attackerValue * attackersLost, "Attacker losses: ");
-        value += changeEvaluation(ATTACKER, MATERIAL_INDEX, defenderValue * defendersLost, "Defender losses: ");
+        value += changeEvaluation(DEFENDER, MATERIAL_INDEX, attackerFraction * attackersLost, "Attacker losses: ");
+        value += changeEvaluation(ATTACKER, MATERIAL_INDEX, defenderFraction * defendersLost, "Defender losses: ");
 
         if(defendersLost > mStandardTaflmanCount[DEFENDER]) defenderLossLevel = 2;
         else if(defendersLost > mLightTaflmanCount[DEFENDER]) defenderLossLevel = 1;
@@ -626,23 +629,27 @@ public class FishyEvaluator implements Evaluator {
             value += changeEvaluation(DEFENDER, MATERIAL_INDEX, 0.1f, "Attacker is on heavy losses: -0.1 MATERIAL");
         }
 
-        // 5. ==================== PIECE-SQUARE TABLE =====================
-        attackerValue = PIECE_SQUARE_VALUE / mStartingAttackerCount;
-        defenderValue = PIECE_SQUARE_VALUE / (mStartingDefenderCount  - 2);
-        float kingValue = (PIECE_SQUARE_VALUE / (mStartingDefenderCount - 2)) * 3;
-
-        for(char taflman : attackingTaflmen) {
-            value += changeEvaluation(ATTACKER, PIECE_SQUARE_INDEX, attackerValue * mPieceSquareTable.getMultiplier(taflman, board.findTaflmanSpace(taflman)));
-        }
-
-        for(char taflman: defendingTaflmen) {
-            if(Taflman.isKing(taflman)) value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, kingValue * mPieceSquareTable.getMultiplier(taflman, board.findTaflmanSpace(taflman)));
-            else value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, defenderValue * mPieceSquareTable.getMultiplier(taflman, board.findTaflmanSpace(taflman)));
-        }
 
         if(debug) {
             debugString += "Material: " + (value - debugValue) + "\n";
             debugValue = value;
+        }
+
+
+        // 5. ==================== PIECE-SQUARE TABLE =====================
+        attackerFraction = 1f / mStartingAttackerCount;
+        defenderFraction = 1f / (mStartingDefenderCount  - 2);
+        float kingFraction = (1f / (mStartingDefenderCount - 2)) * 3;
+
+        for(char taflman : attackingTaflmen) {
+            Coord space = board.findTaflmanSpace(taflman);
+            value += changeEvaluation(ATTACKER, PIECE_SQUARE_INDEX, attackerFraction * mPieceSquareTable.getMultiplier(taflman, space), "Attacker PST " + space + ": ");
+        }
+
+        for(char taflman: defendingTaflmen) {
+            Coord space = board.findTaflmanSpace(taflman);
+            if(Taflman.isKing(taflman)) value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, kingFraction * mPieceSquareTable.getMultiplier(taflman, space), "King PST " + space + ": ");
+            else value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, defenderFraction * mPieceSquareTable.getMultiplier(taflman, space), "Defender PST " + space + ": ");
         }
 
         if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
