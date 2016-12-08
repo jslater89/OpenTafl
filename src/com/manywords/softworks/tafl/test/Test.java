@@ -18,7 +18,7 @@ public class Test {
     public static void run() {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
-        // Initial tests (debug only
+        // Initial tests (debug only)
 
         // Mechanics tests
         tests.add(new RepetitionHashTableTest());
@@ -75,6 +75,7 @@ public class Test {
         // AI tests
         tests.add(new AIThreatEvaluationTest());
         tests.add(new AIMatchingZobristTest());
+        tests.add(new AIMoveRepetitionTest());
         tests.add(new AIMoveConsiderationCrashTest());
         tests.add(new AIIncompleteContinuationTest());
         tests.add(new AISearchEquivalenceTest());

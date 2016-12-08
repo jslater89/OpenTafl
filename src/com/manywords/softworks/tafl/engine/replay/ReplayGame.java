@@ -424,6 +424,10 @@ public class ReplayGame {
         }
 
         mGame.getHistory().retainAll(toRetain);
+
+        for(GameState state : mGame.getHistory()) {
+            mGame.getRepetitions().increment(state.mZobristHash);
+        }
     }
 
     public int historySize() {

@@ -116,26 +116,26 @@ public class FishyEvaluator implements Evaluator {
         if(taflmanTotal < mStartingDefenderCount) mStandardTaflmanCount[DEFENDER] += (mStartingDefenderCount - taflmanTotal);
 
         // Set up attacker taflman values
-        taflmanTotal = 0;
-        mLightTaflmanCount[ATTACKER] = (int) (mStartingAttackerCount * LIGHT_TAFLMAN_LOSSES);
-        mStandardTaflmanCount[ATTACKER] = (int) (mStartingAttackerCount * standardTaflmanPercentage);
-        mHeavyTaflmanCount[ATTACKER] = (int) (mStartingAttackerCount * HEAVY_TAFLMAN_LOSSES);
-
-        taflmanTotal = mLightTaflmanCount[ATTACKER] + mStandardTaflmanCount[ATTACKER] + mHeavyTaflmanCount[ATTACKER];
-        if(taflmanTotal < mStartingAttackerCount) mStandardTaflmanCount[ATTACKER] += (mStartingAttackerCount - taflmanTotal);
-
-        short standardTaflmanValue = (short) (MATERIAL_VALUE * (1d - HEAVY_TAFLMAN_VALUE - LIGHT_TAFLMAN_VALUE));
-        short lightTaflmanValue = (short) (MATERIAL_VALUE * LIGHT_TAFLMAN_VALUE);
-        short heavyTaflmanValue = (short) (MATERIAL_VALUE * HEAVY_TAFLMAN_VALUE);
-
-        mStandardTaflmanValue[ATTACKER] = (short) (standardTaflmanValue / mStandardTaflmanCount[ATTACKER]);
-        mStandardTaflmanValue[DEFENDER] = (short) (standardTaflmanValue / mStandardTaflmanCount[DEFENDER]);
-
-        mLightTaflmanValue[ATTACKER] = (short) (lightTaflmanValue / mLightTaflmanCount[ATTACKER]);
-        mLightTaflmanValue[DEFENDER] = (short) (lightTaflmanValue / mLightTaflmanCount[DEFENDER]);
-
-        mHeavyTaflmanValue[ATTACKER] = (short) (heavyTaflmanValue / mHeavyTaflmanCount[ATTACKER]);
-        mHeavyTaflmanValue[DEFENDER] = (short) (heavyTaflmanValue / mHeavyTaflmanCount[DEFENDER]);
+//        taflmanTotal = 0;
+//        mLightTaflmanCount[ATTACKER] = (int) (mStartingAttackerCount * LIGHT_TAFLMAN_LOSSES);
+//        mStandardTaflmanCount[ATTACKER] = (int) (mStartingAttackerCount * standardTaflmanPercentage);
+//        mHeavyTaflmanCount[ATTACKER] = (int) (mStartingAttackerCount * HEAVY_TAFLMAN_LOSSES);
+//
+//        taflmanTotal = mLightTaflmanCount[ATTACKER] + mStandardTaflmanCount[ATTACKER] + mHeavyTaflmanCount[ATTACKER];
+//        if(taflmanTotal < mStartingAttackerCount) mStandardTaflmanCount[ATTACKER] += (mStartingAttackerCount - taflmanTotal);
+//
+//        short standardTaflmanValue = (short) (MATERIAL_VALUE * (1d - HEAVY_TAFLMAN_VALUE - LIGHT_TAFLMAN_VALUE));
+//        short lightTaflmanValue = (short) (MATERIAL_VALUE * LIGHT_TAFLMAN_VALUE);
+//        short heavyTaflmanValue = (short) (MATERIAL_VALUE * HEAVY_TAFLMAN_VALUE);
+//
+//        mStandardTaflmanValue[ATTACKER] = (short) (standardTaflmanValue / mStandardTaflmanCount[ATTACKER]);
+//        mStandardTaflmanValue[DEFENDER] = (short) (standardTaflmanValue / mStandardTaflmanCount[DEFENDER]);
+//
+//        mLightTaflmanValue[ATTACKER] = (short) (lightTaflmanValue / mLightTaflmanCount[ATTACKER]);
+//        mLightTaflmanValue[DEFENDER] = (short) (lightTaflmanValue / mLightTaflmanCount[DEFENDER]);
+//
+//        mHeavyTaflmanValue[ATTACKER] = (short) (heavyTaflmanValue / mHeavyTaflmanCount[ATTACKER]);
+//        mHeavyTaflmanValue[DEFENDER] = (short) (heavyTaflmanValue / mHeavyTaflmanCount[DEFENDER]);
     }
 
     private short getMaxFor(int category) {
