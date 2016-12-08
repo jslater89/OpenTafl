@@ -594,6 +594,9 @@ public class AiWorkspace extends Game {
                         horizonStart += horizonCount;
                     }
 
+                    // Fall out early if we've searched too deep
+                    if (currentHorizonDepth > continuationDepth * 2) break;
+
                     boolean certainVictory = true;
                     int e = 0;
                     for (GameTreeNode branch : getTreeRoot().getBranches()) {
