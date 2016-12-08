@@ -206,9 +206,9 @@ Explanatory notes:
 		If "n", the defenders move first.
 	tfr:
 		(threefold repetition) what should happen in the case of a threefold repetition?
-		if "w", the player forced to respond wins. If "l", the player forced to respond
-		loses. If "d", the game is a draw (default). If "i", threefold repetitions are
-		ignored.
+		if "w", the player forcing the repetition wins. If "l", the player forced the
+		repetition loses. If "d", the game is a draw (default). If "i", threefold
+		repetitions are ignored.
 	ka: 
 		(king armed) does the king participate in captures? Defaults to "y" (yes).
 		If "a" (anvil-only), the king can be captured against, but cannot move to make a
@@ -269,7 +269,7 @@ Explanatory notes:
 		(corner passable by...) a list of piece types which can move through the corner
 		spaces. Defaults to "K" (king only).
 	cenp:
-		as corp. Defaults to "tcnkTCNK" (king only).
+		as corp. Defaults to "tcnkTCNK" (all pieces).
 	aforp:
 		as corp. Defaults to "tcnkTCNK" (all pieces).
 	dforp:
