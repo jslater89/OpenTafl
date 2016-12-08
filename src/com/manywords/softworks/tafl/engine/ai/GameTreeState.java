@@ -123,6 +123,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return getBranches().get(i);
     }
 
+    // TODO: I believe this is broken, somehow
     public static List<GameTreeNode> getPathStartingWithNode(GameTreeNode node) {
         List<GameTreeNode> bestPath = new ArrayList<GameTreeNode>();
 
