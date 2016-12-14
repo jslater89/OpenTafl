@@ -380,17 +380,24 @@ public class AiWorkspace extends Game {
 
         // Continuation search happens here
 
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                synchronized (mTimeLock) {
-                    if(mUseHorizonSearch) mHorizonTime = true;
+        long delay = mThinkTime - mHorizonMillis;
+        if(delay > 0) {
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (mTimeLock) {
+                        if (mUseHorizonSearch) mHorizonTime = true;
+                    }
                 }
+            }, delay);
+        }
+        else {
+            synchronized (mTimeLock) {
+                if (mUseHorizonSearch) mHorizonTime = true;
             }
-        }, mThinkTime - mHorizonMillis);
+        }
 
         // Horizon search happens here
-
         t.schedule(new TimerTask() {
             @Override
             public void run() {
