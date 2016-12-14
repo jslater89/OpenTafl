@@ -780,7 +780,9 @@ public class AiWorkspace extends Game {
                 true, // update Zobrist
                 berserkingTaflman);
 
+        getRepetitions().increment(nextState.mZobristHash);
         nextState.checkVictory();
+        getRepetitions().decrement(nextState.mZobristHash);
         return nextState;
     }
 }

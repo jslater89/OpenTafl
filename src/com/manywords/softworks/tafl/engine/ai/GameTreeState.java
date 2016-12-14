@@ -51,6 +51,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
         mEnteringMove = null;
 
+        mVictory = copyState.checkVictory();
         mAlpha = -5000;
         mBeta = 5000;
         mDepth = 0;
@@ -74,8 +75,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
         // result should be good move except in cases like berserk,
         // where most moves on a berserk turn are illegal.
         if(nextGameState.getLastMoveResult() >= LOWEST_NONERROR_RESULT) {
-            mGame.advanceState(this, nextGameState, nextGameState.getBerserkingTaflman() == EMPTY, nextGameState.getBerserkingTaflman(), true);
             nextState = new GameTreeState(workspace, nextGameState, this);
+            mGame.advanceState(this, nextState, nextState.getBerserkingTaflman() == EMPTY, nextState.getBerserkingTaflman(), true);
         }
         else {
             nextState = new GameTreeState(nextGameState.getLastMoveResult());
@@ -267,7 +268,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
         if(extension && mDepth <= overallMaxDepth) {
             if(workspace.mNoTime && mValue != Evaluator.NO_VALUE) return this; // If we don't have a value, we'll fall out elsewhere
-            else if(mVictory > HIGHEST_NONTERMINAL_RESULT) return this;
+            else if(checkVictory() > HIGHEST_NONTERMINAL_RESULT) return this;
         }
 
         short cachedValue = Evaluator.NO_VALUE;
@@ -288,6 +289,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // No transposition hits allowed in the first level of depthin', I guess.
             cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), remainingDepth, mGameLength);
         }
+
+        int victory = checkVictory();
 
         int fallout = 0;
         if (cachedValue != Evaluator.NO_VALUE && mDepth > 0) {
@@ -314,7 +317,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             fallout = 1;
         }
         else if (mDepth != 0
-                && (checkVictory() > HIGHEST_NONTERMINAL_RESULT
+                && (victory > HIGHEST_NONTERMINAL_RESULT
                 || mDepth >= currentMaxDepth
                 || (workspace.mNoTime)
                 || (!extension && workspace.mContinuationTime)
@@ -388,8 +391,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
 
             if(mValue == Evaluator.NO_VALUE) {
-
-                throw new IllegalStateException("Unvalued state after search");
+                throw new IllegalStateException("Unvalued state after search: " + getEnteringMoveSequence());
             }
 
             // This state has not occurred in the history for not-our-children
