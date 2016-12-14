@@ -271,8 +271,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
         if(extension && mDepth <= overallMaxDepth) {
-            if(workspace.mNoTime && mValue != Evaluator.NO_VALUE) return this; // If we don't have a value, we'll fall out elsewhere
-            else if(checkVictory() > HIGHEST_NONTERMINAL_RESULT) return this;
+            if(workspace.mNoTime && mValue != Evaluator.NO_VALUE || checkVictory() > HIGHEST_NONTERMINAL_RESULT) {
+                if(mValue == Evaluator.NO_VALUE) mValue = evaluate();
+                return minifyState();
+            }
         }
 
         short cachedValue = Evaluator.NO_VALUE;
