@@ -277,7 +277,6 @@ public class FishyEvaluator implements Evaluator {
 
             if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
         }
-
         value = 0;
 
         List<Character> defendingTaflmen = state.getDefenders().getTaflmen();
@@ -637,19 +636,23 @@ public class FishyEvaluator implements Evaluator {
 
 
         // 5. ==================== PIECE-SQUARE TABLE =====================
-        attackerFraction = 1f / mStartingAttackerCount;
-        defenderFraction = 1f / (mStartingDefenderCount  - 2);
-        float kingFraction = (1f / (mStartingDefenderCount - 2)) * 3;
+        if(mPieceSquareTable != null) {
+            attackerFraction = 1f / mStartingAttackerCount;
+            defenderFraction = 1f / (mStartingDefenderCount - 2);
+            float kingFraction = (1f / (mStartingDefenderCount - 2)) * 3;
 
-        for(char taflman : attackingTaflmen) {
-            Coord space = board.findTaflmanSpace(taflman);
-            value += changeEvaluation(ATTACKER, PIECE_SQUARE_INDEX, attackerFraction * mPieceSquareTable.getMultiplier(taflman, space), "Attacker PST " + space + ": ");
-        }
+            for (char taflman : attackingTaflmen) {
+                Coord space = board.findTaflmanSpace(taflman);
+                value += changeEvaluation(ATTACKER, PIECE_SQUARE_INDEX, attackerFraction * mPieceSquareTable.getMultiplier(taflman, space), "Attacker PST " + space + ": ");
+            }
 
-        for(char taflman: defendingTaflmen) {
-            Coord space = board.findTaflmanSpace(taflman);
-            if(Taflman.isKing(taflman)) value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, kingFraction * mPieceSquareTable.getMultiplier(taflman, space), "King PST " + space + ": ");
-            else value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, defenderFraction * mPieceSquareTable.getMultiplier(taflman, space), "Defender PST " + space + ": ");
+            for (char taflman : defendingTaflmen) {
+                Coord space = board.findTaflmanSpace(taflman);
+                if (Taflman.isKing(taflman))
+                    value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, kingFraction * mPieceSquareTable.getMultiplier(taflman, space), "King PST " + space + ": ");
+                else
+                    value += changeEvaluation(DEFENDER, PIECE_SQUARE_INDEX, defenderFraction * mPieceSquareTable.getMultiplier(taflman, space), "Defender PST " + space + ": ");
+            }
         }
 
         if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
