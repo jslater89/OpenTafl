@@ -75,8 +75,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
         // result should be good move except in cases like berserk,
         // where most moves on a berserk turn are illegal.
         if(nextGameState.getLastMoveResult() >= LOWEST_NONERROR_RESULT) {
+            mGame.advanceState(this, nextGameState, nextGameState.getBerserkingTaflman() == EMPTY, nextGameState.getBerserkingTaflman(), true);
             nextState = new GameTreeState(workspace, nextGameState, this);
-            mGame.advanceState(this, nextState, nextState.getBerserkingTaflman() == EMPTY, nextState.getBerserkingTaflman(), true);
+
+            workspace.getRepetitions().increment(nextState.mZobristHash);
+            nextState.checkVictory();
+            workspace.getRepetitions().decrement(nextState.mZobristHash);
         }
         else {
             nextState = new GameTreeState(nextGameState.getLastMoveResult());
