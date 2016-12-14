@@ -432,7 +432,7 @@ public class AiWorkspace extends Game {
             mLastDepth = depth;
 
             if (canSearchToDepth(depth)) {
-                if (isTimeCritical() || mNoTime || mHorizonTime) {
+                if (isTimeCritical() || mNoTime || mHorizonTime || mContinuationTime) {
                     break;
                 }
 
@@ -577,6 +577,7 @@ public class AiWorkspace extends Game {
                     while(timeRemaining > estimatedTimeToDepth(horizonDepth) * 2) {
                         horizonDepth++;
                     }
+
                     // Horizon depth -1 because it gets incremented before it fails the test.
                     horizonDepth = Math.min(horizonDepth - 1, deepestSearch - 1);
                     OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Extra horizon depth: " + horizonDepth + " (in " + estimatedTimeToDepth(horizonDepth) + "/" + timeRemaining + ")");
@@ -598,31 +599,30 @@ public class AiWorkspace extends Game {
 
                     if (currentHorizonDepth > continuationDepth + horizonLimit) {
                         currentHorizonDepth = continuationDepth + horizonLimit;
-                        horizonStart += horizonCount;
                     }
 
-                    boolean certainVictory = true;
-                    int e = 0;
-                    for (GameTreeNode branch : getTreeRoot().getBranches()) {
-                        if (e < horizonStart) {
-                            e++;
-                            continue;
-                        }
+                    if(currentHorizonDepth == deepestSearch) break;
 
+                    // Fall out early if we've searched too deep
+
+                    boolean certainVictory = true;
+                    int horizonOptions = getTreeRoot().getBranches().size();
+
+                    for (GameTreeNode branch : getTreeRoot().getBranches()) {
                         List<GameTreeNode> nodes = GameTreeState.getPathStartingWithNode(branch);
                         GameTreeNode n = nodes.get(nodes.size() - 1);
                         if (n.getVictory() == GameState.GOOD_MOVE) {
+                            short oldValue = n.getValue();
                             n.explore(currentHorizonDepth, continuationDepth, n.getAlpha(), n.getBeta(), mThreadPool, false);
+
                             certainVictory = false;
                             n.revalueParent(n.getDepth());
                         }
-
-                        e++;
-                        if (e > horizonStart + horizonCount) break;
                     }
 
                     OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Ran horizon search at depth: " + currentHorizonDepth
                             + " starting index " + horizonStart + " ending index " + (horizonStart + horizonCount) + " with " + timeRemaining + "msec");
+
 
                     if (currentHorizonDepth > deepestSearch) deepestSearch = currentHorizonDepth;
 
