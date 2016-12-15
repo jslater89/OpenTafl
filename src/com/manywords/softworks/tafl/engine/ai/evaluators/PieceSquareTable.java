@@ -9,9 +9,7 @@ import com.manywords.softworks.tafl.rules.Taflman;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.manywords.softworks.tafl.rules.Rules.KING_STRONG;
-import static com.manywords.softworks.tafl.rules.Rules.KING_STRONG_CENTER;
-import static com.manywords.softworks.tafl.rules.Rules.KING_WEAK;
+import static com.manywords.softworks.tafl.rules.Rules.*;
 
 /**
  * Created by jay on 12/4/16.
@@ -36,7 +34,8 @@ public class PieceSquareTable {
     /*
      * Split the board into four main regions, with some subregions.
      * 1. Center: moderately bad for both sides, to discourage the attackers from making
-     *    incautious center dives, and to encourage the defenders to spread out.
+     *    incautious center dives, and to encourage the defenders to spread out. The
+     *    center is a diamond of diameter centerSize.
      *    a. Throne: good for the king to be on or next to the throne, if he is weak.
      * 2. Gutter: the region between the corners. Bad for defenders, good for king, good for attackers.
      * 3. Crucial: the region in between the center and the gutter. Generally controls movement
@@ -51,6 +50,7 @@ public class PieceSquareTable {
      */
     private void initialize() {
         int dimension = mRules.boardSize;
+        boolean hasCorners = mRules.getEscapeType() == Rules.CORNERS;
 
         int centerSize = 3;
         switch(dimension) {
@@ -82,15 +82,19 @@ public class PieceSquareTable {
         int centerLimit = (dimension / 2) - (centerSize / 2);
 
         List<Coord> centerSpaces = new ArrayList<>();
+        List<Coord> centerCutouts = new ArrayList<>();
         List<Coord> crucialSpaces = new ArrayList<>();
         List<Coord> gutterSpaces = new ArrayList<>();
         List<Coord> cornerSpaces = new ArrayList<>();
 
         for(int y = 0; y < dimension / 2 + 1; y++) {
             for(int x = 0; x < dimension / 2 + 1; x++) {
-                if(x < cornerSize && y < cornerSize) cornerSpaces.add(Coord.get(x, y));
+                if(hasCorners && x < cornerSize && y < cornerSize) cornerSpaces.add(Coord.get(x, y));
                 else if(x < gutterSize || y < gutterSize) gutterSpaces.add(Coord.get(x, y));
-                else if(x >= centerLimit && y >= centerLimit) centerSpaces.add(Coord.get(x, y));
+                else if(x >= centerLimit && y >= centerLimit) {
+                    if((x+y) >= 3 * centerLimit) centerSpaces.add(Coord.get(x, y));
+                    else centerCutouts.add(Coord.get(x, y));
+                }
                 else crucialSpaces.add(Coord.get(x, y));
             }
         }
@@ -100,11 +104,11 @@ public class PieceSquareTable {
 //        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, gutterSpaces);
 //        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, cornerSpaces);
 
-        setValues(dimension, gutterSize, crucialSize, centerSpaces, crucialSpaces, gutterSpaces, cornerSpaces);
+        setValues(dimension, hasCorners, gutterSize, crucialSize, centerSpaces, centerCutouts, crucialSpaces, gutterSpaces, cornerSpaces);
         mirrorValues(dimension);
     }
 
-    private void setValues(int dimension, int gutterSize, int crucialSize, List<Coord> centerSpaces, List<Coord> crucialSpaces, List<Coord> gutterSpaces, List<Coord> cornerSpaces) {
+    private void setValues(int dimension, boolean hasCorners, int gutterSize, int crucialSize, List<Coord> centerSpaces, List<Coord> centerCutouts, List<Coord> crucialSpaces, List<Coord> gutterSpaces, List<Coord> cornerSpaces) {
         int centerIndex = dimension / 2 + 1;
 
         // Center stuff
@@ -112,10 +116,22 @@ public class PieceSquareTable {
         Coord center = Coord.get(centerIndex, centerIndex);
         mTable[PIECE_KING][Coord.getIndex(dimension, center)] = (mRules.getKingStrengthMode() == KING_STRONG ? -0.1f : 0f);
 
+        for(Coord c: centerCutouts) {
+            mTable[PIECE_DEFENDING_TAFLMAN][Coord.getIndex(dimension, c)] = 0.05f;
+            mTable[PIECE_KING][Coord.getIndex(dimension, c)] = 0.05f;
+            mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, c)] = 0.15f;
+        }
+
         // Gutter stuff
         for(Coord c : gutterSpaces) {
-            mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, c)] = -0.15f;
-            mTable[PIECE_DEFENDING_TAFLMAN][Coord.getIndex(dimension, c)] = -0.1f;
+            if(hasCorners) {
+                mTable[PIECE_DEFENDING_TAFLMAN][Coord.getIndex(dimension, c)] = -0.1f;
+                mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, c)] = -0.15f;
+            }
+            else {
+                mTable[PIECE_DEFENDING_TAFLMAN][Coord.getIndex(dimension, c)] = 0.1f;
+                mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, c)] = 0.0f;
+            }
             mTable[PIECE_KING][Coord.getIndex(dimension, c)] = 0.25f;
         }
 
@@ -124,8 +140,8 @@ public class PieceSquareTable {
 
         for(Coord c : crucialSpaces) {
             if(crucialSize > 1) {
-                if(c.x == crucialStart || c.y == crucialStart) setValue(dimension, c, 0.2f);
-                else if(c.x == crucialStart + 1 || c.y == crucialStart + 1) setValue(dimension, c, 0.5f);
+                if(c.x == crucialStart || c.y == crucialStart) setValue(dimension, c, 0.25f);
+                else if(dimension > 9 && (c.x == crucialStart + 1 || c.y == crucialStart + 1)) setValue(dimension, c, 0.33f);
                 else setValue(dimension, c, 0.33f);
             }
             else setValue(dimension, c, 0.33f);
@@ -139,51 +155,54 @@ public class PieceSquareTable {
         }
 
         // It's bad to be right next to the corner, unless you're a non-weak king.
-        Coord cornerRight;
-        Coord cornerBelow;
+        if(hasCorners) {
+            List<Coord> cornerNeighbors = new ArrayList<>();
+            if (dimension == 19) {
+                cornerNeighbors.add(Coord.get(0, 2));
+                cornerNeighbors.add(Coord.get(2, 0));
+                cornerNeighbors.add(Coord.get(1, 2));
+                cornerNeighbors.add(Coord.get(2, 1));
+            }
+            else {
+                cornerNeighbors.add(Coord.get(0, 1));
+                cornerNeighbors.add(Coord.get(1, 0));
+            }
 
-        if(dimension == 19) {
-            cornerRight = Coord.get(0, 2);
-            cornerBelow = Coord.get(2, 0);
-        }
-        else {
-            cornerRight = Coord.get(0, 1);
-            cornerBelow = Coord.get(1, 0);
-        }
+            for(Coord space : cornerNeighbors) {
+                mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, space)] = -0.5f;
+                mTable[PIECE_DEFENDING_TAFLMAN][Coord.getIndex(dimension, space)] = -0.5f;
 
-        float value = -0.5f;
-        mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, cornerRight)] = value;
-        mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, cornerBelow)] = value;
-        mTable[PIECE_DEFENDING_TAFLMAN][Coord.getIndex(dimension, cornerRight)] = value;
-        mTable[PIECE_DEFENDING_TAFLMAN][Coord.getIndex(dimension, cornerBelow)] = value;
+                if (mRules.getKingStrengthMode() != KING_WEAK && mRules.getKingStrengthMode() != KING_STRONG_CENTER)
+                    mTable[PIECE_KING][Coord.getIndex(dimension, space)] = 0.5f;
+                else
+                    mTable[PIECE_KING][Coord.getIndex(dimension, space)] = -0.5f;
 
-        if(mRules.getKingStrengthMode() != KING_WEAK && mRules.getKingStrengthMode() != KING_STRONG_CENTER) value = 0.5f;
-        mTable[PIECE_KING][Coord.getIndex(dimension, cornerRight)] = value;
-        mTable[PIECE_KING][Coord.getIndex(dimension, cornerBelow)] = value;
+            }
 
-        // It's good to be on the corner diagonal point for everyone, but it's also the lynchpin of the attacker's
-        // corner defense
-        Coord cornerDiagonal;
-        if(dimension == 19) cornerDiagonal = Coord.get(2, 2);
-        else cornerDiagonal = Coord.get(1, 1);
+            // It's good to be on the corner diagonal point for everyone, but it's also the lynchpin of the attacker's
+            // corner defense
+            Coord cornerDiagonal;
+            if (dimension == 19) cornerDiagonal = Coord.get(2, 2);
+            else cornerDiagonal = Coord.get(1, 1);
 
-        setValue(dimension, cornerDiagonal, 0.4f);
-        mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, cornerDiagonal)] = 0.75f;
+            setValue(dimension, cornerDiagonal, 0.4f);
+            mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, cornerDiagonal)] = 0.75f;
 
-        List<Coord> cornerDefenseCoords = new ArrayList<>();
-        if(dimension == 19) {
-            cornerDefenseCoords.add(Coord.get(4, 0));
-            cornerDefenseCoords.add(Coord.get(3, 1));
-            cornerDefenseCoords.add(Coord.get(1, 3));
-            cornerDefenseCoords.add(Coord.get(0, 4));
-        }
-        else {
-            cornerDefenseCoords.add(Coord.get(2, 0));
-            cornerDefenseCoords.add(Coord.get(0, 2));
-        }
+            List<Coord> cornerDefenseCoords = new ArrayList<>();
+            if (dimension == 19) {
+                cornerDefenseCoords.add(Coord.get(4, 0));
+                cornerDefenseCoords.add(Coord.get(3, 1));
+                cornerDefenseCoords.add(Coord.get(1, 3));
+                cornerDefenseCoords.add(Coord.get(0, 4));
+            }
+            else {
+                cornerDefenseCoords.add(Coord.get(2, 0));
+                cornerDefenseCoords.add(Coord.get(0, 2));
+            }
 
-        for(Coord c : cornerDefenseCoords) {
-            mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, c)] = 0.66f;
+            for (Coord c : cornerDefenseCoords) {
+                mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, c)] = 0.66f;
+            }
         }
     }
 
@@ -195,8 +214,8 @@ public class PieceSquareTable {
 
     private void mirrorValues(int dimension) {
         int axis = dimension / 2;
-        for(int y = 0; y < axis; y++) {
-            for(int x = 0; x < axis; x++) {
+        for(int y = 0; y < axis + 1; y++) {
+            for(int x = 0; x < axis + 1; x++) {
                 int xDiff = x - axis;
                 int yDiff = y - axis;
 
@@ -226,6 +245,8 @@ public class PieceSquareTable {
 
     public float getMultiplier(char taflman, Coord space) {
         switch(Taflman.getPackedType(taflman)) {
+            case Taflman.TYPE_COMMANDER:
+            case Taflman.TYPE_KNIGHT:
             case Taflman.TYPE_TAFLMAN:
                 if(Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
                     return mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(mRules.boardSize, space)];
