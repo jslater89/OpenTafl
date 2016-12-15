@@ -280,9 +280,9 @@ public class FishyEvaluator implements Evaluator {
         } else if (victory == GameState.DRAW) {
             if (debug) debugString += "Draw at depth " + depth + "/" + remainingDepth + "\n";
 
-            // Treat draws as losses
-            if (state.getCurrentSide().isAttackingSide()) value = (short)(Evaluator.DEFENDER_WIN - (500 * (remainingDepth + 1)));
-            else value = (short)(Evaluator.ATTACKER_WIN + (500 * (remainingDepth + 1)));
+            // Contempt factor: a draw is better than a terrible evaluation or a loss, but still bad.
+            if (state.getCurrentSide().isAttackingSide()) value = (short) -1500;
+            else value = (short) 1500;
 
             if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
         }
