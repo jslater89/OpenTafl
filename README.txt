@@ -269,6 +269,12 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 11. VERSION HISTORY -----------------------------------------------------------
+v0.4.5.0b (released 12/16/16):
+- Fix several search bugs
+- Fix some remaining bugs in OpenTafl's play of repetitions
+- Add piece square table to evaluation function
+- Allow AI to play for a draw when the situation warrants it
+
 v0.4.4.7b (released 10/25/16):
 - Improve error tolerance when loading malformed OpenTafl notation
 - Add more supported monospace fonts for graphical terminal mode, provide
