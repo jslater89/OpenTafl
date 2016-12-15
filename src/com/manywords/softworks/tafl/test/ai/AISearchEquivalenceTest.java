@@ -150,7 +150,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceAlphabetaBenchmark.allowKillerMoves(false);
         workspaceAlphabetaBenchmark.allowMoveOrdering(false);
 
-        workspaceAlphabetaBenchmark.explore(5);
+        workspaceAlphabetaBenchmark.explore(10);
 
         workspaceAlphabetaBenchmark.printSearchStats();
         //workspaceAlphabetaBenchmark.getTreeRoot().printTree("T1: ");
@@ -288,7 +288,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceAllButOrdering.allowKillerMoves(true);
         workspaceAllButOrdering.allowMoveOrdering(false);
 
-        workspaceAllButOrdering.explore(20);
+        workspaceAllButOrdering.explore(10);
 
         workspaceAllButOrdering.printSearchStats();
 
@@ -315,7 +315,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceEverything.allowKillerMoves(true);
         workspaceEverything.allowMoveOrdering(true);
 
-        workspaceEverything.explore(20);
+        workspaceEverything.explore(10);
 
         workspaceEverything.printSearchStats();
 
