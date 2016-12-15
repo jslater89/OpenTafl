@@ -48,8 +48,10 @@ public class AiWorkspace extends Game {
     public static int[] mTimeToDepthAge;
     public int mRepetitionsIgnoreTranspositionTable = 0;
 
-    private long mStartTime;
-    private long mEndTime;
+    private long mPrepStartTime;
+    private long mPrepEndTime;
+    private long mThinkStartTime;
+    private long mThinkEndTime;
 
     private int mLastDepth;
     private int mDeepestSearch;
@@ -68,6 +70,7 @@ public class AiWorkspace extends Game {
 
     /**
      * In depth from the root, inclusive (root == 0, e.g. depth 5 searches to nodes with depth of 5)
+     * Continuation and horizon searches can exceed mMaxDepth
      */
     private int mMaxDepth = 25;
 
@@ -95,6 +98,7 @@ public class AiWorkspace extends Game {
 
     public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
         super(startingGame.mZobristConstants, startingGame.getHistory(), startingGame.getRepetitions());
+        mPrepStartTime = System.currentTimeMillis();
 
         evaluator.initialize(startingGame.getRules());
 
@@ -146,6 +150,9 @@ public class AiWorkspace extends Game {
         }
 
         lastRulesString = startingGame.getRules().getOTRString();
+        mPrepEndTime = System.currentTimeMillis();
+
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Spent on prep time: " + (mPrepEndTime - mPrepStartTime) + "ms");
     }
 
     public static void resetTranspositionTable() {
@@ -336,26 +343,26 @@ public class AiWorkspace extends Game {
     }
 
     private boolean canSearchToDepth(int depth) {
-        long timeLeft = mStartTime + mThinkTime - System.currentTimeMillis();
+        long timeLeft = mThinkStartTime + mThinkTime - System.currentTimeMillis();
 
         // We can start a deeper search
         return mBenchmarkMode || !(isTimeCritical() || timeLeft < (estimatedTimeToDepth(depth)));
     }
 
     private boolean isTimeCritical() {
-        long timeLeft = mStartTime + mThinkTime - System.currentTimeMillis();
+        long timeLeft = mThinkStartTime + mThinkTime - System.currentTimeMillis();
         return timeLeft < (long) Math.min(mThinkTime * 0.05, POST_SEARCH_PAD);
     }
 
     public void explore(int maxThinkTime) {
+        mThinkStartTime = System.currentTimeMillis();
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "In between time: " + (mThinkStartTime - mPrepEndTime) + "ms");
         transpositionTable.resetTableStats();
         mRepetitionsIgnoreTranspositionTable = 0;
         mBestStatePreHorizon = null;
 
         if(maxThinkTime == 0) maxThinkTime = 86400;
         mMaxThinkTime = maxThinkTime * 1000;
-
-        mStartTime = System.currentTimeMillis();
 
         if(mTimeRemaining == null && mGame.getClock() != null) {
             mClockLength = mGame.getClock().toTimeSpec();
@@ -502,7 +509,7 @@ public class AiWorkspace extends Game {
             long continuationStart = System.currentTimeMillis();
             while (true) {
                 long continuationTime = mThinkTime - mHorizonMillis;
-                long timeSpent = System.currentTimeMillis() - mStartTime;
+                long timeSpent = System.currentTimeMillis() - mThinkStartTime;
                 long timeRemaining = continuationTime - timeSpent;
                 long timeRequired = estimatedTimeToDepth(continuationDepth - 1) / 2;
 
@@ -572,7 +579,7 @@ public class AiWorkspace extends Game {
 
             currentHorizonDepth = deepestSearch;
             while (true) {
-                long timeRemaining = (mThinkTime - (System.currentTimeMillis() - mStartTime - POST_SEARCH_PAD));
+                long timeRemaining = (mThinkTime - (System.currentTimeMillis() - mThinkStartTime - POST_SEARCH_PAD));
                 if (!isTimeCritical()) {
                     if (firstHorizon) {
                         firstHorizon = false;
@@ -651,7 +658,9 @@ public class AiWorkspace extends Game {
         }
 
         mDeepestSearch = deepestSearch;
-        mEndTime = System.currentTimeMillis();
+        mThinkEndTime = System.currentTimeMillis();
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Think time: " + (mThinkEndTime - mThinkStartTime) + "ms");
+        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Overall time spent on search: " + (mThinkEndTime - mPrepStartTime) + "ms");
     }
 
     public void printSearchStats() {
@@ -705,8 +714,8 @@ public class AiWorkspace extends Game {
 
             mUiCallback.statusText("Transpositions ignored because of repetitions: " + mRepetitionsIgnoreTranspositionTable);
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
-            mUiCallback.statusText("Thought for: " + (mEndTime - mStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, extension searches " + (fullNodes - nodes) + " nodes");
-            mUiCallback.statusText("Overall speed: " + (fullNodes / ((mEndTime - mStartTime)/ 1000d)) + " nodes/sec");
+            mUiCallback.statusText("Thought for: " + (mThinkEndTime - mThinkStartTime) + "msec. Tree sizes: main search " + nodes + " nodes, extension searches " + (fullNodes - nodes) + " nodes");
+            mUiCallback.statusText("Overall speed: " + (fullNodes / ((mThinkEndTime - mThinkStartTime)/ 1000d)) + " nodes/sec");
             mUiCallback.statusText("Transposition table stats: " + transpositionTable.getTableStats());
 
             OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Best state == best state pre-horizon? " + getTreeRoot().getBestChild().equals(mBestStatePreHorizon));
