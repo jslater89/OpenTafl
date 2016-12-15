@@ -195,31 +195,32 @@ public class AISearchEquivalenceTest extends TaflTest {
         assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //5. CONTINUATION+HORIZON SEARCHES -----------------------------------------------------------------------------
-        AiWorkspace workspaceContinuations = new AiWorkspace(this, g, g.getCurrentState(), 5);
-        workspaceContinuations.chatty = true;
-        workspaceContinuations.setMaxDepth(5);
-
-        workspaceContinuations.allowIterativeDeepening(false);
-        workspaceContinuations.allowContinuation(true);
-        workspaceContinuations.allowHorizon(true);
-        workspaceContinuations.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
-        workspaceContinuations.allowKillerMoves(false);
-        workspaceContinuations.allowMoveOrdering(false);
-
-        workspaceContinuations.explore(10);
-
-        workspaceContinuations.printSearchStats();
-
-        tempWorkspace = workspaceContinuations;
-        localEquivalentMoves.clear();
-        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
-            if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
-        }
-
-        bestChild = tempWorkspace.getTreeRoot().getBestChild();
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. Continuation+horizon move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
-        assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
+        // The whole point of continuation/horizon searches is that they may reveal something different
+//        AiWorkspace workspaceContinuations = new AiWorkspace(this, g, g.getCurrentState(), 5);
+//        workspaceContinuations.chatty = true;
+//        workspaceContinuations.setMaxDepth(5);
+//
+//        workspaceContinuations.allowIterativeDeepening(false);
+//        workspaceContinuations.allowContinuation(true);
+//        workspaceContinuations.allowHorizon(true);
+//        workspaceContinuations.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
+//        workspaceContinuations.allowKillerMoves(false);
+//        workspaceContinuations.allowMoveOrdering(false);
+//
+//        workspaceContinuations.explore(10);
+//
+//        workspaceContinuations.printSearchStats();
+//
+//        tempWorkspace = workspaceContinuations;
+//        localEquivalentMoves.clear();
+//        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+//            if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
+//        }
+//
+//        bestChild = tempWorkspace.getTreeRoot().getBestChild();
+//        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. Continuation+horizon move: " + bestChild.getEnteringMove() + " value: " + bestChild.getValue());
+//        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "5. " + localEquivalentMoves.size() + " local equivalent moves: " + localEquivalentMoves);
+//        assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //6. TRANSPOSITION SEARCH (FIXED DEPTH) ------------------------------------------------------------------------
         AiWorkspace workspaceTranspositionFixed = new AiWorkspace(this, g, g.getCurrentState(), 5);
@@ -281,8 +282,8 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceAllButOrdering.setMaxDepth(5);
 
         workspaceAllButOrdering.allowIterativeDeepening(true);
-        workspaceAllButOrdering.allowContinuation(true);
-        workspaceAllButOrdering.allowHorizon(true);
+        workspaceAllButOrdering.allowContinuation(false);
+        workspaceAllButOrdering.allowHorizon(false);
         workspaceAllButOrdering.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_ON);
         workspaceAllButOrdering.allowKillerMoves(true);
         workspaceAllButOrdering.allowMoveOrdering(false);
@@ -308,8 +309,8 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceEverything.setMaxDepth(5);
 
         workspaceEverything.allowIterativeDeepening(true);
-        workspaceEverything.allowContinuation(true);
-        workspaceEverything.allowHorizon(true);
+        workspaceEverything.allowContinuation(false);
+        workspaceEverything.allowHorizon(false);
         workspaceEverything.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_ON);
         workspaceEverything.allowKillerMoves(true);
         workspaceEverything.allowMoveOrdering(true);

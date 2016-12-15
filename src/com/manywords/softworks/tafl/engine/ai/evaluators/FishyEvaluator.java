@@ -50,11 +50,11 @@ public class FishyEvaluator implements Evaluator {
     private final int RANK_AND_FILE_INDEX = 2;
     private final int MATERIAL_INDEX = 3;
     private final int PIECE_SQUARE_INDEX = 4;
-    private final int KING_FREEDOM_VALUE = 900;
-    private final int KING_RISK_VALUE = 900;
-    private final int RANK_AND_FILE_VALUE = 400;
-    private final int MATERIAL_VALUE = 800;
-    private final int PIECE_SQUARE_VALUE = 700;
+    private final int KING_FREEDOM_VALUE = 500;
+    private final int KING_RISK_VALUE = 500;
+    private final int RANK_AND_FILE_VALUE = 1100;
+    private final int MATERIAL_VALUE = 1650;
+    private final int PIECE_SQUARE_VALUE = 1100;
     // 1400 for unused TAFLMAN_RISK
 
     // Losing fewer than taflman-count * LIGHT_LOSSES is not a tragedy.
