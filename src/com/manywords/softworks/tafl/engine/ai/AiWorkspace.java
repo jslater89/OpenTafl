@@ -20,7 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class AiWorkspace extends Game {
-    private static final long POST_SEARCH_PAD = 250;
+    private static final long POST_SEARCH_PAD = 500;
 
     private static String lastRulesString = "";
     public static TranspositionTable transpositionTable = null;
@@ -254,13 +254,15 @@ public class AiWorkspace extends Game {
         }
         else mainTimeMoves = 20;
 
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Time remaining: " + entry);
+
         // Moves the current side has made
         int movesMade = g.getHistory().size() / 2;
         int movesLeft = mainTimeMoves - movesMade;
         long mainTime = mClockLength.mainTime;
         long overtimeTime = mClockLength.overtimeTime;
         long overtimeCount = mClockLength.overtimeCount;
-        long incrementTime = (mClockLength.incrementTime > 0 ? mClockLength.incrementTime : 3000);
+        long incrementTime = mClockLength.incrementTime;
 
         if(overtimeCount == 0 || overtimeTime == 0) {
             if(movesMade < mainTimeMoves / 2) {
@@ -290,28 +292,31 @@ public class AiWorkspace extends Game {
             if(movesLeft > 0 && (mainTimeRemaining > movesLeft * overtimeTime)) {
                 long timePerMove = mainTimeRemaining / movesLeft;
                 if(mainTimeRemaining + overtimeTime > timePerMove) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Spending main time only");
                     return timePerMove;
                 }
                 else {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Using an overtime period plus main time");
                     return mainTimeRemaining + overtimeTime;
                 }
             }
             else {
                 // Be very careful with time if we only have one overtime and no main time!
                 if(entry.overtimeCount == 1 && mainTimeRemaining == 0) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Emergency overtime use");
                     return entry.overtimeTime - 1000;
                 }
-                if(movesLeft > 0) {
+                else if(movesLeft > 0 && mainTimeRemaining > 0) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Dividing main time into overtime");
                     long timePerMove = mainTimeRemaining / movesLeft;
 
                     // Save half a second, just to avoid using extra overtimes
-                    return entry.overtimeTime + timePerMove - 500;
+                    return entry.overtimeTime + timePerMove - 750;
                 }
                 else {
-                    // TODO: use multiple overtimes if things get dicey
-
                     // Save half a second, just to avoid using extra overtimes
-                    return mainTimeRemaining + entry.overtimeTime - 500;
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Overtime only");
+                    return mainTimeRemaining + entry.overtimeTime - 750;
                 }
             }
         }
@@ -367,6 +372,8 @@ public class AiWorkspace extends Game {
 
         Timer t = new Timer();
 
+        // n.b. if delays are 0, then we've been called with very little time, so we should just do our best and
+        // get out with a move.
         // Main search happens here
 
         t.schedule(new TimerTask() {
@@ -391,21 +398,22 @@ public class AiWorkspace extends Game {
                 }
             }, delay);
         }
-        else {
-            synchronized (mTimeLock) {
-                if (mUseHorizonSearch) mHorizonTime = true;
-            }
-        }
 
         // Horizon search happens here
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                synchronized (mTimeLock) {
-                    mNoTime = true;
-                };
-            }
-        }, mThinkTime - POST_SEARCH_PAD);
+
+        delay = mThinkTime - POST_SEARCH_PAD;
+        if(delay > 0) {
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (mTimeLock) {
+                        mNoTime = true;
+                    }
+                }
+            }, mThinkTime - POST_SEARCH_PAD);
+        }
+
+        // Time's up!
 
         boolean firstExtension = true;
         boolean firstHorizon = true;
@@ -654,23 +662,23 @@ public class AiWorkspace extends Game {
         mGame.mAverageBranchingFactor = observedBranching;
 
         if(chatty && mUiCallback != null) {
-            mUiCallback.statusText("# cutoffs/avg. to 1st a/b a/b");
-            for (int i = 0; i < mAlphaCutoffs.length && i < mDeepestSearch; i++) {
-                String line = "Depth " + i + ": " + mAlphaCutoffs[i] + "/" + mBetaCutoffs[i];
-                if (mAlphaCutoffDistances[i] > 0) {
-                    line += " " + mAlphaCutoffDistances[i] / mAlphaCutoffs[i];
-                } else {
-                    line += " 0";
-                }
-                line += "/";
-
-                if (mBetaCutoffDistances[i] > 0) {
-                    line += "" + mBetaCutoffDistances[i] / mBetaCutoffs[i];
-                } else {
-                    line += "0";
-                }
-                mUiCallback.statusText(line);
-            }
+//            mUiCallback.statusText("# cutoffs/avg. to 1st a/b a/b");
+//            for (int i = 0; i < mAlphaCutoffs.length && i < mDeepestSearch; i++) {
+//                String line = "Depth " + i + ": " + mAlphaCutoffs[i] + "/" + mBetaCutoffs[i];
+//                if (mAlphaCutoffDistances[i] > 0) {
+//                    line += " " + mAlphaCutoffDistances[i] / mAlphaCutoffs[i];
+//                } else {
+//                    line += " 0";
+//                }
+//                line += "/";
+//
+//                if (mBetaCutoffDistances[i] > 0) {
+//                    line += "" + mBetaCutoffDistances[i] / mBetaCutoffs[i];
+//                } else {
+//                    line += "0";
+//                }
+//                mUiCallback.statusText(line);
+//            }
 
 
             mUiCallback.statusText("Finding best state...");
