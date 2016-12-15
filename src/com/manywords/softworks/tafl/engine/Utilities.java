@@ -93,4 +93,49 @@ public class Utilities {
         }
         return "";
     }
+
+    public static void printArray(short[] array) {
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "[");
+
+        if(array.length > 0) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[0]);
+        }
+
+        for(int i = 1; i < array.length; i++) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, ",");
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[i]);
+        }
+
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "]");
+    }
+
+    public static void printArray(int[] array) {
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "[");
+
+        if(array.length > 0) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[0]);
+        }
+
+        for(int i = 1; i < array.length; i++) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, ",");
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[i]);
+        }
+
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "]");
+    }
+
+    public static void printArray(Object[] array) {
+        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "[");
+
+        if(array.length > 0) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[0]);
+        }
+
+        for(int i = 1; i < array.length; i++) {
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, ",");
+            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[i]);
+        }
+
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "]");
+    }
 }

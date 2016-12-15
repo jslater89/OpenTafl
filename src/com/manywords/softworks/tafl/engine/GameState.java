@@ -391,8 +391,7 @@ public class GameState {
         if(threefoldRepetitionResult != Rules.THIRD_REPETITION_IGNORED && mBerserkingTaflman == Taflman.EMPTY) {
             int repeats = countPositionOccurrences();
 
-            // If this position has occurred two other times plus this one, do the threefold
-            // checks.
+            // If this position has occurred three times...
             if(repeats > 2) {
                 if(threefoldRepetitionResult == Rules.THIRD_REPETITION_DRAWS) {
                     return DRAW;

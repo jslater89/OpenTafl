@@ -46,7 +46,7 @@ public class OpenTafl {
         SILENT
     }
 
-    public static final String CURRENT_VERSION = "v0.4.4.7b";
+    public static final String CURRENT_VERSION = "v0.4.5.0b";
     public static final int NETWORK_PROTOCOL_VERSION = 7;
 
     public static boolean devMode = false;
@@ -93,6 +93,7 @@ public class OpenTafl {
             }
             else if(arg.contains("--dev") || arg.contains("--debug")) {
                 logLevel = LogLevel.CHATTY;
+                //runMode = Mode.DEBUG;
                 devMode = true;
             }
             else if (arg.contains("--chatty")) {
@@ -148,20 +149,7 @@ public class OpenTafl {
                 preferredFonts[6] = new Font("Unifont", Font.PLAIN, TerminalSettings.fontSize);
 
                 preferredFonts = AWTTerminalFontConfiguration.filterMonospaced(preferredFonts);
-                if(preferredFonts.length == 0) {
-                    System.out.println("Unable to locate a monospaced font. Please report this issue, including your operating system and operating system version, " +
-                            "at the following link: https://bitbucket.org/Fishbreath/opentafl/issues");
-                    System.out.println("Try running OpenTafl with the --fallback command line switch to run in terminal mode. Press enter to exit.");
-
-                    try {
-                        System.in.read();
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    System.exit(1);
-                }
+                if(preferredFonts.length == 0) throw new IllegalStateException("No monospaced fonts available. Try running OpenTafl with the --fallback option to use text-only mode.");
 
                 SwingTerminalFontConfiguration font = SwingTerminalFontConfiguration.newInstance(preferredFonts);
 

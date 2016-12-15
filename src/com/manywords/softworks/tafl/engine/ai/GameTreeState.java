@@ -51,6 +51,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
         mEnteringMove = null;
 
+        mVictory = copyState.checkVictory();
         mAlpha = -5000;
         mBeta = 5000;
         mDepth = 0;
@@ -76,6 +77,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
         if(nextGameState.getLastMoveResult() >= LOWEST_NONERROR_RESULT) {
             mGame.advanceState(this, nextGameState, nextGameState.getBerserkingTaflman() == EMPTY, nextGameState.getBerserkingTaflman(), true);
             nextState = new GameTreeState(workspace, nextGameState, this);
+
+            workspace.getRepetitions().increment(nextState.mZobristHash);
+            nextState.checkVictory();
+            workspace.getRepetitions().decrement(nextState.mZobristHash);
         }
         else {
             nextState = new GameTreeState(nextGameState.getLastMoveResult());
@@ -123,6 +128,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
         return getBranches().get(i);
     }
 
+    // TODO: I believe this is broken, somehow
     public static List<GameTreeNode> getPathStartingWithNode(GameTreeNode node) {
         List<GameTreeNode> bestPath = new ArrayList<GameTreeNode>();
 
@@ -265,8 +271,10 @@ public class GameTreeState extends GameState implements GameTreeNode {
         }
 
         if(extension && mDepth <= overallMaxDepth) {
-            if(workspace.mNoTime && mValue != Evaluator.NO_VALUE) return this; // If we don't have a value, we'll fall out elsewhere
-            else if(mVictory > HIGHEST_NONTERMINAL_RESULT) return this;
+            if(workspace.mNoTime && mValue != Evaluator.NO_VALUE || checkVictory() > HIGHEST_NONTERMINAL_RESULT) {
+                if(mValue == Evaluator.NO_VALUE) mValue = evaluate();
+                return minifyState();
+            }
         }
 
         short cachedValue = Evaluator.NO_VALUE;
@@ -287,6 +295,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // No transposition hits allowed in the first level of depthin', I guess.
             cachedValue = AiWorkspace.transpositionTable.getValue(getZobrist(), remainingDepth, mGameLength);
         }
+
+        int victory = checkVictory();
 
         int fallout = 0;
         if (cachedValue != Evaluator.NO_VALUE && mDepth > 0) {
@@ -312,9 +322,12 @@ public class GameTreeState extends GameState implements GameTreeNode {
             }
             fallout = 1;
         }
+        else if(victory > HIGHEST_NONTERMINAL_RESULT) {
+            mValue = evaluate();
+            fallout = 2;
+        }
         else if (mDepth != 0
-                && (checkVictory() > HIGHEST_NONTERMINAL_RESULT
-                || mDepth >= currentMaxDepth
+                && (mDepth >= currentMaxDepth
                 || (workspace.mNoTime)
                 || (!extension && workspace.mContinuationTime)
                 || (extension && continuation && workspace.mHorizonTime))) {
@@ -330,20 +343,22 @@ public class GameTreeState extends GameState implements GameTreeNode {
             // be trusted.
             if(continuation && mDepth <= overallMaxDepth && mValue == Evaluator.NO_VALUE) {
                 mValue = Evaluator.INTENTIONALLY_UNVALUED;
+                fallout = 3;
             }
             else if(extension && mDepth > overallMaxDepth && workspace.mNoTime) {
                 // If this is an extension search and we're here because we're out of time, then this is also a useless
                 // node we can't trust.
                 mValue = Evaluator.INTENTIONALLY_UNVALUED;
+                fallout = 4;
             }
             else {
                 mValue = evaluate();
+                fallout = 5;
             }
 
             // Leaf nodes we don't get to finish are always in the transposition table at depth 0.
             // This also holds for e.g. continuation search and other things.
             AiWorkspace.transpositionTable.putValue(getZobrist(), mValue, 0, mGameLength);
-            fallout = 2;
         }
         else {
             // This state has occurred in the history for our children
@@ -365,14 +380,15 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 short preContinuationValue = mValue;
                 unvaluedChildren = continuationOnChildren(currentMaxDepth, overallMaxDepth);
 
-                // If I'm not a new node (i.e., I don't have NO_VALUE, we've gained information over the course of this
+                // If I'm not a new node (i.e., I don't have NO_VALUE), we've gained information over the course of this
                 // search, and it's safe to leave this as is.
                 if(unvaluedChildren && preContinuationValue == Evaluator.NO_VALUE) mValue = Evaluator.INTENTIONALLY_UNVALUED;
+                fallout = 6;
             }
-            else if(extension && !continuation) {
+            else if(extension) {
                 short preExtensionValue = mValue;
-                // In horizon search, since we aren't changing the tree until the very end, we don't need to do as
-                // much bookkeeping.
+                // In horizon search, or continuation search at the leaf depth, cache the pre-extension value and use
+                // it if the search doesn't pan out for time or quitting reasons.
                 unvaluedChildren = exploreChildren(currentMaxDepth, overallMaxDepth, false, true);
 
                 // If I'm the root node of the horizon search (i.e., I had a value beforehand), and I had unvalued
@@ -380,15 +396,16 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 // the root node knows to be unvalued.
                 if(unvaluedChildren && preExtensionValue != Evaluator.NO_VALUE) mValue = preExtensionValue;
                 if(unvaluedChildren && preExtensionValue == Evaluator.NO_VALUE) mValue = Evaluator.INTENTIONALLY_UNVALUED;
+                fallout = 7;
             }
             else {
                 this.mValue = Evaluator.NO_VALUE;
                 exploreChildren(currentMaxDepth, overallMaxDepth, continuation, extension);
+                fallout = 8;
             }
 
             if(mValue == Evaluator.NO_VALUE) {
-
-                throw new IllegalStateException("Unvalued state after search");
+                throw new IllegalStateException("Unvalued state after search: " + getEnteringMoveSequence() + " with fallout: " + fallout);
             }
 
             // This state has not occurred in the history for not-our-children
@@ -397,20 +414,24 @@ public class GameTreeState extends GameState implements GameTreeNode {
             fallout = 3;
         }
 
-        /* This is useful for debugging continuation search troubles, so I'm leaving it in for now.
-        for(GameTreeNode child : getBranches()) {
-            if(child.getValue() == Evaluator.INTENTIONALLY_UNVALUED) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Siblings of mine: " + getEnteringMoveSequence());
-                for(GameTreeNode sibling : getBranches()) {
-                    int pathSize = GameTreeState.getPathStartingWithNode(sibling).size();
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Sibling " + sibling.getEnteringMove() + " (" + pathSize + "): " + sibling.getValue() + (sibling.valueFromTransposition() ? "T" : ""));
-                }
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Time? " + workspace.mContinuationTime + " " + workspace.mHorizonTime + " " + workspace.mNoTime);
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Depths: " + mDepth + "/" + mCurrentMaxDepth + "/" + overallMaxDepth);
-                throw new IllegalStateException("Unvalued node snuck in!");
-            }
+        if(mValue == Evaluator.NO_VALUE) {
+            throw new IllegalStateException("Unvalued state after exploration: " + getEnteringMoveSequence() + " with fallout: " + fallout);
         }
-        */
+
+        // This is useful for debugging continuation search troubles, so I'm leaving it in for now.
+//        for(GameTreeNode child : getBranches()) {
+//            if(child.getValue() == Evaluator.INTENTIONALLY_UNVALUED) {
+//                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Siblings of mine: " + getEnteringMoveSequence());
+//                for(GameTreeNode sibling : getBranches()) {
+//                    int pathSize = GameTreeState.getPathStartingWithNode(sibling).size();
+//                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Sibling " + sibling.getEnteringMove() + " (" + pathSize + "): " + sibling.getValue() + (sibling.valueFromTransposition() ? "T" : ""));
+//                }
+//                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Time? " + workspace.mContinuationTime + " " + workspace.mHorizonTime + " " + workspace.mNoTime);
+//                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Depths: " + mDepth + "/" + mCurrentMaxDepth + "/" + overallMaxDepth);
+//                throw new IllegalStateException("Unvalued node snuck in!");
+//            }
+//        }
+
 
         GameTreeNode minified = minifyState();
         return minified;

@@ -207,23 +207,22 @@ public class ExternalEngineClient implements UiCallback {
 
         if(mClockLength == null) {
             mClockLength = new TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
-            mAttackerClock = mDefenderClock = mClockLength;
+        }
+
+        if(attackerOvertime) {
+            mAttackerClock = new TimeSpec(0, attackerMillis, attackerOvertimes, 0);
         }
         else {
-            if(attackerOvertime) {
-                mAttackerClock = new TimeSpec(0, attackerMillis, attackerOvertimes, 0);
-            }
-            else {
-                mAttackerClock = new TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
-            }
-
-            if(defenderOvertime) {
-                mDefenderClock = new TimeSpec(0, defenderMillis, defenderOvertimes, 0);
-            }
-            else {
-                mDefenderClock = new TimeSpec(defenderMillis, overtimeSeconds * 1000, defenderOvertimes, 0);
-            }
+            mAttackerClock = new TimeSpec(attackerMillis, overtimeSeconds * 1000, attackerOvertimes, 0);
         }
+
+        if(defenderOvertime) {
+            mDefenderClock = new TimeSpec(0, defenderMillis, defenderOvertimes, 0);
+        }
+        else {
+            mDefenderClock = new TimeSpec(defenderMillis, overtimeSeconds * 1000, defenderOvertimes, 0);
+        }
+
     }
 
     private void handleOpponentMoveCommand(String command) {

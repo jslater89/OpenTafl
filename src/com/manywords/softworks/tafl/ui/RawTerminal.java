@@ -525,6 +525,14 @@ public class RawTerminal implements UiCallback {
             specialSpaces.add(corner);
         }
 
+        for (Coord defenderFort : state.getBoard().getRules().getDefenderForts()) {
+            specialSpaces.add(defenderFort);
+        }
+
+        for (Coord attackerFort : state.getBoard().getRules().getAttackerForts()) {
+            specialSpaces.add(attackerFort);
+        }
+
         String boardAsText = "";
 
         for (int i = 0; i < state.getBoard().getBoardDimension(); i++) {

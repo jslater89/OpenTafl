@@ -230,6 +230,31 @@ public class Coord {
         return diagonalCoords.get(dimension).get(getIndex(dimension, c));
     }
 
+    public static Coord getCoordAcrossFrom(int dimension, Coord root, Coord opposite) {
+        int xDiff = Math.abs(root.x - opposite.x);
+        int yDiff = Math.abs(root.y - opposite.y);
+
+        if(xDiff == 0 && yDiff == 0) return root;
+
+        if(yDiff == 0) {
+            int newX = -1;
+            if(xDiff == 1) newX = root.x + 1;
+            else if(xDiff == -1) newX = root.x - 1;
+
+            if(newX < 0 || newX >= dimension) return null;
+            else return Coord.get(newX, root.y);
+        }
+        else if(xDiff == 0) {
+            int newY = -1;
+            if(yDiff == 1) newY = root.y + 1;
+            else if(yDiff == -1) newY = root.y - 1;
+
+            if(newY < 0 || newY >= dimension) return null;
+            else return Coord.get(root.x, newY);
+        }
+        return null;
+    }
+
     public static List<List<Coord>> getRankAndFileCoords(int dimension, Coord c) {
         if(c == null) throw new IllegalStateException();
         return rankAndFileCoords.get(dimension).get(getIndex(dimension, c));

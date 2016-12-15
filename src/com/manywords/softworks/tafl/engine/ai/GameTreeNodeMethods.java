@@ -2,7 +2,6 @@ package com.manywords.softworks.tafl.engine.ai;
 
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.ui.RawTerminal;
