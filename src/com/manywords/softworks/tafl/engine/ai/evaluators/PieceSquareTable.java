@@ -200,8 +200,10 @@ public class PieceSquareTable {
                 cornerDefenseCoords.add(Coord.get(0, 2));
             }
 
-            for (Coord c : cornerDefenseCoords) {
-                mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, c)] = 0.66f;
+            if(dimension > 7) {
+                for (Coord c : cornerDefenseCoords) {
+                    mTable[PIECE_ATTACKING_TAFLMEN][Coord.getIndex(dimension, c)] = 0.66f;
+                }
             }
         }
     }

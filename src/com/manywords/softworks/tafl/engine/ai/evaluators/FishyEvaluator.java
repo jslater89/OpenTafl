@@ -50,11 +50,11 @@ public class FishyEvaluator implements Evaluator {
     private final int RANK_AND_FILE_INDEX = 2;
     private final int MATERIAL_INDEX = 3;
     private final int PIECE_SQUARE_INDEX = 4;
-    private final int KING_FREEDOM_VALUE = 500;
-    private final int KING_RISK_VALUE = 500;
-    private final int RANK_AND_FILE_VALUE = 1100;
-    private final int MATERIAL_VALUE = 1650;
-    private final int PIECE_SQUARE_VALUE = 1100;
+    private short KING_FREEDOM_VALUE = 500;
+    private short KING_RISK_VALUE = 500;
+    private short RANK_AND_FILE_VALUE = 1100;
+    private short MATERIAL_VALUE = 1650;
+    private short PIECE_SQUARE_VALUE = 1100;
     // 1400 for unused TAFLMAN_RISK
 
     // Losing fewer than taflman-count * LIGHT_LOSSES is not a tragedy.
@@ -136,6 +136,15 @@ public class FishyEvaluator implements Evaluator {
 //
 //        mHeavyTaflmanValue[ATTACKER] = (short) (heavyTaflmanValue / mHeavyTaflmanCount[ATTACKER]);
 //        mHeavyTaflmanValue[DEFENDER] = (short) (heavyTaflmanValue / mHeavyTaflmanCount[DEFENDER]);
+
+        // Brandub calls for different weights
+        if(mRules.boardSize == 7) {
+            KING_FREEDOM_VALUE = 750;
+            KING_RISK_VALUE = 750;
+            RANK_AND_FILE_VALUE = 750;
+            MATERIAL_VALUE = 1500;
+            PIECE_SQUARE_VALUE = 750;
+        }
     }
 
     private short getMaxFor(int category) {
