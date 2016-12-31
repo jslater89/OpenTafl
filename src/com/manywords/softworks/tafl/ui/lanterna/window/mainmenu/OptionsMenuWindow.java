@@ -1,14 +1,13 @@
 package com.manywords.softworks.tafl.ui.lanterna.window.mainmenu;
 
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.*;
+import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
 import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
-import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -202,7 +201,8 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.addComponent(TerminalUtils.newSpacer());
 
         final Button networkAddressButton = new Button("Server address", () -> {
-            TerminalSettings.onlineServerHost = TextInputDialog.showDialog(getTextGUI(), "Server address", "Enter server address", TerminalSettings.onlineServerHost);
+            String newAddress = TextInputDialog.showDialog(getTextGUI(), "Server address", "Enter server address", TerminalSettings.onlineServerHost);
+            if(newAddress != null) TerminalSettings.onlineServerHost = newAddress;
             refreshSettings();
         });
         mNetworkAddressLabel = new Label(TerminalSettings.onlineServerHost);
