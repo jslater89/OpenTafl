@@ -161,8 +161,8 @@ are present only for organizational purposes.
 		threefold-rule:
 			"i": ignore
 			"d": draw
-			"w": player who makes the threefold repetition wins
-			"l": player who makes the threefold repetition loses
+			"w": player who forces the threefold repetition wins
+			"l": player who moves into the threefold repetition wins
 		yes-no:
 			"y": yes
 			"n": no
@@ -206,9 +206,10 @@ Explanatory notes:
 		If "n", the defenders move first.
 	tfr:
 		(threefold repetition) what should happen in the case of a threefold repetition?
-		if "w", the player forcing the repetition wins. If "l", the player forced the
-		repetition loses. If "d", the game is a draw (default). If "i", threefold
-		repetitions are ignored.
+		if "w", the player forcing the repetition wins. If "l", the player forcing the
+		repetition loses (that is, the player who moves into the threefold-repeated board
+        state wins). If "d", the game is a draw (default). If "i", threefold repetitions
+        are ignored.
 	ka: 
 		(king armed) does the king participate in captures? Defaults to "y" (yes).
 		If "a" (anvil-only), the king can be captured against, but cannot move to make a
