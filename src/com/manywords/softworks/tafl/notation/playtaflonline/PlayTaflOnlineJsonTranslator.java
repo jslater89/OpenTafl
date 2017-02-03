@@ -175,39 +175,67 @@ public class PlayTaflOnlineJsonTranslator {
 
     private static int getDimensionForName(String name) {
         name = name.toLowerCase();
-        if(name.equals("hhtablut") || name.equals("tablut")) return 9;
+        if(name.equals("hhtablut") || name.equals("tablut") || name.equals("seabattletablut")) return 9;
         else if(name.equals("hhgokstad") || name.equals("seabattlegokstad") || name.equals("gokstad2")) return 13;
         else if(name.equals("hhcoppergate") || name.equals("coppergate2")) return 15;
         else if(name.equals("hhbrandubh") || name.equals("brandubh") || name.equals("hhardri") || name.equals("magpie")) return 7;
         else if(name.equals("hhtawlbwrdd") || name.equals("tawlbwrdd")) return 11;
+        else if(name.equals("hhlewiscross") || name.equals("lewiscross")) return 11;
         else if(name.equals("ardri")) return 7;
+        else if(name.equals("ballinderry2")) return 7;
+        else if(name.equals("ballinderry3")) return 7;
+        else if(name.equals("ballinderry4")) return 7;
+        else if(name.equals("ballinderry6")) return 7;
+        else if(name.equals("ballinderry7")) return 7;
+        else if(name.equals("ballinderry8")) return 7;
+        else if(name.equals("ballinderry9")) return 7;
         else if(name.equals("fetlar") || name.equals("copenhagen") || name.equals("hnefatafl")) return 11;
         else if(name.equals("seabattlecircle") || name.equals("jarlshofcircle")) return 9;
+        else if(name.equals("jarlshof3")) return 9;
         else if(name.equals("seabattlecross") || name.equals("trondheimcross")) return 11;
+        else if(name.equals("toftanes1")) return 13;
+        else if(name.equals("toftanes2")) return 13;
         else if(name.equals("gokstad1")) return 13;
+        else if(name.equals("gokstad3")) return 13;
+        else if(name.equals("gokstad4")) return 13;
         else if(name.equals("coppergate1")) return 15;
         else if(name.equals("papillon")) return 9;
         else if(name.equals("alfheim1")) return 17;
         else if(name.equals("alfheim2")) return 17;
+        else if(name.equals("aleaevangelii")) return 19;
         else return -1;
     }
 
     private static String getLayoutForName(String name) {
         name = name.toLowerCase();
-        if(name.equals("hhtablut") || name.equals("tablut")) return PTOConstants.TABLUT_LAYOUT;
+        if(name.equals("hhtablut") || name.equals("tablut") || name.equals("seabattletablut")) return PTOConstants.TABLUT_LAYOUT;
         else if(name.equals("hhgokstad") || name.equals("seabattlegokstad") || name.equals("gokstad2")) return PTOConstants.PARLETT_LAYOUT;
         else if(name.equals("hhcoppergate") || name.equals("coppergate2")) return PTOConstants.COPPERGATE_II_LAYOUT;
         else if(name.equals("hhbrandubh") || name.equals("brandubh") || name.equals("hhardri") || name.equals("magpie")) return PTOConstants.BRANDUB_LAYOUT;
         else if(name.equals("hhtawlbwrdd") || name.equals("tawlbwrdd")) return PTOConstants.TAWLBWRDD_LAYOUT;
+        else if(name.equals("hhlewiscross") || name.equals("lewiscross")) return PTOConstants.LEWIS_CROSS_LAYOUT;
         else if(name.equals("ardri")) return PTOConstants.ARD_RI_LAYOUT;
+        else if(name.equals("ballinderry2")) return PTOConstants.BALLINDERRY_2_LAYOUT;
+        else if(name.equals("ballinderry3")) return PTOConstants.BALLINDERRY_3_LAYOUT;
+        else if(name.equals("ballinderry4")) return PTOConstants.BALLINDERRY_4_LAYOUT;
+        else if(name.equals("ballinderry6")) return PTOConstants.BALLINDERRY_6_LAYOUT;
+        else if(name.equals("ballinderry7")) return PTOConstants.BALLINDERRY_7_LAYOUT;
+        else if(name.equals("ballinderry8")) return PTOConstants.BALLINDERRY_8_LAYOUT;
+        else if(name.equals("ballinderry9")) return PTOConstants.BALLINDERRY_9_LAYOUT;
         else if(name.equals("fetlar") || name.equals("copenhagen") || name.equals("hnefatafl")) return PTOConstants.COPENHAGEN_LAYOUT;
         else if(name.equals("seabattlecircle") || name.equals("jarlshofcircle")) return PTOConstants.JARLSHOF_LAYOUT;
+        else if(name.equals("jarlshof3")) return PTOConstants.JARLSHOF_3_LAYOUT;
         else if(name.equals("seabattlecross") || name.equals("trondheimcross")) return PTOConstants.SERIF_CROSS_11_LAYOUT;
+        else if(name.equals("toftanes1")) return PTOConstants.TOFTANES_1_LAYOUT;
+        else if(name.equals("toftanes2")) return PTOConstants.TOFTANES_2_LAYOUT;
         else if(name.equals("gokstad1")) return PTOConstants.SERIF_CROSS_13_LAYOUT;
+        else if(name.equals("gokstad3")) return PTOConstants.GOKSTAD_3_LAYOUT;
+        else if(name.equals("gokstad4")) return PTOConstants.GOKSTAD_4_LAYOUT;
         else if(name.equals("coppergate1")) return PTOConstants.SERIF_CROSS_15_LAYOUT;
         else if(name.equals("papillon")) return PTOConstants.PAPILLON_LAYOUT;
         else if(name.equals("alfheim1")) return PTOConstants.ALFHEIM_LAYOUT;
         else if(name.equals("alfheim2")) return PTOConstants.ALFHEIM_II_LAYOUT;
+        else if(name.equals("aleaevangelii")) return PTOConstants.ALEA_EVANGELII_LAYOUT;
         else return null;
     }
 
@@ -216,16 +244,20 @@ public class PlayTaflOnlineJsonTranslator {
         if(name.equals("hhtablut")) return "H.H_Tablut";
         else if(name.equals("tablut")) return "Custom_Tablut";
         else if(name.equals("hhgokstad")) return "H.H._Gokstad";
-        else if(name.equals("gokstad1") || name.equals("gokstad2")) return "Custom_Gokstad";
-        else if(name.equals("seabattlegokstad") || name.equals("seabattlecircle") || name.equals("seabattlecross")) return "Sea_Battle";
+        else if(name.equals("toftanes1") || name.equals("toftanes2")) return "Custom_Toftanes";
+        else if(name.equals("gokstad1") || name.equals("gokstad2") || name.equals("gokstad3") || name.equals("gokstad4")) return "Custom_Gokstad";
+        else if(name.equals("seabattlegokstad") || name.equals("seabattlecircle") || name.equals("seabattlecross") || name.equals("seabattletablut")) return "Sea_Battle";
         else if(name.equals("hhcoppergate")) return "H.H._Coppergate";
         else if(name.equals("coppergate1") || name.equals("coppergate2")) return "Custom_Coppergate";
         else if(name.equals("hhbrandubh")) return "H.H_Brandubh";
         else if(name.equals("brandubh")) return "Custom_Brandubh";
         else if(name.equals("hhtawlbwrdd")) return "H.H._Tawlbwrdd";
         else if(name.equals("tawlbwrdd")) return "Custom_Tawlbwrdd";
+        else if(name.equals("hhlewiscross")) return "H.H._Lewis_Cross";
+        else if(name.equals("lewiscross")) return "Custom_Lewis_Cross";
         else if(name.equals("hhardri")) return "H.H._Ard_Ri";
         else if(name.equals("ardri")) return "Custom_Ard_Ri";
+        else if(name.equals("ballinderry2") || name.equals("ballinderry3") || name.equals("ballinderry4") || name.equals("ballinderry6") || name.equals("ballinderry7") || name.equals("ballinderry8") || name.equals("ballinderry9")) return "Custom_Ballinderry";
         else if(name.equals("magpie")) return "Magpie";
         else if(name.equals("fetlar")) return "Fetlar";
         else if(name.equals("copenhagen")) return "Copenhagen";
@@ -234,6 +266,7 @@ public class PlayTaflOnlineJsonTranslator {
         else if(name.equals("trondheimcross")) return "Custom_Trondheim";
         else if(name.equals("papillon")) return "Custom_Papillon's_Escape";
         else if(name.equals("alfheim1") || name.equals("alfheim2")) return "Custom_Alfheim";
+        else if(name.equals("aleaevangelii")) return "Custom_Alea_Evangelii";
         else return name;
     }
 }
