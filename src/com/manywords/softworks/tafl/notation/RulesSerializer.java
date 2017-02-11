@@ -241,9 +241,13 @@ public class RulesSerializer {
     }
 
 
-    public static String getRulesRecord(Rules rules) {
+    public static String getRulesRecord(Rules rules, boolean invertBoard) {
         String otnrString = getRulesStringWithoutStart(rules);
-        otnrString += "start:" + PositionSerializer.getPositionRecord(rules.getBoard());
+
+        if(invertBoard)
+            otnrString += "starti:" + PositionSerializer.getInvertedPositionRecord(rules.getBoard());
+        else
+            otnrString += "start:" + PositionSerializer.getPositionRecord(rules.getBoard());
 
         return otnrString;
     }
@@ -252,15 +256,25 @@ public class RulesSerializer {
         List<List<Side.TaflmanHolder>> startingTaflmen;
 
         Map<String, String> config = getRulesMap(otnrString);
-        if(config.get("dim") == null || config.get("start") == null) {
+        if(config.get("dim") == null || (config.get("start") == null && config.get("starti") == null)) {
             throw new NotationParseException(-1, "", "Missing dim/start");
         }
 
         config.putIfAbsent("name", "Unknown Tafl");
 
         int boardDimension = Integer.parseInt(config.get("dim"));
-        String startPosition = config.get("start");
-        startingTaflmen = PositionSerializer.parseTaflmenFromPosition(startPosition);
+
+        if(config.containsKey("starti")) {
+            String startPosition = config.get("starti");
+            startingTaflmen = PositionSerializer.parseTaflmenFromInvertedPosition(startPosition);
+        }
+        else if(config.containsKey("start")) {
+            String startPosition = config.get("start");
+            startingTaflmen = PositionSerializer.parseTaflmenFromPosition(startPosition);
+        }
+        else {
+            throw new NotationParseException(-1, "", "No start or starti records");
+        }
 
         Board board = new GenericBoard(boardDimension);
         Side attackers = new GenericSide(board, true, startingTaflmen.get(0));

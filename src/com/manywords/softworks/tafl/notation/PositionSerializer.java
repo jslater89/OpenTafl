@@ -25,16 +25,27 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.rules.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by jay on 2/13/16.
  */
 public class PositionSerializer {
+
+    public static String getInvertedPositionRecord(Board b) {
+        return invertRecord(getPositionRecord(b));
+    }
+
     public static String getPositionRecord(Board b) {
         char[][] board = b.getBoardArray();
 
         return getPositionRecord(board);
+    }
+
+    public static String getInvertedPositionRecord(char[][] board) {
+        return invertRecord(getPositionRecord(board));
     }
 
     public static String getPositionRecord(char[][] board) {
@@ -60,6 +71,11 @@ public class PositionSerializer {
         }
 
         return otnString;
+    }
+
+    public static char[][] loadInvertedPositionRecord(String invertedPosition) throws NotationParseException {
+        String otnPosition = invertRecord(invertedPosition);
+        return loadPositionRecord(otnPosition);
     }
 
     public static char[][] loadPositionRecord(String otnPosition) throws NotationParseException {
@@ -127,6 +143,10 @@ public class PositionSerializer {
         return board;
     }
 
+    public static GameState loadInvertedPositionRecord(Rules rules, String invertedPosition, Game g) throws NotationParseException {
+        return loadPositionRecord(rules, invertRecord(invertedPosition), g);
+    }
+
     public static GameState loadPositionRecord(Rules rules, String otnPosition, Game g) throws NotationParseException {
         //char[][] board = loadPositionRecord(otnPosition);
         Board b = new GenericBoard(rules);
@@ -136,6 +156,10 @@ public class PositionSerializer {
         b.setupTaflmen(attackers, defenders);
 
         return new GameState(g, g.getRules(), b, attackers, defenders);
+    }
+
+    public static List<List<Side.TaflmanHolder>> parseTaflmenFromInvertedPosition(String invertedStart)  throws NotationParseException {
+        return parseTaflmenFromPosition(invertRecord(invertedStart));
     }
 
     public static List<List<Side.TaflmanHolder>> parseTaflmenFromPosition(String startPosition) throws NotationParseException {
@@ -163,5 +187,27 @@ public class PositionSerializer {
         }
 
         return taflmen;
+    }
+
+    public static boolean testInversion(String positionRecord) {
+        String invertedPosition = invertRecord(positionRecord);
+        String originalPosition = invertRecord(invertedPosition);
+
+        return positionRecord.equals(originalPosition);
+    }
+
+    public static String invertRecord(String positionRecord) {
+        String[] rows = positionRecord.split("/");
+        List<String> reversed = Arrays.asList(rows);
+        Collections.reverse(reversed);
+
+        String inverted = "/";
+        for(String row : reversed) {
+            if(!row.isEmpty()) {
+                inverted += row + "/";
+            }
+        }
+
+        return inverted;
     }
 }

@@ -182,7 +182,7 @@ public class Game {
             mTagMap.put(Tag.TIME_REMAINING, timeRemainingString);
         }
 
-        mTagMap.put(Tag.RULES, getRules().getOTRString());
+        mTagMap.put(Tag.RULES, getRules().getOTRString(true));
     }
 
     public UiCallback getUiCallback() {

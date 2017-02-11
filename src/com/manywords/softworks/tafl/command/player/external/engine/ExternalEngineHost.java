@@ -111,7 +111,7 @@ public class ExternalEngineHost {
 
     public void analyzePosition(int moves, int seconds, GameState state) {
         // This is a passable but not perfectly ideal way to check for rules equality.
-        if(!mGame.getRules().getOTRString().equals(state.mGame.getRules().getOTRString())) {
+        if(!mGame.getRules().getOTRString(false).equals(state.mGame.getRules().getOTRString(false))) {
             rules(state.mGame.getRules());
         }
 
@@ -123,7 +123,7 @@ public class ExternalEngineHost {
 
     public void rules(Rules rules) {
         String command = "rules ";
-        command += rules.getOTRString();
+        command += rules.getOTRString(false);
         //System.out.println("Host view of rules: " + rules.getOTRString());
         command += "\n";
 

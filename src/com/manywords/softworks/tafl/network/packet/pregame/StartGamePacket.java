@@ -55,6 +55,6 @@ public class StartGamePacket extends NetworkPacket {
 
     @Override
     public String toString() {
-        return PREFIX + " " + rules.getOTRString() + (history != null ? " " + new HistoryPacket(history, rules.boardSize).toString() : "");
+        return PREFIX + " " + rules.getOTRString(false) + (history != null ? " " + new HistoryPacket(history, rules.boardSize).toString() : "");
     }
 }

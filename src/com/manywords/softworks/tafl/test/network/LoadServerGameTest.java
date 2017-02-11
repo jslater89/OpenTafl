@@ -43,7 +43,7 @@ public class LoadServerGameTest extends ServerTest {
 
         setupServer();
 
-        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", container.game.getRules().getOTRString(), new TimeSpec(300000, 30000, 3, 1000), true, true));
+        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", container.game.getRules().getOTRString(false), new TimeSpec(300000, 30000, 3, 1000), true, true));
         mPlayer1.sendHistoryByMoveRecords(moves, 11);
         mPlayer1.sendClockUpdate(new TimeSpec(200000, 30000, 2, 0), new TimeSpec(100000, 12000, 2, 0));
 
@@ -79,7 +79,7 @@ public class LoadServerGameTest extends ServerTest {
 
         assert mPlayer1.state == mPlayer2.state && mPlayer2.state == ClientServerConnection.State.LOGGED_IN;
 
-        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", container.game.getRules().getOTRString(), new TimeSpec(0, 0, 0, 0), true, true));
+        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", container.game.getRules().getOTRString(false), new TimeSpec(0, 0, 0, 0), true, true));
         moves.clear();
         moves.add(new DetailedMoveRecord(11, Coord.get(3, 3), Coord.get(2, 2), Taflman.encode((char) 0, Taflman.TYPE_TAFLMAN, Taflman.SIDE_DEFENDERS)));
         mPlayer1.sendHistoryByMoveRecords(moves, 11);

@@ -5,6 +5,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.notation.NotationParseException;
+import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -60,6 +61,12 @@ public class PlayTaflOnlineJsonTranslator {
         String openTaflLayout = getLayoutForName(gameObject.getString(PTOConstants.KEY_LAYOUT));
         if(openTaflLayout == null) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Unknown layout: " + gameObject.getString(PTOConstants.KEY_LAYOUT));
+        }
+        else {
+            openTaflLayout = openTaflLayout.replaceFirst("start\\:", "");
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, openTaflLayout);
+            openTaflLayout = "starti:" + PositionSerializer.invertRecord(openTaflLayout);
+            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, openTaflLayout);
         }
 
         // Translate rules to OTNR
@@ -132,7 +139,7 @@ public class PlayTaflOnlineJsonTranslator {
             return null;
         }
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Generated rules re-serialized: " + RulesSerializer.getRulesRecord(r, false));
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Generated rules re-serialized: " + RulesSerializer.getRulesRecord(r, true));
         Game g = new Game(r, null);
 
         // Apply moves

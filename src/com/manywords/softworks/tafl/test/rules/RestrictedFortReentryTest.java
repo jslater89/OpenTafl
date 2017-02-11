@@ -20,7 +20,7 @@ public class RestrictedFortReentryTest extends TaflTest {
         Rules rules = FotevikenTablut.newFotevikenTablut9();
         runTest(rules);
 
-        String rulesString = rules.getOTRString();
+        String rulesString = rules.getOTRString(false);
         try {
             Rules loadedRules = RulesSerializer.loadRulesRecord(rulesString);
 

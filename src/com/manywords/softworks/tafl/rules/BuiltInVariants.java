@@ -108,7 +108,7 @@ public class BuiltInVariants {
             BufferedWriter w = new BufferedWriter(new FileWriter(new File("rules-dump.otr")));
 
             for(Rules r : availableRules) {
-                String rulesString = RulesSerializer.getRulesRecord(r);
+                String rulesString = RulesSerializer.getRulesRecord(r, false);
                 w.write(rulesString + "\n");
             }
 

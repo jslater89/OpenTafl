@@ -356,7 +356,7 @@ public class ExternalEngineClient implements UiCallback {
                 OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Client received: " + cmd);
                 if (cmd.startsWith("rules")) {
                     handleRulesCommand(cmd);
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Client view of rules: " + mRules.getOTRString());
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Client view of rules: " + mRules.getOTRString(false));
                 }
                 else if (cmd.startsWith("play")) {
                     handlePlayCommand(cmd);

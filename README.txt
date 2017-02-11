@@ -9,6 +9,7 @@ README
 7. AI self-play mode
 8. Network play
 9. Headless AI mode
+10. PlayTaflOnline game downloader
 10. Links
 11. Version history
 
@@ -183,12 +184,12 @@ Variations off of those lines of play will be disallowed.
 7. AI SELF-PLAY MODE ----------------------------------------------------------
 For external AI developers, OpenTafl provides a mode by which two AIs, or two
 versions of the same AI, can be made to play each other repeatedly, to judge
-relative strength. Start OpenTafl with the '--dev' switch to enable the AI
-self-play menu item. Set the attacker engine, defender engine, and game clock
-in the options menu, then select the self-play menu item. The iteration count
-is the number of matches the self-play runner will run. A match is a two-game
-series. The player who wins both games wins the match; if the players each win
-one game, the player who wins in the fewest moves win. If the players tie, the
+relative strength. Find the self-play menu item behind the 'Extras' option in
+the main menu. Set the attacker engine, defender engine, and game clock in the
+options menu, then select the self-play menu item. The iteration count is the
+number of matches the self-play runner will run. A match is a two-game series.
+The player who wins both games wins the match; if the players each win one
+game, the player who wins in the fewest moves win. If the players tie, the
 match is considered drawn.
 
 At the end of the self-play matches, a summary will be displayed on screen.
@@ -259,7 +260,15 @@ must use a game clock. The AI will save records of all games it plays in the
 saved-games/headless-ai directory under the OpenTafl directory.
 
 
-10. LINKS ----------------------------------------------------------------------
+10. PLAYTAFLONLINE GAME DOWNLOADER --------------------------------------------
+OpenTafl can download games from PlayTaflOnline.com for study and analysis. To
+download a game, find the 'Download PlayTaflOnline game' option under the
+'Extras' menu. Enter the PlayTaflOnline game number, and OpenTafl will
+automatically download the PlayTaflOnline game file and convert it to OpenTafl
+format.
+
+
+11. LINKS ---------------------------------------------------------------------
 http://softworks.manywords.press/opentafl (official website)
 http://soapbox.manywords.press/tag/tafl (development blog)
 https://bitbucket.org/Fishbreath/opentafl (source code, bug reports)
@@ -268,7 +277,12 @@ http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt (engine
 http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation specification)
 
 
-11. VERSION HISTORY -----------------------------------------------------------
+12. VERSION HISTORY -----------------------------------------------------------
+v0.4.5.1b (released 02/11/17):
+- Add support for new layouts in PlayTaflOnline JSON translator
+- Add menu item for downloading PlayTaflOnline games
+- Add an 'Extras' menu item for
+
 v0.4.5.0b (released 12/31/16):
 - Fix several search bugs
 - Fix some remaining bugs in OpenTafl's play of repetitions
@@ -365,7 +379,6 @@ v0.4.3.3pre (released 08/20/16):
 	- Better time use planning
 	- AI now uses its post-main-search time more productively
 	- AI can now play out repetitions
-
 
 v0.4.2.4b (released 08/16/16):
 - Fix some bugs with replays and annotations
@@ -593,7 +606,6 @@ v0.2.3.0b (released 04/02/16):
     - Games and replays may be loaded from the main menu
     - Player may start a new game rooted at any point in a replay
 
-
 v0.2.2.0b (released 03/28/16):
 - Improvements to OpenTafl AI's time control handling
 - Fix for OpenTafl incorrectly using the opponent's clock when playing as an
@@ -630,7 +642,6 @@ v0.2.0.0b (released 03/14/16):
     - 'clock' commands after main time or overtime expiration
     - 'simple-moves' command
     - 'status' command
-
 
 v0.1.9.1b (released 03/11/16):
 - Possible bug-fixes for non-Swing terminals, which you, as a user, can't use

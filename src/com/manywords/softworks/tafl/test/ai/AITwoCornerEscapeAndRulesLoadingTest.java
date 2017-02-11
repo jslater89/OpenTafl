@@ -19,7 +19,7 @@ public class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest {
         AiWorkspace.resetTranspositionTable();
 
         Rules rules = Brandub.newAiTwoCornerEscapeTest();
-        String rulesString = RulesSerializer.getRulesRecord(rules);
+        String rulesString = RulesSerializer.getRulesRecord(rules, false);
 
         Rules inflatedRules = null;
         try {

@@ -22,7 +22,7 @@ public class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest {
     public void run() {
         AiWorkspace.resetTranspositionTable();
         Rules rules = SeaBattle.newAiTwoEdgeEscapeTest();
-        String rulesString = RulesSerializer.getRulesRecord(rules);
+        String rulesString = RulesSerializer.getRulesRecord(rules, false);
 
         Rules inflatedRules = null;
         try {

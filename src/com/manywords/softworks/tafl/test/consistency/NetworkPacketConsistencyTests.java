@@ -41,7 +41,7 @@ public class NetworkPacketConsistencyTests extends TaflTest {
 
         assert first.equals(second);
 
-        CreateGamePacket cgp = new CreateGamePacket(UUID.randomUUID(), true, "hashypasswordy", Brandub.newBrandub7().getOTRString(), new TimeSpec(300000, 15000, 3, 0), true, true);
+        CreateGamePacket cgp = new CreateGamePacket(UUID.randomUUID(), true, "hashypasswordy", Brandub.newBrandub7().getOTRString(false), new TimeSpec(300000, 15000, 3, 0), true, true);
         first = cgp.toString();
 
         cgp = CreateGamePacket.parse(first);

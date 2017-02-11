@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class HumanReadableRulesPrinter {
     public static String getHumanReadableRules(Rules r) {
         String rules = "";
-        String otrString = r.getOTRString();
+        String otrString = r.getOTRString(false);
         int ruleNumber = 1;
 
         rules += "The tafl games are a collection of Norse board games dating to the Viking age and earlier. They were commonly played in " +
@@ -681,7 +681,7 @@ public class HumanReadableRulesPrinter {
     }
 
     private static String getTaflmanTypeStringForTag(Rules r, String rulesTag) {
-        String tagValue = getValueForTag(r.getOTRString(), rulesTag);
+        String tagValue = getValueForTag(r.getOTRString(false), rulesTag);
 
         String attackerString = getTaflmanTypeStringFromSpec(r, true, tagValue);
         String defenderString = getTaflmanTypeStringFromSpec(r,false, tagValue);
@@ -699,7 +699,7 @@ public class HumanReadableRulesPrinter {
     }
 
     private static String getTaflmanTypeStringForTag(Rules r, boolean attackingSide, String rulesTag) {
-        String tagValue = getValueForTag(r.getOTRString(), rulesTag);
+        String tagValue = getValueForTag(r.getOTRString(false), rulesTag);
         return getTaflmanTypeStringFromSpec(r, attackingSide, tagValue);
     }
 

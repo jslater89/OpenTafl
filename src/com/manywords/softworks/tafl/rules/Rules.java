@@ -457,8 +457,8 @@ public abstract class Rules {
      */
     public abstract boolean isSurroundingFatal();
 
-    public String getOTRString() {
-        return RulesSerializer.getRulesRecord(this);
+    public String getOTRString(boolean invertBoard) {
+        return RulesSerializer.getRulesRecord(this, invertBoard);
     }
 
     public String toString() {

@@ -92,7 +92,7 @@ public class ServerTest extends TaflTest {
 
         assert knownPlayerCount == 2;
 
-        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", Brandub.newBrandub7().getOTRString(), new TimeSpec(0, 0, 0, 0), true, true));
+        mPlayer1.sendCreateGameMessage(new CreateGamePacket(UUID.randomUUID(), true, "none", Brandub.newBrandub7().getOTRString(false), new TimeSpec(0, 0, 0, 0), true, true));
 
         sleep(100);
 

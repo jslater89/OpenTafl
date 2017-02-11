@@ -116,13 +116,13 @@ public class AiWorkspace extends Game {
         mThreadPool = new AiThreadPool(Math.min(1, Runtime.getRuntime().availableProcessors() - 1));
 
         // If the transposition table is null, the size is different, or the rules are different, create a new transposition table.
-        if (mUseTranspositionTable > 0 && (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !RulesSerializer.rulesEqual(startingGame.getRules().getOTRString(), lastRulesString))) {
+        if (mUseTranspositionTable > 0 && (transpositionTable == null || transpositionTable.size() != transpositionTableSize || !RulesSerializer.rulesEqual(startingGame.getRules().getOTRString(false), lastRulesString))) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Creating new transposition table");
             if(transpositionTable == null) {
                 OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Table was null");
             }
             else {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Requested/size: " + transpositionTableSize + "/" + transpositionTable.size() + " Rules equal: " + RulesSerializer.rulesEqual(startingGame.getRules().getOTRString(), lastRulesString));
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Requested/size: " + transpositionTableSize + "/" + transpositionTable.size() + " Rules equal: " + RulesSerializer.rulesEqual(startingGame.getRules().getOTRString(false), lastRulesString));
             }
 
             if(mUseTranspositionTable == TRANSPOSITION_TABLE_ON) {
@@ -145,11 +145,11 @@ public class AiWorkspace extends Game {
 
         killerMoveTable.reset();
 
-        if (mUseHistoryTable && (historyTable == null || historyTable.getDimension() != getRules().boardSize || !RulesSerializer.rulesEqual(startingGame.getRules().getOTRString(), lastRulesString))) {
+        if (mUseHistoryTable && (historyTable == null || historyTable.getDimension() != getRules().boardSize || !RulesSerializer.rulesEqual(startingGame.getRules().getOTRString(false), lastRulesString))) {
             historyTable = new HistoryTable(getRules().boardSize);
         }
 
-        lastRulesString = startingGame.getRules().getOTRString();
+        lastRulesString = startingGame.getRules().getOTRString(false);
         mPrepEndTime = System.currentTimeMillis();
 
         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Spent on prep time: " + (mPrepEndTime - mPrepStartTime) + "ms");

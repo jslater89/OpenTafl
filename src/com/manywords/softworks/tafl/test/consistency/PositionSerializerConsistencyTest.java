@@ -15,6 +15,8 @@ public class PositionSerializerConsistencyTest extends TaflTest {
             char[][] boardArray = rules.getBoard().getBoardArray();
             String positionRecord = PositionSerializer.getPositionRecord(rules.getBoard());
 
+            assert PositionSerializer.testInversion(positionRecord);
+
             char[][] newBoardArray = PositionSerializer.loadPositionRecord(positionRecord);
             String serializedPosition = PositionSerializer.getPositionRecord(newBoardArray);
 

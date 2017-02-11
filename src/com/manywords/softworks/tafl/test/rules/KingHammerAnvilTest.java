@@ -16,7 +16,7 @@ public class KingHammerAnvilTest extends TaflTest {
     @Override
     public void run() {
         Rules rules = Fetlar.newFetlarTest();
-        String rulesString = rules.getOTRString();
+        String rulesString = rules.getOTRString(false);
         rulesString += " ka:h";
         try {
             rules = RulesSerializer.loadRulesRecord(rulesString);
@@ -45,7 +45,7 @@ public class KingHammerAnvilTest extends TaflTest {
         assert state.getPieceAt(0, 3) == Taflman.EMPTY;
 
         rules = Fetlar.newFetlarTest();
-        rulesString = rules.getOTRString();
+        rulesString = rules.getOTRString(false);
         rulesString += " ka:a";
         try {
             rules = RulesSerializer.loadRulesRecord(rulesString);

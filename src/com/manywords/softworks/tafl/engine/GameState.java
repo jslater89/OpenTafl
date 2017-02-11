@@ -574,7 +574,7 @@ public class GameState {
 
     public String getPasteableRulesString() {
         String otnrString = RulesSerializer.getRulesStringWithoutStart(mGame.getRules());
-        otnrString += "start:" + PositionSerializer.getPositionRecord(getBoard());
+        otnrString += "starti:" + PositionSerializer.invertRecord(PositionSerializer.getPositionRecord(getBoard()));
 
         if(getCurrentSide().isAttackingSide() != mGame.getRules().getStartingSide().isAttackingSide()) {
             if(getCurrentSide().isAttackingSide()) {

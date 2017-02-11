@@ -22,39 +22,39 @@ public class RulesSerializerConsistencyTest extends TaflTest {
     public void run() {
         try {
             Rules rules = Copenhagen.newLargeEdgeFortTest();
-            String rules1 = rules.getOTRString();
+            String rules1 = rules.getOTRString(false);
 
             rules = RulesSerializer.loadRulesRecord(rules1);
-            String rules2 = rules.getOTRString();
+            String rules2 = rules.getOTRString(false);
 
             //System.out.println(rules1);
             //System.out.println(rules2);
             assert RulesSerializer.rulesEqual(rules1, rules2);
 
             rules = Brandub.newBrandub7();
-            rules1 = rules.getOTRString();
+            rules1 = rules.getOTRString(false);
 
             rules = RulesSerializer.loadRulesRecord(rules1);
-            rules2 = rules.getOTRString();
+            rules2 = rules.getOTRString(false);
 
             assert RulesSerializer.rulesEqual(rules1, rules2);
 
             rules = Magpie.newMagpie7();
-            rules1 = rules.getOTRString();
+            rules1 = rules.getOTRString(false);
 
             rules = RulesSerializer.loadRulesRecord(rules1);
-            rules2 = rules.getOTRString();
+            rules2 = rules.getOTRString(false);
 
             assert RulesSerializer.rulesEqual(rules1, rules2);
             assert rules.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[TaflmanCodes.K]) == 1;
             assert rules.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[TaflmanCodes.t]) == -1;
 
             rules = Berserk.newBerserk11();
-            rules1 = rules.getOTRString();
+            rules1 = rules.getOTRString(false);
             rules1 += " ks:m";
 
             rules = RulesSerializer.loadRulesRecord(rules1);
-            rules2 = rules.getOTRString();
+            rules2 = rules.getOTRString(false);
 
             assert RulesSerializer.rulesEqual(rules1, rules2);
 

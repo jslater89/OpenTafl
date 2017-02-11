@@ -17,7 +17,7 @@ public class KingUnsafeAgainstBoardEdgeTest extends TaflTest {
     public void run() {
         Rules rules = Berserk.newCommanderCornerCaptureKingTest();
 
-        String rulesString = rules.getOTRString();
+        String rulesString = rules.getOTRString(false);
         rulesString += " ks:m";
         try {
             rules = RulesSerializer.loadRulesRecord(rulesString);
