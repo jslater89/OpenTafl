@@ -3,7 +3,10 @@ package com.manywords.softworks.tafl.notation.playtaflonline;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -64,7 +67,7 @@ public class PlayTaflOnlineDownloader {
             File f = null;
             FileOutputStream fos;
             try {
-                f = File.createTempFile("game-" + mGameNumber, ".json");
+                f = File.createTempFile("opentafl", "game-" + mGameNumber + ".json");
                 fos = new FileOutputStream(f);
             }
             catch (IOException e) {
@@ -79,8 +82,8 @@ public class PlayTaflOnlineDownloader {
                 byte[] buffer = new byte[1024];
 
                 int totalRead = 0;
-                while(is.available() > 0) {
-                    int read = is.read(buffer);
+                int read = 0;
+                while((read = is.read(buffer)) > 0) {
                     totalRead += read;
                     fos.write(buffer, 0, read);
                 }
@@ -99,20 +102,23 @@ public class PlayTaflOnlineDownloader {
                 return;
             }
 
-            try {
-                Game g = PlayTaflOnlineJsonTranslator.readJsonFile(f);
-                File savedGame = new File("saved-games/replays", "pto-" + mGameNumber + ".otg");
-                boolean result = GameSerializer.writeGameToFile(g, savedGame, true);
 
-                if(!result) {
-                    mListener.onDownloadFailed(DownloadListener.Error.LOCAL_FILE_ERROR);
-                }
-                else {
-                    mListener.onDownloadCompleted(savedGame);
-                }
-            }
-            catch(Exception e) {
+            Game g = PlayTaflOnlineJsonTranslator.readJsonFile(f);
+            if(g == null) {
                 mListener.onDownloadFailed(DownloadListener.Error.PARSE_ERROR);
+                return;
+            }
+
+            f.deleteOnExit();
+
+            File savedGame = new File("saved-games/replays", "pto-" + mGameNumber + ".otg");
+            boolean result = GameSerializer.writeGameToFile(g, savedGame, true);
+
+            if(!result) {
+                mListener.onDownloadFailed(DownloadListener.Error.LOCAL_FILE_ERROR);
+            }
+            else {
+                mListener.onDownloadCompleted(savedGame);
             }
         }
     }
