@@ -53,11 +53,8 @@ public class PlayTaflOnlineJsonTranslator {
         JsonReader reader = Json.createReader(stream);
         JsonObject gameObject = reader.readObject();
 
-        int turn = gameObject.getInt(PTOConstants.KEY_TURN);
-
         JsonArray moveArray = gameObject.getJsonArray(PTOConstants.KEY_MOVES);
-        List<MoveRecord> moves = new ArrayList<>();
-        if(turn > 0) parseMoveArray(moveArray);
+        List<MoveRecord> moves = parseMoveArray(moveArray);
 
         // Get starting layout
         String openTaflLayout = getLayoutForName(gameObject.getString(PTOConstants.KEY_LAYOUT));
@@ -154,6 +151,11 @@ public class PlayTaflOnlineJsonTranslator {
             g.getTagMap().put(Game.Tag.DATE, new SimpleDateFormat("yyyy.MM.dd").format(new Date(timestamp)));
         }
 
+        JsonObject lastMove = moveArray.getJsonObject(0);
+        int endState = lastMove.getInt(PTOConstants.KEY_END_STATE);
+        g.getTagMap().put(Game.Tag.RESULT, getResultCode(endState));
+        g.getTagMap().put(Game.Tag.TERMINATION, getTerminationString(endState));
+
         return g;
     }
 
@@ -163,12 +165,23 @@ public class PlayTaflOnlineJsonTranslator {
         // Backwards in the game specification
         for(int i = moveArray.size() - 1; i >= 0; i--) {
             JsonObject moveObject = moveArray.getJsonObject(i);
+            int fromX, fromY, toX, toY;
+
+            fromX = moveObject.getInt(PTOConstants.KEY_MOVE_X_FROM);
+            fromY = moveObject.getInt(PTOConstants.KEY_MOVE_Y_FROM);
+
+            toX = moveObject.getInt(PTOConstants.KEY_MOVE_X_TO);
+            toY = moveObject.getInt(PTOConstants.KEY_MOVE_Y_TO);
+
+            if(fromX == -1 || fromY == -1 || toX == -1 || toY == -1) continue;
+
             Coord startCoord = Coord.get(
-                    moveObject.getInt(PTOConstants.KEY_MOVE_X_FROM),
-                    moveObject.getInt(PTOConstants.KEY_MOVE_Y_FROM));
+                    fromX,
+                    fromY);
+
             Coord endCoord = Coord.get(
-                    moveObject.getInt(PTOConstants.KEY_MOVE_X_TO),
-                    moveObject.getInt(PTOConstants.KEY_MOVE_Y_TO));
+                    toX,
+                    toY);
 
             moves.add(new MoveRecord(startCoord, endCoord));
         }
@@ -271,5 +284,46 @@ public class PlayTaflOnlineJsonTranslator {
         else if(name.equals("alfheim1") || name.equals("alfheim2")) return "Custom_Alfheim";
         else if(name.equals("aleaevangelii")) return "Custom_Alea_Evangelii";
         else return name;
+    }
+
+    private static String getResultCode(int endState) {
+        switch(endState) {
+            case PTOConstants.END_STATE_ATTACKER_WIN:
+            case PTOConstants.END_STATE_DEFENDER_RESIGN:
+            case PTOConstants.END_STATE_DEFENDER_TIME:
+                return "1";
+            case PTOConstants.END_STATE_DEFENDER_WIN:
+            case PTOConstants.END_STATE_ATTACKER_RESIGN:
+            case PTOConstants.END_STATE_ATTACKER_TIME:
+                return "-1";
+            case PTOConstants.END_STATE_DRAW:
+            case PTOConstants.END_STATE_GAME_DECLINED:
+                return "0";
+            default:
+                return "?";
+        }
+    }
+
+    private static String getTerminationString(int endState) {
+        switch(endState) {
+            case PTOConstants.END_STATE_ATTACKER_WIN:
+                return "Attacker wins";
+            case PTOConstants.END_STATE_DEFENDER_RESIGN:
+                return "Defender resigns";
+            case PTOConstants.END_STATE_DEFENDER_TIME:
+                return "Defender times out";
+            case PTOConstants.END_STATE_DEFENDER_WIN:
+                return "Defender wins";
+            case PTOConstants.END_STATE_ATTACKER_RESIGN:
+                return "Attacker resigns";
+            case PTOConstants.END_STATE_ATTACKER_TIME:
+                return "Attacker times out";
+            case PTOConstants.END_STATE_DRAW:
+                return "Draw";
+            case PTOConstants.END_STATE_GAME_DECLINED:
+                return "Game declined";
+            default:
+                return "";
+        }
     }
 }

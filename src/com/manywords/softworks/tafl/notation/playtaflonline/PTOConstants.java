@@ -88,5 +88,15 @@ public class PTOConstants {
     static final int SHIELDWALL_DISABLED = 0;
     static final int SHIELDWALL_ENABLED = 1;
 
+    static final String KEY_END_STATE = "EndState";
+    static final int END_STATE_ATTACKER_WIN = 1;
+    static final int END_STATE_DEFENDER_WIN = 2;
+    static final int END_STATE_DRAW = 3;
+    static final int END_STATE_DEFENDER_RESIGN = 4;
+    static final int END_STATE_ATTACKER_RESIGN = 5;
+    static final int END_STATE_DEFENDER_TIME = 6;
+    static final int END_STATE_ATTACKER_TIME = 7;
+    static final int END_STATE_GAME_DECLINED = 8;
+
     static final String KEY_TURN = "Turn";
 }

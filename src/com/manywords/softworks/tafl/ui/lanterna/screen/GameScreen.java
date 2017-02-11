@@ -238,6 +238,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             if(repeats > 1) {
                 statusText("This position has repeated " + repeats + " times!");
             }
+
             mBoardWindow.rerenderBoard();
         }
     }
@@ -837,6 +838,13 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                             commentText = commentText.replaceAll(ReplayGame.hintRegex, "").trim();
                         }
                         statusText(commentText);
+                    }
+                }
+
+                if(mInReplay && mReplay.getCurrentState().getMoveAddress().size() == 1 && mReplay.getCurrentState().getCanonicalChild() == null) {
+                    Map<String, String> tagMap = mReplay.getGame().getTagMap();
+                    if(tagMap.containsKey(Game.Tag.TERMINATION)) {
+                        statusText("Extra termination information: " + tagMap.get(Game.Tag.TERMINATION));
                     }
                 }
             }
