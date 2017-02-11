@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.ui.lanterna.window.mainmenu;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
@@ -44,6 +45,7 @@ public class OtherOperationsWindow extends BasicWindow {
                     || keyStroke.getKeyType() == KeyType.Enter) return true;
             else return Character.isDigit(keyStroke.getCharacter());
         });
+        box.setPreferredSize(new TerminalSize(32, 1));
 
         p.addComponent(box);
 
