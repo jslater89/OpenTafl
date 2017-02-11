@@ -18,4 +18,8 @@ OpenTafl repository should pass all tests, and engine features should include
 test coverage.
 
 4. Contributing
-Submit a pull request at the OpenTafl repository.
+Submit a pull request to the OpenTafl repository.
+
+Please note: if you're familiar with github, Bitbucket works backwards. To
+submit a pull request, go to your fork of the repository, then create the pull
+request targeting the OpenTafl repository.

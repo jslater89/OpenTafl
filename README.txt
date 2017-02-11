@@ -280,8 +280,14 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 12. VERSION HISTORY -----------------------------------------------------------
 v0.4.5.1b (released 02/11/17):
 - Add support for new layouts in PlayTaflOnline JSON translator
-- Add menu item for downloading PlayTaflOnline games
-- Add an 'Extras' menu item for
+- Add an 'Extras' menu item to hold less commonly-used features
+- Move AI Selfpay to Extras
+- Add Extras menu item for downloading PlayTaflOnline games
+- OpenTafl now outputs game records with the starti: rules entry instead of the
+  start: rules entry
+    - starti is an inverted position record, representing the board from the
+      highest rank (the top rank on the screen) to the lowest (the bottom)
+    - This makes OpenTafl rules notation easier to read without a computer
 
 v0.4.5.0b (released 12/31/16):
 - Fix several search bugs
