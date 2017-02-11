@@ -121,6 +121,11 @@ public class MainMenuWindow extends BasicWindow {
         });
         p.addComponent(loadNotationButton);
 
+        Button downloadFromPTO = new Button("Download PlayTaflOnline game", () -> {
+           mTerminalCallback.onMenuNavigation(new OtherOperationsWindow(mTerminalCallback));
+        });
+        p.addComponent(downloadFromPTO);
+
         if(OpenTafl.devMode) {
             Button tourneyButton = new Button("AI selfplay", () -> mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback)));
             p.addComponent(tourneyButton);
