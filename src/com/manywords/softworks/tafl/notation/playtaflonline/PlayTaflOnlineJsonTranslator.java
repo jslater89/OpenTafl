@@ -132,7 +132,7 @@ public class PlayTaflOnlineJsonTranslator {
             return null;
         }
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Generated rules re-serialized: " + RulesSerializer.getRulesRecord(r));
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Generated rules re-serialized: " + RulesSerializer.getRulesRecord(r, false));
         Game g = new Game(r, null);
 
         // Apply moves

@@ -13,7 +13,6 @@ import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.ServerLobbyScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
-import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 import java.io.File;
 
@@ -121,15 +120,8 @@ public class MainMenuWindow extends BasicWindow {
         });
         p.addComponent(loadNotationButton);
 
-        Button downloadFromPTO = new Button("Download PlayTaflOnline game", () -> {
-           mTerminalCallback.onMenuNavigation(new OtherOperationsWindow(mTerminalCallback));
-        });
+        Button downloadFromPTO = new Button("Extras", () -> mTerminalCallback.onMenuNavigation(new OtherOperationsWindow(mTerminalCallback)));
         p.addComponent(downloadFromPTO);
-
-        if(OpenTafl.devMode) {
-            Button tourneyButton = new Button("AI selfplay", () -> mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback)));
-            p.addComponent(tourneyButton);
-        }
 
         Button quitButton = new Button("Quit", () -> mTerminalCallback.onMenuNavigation(null));
         p.addComponent(quitButton);
