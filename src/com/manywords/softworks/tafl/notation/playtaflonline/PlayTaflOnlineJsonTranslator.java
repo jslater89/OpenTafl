@@ -53,8 +53,11 @@ public class PlayTaflOnlineJsonTranslator {
         JsonReader reader = Json.createReader(stream);
         JsonObject gameObject = reader.readObject();
 
+        int turn = gameObject.getInt(PTOConstants.KEY_TURN);
+
         JsonArray moveArray = gameObject.getJsonArray(PTOConstants.KEY_MOVES);
-        List<MoveRecord> moves = parseMoveArray(moveArray);
+        List<MoveRecord> moves = new ArrayList<>();
+        if(turn > 0) parseMoveArray(moveArray);
 
         // Get starting layout
         String openTaflLayout = getLayoutForName(gameObject.getString(PTOConstants.KEY_LAYOUT));

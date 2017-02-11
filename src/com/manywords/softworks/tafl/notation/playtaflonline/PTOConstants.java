@@ -87,4 +87,6 @@ public class PTOConstants {
     static final String KEY_SHIELDWALL = "ShieldWall";
     static final int SHIELDWALL_DISABLED = 0;
     static final int SHIELDWALL_ENABLED = 1;
+
+    static final String KEY_TURN = "Turn";
 }
