@@ -195,9 +195,9 @@ are present only for organizational purposes.
 			The value of the starting position rules entry is the positional record
 			corresponding to the start position.
 		inverted-starting-position: <"starti:"><inverted-position-record>
-		    The value of the inverted starting position rules entry is the
-		    positional record corresponding to the start position with its rows in
-		    reverse order. See the explanatory note for more details.
+			The value of the inverted starting position rules entry is the
+			positional record corresponding to the start position with its rows in
+			reverse order. See the explanatory note for more details.
 
 
 Explanatory notes:
@@ -306,20 +306,20 @@ Explanatory notes:
 		(berserk mode) Defaults to "n" (none).
 	starting-position:
 		must be present.
-    inverted-starting-position:
-        Ordinary position records start counting at a1, moving from left to right
-        and from rank 1 to rank N. Under the ordinary convention, where the space
-        labeled a1 is at the bottom left, this means that reading the position
-        record from start to finish gives the board position from bottom to top,
-        which is difficult to visualize. The inverted position record is the
-        regular position record with its rows in reverse order, so that the first
-        row entry in the position record corresponds to the leftmost space in
-        rank N. Reading the inverted position record from start to finish presents
-        the board in standard left-to-right, top-to-bottom format.
+	inverted-starting-position:
+		Ordinary position records start counting at a1, moving from left to right
+		and from rank 1 to rank N. Under the ordinary convention, where the space
+		labeled a1 is at the bottom left, this means that reading the position
+		record from start to finish gives the board position from bottom to top,
+		which is difficult to visualize. The inverted position record is the
+		regular position record with its rows in reverse order, so that the first
+		row entry in the position record corresponds to the leftmost space in
+		rank N. Reading the inverted position record from start to finish presents
+		the board in standard left-to-right, top-to-bottom format.
 
-        For this reason, tafl engines which display space a1 at the bottom left
-        should create rules records for human consumption using the starti tag
-        instead of the start tag.
+		For this reason, tafl engines which display space a1 at the bottom left
+		should create rules records for human consumption using the starti tag
+		instead of the start tag.
 
 Examples:
 
