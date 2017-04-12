@@ -40,6 +40,18 @@ public class Coord {
     private static Map<Integer, List<Coord>> rightEdge;
     private static Map<Integer, List<Coord>> allEdges;
 
+    public Coord offset(int dimension, int offsetX, int offsetY) {
+        int newX = x + offsetX;
+        if(newX < 0) newX = 0;
+        if(newX >= dimension) newX = dimension - 1;
+
+        int newY = y + offsetY;
+        if(newY < 0) newY = 0;
+        if(newY >= dimension) newY = dimension - 1;
+
+        return Coord.get(newX, newY);
+    }
+
     public static void initialize() {
         if(initialized) return;
         initialized = true;

@@ -7,7 +7,7 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.BasicTextImage;
 import com.googlecode.lanterna.gui2.Interactable;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.manywords.softworks.tafl.OpenTafl;
+import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
 import com.manywords.softworks.tafl.rules.Board;
@@ -31,6 +31,13 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
     private int mSpaceHeight = mRowHeight - 1;
     private int mSpaceWidth = mColWidth - 1;
     private int mLeftPad = 0;
+
+    private GameState mCurrentState;
+
+    // For interactability
+    private boolean mFocused;
+    private Coord mFocusPosition;
+
     public static void init(int dimension) {
         boardDimension = dimension;
     }
@@ -61,6 +68,9 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         mSpaceHeight = mRowHeight - 1;
         mSpaceWidth = mColWidth - 1;
 
+        mFocused = false;
+        mFocusPosition = Coord.get(boardDimension / 2, boardDimension / 2);
+
         renderBoardBackground();
         if(state != null) {
             renderBoard(state, null, null, null, null);
@@ -68,8 +78,15 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
     }
 
     public void renderBoard(GameState state, Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
+        mCurrentState = state;
+        if(mCurrentState != null) rerender(highlight, allowableDestinations, allowableMoves, captureSpaces);
+    }
+
+    private void rerender(Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
+        if(mCurrentState == null) return;
+
         clearSpaces();
-        renderSpecialSpaces(state.getBoard().getRules());
+        renderSpecialSpaces(mCurrentState.getBoard().getRules());
 
         // Render in order of most spaces to fewest, for maximum information preservation
         if(allowableMoves != null) renderAllowableMoves(allowableMoves);
@@ -77,7 +94,13 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         if(captureSpaces != null) renderCapturingMoves(highlight, captureSpaces);
         if(highlight != null) renderHighlight(highlight);
 
-        renderTaflmen(state.getBoard());
+        if(mFocused) {
+            renderHighlight(mFocusPosition);
+            // TODO: renderSelection ('o' for selected piece)
+            // TODO: renderMovement (< > ^ v over piece and intervening spaces, or 'o' if no movement)
+        }
+
+        renderTaflmen(mCurrentState.getBoard());
     }
 
     private void renderBoardBackground() {
@@ -332,9 +355,52 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         return new TerminalPosition(xStart, yStart);
     }
 
+    private void focusPositionChanged() {
+        char taflman = mCurrentState.getBoard().getOccupier(mFocusPosition);
+
+        List<Coord> moves = null;
+        List<Coord> dests = null;
+        List<Coord> captures = null;
+
+        if(taflman != Taflman.EMPTY) {
+            moves = Taflman.getAllowableMoves(mCurrentState, taflman);
+            dests = Taflman.getAllowableDestinations(mCurrentState, taflman);
+            captures = Taflman.getCapturingMoves(mCurrentState, taflman);
+        }
+
+        rerender(null, moves, dests, captures);
+    }
+
     @Override
     public Interactable.Result handleKeyStroke(KeyStroke s) {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Keystroke: " + s);
-        return Interactable.Result.UNHANDLED;
+        Interactable.Result r = Interactable.Result.UNHANDLED;
+        if(s.getKeyType() == KeyType.ArrowDown || (s.getKeyType() == KeyType.Character && s.getCharacter() == 's')) {
+            mFocusPosition = mFocusPosition.offset(boardDimension, 0, -1);
+            r = Interactable.Result.HANDLED;
+        }
+        else if(s.getKeyType() == KeyType.ArrowUp || (s.getKeyType() == KeyType.Character && s.getCharacter() == 'w')) {
+            mFocusPosition = mFocusPosition.offset(boardDimension, 0, 1);
+            r = Interactable.Result.HANDLED;
+        }
+        else if(s.getKeyType() == KeyType.ArrowRight || (s.getKeyType() == KeyType.Character && s.getCharacter() == 'd')) {
+            mFocusPosition = mFocusPosition.offset(boardDimension, 1, 0);
+            r = Interactable.Result.HANDLED;
+        }
+        else if(s.getKeyType() == KeyType.ArrowLeft || (s.getKeyType() == KeyType.Character && s.getCharacter() == 'a')) {
+            mFocusPosition = mFocusPosition.offset(boardDimension, -1, 0);
+            r = Interactable.Result.HANDLED;
+        }
+
+        if(r != Interactable.Result.UNHANDLED) {
+            focusPositionChanged();
+        }
+        return r;
+    }
+
+    @Override
+    public void notifyFocus(boolean focused) {
+        mFocused = focused;
+        if(focused) focusPositionChanged();
+        else rerender(null, null, null, null);
     }
 }

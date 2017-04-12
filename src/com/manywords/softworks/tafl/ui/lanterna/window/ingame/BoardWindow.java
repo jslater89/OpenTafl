@@ -78,6 +78,7 @@ public class BoardWindow extends BasicWindow {
     }
 
     public void notifyFocus(boolean focused) {
+        mBoardImage.notifyFocus(focused);
         if(focused) {
             setTitle(Ansi.UNDERLINE + mCanonicalTitle.toUpperCase() + Ansi.UNDERLINE_OFF);
         }

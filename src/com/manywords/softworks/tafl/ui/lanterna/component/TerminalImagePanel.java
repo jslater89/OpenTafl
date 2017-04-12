@@ -6,7 +6,6 @@ import com.googlecode.lanterna.graphics.TextImage;
 import com.googlecode.lanterna.gui2.AbstractInteractableComponent;
 import com.googlecode.lanterna.gui2.InteractableRenderer;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
-import com.googlecode.lanterna.input.KeyStroke;
 
 /**
  * Created by jay on 2/15/16.
@@ -14,18 +13,13 @@ import com.googlecode.lanterna.input.KeyStroke;
 public class TerminalImagePanel extends AbstractInteractableComponent<TerminalImagePanel> {
     private final TextImage mImage;
     private final TerminalSize mMinimumSize;
-    private final SimpleInteractable mInteractable;
 
     public TerminalImagePanel(TextImage image) {
         this(image, new TerminalSize(0, 0));
     }
     public TerminalImagePanel(TextImage image, TerminalSize minimumSize) {
-        this(image, minimumSize, null);
-    }
-    public TerminalImagePanel(TextImage image, TerminalSize minimumSize, SimpleInteractable interactable) {
         mImage = image;
         mMinimumSize = minimumSize;
-        mInteractable = interactable;
     }
 
     public TextImage getImage() { return mImage; }
@@ -65,14 +59,5 @@ public class TerminalImagePanel extends AbstractInteractableComponent<TerminalIm
                 textGUIGraphics.drawImage(new TerminalPosition(startColumn, startRow), mImage);
             }
         };
-    }
-
-    @Override
-    protected Result handleKeyStroke(KeyStroke keyStroke) {
-        if(mInteractable != null) {
-            Result r = mInteractable.handleKeyStroke(keyStroke);
-            if(r != Result.UNHANDLED) return r;
-        }
-        return super.handleKeyStroke(keyStroke);
     }
 }

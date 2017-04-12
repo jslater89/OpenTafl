@@ -8,4 +8,5 @@ import com.googlecode.lanterna.input.KeyStroke;
  */
 public interface SimpleInteractable {
     Interactable.Result handleKeyStroke(KeyStroke s);
+    void notifyFocus(boolean focused);
 }
