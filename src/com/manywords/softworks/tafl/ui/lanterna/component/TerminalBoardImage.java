@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.Interactable;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
@@ -25,6 +26,11 @@ import java.util.List;
  * Created by jay on 2/15/16.
  */
 public class TerminalBoardImage extends BasicTextImage implements SimpleInteractable {
+    public interface Callback {
+        void onUnhandledKey(KeyStroke key, Coord location);
+        void onMoveRequested(MoveRecord move);
+    }
+
     private static int boardDimension;
     private int mRowHeight = 3;
     private int mColWidth = 5;
@@ -35,8 +41,11 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
     private GameState mCurrentState;
 
     // For interactability
+    private boolean mAllowMovement = true;
     private boolean mFocused;
     private Coord mFocusPosition;
+    private Coord mSelectedPosition;
+    private Callback mCallback;
 
     public static void init(int dimension) {
         boardDimension = dimension;
@@ -85,10 +94,10 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
     private void rerender(Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
         if(mCurrentState == null) return;
 
+        // Render in order of most spaces to fewest, for maximum information preservation
         clearSpaces();
         renderSpecialSpaces(mCurrentState.getBoard().getRules());
 
-        // Render in order of most spaces to fewest, for maximum information preservation
         if(allowableMoves != null) renderAllowableMoves(allowableMoves);
         if(allowableDestinations != null) renderAllowableDestinations(highlight, allowableDestinations);
         if(captureSpaces != null) renderCapturingMoves(highlight, captureSpaces);
@@ -96,8 +105,10 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
 
         if(mFocused) {
             renderHighlight(mFocusPosition);
-            // TODO: renderSelection ('o' for selected piece)
-            // TODO: renderMovement (< > ^ v over piece and intervening spaces, or 'o' if no movement)
+            if(mSelectedPosition != null) {
+                renderSelection(mSelectedPosition);
+                renderMovement(mSelectedPosition, mFocusPosition);
+            }
         }
 
         renderTaflmen(mCurrentState.getBoard());
@@ -248,6 +259,58 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         fillCoord(star, highlight);
     }
 
+    private void renderSelection(Coord selected) {
+        TextCharacter circle = new TextCharacter('o', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        fillCoord(circle, selected);
+    }
+
+    private void renderMovement(Coord start, Coord end) {
+        TextCharacter circle = new TextCharacter('o', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter up = new TextCharacter('^', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter down = new TextCharacter('v', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter left = new TextCharacter('<', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter right = new TextCharacter('>', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+
+        TextCharacter dash = new TextCharacter('-', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter pipe = new TextCharacter('|', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+
+        TextCharacter direction = circle;
+        if(start.y < end.y) direction = up;
+        if(start.y > end.y) direction = down;
+        if(start.x > end.x) direction = left;
+        if(start.x < end.x) direction = right;
+
+        TextCharacter unstoppable = dash;
+        if(start.x == end.x) {
+            unstoppable = pipe;
+        }
+
+        char taflman = mCurrentState.getBoard().getOccupier(start);
+        List<Coord> moves = Taflman.getAllowableMoves(mCurrentState, taflman);
+        List<Coord> stops = Taflman.getAllowableDestinations(mCurrentState, taflman);
+
+        boolean skip = false;
+
+        // Render the focus position as the move character, the not-stoppable dash character,
+        // or a regular highlight, depending on whether the focus position can be stopped on,
+        // moved through, or nothing at all. If nothing at all, don't render the moves up
+        // to that point.
+        if(stops.contains(mFocusPosition)) fillCoord(direction, mFocusPosition);
+        else if(moves.contains(mFocusPosition)) fillCoord(unstoppable, mFocusPosition);
+        else if(mFocusPosition.equals(mSelectedPosition)) renderSelection(mFocusPosition);
+        else {
+            skip = true;
+            renderHighlight(mFocusPosition);
+        }
+
+        if(!skip) {
+            for (Coord intervening : Coord.getInterveningSpaces(boardDimension, start, end)) {
+                if (stops.contains(intervening)) fillCoord(direction, intervening);
+                else if (moves.contains(intervening)) fillCoord(unstoppable, intervening);
+            }
+        }
+    }
+
     private void fillCoords(TextCharacter character, Collection<Coord> coords) {
         for(Coord c : coords) {
             fillCoord(character, c);
@@ -312,10 +375,11 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
 
     private void renderSpecialSpaces(Rules rules) {
         TextCharacter star = new TextCharacter('*', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter circle = new TextCharacter('o', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
         TextCharacter dot = new TextCharacter('.', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
         TextCharacter dash = new TextCharacter('-', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
         fillCoords(star, rules.getCornerSpaces());
-        fillCoords(star, rules.getCenterSpaces());
+        fillCoords(circle, rules.getCenterSpaces());
         fillCoords(dot, rules.getAttackerForts());
         fillCoords(dash, rules.getDefenderForts());
     }
@@ -356,7 +420,12 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
     }
 
     private void focusPositionChanged() {
-        char taflman = mCurrentState.getBoard().getOccupier(mFocusPosition);
+        // Render info about the taflmen under the cursor, or at the selected
+        // location (if one exists)
+        Coord location = mFocusPosition;
+        if(mSelectedPosition != null) location = mSelectedPosition;
+
+        char taflman = mCurrentState.getBoard().getOccupier(location);
 
         List<Coord> moves = null;
         List<Coord> dests = null;
@@ -390,9 +459,39 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
             mFocusPosition = mFocusPosition.offset(boardDimension, -1, 0);
             r = Interactable.Result.HANDLED;
         }
+        else if(s.getKeyType() == KeyType.Character && s.getCharacter() == ' ') {
+            if(mSelectedPosition == null) {
+                char taflman = mCurrentState.getBoard().getOccupier(mFocusPosition);
+
+                if(taflman != Taflman.EMPTY) {
+                    mSelectedPosition = mFocusPosition;
+                }
+            }
+            else if(mSelectedPosition.x != mFocusPosition.x && mSelectedPosition.y != mFocusPosition.y){
+                mSelectedPosition = null;
+            }
+            else {
+                // selected a space in line with another space
+
+                // Temporary variable to keep the board image from trying to render mSelectedPosition after the
+                // taflman has left (which happens before onMoveRequested returns)
+                Coord startPosition = mSelectedPosition;
+                mSelectedPosition = null;
+                if(mCallback != null) mCallback.onMoveRequested(new MoveRecord(startPosition, mFocusPosition));
+            }
+
+            r = Interactable.Result.HANDLED;
+        }
+        else if(s.getKeyType() == KeyType.Escape) {
+            mSelectedPosition = null;
+            r = Interactable.Result.HANDLED;
+        }
 
         if(r != Interactable.Result.UNHANDLED) {
             focusPositionChanged();
+        }
+        else {
+            if(mCallback != null) mCallback.onUnhandledKey(s, mFocusPosition);
         }
         return r;
     }
@@ -402,5 +501,9 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         mFocused = focused;
         if(focused) focusPositionChanged();
         else rerender(null, null, null, null);
+    }
+
+    public void setCallback(Callback callback) {
+        mCallback = callback;
     }
 }

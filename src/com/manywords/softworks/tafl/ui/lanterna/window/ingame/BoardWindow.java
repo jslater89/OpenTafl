@@ -6,6 +6,7 @@ import com.googlecode.lanterna.gui2.Interactable;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.engine.Game;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.ui.Ansi;
@@ -46,6 +47,19 @@ public class BoardWindow extends BasicWindow {
         else {
             mBoardImage = new TerminalBoardImage(3, 5);
         }
+
+        mBoardImage.setCallback(new TerminalBoardImage.Callback() {
+
+            @Override
+            public void onUnhandledKey(KeyStroke key, Coord location) {
+
+            }
+
+            @Override
+            public void onMoveRequested(MoveRecord move) {
+                mCallback.handleInGameCommand("move " + move.start + " " + move.end);
+            }
+        });
 
         TerminalImagePanel boardImagePanel = new TerminalImagePanel(mBoardImage, new TerminalSize(40, 25));
         p.addComponent(boardImagePanel);
