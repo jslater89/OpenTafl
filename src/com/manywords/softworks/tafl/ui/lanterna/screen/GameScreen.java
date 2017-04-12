@@ -75,6 +75,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     private boolean mInReplay;
     private boolean mPostGame;
 
+    private static final int FOCUS_COMMAND = 0;
+    private static final int FOCUS_BOARD = 1;
+    private int mFocusedWindow = FOCUS_COMMAND;
+
     public GameScreen(Game g, String title) {
         mGame = g;
         mTitle = title;
@@ -126,6 +130,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         layoutGameWindows(mGui.getScreen().getTerminalSize());
 
+        setFocusedWindow(mFocusedWindow);
         mGui.waitForWindowToClose(mBoardWindow);
     }
 
@@ -315,6 +320,33 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     @Override
     public boolean inGame() {
         return mInGame;
+    }
+
+    private void cycleFocus(int direction) {
+        if(direction == FOCUS_FORWARD) {
+            mFocusedWindow = ++mFocusedWindow % 2;
+        }
+        else {
+            mFocusedWindow -= 1;
+            if(mFocusedWindow < 0) mFocusedWindow = 1;
+        }
+
+        setFocusedWindow(mFocusedWindow);
+    }
+
+    private void setFocusedWindow(int focusedWindow) {
+        switch(focusedWindow) {
+            case FOCUS_COMMAND:
+                mGui.setActiveWindow(mCommandWindow);
+                mCommandWindow.notifyFocus(true);
+                mBoardWindow.notifyFocus(false);
+                break;
+            case FOCUS_BOARD:
+                mGui.setActiveWindow(mBoardWindow);
+                mCommandWindow.notifyFocus(false);
+                mBoardWindow.notifyFocus(true);
+                break;
+        }
     }
 
     private class GameScreenTerminalCallback extends DefaultTerminalCallback {
@@ -920,7 +952,17 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 mStatusWindow.handleInput(key);
                 return true;
             }
-            else return false;
+            else if(key.getKeyType() == KeyType.Tab) {
+                cycleFocus(FOCUS_FORWARD);
+                return true;
+            }
+            else if(key.getKeyType() == KeyType.ReverseTab) {
+                cycleFocus(FOCUS_BACKWARD);
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         @Override

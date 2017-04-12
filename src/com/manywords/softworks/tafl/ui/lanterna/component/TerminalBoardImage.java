@@ -5,6 +5,9 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.BasicTextImage;
+import com.googlecode.lanterna.gui2.Interactable;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
 import com.manywords.softworks.tafl.rules.Board;
@@ -21,7 +24,7 @@ import java.util.List;
 /**
  * Created by jay on 2/15/16.
  */
-public class TerminalBoardImage extends BasicTextImage {
+public class TerminalBoardImage extends BasicTextImage implements SimpleInteractable {
     private static int boardDimension;
     private int mRowHeight = 3;
     private int mColWidth = 5;
@@ -327,5 +330,11 @@ public class TerminalBoardImage extends BasicTextImage {
         int yStart = getSize().getRows() - ((c.y + 1) * mRowHeight);
         int xStart = c.x * mColWidth + 1;
         return new TerminalPosition(xStart, yStart);
+    }
+
+    @Override
+    public Interactable.Result handleKeyStroke(KeyStroke s) {
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Keystroke: " + s);
+        return Interactable.Result.UNHANDLED;
     }
 }

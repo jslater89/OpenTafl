@@ -15,6 +15,9 @@ import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
  * Created by jay on 4/2/16.
  */
 public abstract class LogicalScreen {
+    static final int FOCUS_FORWARD = 0;
+    static final int FOCUS_BACKWARD = 1;
+
     public interface TerminalCallback {
         public void onMenuNavigation(Window destination);
         public void changeActiveScreen(LogicalScreen screen);

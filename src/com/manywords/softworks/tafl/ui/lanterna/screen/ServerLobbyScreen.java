@@ -47,12 +47,10 @@ public class ServerLobbyScreen extends LogicalScreen {
     protected ServerLobbyTerminalCallback mTerminalCallback;
 
     private int mFocusedWindow = 0;
+
     private static final int FOCUS_LIST = 0;
     private static final int FOCUS_DETAIL = 1;
     private static final int FOCUS_CHAT = 2;
-    private static final int FOCUS_FORWARD = 3;
-    private static final int FOCUS_BACKWARD = 4;
-
 
     public ServerLobbyScreen() {
         mConnection = new ClientServerConnection(TerminalSettings.onlineServerHost, TerminalSettings.onlineServerPort, new ClientServerCallback());

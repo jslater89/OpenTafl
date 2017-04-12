@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.lanterna.component.EnterTerminatedTextBox;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
@@ -65,7 +66,10 @@ public class CommandWindow extends BasicWindow {
 
     @Override
     public boolean handleInput(KeyStroke key) {
-        if(key.getKeyType() == KeyType.ArrowUp) {
+        boolean handledByScreen = mCallback.handleKeyStroke(key);
+
+        if(handledByScreen) return true;
+        else if(key.getKeyType() == KeyType.ArrowUp) {
             if(++mCommandBufferPosition >= mCommandBuffer.size()) {
                 mCommandBufferPosition = mCommandBuffer.size() - 1;
             }
@@ -87,5 +91,14 @@ public class CommandWindow extends BasicWindow {
         super.setSize(size);
 
         mTextBox.setPreferredSize(new TerminalSize(getSize().getColumns(), 1));
+    }
+
+    public void notifyFocus(boolean focused) {
+        if(focused) {
+            setTitle(Ansi.UNDERLINE + "COMMAND" + Ansi.UNDERLINE_OFF);
+        }
+        else {
+            setTitle("Command");
+        }
     }
 }
