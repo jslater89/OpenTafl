@@ -232,6 +232,47 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
         }
     }
 
+    private void cycleSpaceType(Coord location) {
+        SpaceType currentType = mRules.getSpaceTypeFor(location);
+
+        List<Coord> attackerForts = new ArrayList<>(mRules.getAttackerForts());
+        List<Coord> defenderForts = new ArrayList<>(mRules.getDefenderForts());
+        List<Coord> centerSpaces = new ArrayList<>(mRules.getCenterSpaces());
+        List<Coord> cornerSpaces = new ArrayList<>(mRules.getCornerSpaces());
+
+        attackerForts.remove(location);
+        defenderForts.remove(location);
+        centerSpaces.remove(location);
+        cornerSpaces.remove(location);
+
+        switch(currentType) {
+            case NONE:
+                cornerSpaces.add(location);
+                break;
+            case CORNER:
+                centerSpaces.add(location);
+                break;
+            case CENTER:
+                attackerForts.add(location);
+                break;
+            case ATTACKER_FORT:
+                defenderForts.add(location);
+                break;
+            //Otherwise: do nothing, it's already removed.
+        }
+
+        mRules.setAttackerForts(new ArrayList<>());
+        mRules.setDefenderForts(new ArrayList<>());
+        mRules.setCenterSpaces(new ArrayList<>());
+        mRules.setCornerSpaces(new ArrayList<>());
+
+        mRules.setAttackerForts(attackerForts);
+        mRules.setDefenderForts(defenderForts);
+        mRules.setCenterSpaces(centerSpaces);
+        mRules.setCornerSpaces(cornerSpaces);
+        updateBoard();
+    }
+
     private void updateTaflmanIds() {
         short currentId = 0;
         List<Side.TaflmanHolder> newDefenders = new ArrayList<>();
@@ -287,7 +328,7 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
                         break;
                     case 't':
-                        // cycle space (t)ype for location
+                        cycleSpaceType(location);
                         break;
                     case 'i':
                         // cycle s(i)de for location
