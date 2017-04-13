@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.Interactable;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -28,6 +29,8 @@ public class BoardWindow extends FocusableBasicWindow {
     private LogicalScreen.TerminalCallback mCallback;
     private TerminalBoardImage mBoardImage;
     private String mCanonicalTitle;
+    private TerminalBoardImage.Callback mUnhandledCallback;
+
     public BoardWindow(String title, Game g, LogicalScreen.TerminalCallback callback) {
         super(title);
         mCanonicalTitle = title;
@@ -42,6 +45,8 @@ public class BoardWindow extends FocusableBasicWindow {
     public BoardWindow(String title, Board board, LogicalScreen.TerminalCallback callback) {
         super(title);
 
+        mCallback = callback;
+        mCanonicalTitle = title;
         init(board.getBoardDimension());
     }
 
@@ -67,7 +72,7 @@ public class BoardWindow extends FocusableBasicWindow {
 
             @Override
             public void onUnhandledKey(KeyStroke key, Coord location) {
-
+                if(mUnhandledCallback != null) mUnhandledCallback.onUnhandledKey(key, location);
             }
 
             @Override
@@ -95,14 +100,13 @@ public class BoardWindow extends FocusableBasicWindow {
     }
 
     public void renderGame() {
-        Game toRender = (mReplayGame != null ? mReplayGame.getGame() : mGame);
-        mBoardImage.renderState(toRender.getCurrentState(), null, null, null, null);
-        invalidate();
+        renderGame(null, null, null, null);
     }
 
     public void renderGame(Coord location, List<Coord> stops, List<Coord> moves, List<Coord> captures) {
         Game toRender = (mReplayGame != null ? mReplayGame.getGame() : mGame);
         mBoardImage.renderState(toRender.getCurrentState(), location, stops, moves, captures);
+        invalidate();
     }
 
     public void renderState(GameState state, Coord highlight, List<Coord> stops, List<Coord> moves, List<Coord> captures) {
@@ -114,10 +118,16 @@ public class BoardWindow extends FocusableBasicWindow {
     }
 
     public void renderBoard(Board board, Coord highlight, List<Coord> stops, List<Coord> moves, List<Coord> captures) {
+        mBoardImage.renderBoard(board, highlight, stops, moves, captures);
+        invalidate();
+    }
 
+    public void setUnhandledKeyCallback(TerminalBoardImage.Callback callback) {
+        mUnhandledCallback = callback;
     }
 
     public void notifyFocus(boolean focused) {
+        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Window focus: " + focused);
         mBoardImage.notifyFocus(focused);
         if(focused) {
             setTitle(Ansi.UNDERLINE + mCanonicalTitle.toUpperCase() + Ansi.UNDERLINE_OFF);

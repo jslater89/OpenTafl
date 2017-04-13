@@ -11,8 +11,12 @@ public abstract class Board {
      */
     public abstract void setupTaflmen(Side attackers, Side defenders);
 
-    public abstract int getIndex(Coord c);
-    public abstract int getIndex(int x, int y);
+    public int getIndex(Coord c) {
+        return c.y * getBoardDimension() + c.x;
+    }
+    public int getIndex(int x, int y) {
+        return y * getBoardDimension() + x;
+    }
 
     /**
      * Get the board's edge length.

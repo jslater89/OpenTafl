@@ -12,6 +12,7 @@ import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.ServerLobbyScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.VariantEditorScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
 import java.io.File;
@@ -39,6 +40,9 @@ public class MainMenuWindow extends BasicWindow {
 
         EmptySpace e1 = new EmptySpace(new TerminalSize(0, 1));
         p.addComponent(e1);
+
+        Button variantButton = new Button("Variant editor", () -> mTerminalCallback.changeActiveScreen(new VariantEditorScreen()));
+        p.addComponent(variantButton);
 
         Button playButton = new Button("Play", () -> TerminalUtils.startGame(getTextGUI(), mTerminalCallback));
         p.addComponent(playButton);

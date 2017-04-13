@@ -436,21 +436,21 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         Coord location = mFocusPosition;
         if(mSelectedPosition != null) location = mSelectedPosition;
 
+        List<Coord> moves = null;
+        List<Coord> dests = null;
+        List<Coord> captures = null;
+
         if(mCurrentState != null) {
             char taflman = mCurrentState.getBoard().getOccupier(location);
-
-            List<Coord> moves = null;
-            List<Coord> dests = null;
-            List<Coord> captures = null;
 
             if (taflman != Taflman.EMPTY) {
                 moves = Taflman.getAllowableMoves(mCurrentState, taflman);
                 dests = Taflman.getAllowableDestinations(mCurrentState, taflman);
                 captures = Taflman.getCapturingMoves(mCurrentState, taflman);
             }
-
-            rerender(null, moves, dests, captures);
         }
+
+        if(mCurrentBoard != null) rerender(null, moves, dests, captures);
     }
 
     @Override

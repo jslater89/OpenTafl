@@ -195,6 +195,10 @@ public class GenericRules extends Rules {
     private boolean mAttackerKnights;
     private boolean mDefenderKnights;
 
+    public void setBoard(Board b) {
+        mBoard = b;
+    }
+
     @Override
     public void setupSpaceGroups(int boardSize) {
         mBoardSize = boardSize;

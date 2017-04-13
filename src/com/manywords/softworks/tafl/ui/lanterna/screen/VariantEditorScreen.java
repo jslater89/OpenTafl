@@ -3,9 +3,10 @@ package com.manywords.softworks.tafl.ui.lanterna.screen;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
-import com.manywords.softworks.tafl.rules.GenericBoard;
-import com.manywords.softworks.tafl.rules.GenericRules;
-import com.manywords.softworks.tafl.rules.GenericSide;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
+import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
@@ -14,6 +15,7 @@ import com.manywords.softworks.tafl.ui.lanterna.window.varianteditor.OptionsWind
 import com.manywords.softworks.tafl.ui.lanterna.window.varianteditor.RulesWindow;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jay on 4/12/17.
@@ -32,8 +34,10 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
         super.setActive(t, gui);
         mTerminalCallback = new VariantEditorTerminalCallback();
 
+        // Mostly for drawing
         mStartingBoard = new GenericBoard(9);
 
+        // THe real work happens here
         mAttackers = new GenericSide(mStartingBoard, true);
         mAttackers.setStartingTaflmen(new ArrayList<>());
 
@@ -55,6 +59,9 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
     private void createWindows() {
         TerminalBoardImage.init(mStartingBoard.getBoardDimension());
         mBoardWindow = new BoardWindow("Board Design", mStartingBoard, mTerminalCallback);
+        mBoardWindow.setUnhandledKeyCallback(new BoardEditCallback());
+        mBoardWindow.renderBoard(mStartingBoard);
+
         mRulesWindow = new RulesWindow();
         mOptionsWindow = new OptionsWindow();
     }
@@ -111,8 +118,8 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
         layoutWindows(mGui.getScreen().getTerminalSize());
 
-        mGui.setActiveWindow(mOptionsWindow);
-        //mOptionsWindow.notifyFocus(true);
+        mGui.setActiveWindow(mBoardWindow);
+        mBoardWindow.notifyFocus(true);
 
         mGui.waitForWindowToClose(mOptionsWindow);
     }
@@ -123,6 +130,177 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
     protected void leaveUi() {
         removeWindows();
+    }
+
+
+    private void cycleTaflmanType(Coord location, char taflman) {
+        char newTaflman = Taflman.EMPTY;
+        char packedSide = Taflman.getPackedSide(taflman);
+        if(taflman == Taflman.EMPTY) {
+            newTaflman |= Taflman.SIDE_ATTACKERS;
+            newTaflman |= Taflman.TYPE_TAFLMAN;
+            packedSide = Taflman.SIDE_ATTACKERS;
+        }
+        else {
+            newTaflman |= Taflman.getPackedSide(taflman);
+
+            switch(Taflman.getPackedType(taflman)) {
+                case Taflman.TYPE_TAFLMAN:
+                    newTaflman |= Taflman.TYPE_COMMANDER;
+                    break;
+                case Taflman.TYPE_COMMANDER:
+                    newTaflman |= Taflman.TYPE_KNIGHT;
+                    break;
+                case Taflman.TYPE_KNIGHT:
+                    if(Taflman.getPackedSide(newTaflman) == Taflman.SIDE_DEFENDERS) {
+                        newTaflman |= Taflman.TYPE_KING;
+                        break;
+                    }
+                case Taflman.TYPE_KING:
+                    newTaflman = Taflman.EMPTY;
+                }
+        }
+
+        Side s = packedSide == Taflman.SIDE_ATTACKERS ? mAttackers : mDefenders;
+        List<Side.TaflmanHolder> currentTaflmen = s.getStartingTaflmen();
+
+        Side.TaflmanHolder toRemove = null;
+        for(Side.TaflmanHolder t : currentTaflmen) {
+            if(t.coord.equals(location)) {
+                toRemove = t;
+                break;
+            }
+        }
+        currentTaflmen.remove(toRemove);
+
+        if(newTaflman != Taflman.EMPTY) currentTaflmen.add(new Side.TaflmanHolder(newTaflman, location));
+        s.setStartingTaflmen(currentTaflmen);
+
+        updateTaflmanIds();
+        updateBoard();
+    }
+
+    private void cycleTaflmanSide(Coord location) {
+        boolean attackerToDefender = false;
+        boolean defenderToAttacker = false;
+        Side.TaflmanHolder ofInterest = null;
+
+        for(Side.TaflmanHolder t : mAttackers.getStartingTaflmen()) {
+            if(t.coord.equals(location)) {
+                ofInterest = t;
+                attackerToDefender = true;
+                break;
+            }
+        }
+
+        for(Side.TaflmanHolder t : mDefenders.getStartingTaflmen()) {
+            if(t.coord.equals(location)) {
+                ofInterest = t;
+                defenderToAttacker = true;
+                break;
+            }
+        }
+
+        if(attackerToDefender) {
+            List<Side.TaflmanHolder> attackers = mAttackers.getStartingTaflmen();
+            attackers.remove(ofInterest);
+
+            List<Side.TaflmanHolder> defenders = mDefenders.getStartingTaflmen();
+            char packed = Taflman.EMPTY;
+            packed |= Taflman.getPackedType(ofInterest.packed);
+            packed |= Taflman.SIDE_DEFENDERS;
+            ofInterest = new Side.TaflmanHolder(packed, ofInterest.coord);
+            defenders.add(ofInterest);
+
+            updateTaflmanIds();
+            updateBoard();
+        }
+
+        if(defenderToAttacker) {
+            List<Side.TaflmanHolder> defenders = mDefenders.getStartingTaflmen();
+            defenders.remove(ofInterest);
+
+            List<Side.TaflmanHolder> attackers = mAttackers.getStartingTaflmen();
+            char packed = Taflman.EMPTY;
+            packed |= Taflman.getPackedType(ofInterest.packed);
+            packed |= Taflman.SIDE_ATTACKERS;
+            ofInterest = new Side.TaflmanHolder(packed, ofInterest.coord);
+            attackers.add(ofInterest);
+
+            updateTaflmanIds();
+            updateBoard();
+        }
+    }
+
+    private void updateTaflmanIds() {
+        short currentId = 0;
+        List<Side.TaflmanHolder> newDefenders = new ArrayList<>();
+        List<Side.TaflmanHolder> newAttackers = new ArrayList<>();
+
+        for(Side.TaflmanHolder t : mDefenders.getStartingTaflmen()) {
+            char packed = Taflman.EMPTY;
+            packed |= Taflman.getPackedSide(t.packed);
+            packed |= Taflman.getPackedType(t.packed);
+            packed |= currentId;
+
+            newDefenders.add(new Side.TaflmanHolder(packed, t.coord));
+            currentId += 1;
+        }
+
+        currentId = 0;
+        for(Side.TaflmanHolder t : mAttackers.getStartingTaflmen()) {
+            char packed = Taflman.EMPTY;
+            packed |= Taflman.getPackedSide(t.packed);
+            packed |= Taflman.getPackedType(t.packed);
+            packed |= currentId;
+
+            newAttackers.add(new Side.TaflmanHolder(packed, t.coord));
+            currentId += 1;
+        }
+
+        mAttackers.setStartingTaflmen(newAttackers);
+        mDefenders.setStartingTaflmen(newDefenders);
+    }
+
+    private void updateBoard() {
+        mStartingBoard = new GenericBoard(9);
+
+        mAttackers = new GenericSide(mStartingBoard, true, mAttackers.getStartingTaflmen());
+        mDefenders = new GenericSide(mStartingBoard, false, mDefenders.getStartingTaflmen());
+
+        mStartingBoard.setupTaflmen(mAttackers, mDefenders);
+        mStartingBoard.setRules(mRules);
+        mRules.setBoard(mStartingBoard);
+
+        mBoardWindow.renderBoard(mStartingBoard);
+    }
+
+    private class BoardEditCallback implements TerminalBoardImage.Callback {
+
+        @Override
+        public void onUnhandledKey(KeyStroke key, Coord location) {
+            if(key.getKeyType() == KeyType.Character) {
+                switch(key.getCharacter()) {
+                    case 'p':
+                        char taflman = mStartingBoard.getOccupier(location);
+                        cycleTaflmanType(location, taflman);
+
+                        break;
+                    case 't':
+                        // cycle space (t)ype for location
+                        break;
+                    case 'i':
+                        // cycle s(i)de for location
+                        cycleTaflmanSide(location);
+                        break;
+                }
+            }
+        }
+
+        @Override
+        public void onMoveRequested(MoveRecord move) {
+
+        }
     }
 
     private class VariantEditorTerminalCallback extends DefaultTerminalCallback {

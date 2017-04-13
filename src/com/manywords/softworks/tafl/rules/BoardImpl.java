@@ -3,7 +3,10 @@ package com.manywords.softworks.tafl.rules;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class BoardImpl extends Board {
     public BoardImpl(int dimension) {
@@ -39,14 +42,6 @@ public abstract class BoardImpl extends Board {
         for(Side.TaflmanHolder t : defenders.getStartingTaflmen()) {
             mCachedTaflmanLocations.put(t.packed, t.coord);
         }
-    }
-
-    public int getIndex(Coord c) {
-        return c.y * getBoardDimension() + c.x;
-    }
-
-    public int getIndex(int x, int y) {
-        return y * getBoardDimension() + x;
     }
 
     public Coord findTaflmanSpace(char taflman) {
