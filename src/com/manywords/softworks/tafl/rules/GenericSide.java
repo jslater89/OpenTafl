@@ -11,8 +11,9 @@ public class GenericSide extends Side {
     private boolean mCommanders = false;
     private boolean mKnights = false;
 
-    public GenericSide(Board b) {
+    public GenericSide(Board b, boolean isAttackingSide) {
         super(b);
+        mAttackingSide = isAttackingSide;
     }
 
     public GenericSide(Board b, boolean isAttackingSide, List<TaflmanHolder> taflmen) {

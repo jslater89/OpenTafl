@@ -133,7 +133,7 @@ public class MainMenuWindow extends BasicWindow {
         p.addComponent(panel);
 
         Game game = new Game(Copenhagen.newCopenhagen11(), null);
-        i.renderBoard(game.getCurrentState(), null, null, null, null);
+        i.renderState(game.getCurrentState(), null, null, null, null);
         */
 
         this.setComponent(p);

@@ -18,6 +18,7 @@ import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -39,6 +40,7 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
     private int mLeftPad = 0;
 
     private GameState mCurrentState;
+    private Board mCurrentBoard;
 
     // For interactability
     private boolean mAllowMovement = true;
@@ -82,21 +84,26 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
 
         renderBoardBackground();
         if(state != null) {
-            renderBoard(state, null, null, null, null);
+            renderState(state, null, null, null, null);
         }
     }
 
-    public void renderBoard(GameState state, Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
+    public void renderState(GameState state, Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
         mCurrentState = state;
-        if(mCurrentState != null) rerender(highlight, allowableDestinations, allowableMoves, captureSpaces);
+        if(mCurrentState != null) renderBoard(mCurrentState.getBoard(), highlight, allowableDestinations, allowableMoves, captureSpaces);
+    }
+
+    public void renderBoard(Board board, Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
+        mCurrentBoard = board;
+        if(mCurrentBoard != null) rerender(highlight, allowableDestinations, allowableMoves, captureSpaces);
     }
 
     private void rerender(Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
-        if(mCurrentState == null) return;
+        if(mCurrentBoard == null) return;
 
         // Render in order of most spaces to fewest, for maximum information preservation
         clearSpaces();
-        renderSpecialSpaces(mCurrentState.getBoard().getRules());
+        renderSpecialSpaces(mCurrentBoard.getRules());
 
         if(allowableMoves != null) renderAllowableMoves(allowableMoves);
         if(allowableDestinations != null) renderAllowableDestinations(highlight, allowableDestinations);
@@ -111,7 +118,7 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
             }
         }
 
-        renderTaflmen(mCurrentState.getBoard());
+        renderTaflmen(mCurrentBoard);
     }
 
     private void renderBoardBackground() {
@@ -286,8 +293,12 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         }
 
         char taflman = mCurrentState.getBoard().getOccupier(start);
-        List<Coord> moves = Taflman.getAllowableMoves(mCurrentState, taflman);
-        List<Coord> stops = Taflman.getAllowableDestinations(mCurrentState, taflman);
+        List<Coord> moves = new ArrayList<>();
+        List<Coord> stops = new ArrayList<>();
+        if(mCurrentState != null) {
+            moves = Taflman.getAllowableMoves(mCurrentState, taflman);
+            stops = Taflman.getAllowableDestinations(mCurrentState, taflman);
+        }
 
         boolean skip = false;
 
@@ -425,19 +436,21 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         Coord location = mFocusPosition;
         if(mSelectedPosition != null) location = mSelectedPosition;
 
-        char taflman = mCurrentState.getBoard().getOccupier(location);
+        if(mCurrentState != null) {
+            char taflman = mCurrentState.getBoard().getOccupier(location);
 
-        List<Coord> moves = null;
-        List<Coord> dests = null;
-        List<Coord> captures = null;
+            List<Coord> moves = null;
+            List<Coord> dests = null;
+            List<Coord> captures = null;
 
-        if(taflman != Taflman.EMPTY) {
-            moves = Taflman.getAllowableMoves(mCurrentState, taflman);
-            dests = Taflman.getAllowableDestinations(mCurrentState, taflman);
-            captures = Taflman.getCapturingMoves(mCurrentState, taflman);
+            if (taflman != Taflman.EMPTY) {
+                moves = Taflman.getAllowableMoves(mCurrentState, taflman);
+                dests = Taflman.getAllowableDestinations(mCurrentState, taflman);
+                captures = Taflman.getCapturingMoves(mCurrentState, taflman);
+            }
+
+            rerender(null, moves, dests, captures);
         }
-
-        rerender(null, moves, dests, captures);
     }
 
     @Override
@@ -459,7 +472,8 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
             mFocusPosition = mFocusPosition.offset(boardDimension, -1, 0);
             r = Interactable.Result.HANDLED;
         }
-        else if(s.getKeyType() == KeyType.Character && s.getCharacter() == ' ') {
+        else if(s.getKeyType() == KeyType.Character && s.getCharacter() == ' ' && mCurrentState != null) {
+            // We can only select if the current state is not null. Otherwise, we're editing a board.
             if(mSelectedPosition == null) {
                 char taflman = mCurrentState.getBoard().getOccupier(mFocusPosition);
 

@@ -1,11 +1,14 @@
 package com.manywords.softworks.tafl.ui.lanterna.window.ingame;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.Label;
+import com.googlecode.lanterna.gui2.LinearLayout;
+import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.lanterna.component.EnterTerminatedTextBox;
+import com.manywords.softworks.tafl.ui.lanterna.component.FocusableBasicWindow;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
 import java.util.ArrayList;
@@ -14,7 +17,7 @@ import java.util.List;
 /**
  * Created by jay on 2/15/16.
  */
-public class CommandWindow extends BasicWindow {
+public class CommandWindow extends FocusableBasicWindow {
     private LogicalScreen.TerminalCallback mCallback;
     private EnterTerminatedTextBox mTextBox;
 

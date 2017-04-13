@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
+import com.manywords.softworks.tafl.ui.lanterna.screen.VariantEditorScreen;
 import com.manywords.softworks.tafl.ui.lanterna.window.selfplay.SelfplayWindow;
 
 /**
@@ -35,6 +36,9 @@ public class OtherOperationsWindow extends BasicWindow {
 
         Button downloadButton = new Button("Download PlayTaflOnline game", () -> new DownloadPlayTaflOnlineDialog(mTerminalCallback).showDialog(getTextGUI()));
         p.addComponent(downloadButton);
+
+        Button variantButton = new Button("Variant editor", () -> mTerminalCallback.changeActiveScreen(new VariantEditorScreen()));
+        p.addComponent(variantButton);
 
         Button tourneyButton = new Button("AI selfplay", () -> mTerminalCallback.onMenuNavigation(new SelfplayWindow(mTerminalCallback)));
         p.addComponent(tourneyButton);
