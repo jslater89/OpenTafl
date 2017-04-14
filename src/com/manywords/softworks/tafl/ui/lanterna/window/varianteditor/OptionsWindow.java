@@ -69,7 +69,7 @@ public class OptionsWindow extends FocusableBasicWindow {
         secondRow.addComponent(newLayout);
 
         Button loadStatic = new Button("Load static", () -> {
-            List<Rules> builtins = BuiltInVariants.availableRules;
+            List<Rules> builtins = Variants.builtinRules;
             Rules[] r = new Rules[builtins.size()];
 
             ListSelectDialogBuilder<Rules> builder = new ListSelectDialogBuilder<>();

@@ -4,7 +4,7 @@ import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.*;
 import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
-import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -63,7 +63,7 @@ public class OptionsMenuWindow extends BasicWindow {
         optionsPanel.setLayoutManager(new GridLayout(3));
 
         Button variantSelect = new Button("Variant", this::showVariantSelectDialog);
-        mVariantLabel = new Label(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        mVariantLabel = new Label(Variants.rulesDescriptions.get(TerminalSettings.variant));
         optionsPanel.addComponent(variantSelect);
         optionsPanel.addComponent(TerminalUtils.newSpacer());
         optionsPanel.addComponent(mVariantLabel);
@@ -226,7 +226,7 @@ public class OptionsMenuWindow extends BasicWindow {
     }
 
     private void refreshSettings() {
-        mVariantLabel.setText(BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        mVariantLabel.setText(Variants.rulesDescriptions.get(TerminalSettings.variant));
         mClockLabel.setText(TerminalSettings.timeSpec.toString());
         mAttackerLabel.setText(TerminalSettings.labelForPlayerType(TerminalSettings.attackers));
 
@@ -341,9 +341,9 @@ public class OptionsMenuWindow extends BasicWindow {
     }
 
     private void showVariantSelectDialog() {
-        Runnable[] variants = new Runnable[BuiltInVariants.rulesDescriptions.size()];
+        Runnable[] variants = new Runnable[Variants.rulesDescriptions.size()];
         for(int i = 0; i < variants.length; i++) {
-            final String name = BuiltInVariants.rulesDescriptions.get(i);
+            final String name = Variants.rulesDescriptions.get(i);
             final int index = i;
             Runnable r = new Runnable() {
                 @Override

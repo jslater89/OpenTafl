@@ -3,6 +3,8 @@ package com.manywords.softworks.tafl.ui.lanterna.screen;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.OpenTafl;
@@ -453,7 +455,14 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
             File f = TerminalUtils.showFileChooserDialog(mGui, "Save rule set", "Save", new File("user-rules"));
 
             if(f != null) {
-                // TODO: check/message for overwriting
+                if(!f.getName().endsWith(".otr")) {
+                    f = new File(f.getParent(), f.getName() + ".otr");
+                }
+
+                if(f.exists()) {
+                    MessageDialogButton result = MessageDialog.showMessageDialog(mGui, "File exists", "Overwrite existing file?", MessageDialogButton.Yes, MessageDialogButton.No);
+                    if(result == MessageDialogButton.No) return;
+                }
 
                 try {
                     BufferedWriter w = new BufferedWriter(new FileWriter(f));
@@ -470,8 +479,10 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
         @Override
         public void quit() {
-            // TODO: confirm
-            mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+            MessageDialogButton result = MessageDialog.showMessageDialog(mGui, "Confirm quit", "Quit, discarding any unsaved changes?", MessageDialogButton.Yes, MessageDialogButton.No);
+            if(result == MessageDialogButton.Yes) {
+                mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+            }
         }
 
         @Override

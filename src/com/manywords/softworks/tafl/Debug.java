@@ -4,7 +4,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineClient;
 import com.manywords.softworks.tafl.engine.ai.evaluators.PieceSquareTable;
-import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class Debug {
     public static void run(Map<String, String> args) {
-        Rules r = BuiltInVariants.rulesForNameAndDimension("Fetlar", 11);
+        Rules r = Variants.rulesForNameAndDimension("Fetlar", 11);
         PieceSquareTable table = new PieceSquareTable(r, null);
 
         table.logTable(0);

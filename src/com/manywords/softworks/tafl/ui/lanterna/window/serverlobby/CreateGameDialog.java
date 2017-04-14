@@ -11,7 +11,7 @@ import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.notation.NotationParseException;
-import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
@@ -51,18 +51,18 @@ public class CreateGameDialog extends DialogWindow {
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
 
-        final Label rulesLabel = new Label("Rules: " + BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        final Label rulesLabel = new Label("Rules: " + Variants.rulesDescriptions.get(TerminalSettings.variant));
         final Button rulesButton = new Button("Rules", () -> {
-            String[] rulesTextArray = new String[BuiltInVariants.rulesDescriptions.size()];
+            String[] rulesTextArray = new String[Variants.rulesDescriptions.size()];
 
             for(int i = 0; i < rulesTextArray.length; i++) {
-                rulesTextArray[i] = BuiltInVariants.rulesDescriptions.get(i);
+                rulesTextArray[i] = Variants.rulesDescriptions.get(i);
             }
 
             String rulesDescription = ListSelectDialog.showDialog(getTextGUI(), "Rules", "Select a rules variant", rulesTextArray);
             if(rulesDescription != null) {
-                settingsRulesIndex = BuiltInVariants.indexForDescription(rulesDescription);
-                rules = BuiltInVariants.availableRules.get(settingsRulesIndex);
+                settingsRulesIndex = Variants.indexForDescription(rulesDescription);
+                rules = Variants.availableRules.get(settingsRulesIndex);
                 rulesLabel.setText("Rules: " + rules.toString());
             }
         });
@@ -129,7 +129,7 @@ public class CreateGameDialog extends DialogWindow {
             rulesLabel.setText("Rules: loaded " + rules.toString());
         });
 
-        rules = BuiltInVariants.availableRules.get(TerminalSettings.variant);
+        rules = Variants.availableRules.get(TerminalSettings.variant);
 
         timeSpec = TerminalSettings.timeSpec;
         if(timeSpec != null && timeSpec.isEnabled()) {

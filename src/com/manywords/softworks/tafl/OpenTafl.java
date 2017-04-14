@@ -10,7 +10,7 @@ import com.manywords.softworks.tafl.network.client.HeadlessAIClient;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.notation.playtaflonline.PlayTaflOnlineJsonTranslator;
-import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.test.Benchmark;
 import com.manywords.softworks.tafl.test.Test;
@@ -46,7 +46,7 @@ public class OpenTafl {
         SILENT
     }
 
-    public static final String CURRENT_VERSION = "v0.4.5.1b";
+    public static final String CURRENT_VERSION = "v0.4.6.0pre1";
     public static final int NETWORK_PROTOCOL_VERSION = 7;
 
     public static boolean devMode = false;
@@ -110,7 +110,7 @@ public class OpenTafl {
         directoryCheck();
         setupLogging();
         Coord.initialize();
-        BuiltInVariants.loadExternalRules(new File("external-rules.conf"));
+        Variants.loadExternalRules(new File("external-rules.conf"), new File("user-rules"));
         TerminalSettings.loadFromFile();
 
         switch(runMode) {

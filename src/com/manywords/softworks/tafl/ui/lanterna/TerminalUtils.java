@@ -8,19 +8,17 @@ import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
 import com.manywords.softworks.tafl.network.client.ClientServerConnection;
-import com.manywords.softworks.tafl.rules.BuiltInVariants;
 import com.manywords.softworks.tafl.rules.Rules;
+import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.ui.lanterna.screen.GameScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,14 +47,14 @@ public class TerminalUtils {
         TimeSpec ts = TerminalSettings.timeSpec;
         Game g;
         if(ts.mainTime == 0 && (ts.overtimeTime == 0 ||ts.overtimeCount == 0)) {
-            g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), callback.getUiCallback());
+            g = new Game(Variants.availableRules.get(TerminalSettings.variant), callback.getUiCallback());
         }
         else {
-            g = new Game(BuiltInVariants.availableRules.get(TerminalSettings.variant), callback.getUiCallback(), ts);
+            g = new Game(Variants.availableRules.get(TerminalSettings.variant), callback.getUiCallback(), ts);
         }
 
         // Blocks here
-        GameScreen gameScreen = new GameScreen(g, BuiltInVariants.rulesDescriptions.get(TerminalSettings.variant));
+        GameScreen gameScreen = new GameScreen(g, Variants.rulesDescriptions.get(TerminalSettings.variant));
         callback.changeActiveScreen(gameScreen);
         return g;
     }
