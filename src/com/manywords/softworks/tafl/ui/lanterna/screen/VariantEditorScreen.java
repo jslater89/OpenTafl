@@ -452,6 +452,8 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
         public void saveRules() {
             // TODO: update from rules UI
 
+            // TODO: check rules for consistency
+
             File f = TerminalUtils.showFileChooserDialog(mGui, "Save rule set", "Save", new File("user-rules"));
 
             if(f != null) {

@@ -6,7 +6,6 @@ import com.googlecode.lanterna.gui2.LinearLayout;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.lanterna.component.EnterTerminatedTextBox;
 import com.manywords.softworks.tafl.ui.lanterna.component.FocusableBasicWindow;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
@@ -92,14 +91,5 @@ public class CommandWindow extends FocusableBasicWindow {
         super.setSize(size);
 
         mTextBox.setPreferredSize(new TerminalSize(getSize().getColumns(), 1));
-    }
-
-    public void notifyFocus(boolean focused) {
-        if(focused) {
-            setTitle(Ansi.UNDERLINE + "COMMAND" + Ansi.UNDERLINE_OFF);
-        }
-        else {
-            setTitle("Command");
-        }
     }
 }
