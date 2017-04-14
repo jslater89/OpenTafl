@@ -46,7 +46,7 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
         super.setActive(t, gui);
         mTerminalCallback = new VariantEditorTerminalCallback();
 
-        createNewRules(9);
+        createNewRules(13);
         enterUi();
     }
 
@@ -65,7 +65,9 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
         if(mRules != null) newRules.copyNonDimensionalRules(mRules);
         mRules = newRules;
 
-        if(mRulesWindow != null) mRulesWindow.setLabel(RulesSerializer.getRulesRecord(mRules, true));
+        if(mRulesWindow != null) {
+            mRulesWindow.updateScreen(mRules);
+        }
     }
 
     private void loadRules(Rules r) {
@@ -78,7 +80,7 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
         newRules.copyNonDimensionalRules(r);
         newRules.copyDimensionalRules(r);
         mRules = newRules;
-        mRulesWindow.setLabel(RulesSerializer.getRulesRecord(mRules, true));
+        mRulesWindow.updateScreen(mRules);
     }
 
     protected void enterUi() {
@@ -92,7 +94,7 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
         createBoardWindow();
 
         mRulesWindow = new RulesWindow(mTerminalCallback);
-        mRulesWindow.setLabel(RulesSerializer.getRulesRecord(mRules, true));
+        mRulesWindow.updateScreen(mRules);
         mOptionsWindow = new OptionsWindow(mTerminalCallback, new OptionsHost());
     }
 
@@ -450,7 +452,7 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
         @Override
         public void saveRules() {
-            // TODO: update from rules UI
+            mRulesWindow.updateRules(mRules);
 
             // TODO: check rules for consistency
 

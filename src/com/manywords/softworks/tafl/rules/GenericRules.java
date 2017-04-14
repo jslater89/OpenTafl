@@ -155,6 +155,10 @@ public class GenericRules extends Rules {
         mSpeedLimits = speeds;
     }
 
+    public int[] getSpeedLimits() {
+        return mSpeedLimits;
+    }
+
     public void setCenterParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] hostileEmpty, boolean[] reenterable) {
         if(passable != null) centerPassableFor = passable;
         if(stoppable != null) centerStoppableFor = stoppable;
