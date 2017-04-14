@@ -5,16 +5,22 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
+import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.window.ingame.BoardWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.varianteditor.OptionsWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.varianteditor.RulesWindow;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -444,7 +450,22 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
         @Override
         public void saveRules() {
-            // TODO: implement
+            // TODO: update from rules UI
+
+            File f = TerminalUtils.showFileChooserDialog(mGui, "Save rule set", "Save", new File("user-rules"));
+
+            if(f != null) {
+                try {
+                    BufferedWriter w = new BufferedWriter(new FileWriter(f));
+                    w.write(RulesSerializer.getRulesRecord(mRules, true));
+                    w.flush();
+                    w.close();
+                }
+                catch (IOException e) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to write user rules file: " + e);
+                    OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+                }
+            }
         }
 
         @Override

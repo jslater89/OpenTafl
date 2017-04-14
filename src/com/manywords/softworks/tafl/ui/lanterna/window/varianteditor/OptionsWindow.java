@@ -3,12 +3,17 @@ package com.manywords.softworks.tafl.ui.lanterna.window.varianteditor;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
+import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.notation.NotationParseException;
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.component.FocusableBasicWindow;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
+import java.io.*;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -75,7 +80,33 @@ public class OptionsWindow extends FocusableBasicWindow {
         secondRow.addComponent(loadStatic);
 
         Button loadUser = new Button("Load user", () -> {
+            File f = TerminalUtils.showFileChooserDialog(getTextGUI(), "Load rule set", "Load", new File("user-rules"));
 
+            if(f != null) {
+                if(f.exists()) {
+                    try {
+                        BufferedReader r = new BufferedReader(new FileReader(f));
+                        String rulesString = r.readLine();
+
+                        Rules rules = RulesSerializer.loadRulesRecord(rulesString);
+                        mHost.loadRules(rules);
+                    }
+                    catch (FileNotFoundException e) {
+                        // Already caught below
+                    }
+                    catch (IOException e) {
+                        MessageDialog.showMessageDialog(getTextGUI(), "Error", "Failed to read file");
+                        OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+                    }
+                    catch (NotationParseException e) {
+                        MessageDialog.showMessageDialog(getTextGUI(), "Error", "Failed to parse file");
+                        OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+                    }
+                }
+                else {
+                    MessageDialog.showMessageDialog(getTextGUI(), "Error", "File not found");
+                }
+            }
         });
         secondRow.addComponent(loadUser);
 

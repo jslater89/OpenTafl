@@ -313,6 +313,10 @@ public class OpenTafl {
             new File("saved-games/headless-ai").mkdirs();
         }
 
+        if(!new File("user-rules").exists()) {
+            new File("user-rules").mkdirs();
+        }
+
         if(!new File("saved-games/headless-ai").exists()) {
             new File("saved-games/headless-ai").mkdirs();
         }
