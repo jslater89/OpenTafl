@@ -232,7 +232,7 @@ public class RulesWindow extends FocusableBasicWindow {
         rules.setBerserkMode(berserkStringToType(mBerserkRadio.getCheckedItem()));
 
         // Dialogs
-        rules.setSpeedLimits(GenericRules.SPEED_LIMITS_BY_TYPE, mTaflmanSpeedLimits);
+        rules.setSpeedLimits(mTaflmanSpeedLimits);
         rules.setCenterParameters(
                 mCenterPropertiesDialog.passable,
                 mCenterPropertiesDialog.stoppable,

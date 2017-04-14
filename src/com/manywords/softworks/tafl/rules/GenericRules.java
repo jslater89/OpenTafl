@@ -150,8 +150,51 @@ public class GenericRules extends Rules {
         mBerserkMode = berserkMode;
     }
 
-    public void setSpeedLimits(int mode, int[] speeds) {
-        mSpeedLimitMode = mode;
+    public void setSpeedLimits(int[] speeds) {
+        boolean allSpeedsIdentical = true;
+        boolean attackerSpeedsIdentical = true;
+        boolean defenderSpeedsIdentical = true;
+
+        int defenderSpeed = -2;
+        int attackerSpeed = -2;
+        for(int i = 0; i < speeds.length / 2; i++) {
+            if(defenderSpeed == -2) {
+                defenderSpeed = speeds[i];
+            }
+            else if(defenderSpeed != speeds[i]) {
+                defenderSpeedsIdentical = false;
+            }
+        }
+
+        for(int i = speeds.length / 2; i < speeds.length; i++) {
+            if(attackerSpeed == -2) {
+                attackerSpeed = speeds[i];
+            }
+            else if(attackerSpeed != speeds[i]) {
+                attackerSpeedsIdentical = false;
+            }
+        }
+
+        // Three cases: attacker speeds are all identical and defender speeds are all identical,
+        // but each side has a different speed; or attackers/defenders (two cases) have differing
+        // speeds internally. If one or more is true, all speeds are not identical.
+        if(attackerSpeed != defenderSpeed || !attackerSpeedsIdentical || !defenderSpeedsIdentical) {
+            allSpeedsIdentical = false;
+        }
+
+        if(allSpeedsIdentical && defenderSpeed == -1) {
+            mSpeedLimitMode = SPEED_LIMITS_NONE;
+        }
+        else if(allSpeedsIdentical) {
+            mSpeedLimitMode = SPEED_LIMITS_IDENTICAL;
+        }
+        else if(attackerSpeedsIdentical && defenderSpeedsIdentical) {
+            mSpeedLimitMode = SPEED_LIMITS_BY_SIDE;
+        }
+        else {
+            mSpeedLimitMode = SPEED_LIMITS_BY_TYPE;
+        }
+
         mSpeedLimits = speeds;
     }
 
@@ -460,6 +503,7 @@ public class GenericRules extends Rules {
     }
 
     public void copyNonDimensionalRules(Rules from) {
+        mName = from.getName();
         mEscapeType = from.getEscapeType();
         mSurroundingFatal = from.isSurroundingFatal();
         mAttackersFirst = from.getStartingSide().isAttackingSide();

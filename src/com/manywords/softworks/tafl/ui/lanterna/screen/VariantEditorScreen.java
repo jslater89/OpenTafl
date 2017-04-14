@@ -122,26 +122,18 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
         int boardWindowWidth = boardWindowSize.getColumns();
         int boardWindowHeight = boardWindowSize.getRows();
 
-        if(leftoverRight < 20) {
-            boardWindowHeight = boardWindowSize.getRows();
+        // command beneath the board window, status to the right
+        int minRulesWidth = 85;
+        int rulesWidth = Math.max(minRulesWidth, leftoverRight - 4);
+        rulesPosition = new TerminalPosition(boardWindowWidth + 2, 0);
+        rulesSize = new TerminalSize(rulesWidth, size.getRows() - 2);
 
-            int leftoverBottom = size.getRows() - 2 - boardWindowHeight - 2;
+        optionsPosition = new TerminalPosition(0, boardWindowHeight + 2);
 
-            // status and command stacked beneath the board window
-            rulesPosition = new TerminalPosition(0, boardWindowHeight + 2);
-            rulesSize = new TerminalSize(boardWindowWidth, leftoverBottom - 6);
+        int minOptionsHeight = 4;
+        int optionsHeight = Math.max(size.getRows() - boardWindowHeight - 4, minOptionsHeight);
+        optionsSize = new TerminalSize(boardWindowWidth, optionsHeight);
 
-            optionsPosition = new TerminalPosition(0, boardWindowHeight + 2 + rulesSize.getRows() + 2);
-            optionsSize = new TerminalSize(boardWindowWidth, leftoverBottom - rulesSize.getRows() - 2);
-        }
-        else {
-            // command beneath the board window, status to the right
-            rulesPosition = new TerminalPosition(boardWindowWidth + 2, 0);
-            rulesSize = new TerminalSize(leftoverRight - 4, size.getRows() - 2);
-
-            optionsPosition = new TerminalPosition(0, boardWindowHeight + 2);
-            optionsSize = new TerminalSize(boardWindowWidth, size.getRows() - boardWindowHeight - 4);
-        }
 
         mBoardWindow.setSize(new TerminalSize(boardWindowWidth, boardWindowHeight));
 
@@ -441,6 +433,8 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
         @Override
         public void loadRules(Rules r) {
+            if(r == null) return;
+
             VariantEditorScreen.this.loadRules(r);
 
             createBoardWindow();
@@ -459,6 +453,8 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
             File f = TerminalUtils.showFileChooserDialog(mGui, "Save rule set", "Save", new File("user-rules"));
 
             if(f != null) {
+                // TODO: check/message for overwriting
+
                 try {
                     BufferedWriter w = new BufferedWriter(new FileWriter(f));
                     w.write(RulesSerializer.getRulesRecord(mRules, true));
@@ -474,8 +470,14 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
         @Override
         public void quit() {
-            // TODO: detect if changed
+            // TODO: confirm
             mTerminalCallback.changeActiveScreen(new MainMenuScreen());
+        }
+
+        @Override
+        public Rules getRules() {
+            mRulesWindow.updateRules(mRules);
+            return mRules;
         }
     }
 

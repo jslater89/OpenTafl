@@ -4,14 +4,18 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
+import com.manywords.softworks.tafl.ui.HumanReadableRulesPrinter;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.component.FocusableBasicWindow;
+import com.manywords.softworks.tafl.ui.lanterna.component.ScrollingMessageDialog;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
+import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -40,9 +44,9 @@ public class OptionsWindow extends FocusableBasicWindow {
         firstRow.addComponent(mStatus);
         p.addComponent(firstRow);
 
-        Panel rowSpacer = new Panel();
-        rowSpacer.addComponent(TerminalUtils.newSpacer());
-        p.addComponent(rowSpacer);
+//        Panel rowSpacer = new Panel();
+//        rowSpacer.addComponent(TerminalUtils.newSpacer());
+//        p.addComponent(rowSpacer);
 
         Panel secondRow = new Panel();
         secondRow.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
@@ -119,7 +123,7 @@ public class OptionsWindow extends FocusableBasicWindow {
         thirdRow.addComponent(save);
 
         Button help = new Button("Help", () -> {
-
+            // TODO: handle help
         });
         thirdRow.addComponent(help);
 
@@ -127,6 +131,21 @@ public class OptionsWindow extends FocusableBasicWindow {
         thirdRow.addComponent(quit);
 
         p.addComponent(thirdRow);
+
+        Panel fourthRow = new Panel();
+        fourthRow.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        Button readableRules = new Button("Human-readable rules", () -> {
+            ScrollingMessageDialog d = new ScrollingMessageDialog(
+                    "Rules",
+                    HumanReadableRulesPrinter.getHumanReadableRules(mHost.getRules()),
+                    MessageDialogButton.Close);
+            d.setSize(new TerminalSize(50, 25));
+            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
+            d.showDialog(getTextGUI());
+        });
+        fourthRow.addComponent(readableRules);
+
+        p.addComponent(fourthRow);
 
 
         setComponent(p);
@@ -170,5 +189,6 @@ public class OptionsWindow extends FocusableBasicWindow {
         void loadRules(Rules r);
         void saveRules();
         void quit();
+        Rules getRules();
     }
 }

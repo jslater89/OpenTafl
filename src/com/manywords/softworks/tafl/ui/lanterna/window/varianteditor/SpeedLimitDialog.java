@@ -74,6 +74,7 @@ public class SpeedLimitDialog extends DialogWindow {
 
             for(int i = 0; i < mSpeedLimits.length; i++) {
                 mSpeedLimits[i] = Integer.parseInt(mSpeedLimitInputs[i].getText());
+                if(mSpeedLimits[i] <= 0) mSpeedLimits[i] = -1;
             }
 
             close();

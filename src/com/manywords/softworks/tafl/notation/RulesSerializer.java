@@ -300,7 +300,7 @@ public class RulesSerializer {
 
         if(config.containsKey("spd")) {
             TaflmanSpeedHolder holder = getTaflmanSpeedsForString(config.get("spd"));
-            rules.setSpeedLimits(holder.mode, holder.speeds);
+            rules.setSpeedLimits(holder.speeds);
         }
 
         if(config.containsKey("cor")) rules.setCornerSpaces(getCoordListForString(config.get("cor")));
