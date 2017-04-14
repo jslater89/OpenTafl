@@ -33,6 +33,7 @@ syntax: regexp
 ^[a-zA-Z0-9_-]+.json$
 ^lib/.*\.jar
 ^saved-games/.*
+^user-rules/.*
 ^engines/.*
 ^build/.*
 ^\.gradle.*
