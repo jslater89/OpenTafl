@@ -4,7 +4,6 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.Interactable;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -26,16 +25,16 @@ import java.util.List;
 public class BoardWindow extends FocusableBasicWindow {
     private Game mGame;
     private ReplayGame mReplayGame;
-    private LogicalScreen.TerminalCallback mCallback;
     private TerminalBoardImage mBoardImage;
     private String mCanonicalTitle;
     private TerminalBoardImage.Callback mUnhandledCallback;
 
+    private boolean mFocused;
+
     public BoardWindow(String title, Game g, LogicalScreen.TerminalCallback callback) {
-        super(title);
+        super(title, callback);
         mCanonicalTitle = title;
         mGame = g;
-        mCallback = callback;
 
         init(mGame.getRules().getBoard().getBoardDimension());
 
@@ -43,7 +42,7 @@ public class BoardWindow extends FocusableBasicWindow {
     }
 
     public BoardWindow(String title, Board board, LogicalScreen.TerminalCallback callback) {
-        super(title);
+        super(title, callback);
 
         mCallback = callback;
         mCanonicalTitle = title;
@@ -78,6 +77,11 @@ public class BoardWindow extends FocusableBasicWindow {
             @Override
             public void onMoveRequested(MoveRecord move) {
                 mCallback.handleInGameCommand("move " + move.start + " " + move.end);
+            }
+
+            @Override
+            public void onFocusPositionChanged(Coord focusPosition) {
+                if(mUnhandledCallback != null) mUnhandledCallback.onFocusPositionChanged(focusPosition);
             }
         });
 
@@ -127,18 +131,26 @@ public class BoardWindow extends FocusableBasicWindow {
     }
 
     public void notifyFocus(boolean focused) {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Window focus: " + focused);
         mBoardImage.notifyFocus(focused);
         if(focused) {
+            mFocused = true;
             setTitle(Ansi.UNDERLINE + mCanonicalTitle.toUpperCase() + Ansi.UNDERLINE_OFF);
         }
         else {
+            mFocused = false;
             setTitle(mCanonicalTitle);
         }
     }
 
     @Override
+    protected boolean isFocused() {
+        return mFocused;
+    }
+
+    @Override
     public boolean handleInput(KeyStroke key) {
+        if(!isFocused()) return false;
+
         boolean handledByScreen = mCallback.handleKeyStroke(key);
 
         return handledByScreen || (mBoardImage.handleKeyStroke(key) != Interactable.Result.UNHANDLED);

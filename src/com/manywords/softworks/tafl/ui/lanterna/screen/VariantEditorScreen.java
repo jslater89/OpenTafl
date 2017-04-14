@@ -6,6 +6,7 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
 import com.manywords.softworks.tafl.ui.lanterna.component.TerminalBoardImage;
@@ -30,23 +31,48 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
     private GenericSide mDefenders;
     private GenericRules mRules;
 
+    private int mFocusedWindow = FOCUS_OPTIONS;
+    private static final int FOCUS_BOARD = 0;
+    private static final int FOCUS_RULES = 1;
+    private static final int FOCUS_OPTIONS = 2;
+
     public void setActive(AdvancedTerminal t, WindowBasedTextGUI gui) {
         super.setActive(t, gui);
         mTerminalCallback = new VariantEditorTerminalCallback();
 
-        // Mostly for drawing
-        mStartingBoard = new GenericBoard(9);
+        createNewRules(9);
+        enterUi();
+    }
 
-        // THe real work happens here
+    private void createNewRules(int size) {
+        // Mostly for drawing
+        mStartingBoard = new GenericBoard(size);
+
+        // The real work happens here
         mAttackers = new GenericSide(mStartingBoard, true);
         mAttackers.setStartingTaflmen(new ArrayList<>());
 
         mDefenders = new GenericSide(mStartingBoard, false);
         mDefenders.setStartingTaflmen(new ArrayList<>());
 
-        mRules = new GenericRules(mStartingBoard, mAttackers, mDefenders);
+        GenericRules newRules = new GenericRules(mStartingBoard, mAttackers, mDefenders);
+        if(mRules != null) newRules.copyNonDimensionalRules(mRules);
+        mRules = newRules;
 
-        enterUi();
+        if(mRulesWindow != null) mRulesWindow.setLabel(RulesSerializer.getRulesRecord(mRules, true));
+    }
+
+    private void loadRules(Rules r) {
+        mStartingBoard = new GenericBoard(r.boardSize);
+
+        mAttackers = new GenericSide(mStartingBoard, true, new ArrayList<>(r.getAttackers().getStartingTaflmen()));
+        mDefenders = new GenericSide(mStartingBoard, false, new ArrayList<>(r.getDefenders().getStartingTaflmen()));
+
+        GenericRules newRules = new GenericRules(mStartingBoard, mAttackers, mDefenders);
+        newRules.copyNonDimensionalRules(r);
+        newRules.copyDimensionalRules(r);
+        mRules = newRules;
+        mRulesWindow.setLabel(RulesSerializer.getRulesRecord(mRules, true));
     }
 
     protected void enterUi() {
@@ -57,13 +83,20 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
     }
 
     private void createWindows() {
+        createBoardWindow();
+
+        mRulesWindow = new RulesWindow(mTerminalCallback);
+        mRulesWindow.setLabel(RulesSerializer.getRulesRecord(mRules, true));
+        mOptionsWindow = new OptionsWindow(mTerminalCallback, new OptionsHost());
+    }
+
+    private void createBoardWindow() {
+        if(mBoardWindow != null) mGui.removeWindow(mBoardWindow);
+
         TerminalBoardImage.init(mStartingBoard.getBoardDimension());
         mBoardWindow = new BoardWindow("Board Design", mStartingBoard, mTerminalCallback);
         mBoardWindow.setUnhandledKeyCallback(new BoardEditCallback());
         mBoardWindow.renderBoard(mStartingBoard);
-
-        mRulesWindow = new RulesWindow();
-        mOptionsWindow = new OptionsWindow();
     }
 
     protected void layoutWindows(TerminalSize size) {
@@ -118,14 +151,15 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
         layoutWindows(mGui.getScreen().getTerminalSize());
 
-        mGui.setActiveWindow(mBoardWindow);
-        mBoardWindow.notifyFocus(true);
+        setFocusedWindow(FOCUS_OPTIONS);
 
         mGui.waitForWindowToClose(mOptionsWindow);
     }
 
     protected void removeWindows() {
-
+        mGui.removeWindow(mBoardWindow);
+        mGui.removeWindow(mRulesWindow);
+        mGui.removeWindow(mOptionsWindow);
     }
 
     protected void leaveUi() {
@@ -304,7 +338,7 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
     }
 
     private void updateBoard() {
-        mStartingBoard = new GenericBoard(9);
+        mStartingBoard = new GenericBoard(mRules.boardSize);
 
         mAttackers = new GenericSide(mStartingBoard, true, mAttackers.getStartingTaflmen());
         mDefenders = new GenericSide(mStartingBoard, false, mDefenders.getStartingTaflmen());
@@ -331,16 +365,92 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
                         cycleSpaceType(location);
                         break;
                     case 'i':
-                        // cycle s(i)de for location
                         cycleTaflmanSide(location);
                         break;
                 }
+                onFocusPositionChanged(location);
             }
         }
 
         @Override
         public void onMoveRequested(MoveRecord move) {
 
+        }
+
+        @Override
+        public void onFocusPositionChanged(Coord focusPosition) {
+            mOptionsWindow.updateStatus(focusPosition, mRules.getSpaceTypeFor(focusPosition), mStartingBoard.getOccupier(focusPosition));
+        }
+    }
+
+    private void cycleFocus(int direction) {
+        if(direction == FOCUS_FORWARD) {
+            mFocusedWindow = ++mFocusedWindow % 3;
+        }
+        else {
+            mFocusedWindow -= 1;
+            if(mFocusedWindow < 0) mFocusedWindow = 2;
+        }
+
+        setFocusedWindow(mFocusedWindow);
+    }
+
+    private void setFocusedWindow(int focusedWindow) {
+        switch(focusedWindow) {
+            case FOCUS_BOARD:
+                mGui.setActiveWindow(mBoardWindow);
+                mBoardWindow.notifyFocus(true);
+                mRulesWindow.notifyFocus(false);
+                mOptionsWindow.notifyFocus(false);
+                break;
+            case FOCUS_RULES:
+                mGui.setActiveWindow(mRulesWindow);
+                mBoardWindow.notifyFocus(false);
+                mRulesWindow.notifyFocus(true);
+                mOptionsWindow.notifyFocus(false);
+                break;
+            case FOCUS_OPTIONS:
+                mGui.setActiveWindow(mOptionsWindow);
+                mBoardWindow.notifyFocus(false);
+                mRulesWindow.notifyFocus(false);
+                mOptionsWindow.notifyFocus(true);
+                break;
+        }
+    }
+
+    private class OptionsHost implements OptionsWindow.OptionsWindowHost {
+
+        @Override
+        public void newLayout(int dimension) {
+            createNewRules(dimension);
+            createBoardWindow();
+
+            mGui.addWindow(mBoardWindow);
+            layoutWindows(mTerminal.getSize());
+
+            setFocusedWindow(FOCUS_OPTIONS);
+        }
+
+        @Override
+        public void loadRules(Rules r) {
+            VariantEditorScreen.this.loadRules(r);
+
+            createBoardWindow();
+            mGui.addWindow(mBoardWindow);
+            layoutWindows(mTerminal.getSize());
+
+            setFocusedWindow(FOCUS_OPTIONS);
+        }
+
+        @Override
+        public void saveRules() {
+            // TODO: implement
+        }
+
+        @Override
+        public void quit() {
+            // TODO: detect if changed
+            mTerminalCallback.changeActiveScreen(new MainMenuScreen());
         }
     }
 
@@ -349,6 +459,19 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
         @Override
         public void changeActiveScreen(LogicalScreen screen) {
             mTerminal.changeActiveScreen(screen);
+        }
+
+        @Override
+        public boolean handleKeyStroke(KeyStroke key) {
+            if(key.getKeyType() == KeyType.Tab) {
+                cycleFocus(FOCUS_FORWARD);
+                return true;
+            }
+            else if(key.getKeyType() == KeyType.ReverseTab) {
+                cycleFocus(FOCUS_BACKWARD);
+                return true;
+            }
+            return false;
         }
     }
 }

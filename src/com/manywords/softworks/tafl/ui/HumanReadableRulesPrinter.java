@@ -45,7 +45,7 @@ public class HumanReadableRulesPrinter {
 
         if(centers.size() > 0) {
             rules += ruleNumber++ + ". The " + centerString + " " + centerVerb + "known as the throne. The throne is marked on the board with " +
-                    "asterisks. ";
+                    "circles. ";
 
             List<Character> unallocatedTypes = new ArrayList<>();
             unallocatedTypes.add('t');

@@ -18,7 +18,6 @@ import java.util.List;
  * Created by jay on 2/15/16.
  */
 public class CommandWindow extends FocusableBasicWindow {
-    private LogicalScreen.TerminalCallback mCallback;
     private EnterTerminatedTextBox mTextBox;
 
     private int mCommandBufferSize = 25;
@@ -26,8 +25,7 @@ public class CommandWindow extends FocusableBasicWindow {
     private List<String> mCommandBuffer = new ArrayList<>(mCommandBufferSize);
 
     public CommandWindow(LogicalScreen.TerminalCallback callback) {
-        super("Command");
-        mCallback = callback;
+        super("Command", callback);
 
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());

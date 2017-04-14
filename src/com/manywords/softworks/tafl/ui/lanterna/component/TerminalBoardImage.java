@@ -30,6 +30,7 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
     public interface Callback {
         void onUnhandledKey(KeyStroke key, Coord location);
         void onMoveRequested(MoveRecord move);
+        void onFocusPositionChanged(Coord focusPosition);
     }
 
     private static int boardDimension;
@@ -451,6 +452,7 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         }
 
         if(mCurrentBoard != null) rerender(null, moves, dests, captures);
+        if(mCallback != null) mCallback.onFocusPositionChanged(mFocusPosition);
     }
 
     @Override
