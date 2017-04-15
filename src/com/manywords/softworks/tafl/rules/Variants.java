@@ -12,6 +12,7 @@ import com.manywords.softworks.tafl.rules.seabattle.SeaBattle;
 import com.manywords.softworks.tafl.rules.tablut.FotevikenTablut;
 import com.manywords.softworks.tafl.rules.tablut.Tablut;
 import com.manywords.softworks.tafl.rules.tawlbwrdd.Tawlbwrdd;
+import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -84,19 +85,30 @@ public class Variants {
         availableRules.clear();
         rulesDescriptions.clear();
 
-        availableRules.addAll(hardcodedRules);
-        rulesDescriptions.addAll(hardcodedDescriptions);
-        builtinRules = new ArrayList<>(availableRules);
-        builtinDescriptions = new ArrayList<>(rulesDescriptions);
-
         loadExternalRules(lastExternalRules, lastUserDirectory);
     }
 
     public static void loadExternalRules(File externalRulesFile, File userRulesDirectory) {
         lastExternalRules = externalRulesFile;
         lastUserDirectory = userRulesDirectory;
+
+        availableRules.addAll(hardcodedRules);
+        rulesDescriptions.addAll(hardcodedDescriptions);
+
         loadExternalBuiltins(externalRulesFile);
+
+        builtinRules = new ArrayList<>(availableRules);
+        builtinDescriptions = new ArrayList<>(rulesDescriptions);
+
         loadUserRules(userRulesDirectory);
+
+        if(TerminalSettings.variant >= availableRules.size()) {
+            TerminalSettings.variant = availableRules.size() - 1;
+        }
+
+        if(OpenTafl.devMode) {
+            dumpRules();
+        }
     }
 
     private static void loadExternalBuiltins(File externalRulesFile) {
@@ -121,10 +133,6 @@ public class Variants {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Couldn't read file: not found");
         } catch (IOException e) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Couldn't read file: read error");
-        }
-
-        if(OpenTafl.devMode) {
-            dumpRules();
         }
     }
 
