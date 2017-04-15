@@ -242,7 +242,8 @@ public class OptionsWindow extends FocusableBasicWindow {
                     "position. The other buttons in the options window allow for loading built-in or user-defined " +
                     "rules, saving the currently-displayed set of rules as a user-defined rule set, showing this " +
                     "help message, returning to the main menu, and displaying the human-readable version of the " +
-                    "currently-displayed rules." +
+                    "currently-displayed rules. Finally, using the 'Delete rules' button, the user may select " +
+                    "unwanted rules variant files for deletion." +
                     "\n\n" +
                     Ansi.UNDERLINE + "Rules window help" + Ansi.UNDERLINE_OFF +
                     "\n\n" +

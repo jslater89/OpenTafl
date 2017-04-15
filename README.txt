@@ -6,12 +6,13 @@ README
 4. External engines
 5. Replay mode
 6. Puzzles
-7. AI self-play mode
-8. Network play
-9. Headless AI mode
-10. PlayTaflOnline game downloader
-10. Links
-11. Version history
+7. Variant editor
+8. AI self-play mode
+9. Network play
+10. Headless AI mode
+11. PlayTaflOnline game downloader
+12. Links
+13. Version history
 
 1. INTRODUCTION ---------------------------------------------------------------
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
@@ -145,6 +146,9 @@ the game. Again, OpenTafl will display this as 7a.2.1a.1.1a. ..... (variation
 move), for readability and consistency, and 'jump' will accept either form of
 the address.
 
+Old saved games can be deleted using the 'Delete a saved game' option in the
+Extras menu.
+
 
 6. PUZZLES --------------------------------------------------------------------
 Some tafl puzzles come in the form of OpenTafl Notation rules strings, which
@@ -183,7 +187,14 @@ author thinks are interesting, and the player may only explore those lines.
 Variations off of those lines of play will be disallowed.
 
 
-7. AI SELF-PLAY MODE ----------------------------------------------------------
+7. VARIANT EDITOR -------------------------------------------------------------
+OpenTafl contains a full-featured graphical variant editor. It supports editing
+every rules setting available to OpenTafl, as described in the OpenTafl
+Notation specification's rules section. Further information on the variant
+editor may be found in its built-in help window.
+
+
+8. AI SELF-PLAY MODE ----------------------------------------------------------
 For external AI developers, OpenTafl provides a mode by which two AIs, or two
 versions of the same AI, can be made to play each other repeatedly, to judge
 relative strength. Find the self-play menu item behind the 'Extras' option in
@@ -199,7 +210,7 @@ Detailed results, including game records for every game, will be saved in the
 'selfplay-results' subdirectory under the main OpenTafl directory.
 
 
-8. NETWORK PLAY ---------------------------------------------------------------
+9. NETWORK PLAY ---------------------------------------------------------------
 OpenTafl can be played with humans and AIs from around the world, using its
 tafl server functionality. Anyone may run an OpenTafl server by running the
 OpenTafl command with the --server flag. An OpenTafl server is provided by
@@ -254,7 +265,7 @@ games. The 'chat' command may be used to interact with your opponent during a
 game, according to the restrictions given above.
 
 
-9. HEADLESS AI MODE -----------------------------------------------------------
+10. HEADLESS AI MODE -----------------------------------------------------------
 OpenTafl can be started in headless AI mode, connecting an external engine to a
 network server. The AI can be set to join a game already present on the server,
 or to continuously host games. Whether joining games or hosting games, the AI
@@ -262,7 +273,7 @@ must use a game clock. The AI will save records of all games it plays in the
 saved-games/headless-ai directory under the OpenTafl directory.
 
 
-10. PLAYTAFLONLINE GAME DOWNLOADER --------------------------------------------
+11. PLAYTAFLONLINE GAME DOWNLOADER --------------------------------------------
 OpenTafl can download games from PlayTaflOnline.com for study and analysis. To
 download a game, find the 'Download PlayTaflOnline game' option under the
 'Extras' menu. Enter the PlayTaflOnline game number, and OpenTafl will
@@ -270,7 +281,7 @@ automatically download the PlayTaflOnline game file and convert it to OpenTafl
 format.
 
 
-11. LINKS ---------------------------------------------------------------------
+12. LINKS ---------------------------------------------------------------------
 http://softworks.manywords.press/opentafl (official website)
 http://soapbox.manywords.press/tag/tafl (development blog)
 https://bitbucket.org/Fishbreath/opentafl (source code, bug reports)
@@ -279,11 +290,12 @@ http://manywords.press/other-stuff/opentafl/opentafl-engine-protocol.txt (engine
 http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation specification)
 
 
-12. VERSION HISTORY -----------------------------------------------------------
+13. VERSION HISTORY -----------------------------------------------------------
 v0.4.6.0b (released 04/15/17):
 - Add variant editor
-- Board view is now focusable, allowing control by arrow keys
+- Board view is now focusable and allows in-game control by arrow keys
 - Rearrange main menu for hopefully-better usability
+- Extras menu now has a delete-saved-game file picker, for in-UI cleanup
 
 v0.4.5.1b (released 02/11/17):
 - Add support for new layouts in PlayTaflOnline JSON translator
