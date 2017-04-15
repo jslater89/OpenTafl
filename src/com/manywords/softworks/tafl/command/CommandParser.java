@@ -433,6 +433,12 @@ public class CommandParser {
     public static String getHelpString(List<Command.Type> types) {
         StringBuilder help = new StringBuilder();
 
+        help.append("To use the keyboard to play, press the Tab key to switch to the board window. ");
+        help.append("The board window's title will be underlined, signifying that it now has focus. ");
+        help.append("Use the arrow keys to move the cursor. Use the space bar to select a taflman to move. ");
+        help.append("When a taflman is selected, use the arrow keys to navigate to the destination space. ");
+        help.append("Press the space bar again to confirm the movement. To return to the command input window, ");
+        help.append("Press the Tab key again.\n\n");
         for(Command.Type t : types) {
             help.append(getHelpString(t));
         }
