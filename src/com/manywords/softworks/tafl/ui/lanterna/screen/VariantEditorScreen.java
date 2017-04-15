@@ -472,6 +472,8 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
                     OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
                 }
             }
+
+            Variants.reloadRules();
         }
 
         @Override

@@ -19,7 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Variants {
-    public static List<Rules> availableRules = new ArrayList<>(Arrays.asList(
+    public static List<Rules> availableRules = new ArrayList<>();
+    public static List<String> rulesDescriptions = new ArrayList<>();
+
+    public static List<Rules> hardcodedRules = new ArrayList<>(Arrays.asList(
             SeaBattle.newSeaBattle9(),
             Fetlar.newFetlar11(),
             Copenhagen.newCopenhagen11(),
@@ -32,7 +35,7 @@ public class Variants {
             Magpie.newMagpie7()
     ));
 
-    public static List<String> rulesDescriptions = new ArrayList<>(Arrays.asList(
+    public static List<String> hardcodedDescriptions = new ArrayList<>(Arrays.asList(
             "1. Sea Battles 9x9",
             "2. Fetlar 11x11",
             "3. Copenhagen 11x11",
@@ -45,8 +48,10 @@ public class Variants {
             "10. Magpie 7x7"
     ));
 
-    public static List<Rules> builtinRules = new ArrayList<>(availableRules);
-    public static List<String> builtinDescriptions = new ArrayList<>(rulesDescriptions);
+    private static File lastExternalRules;
+    private static File lastUserDirectory;
+    public static List<Rules> builtinRules = new ArrayList<>(hardcodedRules);
+    public static List<String> builtinDescriptions = new ArrayList<>(hardcodedDescriptions);
 
     public static Rules rulesForNameAndDimension(String name, int dimension) {
         for(Rules r : availableRules) {
@@ -75,7 +80,21 @@ public class Variants {
         }
     }
 
+    public static void reloadRules() {
+        availableRules.clear();
+        rulesDescriptions.clear();
+
+        availableRules.addAll(hardcodedRules);
+        rulesDescriptions.addAll(hardcodedDescriptions);
+        builtinRules = new ArrayList<>(availableRules);
+        builtinDescriptions = new ArrayList<>(rulesDescriptions);
+
+        loadExternalRules(lastExternalRules, lastUserDirectory);
+    }
+
     public static void loadExternalRules(File externalRulesFile, File userRulesDirectory) {
+        lastExternalRules = externalRulesFile;
+        lastUserDirectory = userRulesDirectory;
         loadExternalBuiltins(externalRulesFile);
         loadUserRules(userRulesDirectory);
     }

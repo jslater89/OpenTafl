@@ -149,6 +149,30 @@ public class OptionsWindow extends FocusableBasicWindow {
         });
         fourthRow.addComponent(readableRules);
 
+        Button deleteRules = new Button("Delete rules", () -> {
+            File f = TerminalUtils.showFileChooserDialog(getTextGUI(), "Delete rules", "Delete", new File("user-rules"));
+
+            if(f != null) {
+                if(f.exists()) {
+                    if(f.getName().endsWith(".otr")) {
+                        MessageDialogButton result = MessageDialog.showMessageDialog(getTextGUI(), "Confirm delete", "This cannot be undone. Are you sure?", MessageDialogButton.Yes, MessageDialogButton.No);
+
+                        if (result.equals(MessageDialogButton.Yes)) {
+                            f.delete();
+                            Variants.reloadRules();
+                        }
+                    }
+                    else {
+                        MessageDialog.showMessageDialog(getTextGUI(), "Wrong file type", "Only OpenTafl Rules (.otr) files can be deleted here.", MessageDialogButton.OK);
+                    }
+                }
+                else {
+                    MessageDialog.showMessageDialog(getTextGUI(), "File not found", "Cannot delete a non-existent file.", MessageDialogButton.OK);
+                }
+            }
+        });
+        fourthRow.addComponent(deleteRules);
+
         p.addComponent(fourthRow);
 
 
