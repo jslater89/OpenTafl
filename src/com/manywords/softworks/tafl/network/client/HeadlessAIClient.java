@@ -18,7 +18,7 @@ import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
 import com.manywords.softworks.tafl.notation.GameSerializer;
-import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.ui.UiCallback;
@@ -92,7 +92,7 @@ public class HeadlessAIClient {
             if(entry.getKey().contains("--username")) username = entry.getValue().trim();
             if(entry.getKey().contains("--password")) password = entry.getValue().trim();
 
-            if(entry.getKey().contains("--rules")) r = BuiltInVariants.availableRules.get(Integer.parseInt(entry.getValue()) - 1);
+            if(entry.getKey().contains("--rules")) r = Variants.availableRules.get(Integer.parseInt(entry.getValue()) - 1);
             if(entry.getKey().contains("--clock")) ts = TimeSpec.parseMachineReadableString(entry.getValue(), "\\+");
             if(entry.getKey().contains("--game-password")) gamePassword = entry.getValue().trim();
 

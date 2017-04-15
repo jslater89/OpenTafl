@@ -45,7 +45,7 @@ public class HumanReadableRulesPrinter {
 
         if(centers.size() > 0) {
             rules += ruleNumber++ + ". The " + centerString + " " + centerVerb + "known as the throne. The throne is marked on the board with " +
-                    "asterisks. ";
+                    "circles. ";
 
             List<Character> unallocatedTypes = new ArrayList<>();
             unallocatedTypes.add('t');
@@ -484,7 +484,7 @@ public class HumanReadableRulesPrinter {
 
                 int speedLimit = r.getTaflmanSpeedLimit(Taflman.ALL_TAFLMAN_TYPES[i]);
 
-                String speedLimitString = (speedLimit == -1 ? "any number of spaces. " : "up to " + speedLimit + " spaces. ");
+                String speedLimitString = (speedLimit == -1 ? "any number of spaces. " : "up to " + speedLimit + (speedLimit > 1 ? " spaces. " : " space. "));
 
                 if(taflmanType == Taflman.TYPE_KING) {
                     if(!isAttacking) rules += "The king moves " + speedLimitString;
@@ -506,9 +506,10 @@ public class HumanReadableRulesPrinter {
             rules += "\n\n";
         }
 
-        rules += ruleNumber++ + ". All taflmen " + (r.getKingStrengthMode() != Rules.KING_WEAK ? "except the king " : "") + "are captured when the opposing side moves " +
-                "a taflman such that the captured taflman is surrounded on both sides, along a row or a column, by enemy taflmen or hostile spaces. " +
-                "A taflman is only captured if the opponent's move closes the trap: a taflman may therefore safely move in between two enemy taflmen, or " +
+        boolean kingWeak = r.getKingStrengthMode() == Rules.KING_WEAK || (r.getKingStrengthMode() == Rules.KING_STRONG_CENTER && centers.size() == 0);
+        rules += ruleNumber++ + ". Taflmen" + (kingWeak ? ", except for the king, " : " ") + "are captured when an " +
+                "opponent's move surrounds a taflman on two sides, along a row or a column, with hostile taflmen or spaces. " +
+                "Taflmen are only captured if the opponent's move closes the trap. A taflman may therefore safely move in between two enemy taflmen, or " +
                 "an enemy taflman and a hostile space. Captured taflmen are removed from the game. ";
 
         switch(r.getKingArmedMode()) {
@@ -526,11 +527,16 @@ public class HumanReadableRulesPrinter {
                 break;
         }
 
-        if(r.getKingStrengthMode() == Rules.KING_STRONG || (r.getKingStrengthMode() == Rules.KING_STRONG_CENTER && centers.size() == 0)) {
-            rules += ruleNumber++ + ". The king must be surrounded by enemy taflmen or hostile spaces on all four sides to be captured. ";
-            if(r.getKingStrengthMode() != Rules.KING_MIDDLEWEIGHT) {
-                rules += "The king cannot be captured against the edge of the board. ";
-            }
+        if(r.getKingStrengthMode() == Rules.KING_STRONG) {
+            rules += ruleNumber++ + ". The king must be surrounded by enemy taflmen or hostile spaces on all four sides to be captured. " +
+                    "The king may not be captured against the edge of the board.";
+
+            rules += "\n\n";
+        }
+        else if(r.getKingStrengthMode() == Rules.KING_MIDDLEWEIGHT) {
+            rules += ruleNumber++ + ". The king must be surrounded by enemy taflmen or hostile spaces on all sides to be captured. " +
+                    "The king may be captured against the edge of the board, provided all adjacent spaces are either hostile or contain " +
+                    "enemy taflmen.";
 
             rules += "\n\n";
         }

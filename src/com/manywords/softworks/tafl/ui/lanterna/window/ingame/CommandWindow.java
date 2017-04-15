@@ -1,10 +1,13 @@
 package com.manywords.softworks.tafl.ui.lanterna.window.ingame;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.Label;
+import com.googlecode.lanterna.gui2.LinearLayout;
+import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.ui.lanterna.component.EnterTerminatedTextBox;
+import com.manywords.softworks.tafl.ui.lanterna.component.FocusableBasicWindow;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 
 import java.util.ArrayList;
@@ -13,8 +16,7 @@ import java.util.List;
 /**
  * Created by jay on 2/15/16.
  */
-public class CommandWindow extends BasicWindow {
-    private LogicalScreen.TerminalCallback mCallback;
+public class CommandWindow extends FocusableBasicWindow {
     private EnterTerminatedTextBox mTextBox;
 
     private int mCommandBufferSize = 25;
@@ -22,8 +24,7 @@ public class CommandWindow extends BasicWindow {
     private List<String> mCommandBuffer = new ArrayList<>(mCommandBufferSize);
 
     public CommandWindow(LogicalScreen.TerminalCallback callback) {
-        super("Command");
-        mCallback = callback;
+        super("Command", callback);
 
         Panel p = new Panel();
         p.setLayoutManager(new LinearLayout());
@@ -65,7 +66,10 @@ public class CommandWindow extends BasicWindow {
 
     @Override
     public boolean handleInput(KeyStroke key) {
-        if(key.getKeyType() == KeyType.ArrowUp) {
+        boolean handledByScreen = mCallback.handleKeyStroke(key);
+
+        if(handledByScreen) return true;
+        else if(key.getKeyType() == KeyType.ArrowUp) {
             if(++mCommandBufferPosition >= mCommandBuffer.size()) {
                 mCommandBufferPosition = mCommandBuffer.size() - 1;
             }

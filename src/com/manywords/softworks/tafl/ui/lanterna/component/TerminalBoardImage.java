@@ -5,7 +5,11 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.BasicTextImage;
+import com.googlecode.lanterna.gui2.Interactable;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.manywords.softworks.tafl.engine.GameState;
+import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.collections.TaflmanCoordMap;
 import com.manywords.softworks.tafl.rules.Board;
 import com.manywords.softworks.tafl.rules.Coord;
@@ -14,6 +18,7 @@ import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -21,13 +26,30 @@ import java.util.List;
 /**
  * Created by jay on 2/15/16.
  */
-public class TerminalBoardImage extends BasicTextImage {
+public class TerminalBoardImage extends BasicTextImage implements SimpleInteractable {
+    public interface Callback {
+        void onUnhandledKey(KeyStroke key, Coord location);
+        void onMoveRequested(MoveRecord move);
+        void onFocusPositionChanged(Coord focusPosition);
+    }
+
     private static int boardDimension;
     private int mRowHeight = 3;
     private int mColWidth = 5;
     private int mSpaceHeight = mRowHeight - 1;
     private int mSpaceWidth = mColWidth - 1;
     private int mLeftPad = 0;
+
+    private GameState mCurrentState;
+    private Board mCurrentBoard;
+
+    // For interactability
+    private boolean mAllowMovement = true;
+    private boolean mFocused;
+    private Coord mFocusPosition;
+    private Coord mSelectedPosition;
+    private Callback mCallback;
+
     public static void init(int dimension) {
         boardDimension = dimension;
     }
@@ -58,23 +80,46 @@ public class TerminalBoardImage extends BasicTextImage {
         mSpaceHeight = mRowHeight - 1;
         mSpaceWidth = mColWidth - 1;
 
+        mFocused = false;
+        mFocusPosition = Coord.get(boardDimension / 2, boardDimension / 2);
+
         renderBoardBackground();
         if(state != null) {
-            renderBoard(state, null, null, null, null);
+            renderState(state, null, null, null, null);
         }
     }
 
-    public void renderBoard(GameState state, Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
-        clearSpaces();
-        renderSpecialSpaces(state.getBoard().getRules());
+    public void renderState(GameState state, Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
+        mCurrentState = state;
+        if(mCurrentState != null) renderBoard(mCurrentState.getBoard(), highlight, allowableDestinations, allowableMoves, captureSpaces);
+    }
+
+    public void renderBoard(Board board, Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
+        mCurrentBoard = board;
+        if(mCurrentBoard != null) rerender(highlight, allowableDestinations, allowableMoves, captureSpaces);
+    }
+
+    private void rerender(Coord highlight, List<Coord> allowableDestinations, List<Coord> allowableMoves, List<Coord> captureSpaces) {
+        if(mCurrentBoard == null) return;
 
         // Render in order of most spaces to fewest, for maximum information preservation
+        clearSpaces();
+        renderSpecialSpaces(mCurrentBoard.getRules());
+
         if(allowableMoves != null) renderAllowableMoves(allowableMoves);
         if(allowableDestinations != null) renderAllowableDestinations(highlight, allowableDestinations);
         if(captureSpaces != null) renderCapturingMoves(highlight, captureSpaces);
         if(highlight != null) renderHighlight(highlight);
 
-        renderTaflmen(state.getBoard());
+        if(mFocused) {
+            renderHighlight(mFocusPosition);
+            if(mSelectedPosition != null) {
+                renderSelection(mSelectedPosition);
+                renderMovement(mSelectedPosition, mFocusPosition);
+            }
+        }
+
+        renderTaflmen(mCurrentBoard);
     }
 
     private void renderBoardBackground() {
@@ -222,6 +267,62 @@ public class TerminalBoardImage extends BasicTextImage {
         fillCoord(star, highlight);
     }
 
+    private void renderSelection(Coord selected) {
+        TextCharacter circle = new TextCharacter('o', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        fillCoord(circle, selected);
+    }
+
+    private void renderMovement(Coord start, Coord end) {
+        TextCharacter circle = new TextCharacter('o', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter up = new TextCharacter('^', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter down = new TextCharacter('v', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter left = new TextCharacter('<', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter right = new TextCharacter('>', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+
+        TextCharacter dash = new TextCharacter('-', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter pipe = new TextCharacter('|', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+
+        TextCharacter direction = circle;
+        if(start.y < end.y) direction = up;
+        if(start.y > end.y) direction = down;
+        if(start.x > end.x) direction = left;
+        if(start.x < end.x) direction = right;
+
+        TextCharacter unstoppable = dash;
+        if(start.x == end.x) {
+            unstoppable = pipe;
+        }
+
+        char taflman = mCurrentState.getBoard().getOccupier(start);
+        List<Coord> moves = new ArrayList<>();
+        List<Coord> stops = new ArrayList<>();
+        if(mCurrentState != null) {
+            moves = Taflman.getAllowableMoves(mCurrentState, taflman);
+            stops = Taflman.getAllowableDestinations(mCurrentState, taflman);
+        }
+
+        boolean skip = false;
+
+        // Render the focus position as the move character, the not-stoppable dash character,
+        // or a regular highlight, depending on whether the focus position can be stopped on,
+        // moved through, or nothing at all. If nothing at all, don't render the moves up
+        // to that point.
+        if(stops.contains(mFocusPosition)) fillCoord(direction, mFocusPosition);
+        else if(moves.contains(mFocusPosition)) fillCoord(unstoppable, mFocusPosition);
+        else if(mFocusPosition.equals(mSelectedPosition)) renderSelection(mFocusPosition);
+        else {
+            skip = true;
+            renderHighlight(mFocusPosition);
+        }
+
+        if(!skip) {
+            for (Coord intervening : Coord.getInterveningSpaces(boardDimension, start, end)) {
+                if (stops.contains(intervening)) fillCoord(direction, intervening);
+                else if (moves.contains(intervening)) fillCoord(unstoppable, intervening);
+            }
+        }
+    }
+
     private void fillCoords(TextCharacter character, Collection<Coord> coords) {
         for(Coord c : coords) {
             fillCoord(character, c);
@@ -286,10 +387,11 @@ public class TerminalBoardImage extends BasicTextImage {
 
     private void renderSpecialSpaces(Rules rules) {
         TextCharacter star = new TextCharacter('*', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter circle = new TextCharacter('o', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
         TextCharacter dot = new TextCharacter('.', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
         TextCharacter dash = new TextCharacter('-', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
         fillCoords(star, rules.getCornerSpaces());
-        fillCoords(star, rules.getCenterSpaces());
+        fillCoords(circle, rules.getCenterSpaces());
         fillCoords(dot, rules.getAttackerForts());
         fillCoords(dash, rules.getDefenderForts());
     }
@@ -327,5 +429,97 @@ public class TerminalBoardImage extends BasicTextImage {
         int yStart = getSize().getRows() - ((c.y + 1) * mRowHeight);
         int xStart = c.x * mColWidth + 1;
         return new TerminalPosition(xStart, yStart);
+    }
+
+    private void focusPositionChanged() {
+        // Render info about the taflmen under the cursor, or at the selected
+        // location (if one exists)
+        Coord location = mFocusPosition;
+        if(mSelectedPosition != null) location = mSelectedPosition;
+
+        List<Coord> moves = null;
+        List<Coord> dests = null;
+        List<Coord> captures = null;
+
+        if(mCurrentState != null) {
+            char taflman = mCurrentState.getBoard().getOccupier(location);
+
+            if (taflman != Taflman.EMPTY) {
+                moves = Taflman.getAllowableMoves(mCurrentState, taflman);
+                dests = Taflman.getAllowableDestinations(mCurrentState, taflman);
+                captures = Taflman.getCapturingMoves(mCurrentState, taflman);
+            }
+        }
+
+        if(mCurrentBoard != null) rerender(null, moves, dests, captures);
+        if(mCallback != null) mCallback.onFocusPositionChanged(mFocusPosition);
+    }
+
+    @Override
+    public Interactable.Result handleKeyStroke(KeyStroke s) {
+        Interactable.Result r = Interactable.Result.UNHANDLED;
+        if(s.getKeyType() == KeyType.ArrowDown || (s.getKeyType() == KeyType.Character && s.getCharacter() == 's')) {
+            mFocusPosition = mFocusPosition.offset(boardDimension, 0, -1);
+            r = Interactable.Result.HANDLED;
+        }
+        else if(s.getKeyType() == KeyType.ArrowUp || (s.getKeyType() == KeyType.Character && s.getCharacter() == 'w')) {
+            mFocusPosition = mFocusPosition.offset(boardDimension, 0, 1);
+            r = Interactable.Result.HANDLED;
+        }
+        else if(s.getKeyType() == KeyType.ArrowRight || (s.getKeyType() == KeyType.Character && s.getCharacter() == 'd')) {
+            mFocusPosition = mFocusPosition.offset(boardDimension, 1, 0);
+            r = Interactable.Result.HANDLED;
+        }
+        else if(s.getKeyType() == KeyType.ArrowLeft || (s.getKeyType() == KeyType.Character && s.getCharacter() == 'a')) {
+            mFocusPosition = mFocusPosition.offset(boardDimension, -1, 0);
+            r = Interactable.Result.HANDLED;
+        }
+        else if(s.getKeyType() == KeyType.Character && s.getCharacter() == ' ' && mCurrentState != null) {
+            // We can only select if the current state is not null. Otherwise, we're editing a board.
+            if(mSelectedPosition == null) {
+                char taflman = mCurrentState.getBoard().getOccupier(mFocusPosition);
+
+                if(taflman != Taflman.EMPTY) {
+                    mSelectedPosition = mFocusPosition;
+                }
+            }
+            else if(mSelectedPosition.x != mFocusPosition.x && mSelectedPosition.y != mFocusPosition.y){
+                mSelectedPosition = null;
+            }
+            else {
+                // selected a space in line with another space
+
+                // Temporary variable to keep the board image from trying to render mSelectedPosition after the
+                // taflman has left (which happens before onMoveRequested returns)
+                Coord startPosition = mSelectedPosition;
+                mSelectedPosition = null;
+                if(mCallback != null) mCallback.onMoveRequested(new MoveRecord(startPosition, mFocusPosition));
+            }
+
+            r = Interactable.Result.HANDLED;
+        }
+        else if(s.getKeyType() == KeyType.Escape) {
+            mSelectedPosition = null;
+            r = Interactable.Result.HANDLED;
+        }
+
+        if(r != Interactable.Result.UNHANDLED) {
+            focusPositionChanged();
+        }
+        else {
+            if(mCallback != null) mCallback.onUnhandledKey(s, mFocusPosition);
+        }
+        return r;
+    }
+
+    @Override
+    public void notifyFocus(boolean focused) {
+        mFocused = focused;
+        if(focused) focusPositionChanged();
+        else rerender(null, null, null, null);
+    }
+
+    public void setCallback(Callback callback) {
+        mCallback = callback;
     }
 }

@@ -1,6 +1,11 @@
 package com.manywords.softworks.tafl.rules;
 
+import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.notation.TaflmanCodes;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by jay on 2/6/16.
@@ -145,9 +150,56 @@ public class GenericRules extends Rules {
         mBerserkMode = berserkMode;
     }
 
-    public void setSpeedLimits(int mode, int[] speeds) {
-        mSpeedLimitMode = mode;
+    public void setSpeedLimits(int[] speeds) {
+        boolean allSpeedsIdentical = true;
+        boolean attackerSpeedsIdentical = true;
+        boolean defenderSpeedsIdentical = true;
+
+        int defenderSpeed = -2;
+        int attackerSpeed = -2;
+        for(int i = 0; i < speeds.length / 2; i++) {
+            if(defenderSpeed == -2) {
+                defenderSpeed = speeds[i];
+            }
+            else if(defenderSpeed != speeds[i]) {
+                defenderSpeedsIdentical = false;
+            }
+        }
+
+        for(int i = speeds.length / 2; i < speeds.length; i++) {
+            if(attackerSpeed == -2) {
+                attackerSpeed = speeds[i];
+            }
+            else if(attackerSpeed != speeds[i]) {
+                attackerSpeedsIdentical = false;
+            }
+        }
+
+        // Three cases: attacker speeds are all identical and defender speeds are all identical,
+        // but each side has a different speed; or attackers/defenders (two cases) have differing
+        // speeds internally. If one or more is true, all speeds are not identical.
+        if(attackerSpeed != defenderSpeed || !attackerSpeedsIdentical || !defenderSpeedsIdentical) {
+            allSpeedsIdentical = false;
+        }
+
+        if(allSpeedsIdentical && defenderSpeed == -1) {
+            mSpeedLimitMode = SPEED_LIMITS_NONE;
+        }
+        else if(allSpeedsIdentical) {
+            mSpeedLimitMode = SPEED_LIMITS_IDENTICAL;
+        }
+        else if(attackerSpeedsIdentical && defenderSpeedsIdentical) {
+            mSpeedLimitMode = SPEED_LIMITS_BY_SIDE;
+        }
+        else {
+            mSpeedLimitMode = SPEED_LIMITS_BY_TYPE;
+        }
+
         mSpeedLimits = speeds;
+    }
+
+    public int[] getSpeedLimits() {
+        return mSpeedLimits;
     }
 
     public void setCenterParameters(boolean[] passable, boolean[] stoppable, boolean[] hostile, boolean[] hostileEmpty, boolean[] reenterable) {
@@ -194,6 +246,10 @@ public class GenericRules extends Rules {
     private boolean mDefenderCommanders;
     private boolean mAttackerKnights;
     private boolean mDefenderKnights;
+
+    public void setBoard(Board b) {
+        mBoard = b;
+    }
 
     @Override
     public void setupSpaceGroups(int boardSize) {
@@ -444,5 +500,102 @@ public class GenericRules extends Rules {
     @Override
     public boolean isSurroundingFatal() {
         return mSurroundingFatal;
+    }
+
+    public void copyNonDimensionalRules(Rules from) {
+        mName = from.getName();
+        mEscapeType = from.getEscapeType();
+        mSurroundingFatal = from.isSurroundingFatal();
+        mAttackersFirst = from.getStartingSide().isAttackingSide();
+        mThreefoldResult = from.threefoldRepetitionResult();
+        mKingArmedMode = from.getKingArmedMode();
+        mKingMode = from.getKingStrengthMode();
+        mKingJumpMode = from.getKingJumpMode();
+        mCommanderJumpMode = from.getCommanderJumpMode();
+        mKnightJumpMode = from.getKnightJumpMode();
+        mShieldwallMode = from.allowShieldWallCaptures();
+        mShieldwallFlankingRequired = from.allowFlankingShieldwallCapturesOnly();
+        mEdgeFortEscape = from.allowEdgeFortEscapes();
+        mBerserkMode = from.getBerserkMode();
+        mSpeedLimitMode = from.getSpeedLimitMode();
+        mSpeedLimits = new int[TAFLMAN_TYPE_COUNT];
+        Utilities.fillArray(mSpeedLimits, -1);
+
+        if(mSpeedLimitMode == SPEED_LIMITS_IDENTICAL) {
+            char taflman = Taflman.TYPE_TAFLMAN | Taflman.SIDE_DEFENDERS;
+            Utilities.fillArray(mSpeedLimits, from.getTaflmanSpeedLimit(taflman));
+        }
+        else if(mSpeedLimitMode == SPEED_LIMITS_BY_SIDE) {
+            char taflman = Taflman.TYPE_TAFLMAN | Taflman.SIDE_ATTACKERS;
+            Arrays.fill(mSpeedLimits, 0, TAFLMAN_TYPE_COUNT / 2, from.getTaflmanSpeedLimit(taflman));
+
+            taflman = Taflman.TYPE_TAFLMAN | Taflman.SIDE_DEFENDERS;
+            Arrays.fill(mSpeedLimits, TAFLMAN_TYPE_COUNT / 2, mSpeedLimits.length, from.getTaflmanSpeedLimit(taflman));
+        }
+        else if(mSpeedLimitMode == SPEED_LIMITS_BY_TYPE) {
+            char taflman = Taflman.TYPE_TAFLMAN | Taflman.SIDE_ATTACKERS;
+            mSpeedLimits[TaflmanCodes.t] = from.getTaflmanSpeedLimit(taflman);
+
+            taflman = Taflman.TYPE_COMMANDER | Taflman.SIDE_ATTACKERS;
+            mSpeedLimits[TaflmanCodes.c] = from.getTaflmanSpeedLimit(taflman);
+
+            taflman = Taflman.TYPE_KNIGHT | Taflman.SIDE_ATTACKERS;
+            mSpeedLimits[TaflmanCodes.n] = from.getTaflmanSpeedLimit(taflman);
+
+            taflman = Taflman.TYPE_KING | Taflman.SIDE_ATTACKERS;
+            mSpeedLimits[TaflmanCodes.k] = from.getTaflmanSpeedLimit(taflman);
+
+            taflman = Taflman.TYPE_TAFLMAN | Taflman.SIDE_DEFENDERS;
+            mSpeedLimits[TaflmanCodes.T] = from.getTaflmanSpeedLimit(taflman);
+
+            taflman = Taflman.TYPE_COMMANDER | Taflman.SIDE_DEFENDERS;
+            mSpeedLimits[TaflmanCodes.C] = from.getTaflmanSpeedLimit(taflman);
+
+            taflman = Taflman.TYPE_KNIGHT | Taflman.SIDE_DEFENDERS;
+            mSpeedLimits[TaflmanCodes.N] = from.getTaflmanSpeedLimit(taflman);
+
+            taflman = Taflman.TYPE_KING | Taflman.SIDE_DEFENDERS;
+            mSpeedLimits[TaflmanCodes.K] = from.getTaflmanSpeedLimit(taflman);
+        }
+
+        System.arraycopy(from.centerPassableFor, 0, centerPassableFor, 0, centerPassableFor.length);
+        System.arraycopy(from.centerStoppableFor, 0, centerStoppableFor, 0, centerStoppableFor.length);
+        System.arraycopy(from.centerHostileTo, 0, centerHostileTo, 0, centerHostileTo.length);
+        System.arraycopy(from.emptyCenterHostileTo, 0, emptyCenterHostileTo, 0, emptyCenterHostileTo.length);
+        System.arraycopy(from.centerPassableFor, 0, centerPassableFor, 0, centerPassableFor.length);
+
+        System.arraycopy(from.cornerPassableFor, 0, cornerPassableFor, 0, cornerPassableFor.length);
+        System.arraycopy(from.cornerStoppableFor, 0, cornerStoppableFor, 0, cornerStoppableFor.length);
+        System.arraycopy(from.cornerHostileTo, 0, cornerHostileTo, 0, cornerHostileTo.length);
+        System.arraycopy(from.cornerReenterableFor, 0, cornerReenterableFor, 0, cornerReenterableFor.length);
+
+        System.arraycopy(from.attackerFortPassableFor, 0, attackerFortPassableFor, 0, attackerFortPassableFor.length);
+        System.arraycopy(from.attackerFortStoppableFor, 0, attackerFortStoppableFor, 0, attackerFortStoppableFor.length);
+        System.arraycopy(from.attackerFortHostileTo, 0, attackerFortHostileTo, 0, attackerFortHostileTo.length);
+        System.arraycopy(from.attackerFortReenterableFor, 0, attackerFortReenterableFor, 0, attackerFortReenterableFor.length);
+
+        System.arraycopy(from.defenderFortPassableFor, 0, defenderFortPassableFor, 0, defenderFortPassableFor.length);
+        System.arraycopy(from.defenderFortStoppableFor, 0, defenderFortStoppableFor, 0, defenderFortStoppableFor.length);
+        System.arraycopy(from.defenderFortHostileTo, 0, defenderFortHostileTo, 0, defenderFortHostileTo.length);
+        System.arraycopy(from.defenderFortReenterableFor, 0, defenderFortReenterableFor, 0, defenderFortReenterableFor.length);
+    }
+
+    public void copyDimensionalRules(Rules from) {
+        mBoardSize = from.boardSize;
+
+        List<Coord> centerSpaces = new ArrayList<>(from.getCenterSpaces());
+        List<Coord> cornerSpaces = new ArrayList<>(from.getCornerSpaces());
+        List<Coord> attackerForts = new ArrayList<>(from.getAttackerForts());
+        List<Coord> defenderForts = new ArrayList<>(from.getDefenderForts());
+
+        setCenterSpaces(new ArrayList<>());
+        setCornerSpaces(new ArrayList<>());
+        setAttackerForts(new ArrayList<>());
+        setDefenderForts(new ArrayList<>());
+
+        setCenterSpaces(centerSpaces);
+        setCornerSpaces(cornerSpaces);
+        setAttackerForts(attackerForts);
+        setDefenderForts(defenderForts);
     }
 }

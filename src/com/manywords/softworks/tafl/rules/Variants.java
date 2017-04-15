@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BuiltInVariants {
+public class Variants {
     public static List<Rules> availableRules = new ArrayList<>(Arrays.asList(
             SeaBattle.newSeaBattle9(),
             Fetlar.newFetlar11(),
@@ -44,6 +44,9 @@ public class BuiltInVariants {
             "9. Foteviken Tablut 9x9",
             "10. Magpie 7x7"
     ));
+
+    public static List<Rules> builtinRules = new ArrayList<>(availableRules);
+    public static List<String> builtinDescriptions = new ArrayList<>(rulesDescriptions);
 
     public static Rules rulesForNameAndDimension(String name, int dimension) {
         for(Rules r : availableRules) {
@@ -72,7 +75,12 @@ public class BuiltInVariants {
         }
     }
 
-    public static void loadExternalRules(File externalRulesFile) {
+    public static void loadExternalRules(File externalRulesFile, File userRulesDirectory) {
+        loadExternalBuiltins(externalRulesFile);
+        loadUserRules(userRulesDirectory);
+    }
+
+    private static void loadExternalBuiltins(File externalRulesFile) {
         if(!externalRulesFile.exists()) return;
 
         try {
@@ -84,9 +92,7 @@ public class BuiltInVariants {
                     Rules rules = RulesSerializer.loadRulesRecord(line);
                     if (rules == null) continue;
 
-                    String description = rulesDescriptions.size() + 1 + ". " + rules.getName() + " " + rules.boardSize + "x" + rules.boardSize;
-                    availableRules.add(rules);
-                    rulesDescriptions.add(description);
+                    addRules(rules, true);
                 }
                 catch(NotationParseException e) {
                     OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to load rules: " + e);
@@ -100,6 +106,44 @@ public class BuiltInVariants {
 
         if(OpenTafl.devMode) {
             dumpRules();
+        }
+    }
+
+    private static void loadUserRules(File userRulesDirectory) {
+        File[] files = userRulesDirectory.listFiles();
+
+        if(files != null) {
+            for (File f : files) {
+                if(!f.isDirectory()) {
+                    try {
+                        BufferedReader r = new BufferedReader(new FileReader(f));
+                        String rulesString = r.readLine();
+
+                        Rules rules = RulesSerializer.loadRulesRecord(rulesString);
+                        addRules(rules, false);
+                    }
+                    catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    catch (NotationParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void addRules(Rules rules, boolean builtin) {
+        String description = rulesDescriptions.size() + 1 + ". " + rules.getName() + " " + rules.boardSize + "x" + rules.boardSize;
+        availableRules.add(rules);
+        rulesDescriptions.add(description);
+
+        if(builtin) {
+            builtinRules.add(rules);
+            builtinDescriptions.add(description);
         }
     }
 

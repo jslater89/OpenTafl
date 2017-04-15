@@ -304,7 +304,7 @@ public class RawTerminal implements UiCallback {
 
 
         if (command.startsWith("variants")) {
-            for (String desc : BuiltInVariants.rulesDescriptions) {
+            for (String desc : Variants.rulesDescriptions) {
                 println(desc);
             }
         } else if (command.startsWith("options")) {
@@ -324,14 +324,14 @@ public class RawTerminal implements UiCallback {
             try {
                 int variantSelection = Integer.parseInt(commandParts[1]);
 
-                if (variantSelection > BuiltInVariants.availableRules.size()) {
+                if (variantSelection > Variants.availableRules.size()) {
                     println("Unavailable variant. See: ");
                     println("'variants'");
 
                     return;
                 }
 
-                startGame(new Game(BuiltInVariants.availableRules.get(variantSelection - 1), this));
+                startGame(new Game(Variants.availableRules.get(variantSelection - 1), this));
 
             } catch (NumberFormatException e) {
                 println("Wrong command format. Try: ");

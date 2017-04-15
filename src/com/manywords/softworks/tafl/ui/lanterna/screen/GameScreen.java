@@ -75,6 +75,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     private boolean mInReplay;
     private boolean mPostGame;
 
+    private static final int FOCUS_COMMAND = 0;
+    private static final int FOCUS_BOARD = 1;
+    private int mFocusedWindow = FOCUS_COMMAND;
+
     public GameScreen(Game g, String title) {
         mGame = g;
         mTitle = title;
@@ -126,6 +130,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         layoutGameWindows(mGui.getScreen().getTerminalSize());
 
+        setFocusedWindow(mFocusedWindow);
         mGui.waitForWindowToClose(mBoardWindow);
     }
 
@@ -239,7 +244,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 statusText("This position has repeated " + repeats + " times!");
             }
 
-            mBoardWindow.rerenderBoard();
+            mBoardWindow.renderGame();
         }
     }
 
@@ -255,14 +260,14 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
     @Override
     public void gameStateAdvanced() {
-        mBoardWindow.rerenderBoard();
+        mBoardWindow.renderGame();
     }
 
     @Override
     public void victoryForSide(Side side) {
         if(!mCommandEngine.isInGame() && !mInReplay) return;
 
-        mBoardWindow.rerenderBoard();
+        mBoardWindow.renderGame();
 
         if(!mInReplay) {
             // Notify the player if this is a victory on move repetition
@@ -315,6 +320,33 @@ public class GameScreen extends LogicalScreen implements UiCallback {
     @Override
     public boolean inGame() {
         return mInGame;
+    }
+
+    private void cycleFocus(int direction) {
+        if(direction == FOCUS_FORWARD) {
+            mFocusedWindow = ++mFocusedWindow % 2;
+        }
+        else {
+            mFocusedWindow -= 1;
+            if(mFocusedWindow < 0) mFocusedWindow = 1;
+        }
+
+        setFocusedWindow(mFocusedWindow);
+    }
+
+    private void setFocusedWindow(int focusedWindow) {
+        switch(focusedWindow) {
+            case FOCUS_COMMAND:
+                mGui.setActiveWindow(mCommandWindow);
+                mCommandWindow.notifyFocus(true);
+                mBoardWindow.notifyFocus(false);
+                break;
+            case FOCUS_BOARD:
+                mGui.setActiveWindow(mBoardWindow);
+                mCommandWindow.notifyFocus(false);
+                mBoardWindow.notifyFocus(true);
+                break;
+        }
     }
 
     private class GameScreenTerminalCallback extends DefaultTerminalCallback {
@@ -472,7 +504,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             updateComments();
 
             mBoardWindow.enterReplay(rg);
-            mBoardWindow.rerenderBoard();
+            mBoardWindow.renderGame();
         }
 
         @Override
@@ -480,7 +512,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             mInReplay = false;
             mBoardWindow.setGame(g);
             mBoardWindow.leaveReplay();
-            mBoardWindow.rerenderBoard();
+            mBoardWindow.renderGame();
             mGame = g;
 
             mCommandEngine.startGame();
@@ -570,10 +602,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
             else if (r.type == Command.Type.INFO) {
                 CommandParser.Info infoCommand = (CommandParser.Info) c;
-                mBoardWindow.rerenderBoard(infoCommand.location, infoCommand.stops, infoCommand.moves, infoCommand.captures);
+                mBoardWindow.renderGame(infoCommand.location, infoCommand.stops, infoCommand.moves, infoCommand.captures);
             }
             else if (r.type == Command.Type.SHOW) {
-                mBoardWindow.rerenderBoard();
+                mBoardWindow.renderGame();
             }
             else if (r.type == Command.Type.HISTORY) {
                 String gameRecord = (String) r.extra;
@@ -671,18 +703,18 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
             else if(r.type == Command.Type.REPLAY_ENTER) {
                 statusText("Entered replay mode.");
-                mBoardWindow.rerenderBoard();
+                mBoardWindow.renderGame();
             }
             else if(r.type == Command.Type.REPLAY_PLAY_HERE) {
                 statusText("Starting new game from this position...");
-                mBoardWindow.rerenderBoard();
+                mBoardWindow.renderGame();
             }
             else if(r.type == Command.Type.REPLAY_RETURN) {
                 statusText("Returning to game.");
-                mBoardWindow.rerenderBoard();
+                mBoardWindow.renderGame();
             }
             else if(r.type == Command.Type.REPLAY_NEXT) {
-                mBoardWindow.rerenderBoard();
+                mBoardWindow.renderGame();
                 tryTimeUpdate();
                 updateComments();
 
@@ -692,19 +724,19 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 }
             }
             else if(r.type == Command.Type.REPLAY_PREVIOUS) {
-                mBoardWindow.rerenderBoard();
+                mBoardWindow.renderGame();
                 tryTimeUpdate();
                 updateComments();
             }
             else if(r.type == Command.Type.REPLAY_JUMP) {
-                mBoardWindow.rerenderBoard();
+                mBoardWindow.renderGame();
                 tryTimeUpdate();
                 updateComments();
             }
             else if(r.type == Command.Type.VARIATION) {
                 tryTimeUpdate();
                 updateComments();
-                mBoardWindow.rerenderBoard();
+                mBoardWindow.renderGame();
 
                 int result = (Integer) r.extra;
                 if(result > GameState.GOOD_MOVE) { // All results > GOOD_MOVE are special, and should have some status
@@ -714,7 +746,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             else if(r.type == Command.Type.DELETE) {
                 tryTimeUpdate();
                 updateComments();
-                mBoardWindow.rerenderBoard();
+                mBoardWindow.renderGame();
             }
             else if(r.type == Command.Type.ANNOTATE) {
                 AnnotationDialog d = new AnnotationDialog("Edit annotation", mTerminal.getSize(), mReplay);
@@ -920,7 +952,17 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 mStatusWindow.handleInput(key);
                 return true;
             }
-            else return false;
+            else if(key.getKeyType() == KeyType.Tab) {
+                cycleFocus(FOCUS_FORWARD);
+                return true;
+            }
+            else if(key.getKeyType() == KeyType.ReverseTab) {
+                cycleFocus(FOCUS_BACKWARD);
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         @Override
@@ -1019,7 +1061,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         public void onServerMoveReceived(MoveRecord move) {
             OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Game screen received spectator move: " + move);
             mCommandEngine.getCurrentPlayer().onMoveDecided(move);
-            TerminalUtils.runOnUiThread(mGui, () -> mBoardWindow.rerenderBoard());
+            TerminalUtils.runOnUiThread(mGui, () -> mBoardWindow.renderGame());
         }
 
         @Override

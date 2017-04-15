@@ -278,6 +278,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 12. VERSION HISTORY -----------------------------------------------------------
+v0.4.6.0b (released xx/xx/17):
+- Add rules editor
+- Board view is now focusable, allowing control by arrow keys
+- Fix bug in
+
 v0.4.5.1b (released 02/11/17):
 - Add support for new layouts in PlayTaflOnline JSON translator
 - Add an 'Extras' menu item to hold less commonly-used features

@@ -3,11 +3,10 @@ package com.manywords.softworks.tafl.test;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
-import com.manywords.softworks.tafl.rules.BuiltInVariants;
+import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
-import com.manywords.softworks.tafl.rules.fetlar.Fetlar;
 import com.manywords.softworks.tafl.rules.tablut.Tablut;
 
 import java.util.HashMap;
@@ -48,7 +47,7 @@ public class Benchmark extends TaflTest {
         Rules brandub = Brandub.newBrandub7();
         Rules tablut = Tablut.newTablut9();
         Rules copenhagen = Copenhagen.newCopenhagen11();
-        Rules tablut15 = BuiltInVariants.rulesForNameAndDimension("Tablut", 15);
+        Rules tablut15 = Variants.rulesForNameAndDimension("Tablut", 15);
         Game g;
         AiWorkspace w;
         int size = 0, totalSize = 0;

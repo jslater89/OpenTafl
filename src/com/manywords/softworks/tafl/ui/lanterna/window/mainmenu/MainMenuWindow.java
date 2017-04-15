@@ -12,7 +12,7 @@ import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.ServerLobbyScreen;
-import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
+import com.manywords.softworks.tafl.ui.lanterna.screen.VariantEditorScreen;
 
 import java.io.File;
 
@@ -42,12 +42,6 @@ public class MainMenuWindow extends BasicWindow {
 
         Button playButton = new Button("Play", () -> TerminalUtils.startGame(getTextGUI(), mTerminalCallback));
         p.addComponent(playButton);
-
-        Button networkButton = new Button("Join server", () -> mTerminalCallback.changeActiveScreen(new ServerLobbyScreen()));
-        p.addComponent(networkButton);
-
-        Button optionsButton = new Button("Options", () -> mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback)));
-        p.addComponent(optionsButton);
 
         Button loadGameButton = new Button("Load game", () -> {
             File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved game", "Open", new File("saved-games"));
@@ -113,12 +107,14 @@ public class MainMenuWindow extends BasicWindow {
         });
         p.addComponent(viewReplayButton);
 
-        Button loadNotationButton = new Button("Load notation", () -> {
-            LoadNotationDialog d = new LoadNotationDialog(mTerminalCallback, null);
-            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
-            d.showLoadNotationDialog(getTextGUI());
-        });
-        p.addComponent(loadNotationButton);
+        Button optionsButton = new Button("Options", () -> mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback)));
+        p.addComponent(optionsButton);
+
+        Button variantButton = new Button("Variant editor", () -> mTerminalCallback.changeActiveScreen(new VariantEditorScreen()));
+        p.addComponent(variantButton);
+
+        Button networkButton = new Button("Join server", () -> mTerminalCallback.changeActiveScreen(new ServerLobbyScreen()));
+        p.addComponent(networkButton);
 
         Button downloadFromPTO = new Button("Extras", () -> mTerminalCallback.onMenuNavigation(new OtherOperationsWindow(mTerminalCallback)));
         p.addComponent(downloadFromPTO);
@@ -133,7 +129,7 @@ public class MainMenuWindow extends BasicWindow {
         p.addComponent(panel);
 
         Game game = new Game(Copenhagen.newCopenhagen11(), null);
-        i.renderBoard(game.getCurrentState(), null, null, null, null);
+        i.renderState(game.getCurrentState(), null, null, null, null);
         */
 
         this.setComponent(p);

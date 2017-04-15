@@ -47,6 +47,6 @@ public class Magpie extends Brandub {
 
     @Override
     public int getSpeedLimitMode() {
-        return SPEED_LIMITS_IDENTICAL;
+        return SPEED_LIMITS_BY_TYPE;
     }
 }

@@ -25,6 +25,14 @@ public class TaflmanImpl extends Taflman {
     private Rules mRules;
     private Set<Coord> mCachedReachableSpaces;
 
+    public TaflmanImpl(char packed, Side attackers, Side defenders, Board board) {
+        mId = getPackedId(packed);
+        mType = getPackedType(packed);
+        mSide = getPackedSide(packed) == SIDE_ATTACKERS ? attackers : defenders;
+        mBoard = board;
+        mRules = board.getRules();
+    }
+
     public boolean isKing() {
         // This is a bog-standard tafl piece.
         return (char) (mType & TYPE_KING) == TYPE_KING;

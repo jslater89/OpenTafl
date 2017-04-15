@@ -50,6 +50,7 @@ public class Test {
         tests.add(new EdgeVictoryTest());
         tests.add(new CornerVictoryTest());
         tests.add(new RestrictedSpaceTest());
+        tests.add(new RestrictedSpaceJumpTest());
         tests.add(new EncirclementTest());
         tests.add(new StrictShieldwallTest());
         tests.add(new ShieldwallTest());

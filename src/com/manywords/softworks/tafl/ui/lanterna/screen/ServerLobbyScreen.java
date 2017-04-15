@@ -8,15 +8,14 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.googlecode.lanterna.terminal.Terminal;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
+import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.ClientInformation;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
-import com.manywords.softworks.tafl.network.client.ClientServerConnection;
 import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.CreateGamePacket;
@@ -28,8 +27,8 @@ import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ChatWindow;
-import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ServerDetailWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.GameListWindow;
+import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ServerDetailWindow;
 import com.manywords.softworks.tafl.ui.lanterna.window.serverlobby.ServerLoginDialog;
 
 import java.util.List;
@@ -37,22 +36,18 @@ import java.util.List;
 /**
  * Created by jay on 5/23/16.
  */
-public class ServerLobbyScreen extends LogicalScreen {
+public class ServerLobbyScreen extends MultiWindowLogicalScreen {
     private ClientServerConnection mConnection;
 
     private GameListWindow mGameList;
     private ServerDetailWindow mServerDetail;
     private ChatWindow mChatWindow;
 
-    protected ServerLobbyTerminalCallback mTerminalCallback;
-
     private int mFocusedWindow = 0;
+
     private static final int FOCUS_LIST = 0;
     private static final int FOCUS_DETAIL = 1;
     private static final int FOCUS_CHAT = 2;
-    private static final int FOCUS_FORWARD = 3;
-    private static final int FOCUS_BACKWARD = 4;
-
 
     public ServerLobbyScreen() {
         mConnection = new ClientServerConnection(TerminalSettings.onlineServerHost, TerminalSettings.onlineServerPort, new ClientServerCallback());
@@ -63,12 +58,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         mConnection.setCallback(new ClientServerCallback());
     }
 
-    @Override
-    public void onResized(Terminal terminal, TerminalSize terminalSize) {
-        layoutWindows(terminalSize);
-    }
-
-    private void enterUi() {
+    protected void enterUi() {
         createWindows();
         layoutWindows(mGui.getScreen().getTerminalSize());
 
@@ -105,12 +95,12 @@ public class ServerLobbyScreen extends LogicalScreen {
     }
 
     private void createWindows() {
-        mGameList = new GameListWindow(mTerminalCallback, mTerminalCallback);
-        mServerDetail = new ServerDetailWindow(mTerminalCallback, mTerminalCallback);
-        mChatWindow = new ChatWindow(mTerminalCallback, mTerminalCallback);
+        mGameList = new GameListWindow(mTerminalCallback, (GameListWindow.GameListWindowHost) mTerminalCallback);
+        mServerDetail = new ServerDetailWindow(mTerminalCallback, (ServerDetailWindow.GameDetailHost) mTerminalCallback);
+        mChatWindow = new ChatWindow(mTerminalCallback, (ChatWindow.ChatWindowHost) mTerminalCallback);
     }
 
-    private void addWindows() {
+    protected void addWindows() {
         mGui.addWindow(mGameList);
         mGui.addWindow(mServerDetail);
         mGui.addWindow(mChatWindow);
@@ -121,7 +111,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         mGui.waitForWindowToClose(mGameList);
     }
 
-    private void layoutWindows(TerminalSize size) {
+    protected void layoutWindows(TerminalSize size) {
         mGameList.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
         mServerDetail.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
         mChatWindow.setHints(TerminalThemeConstants.MANUAL_LAYOUT);
@@ -141,7 +131,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         mServerDetail.setPosition(new TerminalPosition(chatWidth + 2, serverListHeight + 2));
     }
 
-    private void removeWindows() {
+    protected void removeWindows() {
         mGui.removeWindow(mGameList);
         mGui.removeWindow(mServerDetail);
         mGui.removeWindow(mChatWindow);
@@ -151,7 +141,7 @@ public class ServerLobbyScreen extends LogicalScreen {
         mChatWindow = null;
     }
 
-    private void leaveUi() {
+    protected void leaveUi() {
         removeWindows();
     }
 
@@ -192,18 +182,7 @@ public class ServerLobbyScreen extends LogicalScreen {
 
     @Override
     public void setActive(AdvancedTerminal t, WindowBasedTextGUI gui) {
-        super.setActive(t, gui);
-
-        mTerminalCallback = new ServerLobbyTerminalCallback();
-
-        enterUi();
-    }
-
-    @Override
-    public void setInactive() {
-        super.setInactive();
-
-        leaveUi();
+        super.setActive(t, gui, new ServerLobbyTerminalCallback());
     }
 
     private class ServerLobbyTerminalCallback extends DefaultTerminalCallback implements ChatWindow.ChatWindowHost, GameListWindow.GameListWindowHost, ServerDetailWindow.GameDetailHost {

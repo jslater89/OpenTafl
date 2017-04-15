@@ -3,15 +3,14 @@ package com.manywords.softworks.tafl.ui.lanterna.component;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextImage;
-import com.googlecode.lanterna.gui2.AbstractComponent;
-import com.googlecode.lanterna.gui2.ComponentRenderer;
+import com.googlecode.lanterna.gui2.AbstractInteractableComponent;
+import com.googlecode.lanterna.gui2.InteractableRenderer;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
-import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
 
 /**
  * Created by jay on 2/15/16.
  */
-public class TerminalImagePanel extends AbstractComponent<TerminalImagePanel> {
+public class TerminalImagePanel extends AbstractInteractableComponent<TerminalImagePanel> {
     private final TextImage mImage;
     private final TerminalSize mMinimumSize;
 
@@ -27,8 +26,13 @@ public class TerminalImagePanel extends AbstractComponent<TerminalImagePanel> {
     public TerminalSize getMinimumSize() { return mMinimumSize; }
 
     @Override
-    protected ComponentRenderer<TerminalImagePanel> createDefaultRenderer() {
-        return new ComponentRenderer<TerminalImagePanel>() {
+    protected InteractableRenderer<TerminalImagePanel> createDefaultRenderer() {
+        return new InteractableRenderer<TerminalImagePanel>() {
+            @Override
+            public TerminalPosition getCursorLocation(TerminalImagePanel terminalImagePanel) {
+                return null;
+            }
+
             @Override
             public TerminalSize getPreferredSize(TerminalImagePanel terminalImagePanel) {
                 TerminalSize imageSize = terminalImagePanel.getImage().getSize();

@@ -174,7 +174,8 @@ are present only for organizational purposes.
 			"w": weak everywheret
 		jump-type:
 			"n": no jumps
-			"r": restricted jumps: only to center, corners, or friendly fortresses
+			"r": restricted jumps: only to  or from center, corners, or 
+			     friendly fortresses
 			"j": jump over enemy pieces: no capturing
 			"c": jump over enemy pieces: capturing
 		space-list:
