@@ -161,9 +161,9 @@ public class RulesWindow extends FocusableBasicWindow {
         sixthRow.addComponent(mSpeedLimitsButton);
 
         mCenterPropertiesDialog = new SpacePropertiesDialog("center", true);
-        mCornerPropertiesDialog = new SpacePropertiesDialog("corner", true);
-        mAttackerFortPropertiesDialog = new SpacePropertiesDialog("attacker fort", true);
-        mDefenderFortPropertiesDialog = new SpacePropertiesDialog("defender fort", true);
+        mCornerPropertiesDialog = new SpacePropertiesDialog("corner", false);
+        mAttackerFortPropertiesDialog = new SpacePropertiesDialog("attacker fort", false);
+        mDefenderFortPropertiesDialog = new SpacePropertiesDialog("defender fort", false);
 
         Button mCenterSpacePropertiesButton = new Button("Center properties", () -> {
             mCenterPropertiesDialog.showDialog(getTextGUI());

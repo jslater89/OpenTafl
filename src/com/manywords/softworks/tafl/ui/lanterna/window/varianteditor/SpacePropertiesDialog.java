@@ -34,7 +34,14 @@ public class SpacePropertiesDialog extends DialogWindow {
 
     private void buildWindow() {
         Panel container = new Panel();
-        container.addComponent(new Label("Check boxes for " + mSpaceType + " properties."));
+        container.addComponent(new Label("Check boxes to set " + mSpaceType + " properties."));
+        container.addComponent(TerminalUtils.newSpacer());
+        container.addComponent(new Label("Passable means the taflman type can move through a space type. Stoppable"));
+        container.addComponent(new Label("means the taflman type can land upon a space type. Hostile means the space"));
+        container.addComponent(new Label("type is hostile to the taflman type. Reenterable means the taflman type"));
+        container.addComponent(new Label("can move into the space type if not already on a space of the same type."));
+        if(mShowHostileEmpty) container.addComponent(new Label("Hostile empty means the space type is hostile, but only if unoccupied"));
+        if(mShowHostileEmpty) container.addComponent(new Label("by a friendly taflman."));
         container.addComponent(TerminalUtils.newSpacer());
 
         setupCheckBoxes();
