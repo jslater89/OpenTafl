@@ -73,15 +73,12 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
     }
 
     private void loadRules(Rules r) {
-        mStartingBoard = new GenericBoard(r.boardSize);
+        mRules = GenericRules.copyRules(r);
 
-        mAttackers = new GenericSide(mStartingBoard, true, new ArrayList<>(r.getAttackers().getStartingTaflmen()));
-        mDefenders = new GenericSide(mStartingBoard, false, new ArrayList<>(r.getDefenders().getStartingTaflmen()));
+        mStartingBoard = (GenericBoard) mRules.getBoard();
+        mAttackers = (GenericSide) mRules.getAttackers();
+        mDefenders = (GenericSide) mRules.getDefenders();
 
-        GenericRules newRules = new GenericRules(mStartingBoard, mAttackers, mDefenders);
-        newRules.copyNonDimensionalRules(r);
-        newRules.copyDimensionalRules(r);
-        mRules = newRules;
         mRulesWindow.updateScreen(mRules);
     }
 

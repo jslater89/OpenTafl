@@ -35,6 +35,7 @@ public class Test {
         tests.add(new TranspositionTableConsistencyTest());
         tests.add(new NetworkPacketConsistencyTests());
         tests.add(new BerserkHistoryDuplicationTest());
+        tests.add(new GenericRulesCopyTest());
 
         // Rules tests
         tests.add(new KingHammerAnvilTest());

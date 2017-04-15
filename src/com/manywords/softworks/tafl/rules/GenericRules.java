@@ -581,7 +581,7 @@ public class GenericRules extends Rules {
     }
 
     public void copyDimensionalRules(Rules from) {
-        mBoardSize = from.boardSize;
+        if(mBoardSize != from.boardSize) throw new IllegalArgumentException();
 
         List<Coord> centerSpaces = new ArrayList<>(from.getCenterSpaces());
         List<Coord> cornerSpaces = new ArrayList<>(from.getCornerSpaces());
@@ -597,5 +597,18 @@ public class GenericRules extends Rules {
         setCornerSpaces(cornerSpaces);
         setAttackerForts(attackerForts);
         setDefenderForts(defenderForts);
+    }
+
+    public static GenericRules copyRules(Rules from) {
+        Board startingBoard = new GenericBoard(from.boardSize);
+
+        Side attackers = new GenericSide(startingBoard, true, new ArrayList<>(from.getAttackers().getStartingTaflmen()));
+        Side defenders = new GenericSide(startingBoard, false, new ArrayList<>(from.getDefenders().getStartingTaflmen()));
+
+        GenericRules newRules = new GenericRules(startingBoard, attackers, defenders);
+        newRules.copyNonDimensionalRules(from);
+        newRules.copyDimensionalRules(from);
+
+        return newRules;
     }
 }
