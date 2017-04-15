@@ -291,6 +291,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 13. VERSION HISTORY -----------------------------------------------------------
+v0.4.6.1b (released 04/15/17):
+- Fix bug relating to loading built-in rules, along with associated crashes
+- Fix related bug concerning deleting rules and options menu crashes
+
 v0.4.6.0b (released 04/15/17):
 - Add variant editor
 - Board view is now focusable and allows in-game control by arrow keys
