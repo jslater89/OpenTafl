@@ -17,7 +17,9 @@ README
 OpenTafl is the old-fashioned computer implementation of the old-fashioned
 Norse boardgame. At present, it supports local play against another human or
 the built-in AI. Other features include support for play against external AI
-engines which use the OpenTafl Engine Protocol and network play against humans.
+engines which use the OpenTafl Engine Protocol, network play against humans,
+and a full-featured rules variant designer which can capture nearly every
+described tafl variation, both modern and historical.
 
 You can follow the development of OpenTafl at soapbox.manywords.press/tag/tafl.
 
@@ -278,15 +280,15 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 12. VERSION HISTORY -----------------------------------------------------------
-v0.4.6.0b (released xx/xx/17):
-- Add rules editor
+v0.4.6.0b (released 04/15/17):
+- Add variant editor
 - Board view is now focusable, allowing control by arrow keys
-- Fix bug in
+- Rearrange main menu for hopefully-better usability
 
 v0.4.5.1b (released 02/11/17):
 - Add support for new layouts in PlayTaflOnline JSON translator
 - Add an 'Extras' menu item to hold less commonly-used features
-- Move AI Selfpay to Extras
+- Move AI Selfplay to Extras
 - Add Extras menu item for downloading PlayTaflOnline games
 - OpenTafl now outputs game records with the starti: rules entry instead of the
   start: rules entry
