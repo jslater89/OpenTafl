@@ -13,7 +13,6 @@ import com.manywords.softworks.tafl.ui.lanterna.TerminalUtils;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.ServerLobbyScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.VariantEditorScreen;
-import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
 
 import java.io.File;
 
@@ -41,17 +40,8 @@ public class MainMenuWindow extends BasicWindow {
         EmptySpace e1 = new EmptySpace(new TerminalSize(0, 1));
         p.addComponent(e1);
 
-        Button variantButton = new Button("Variant editor", () -> mTerminalCallback.changeActiveScreen(new VariantEditorScreen()));
-        p.addComponent(variantButton);
-
         Button playButton = new Button("Play", () -> TerminalUtils.startGame(getTextGUI(), mTerminalCallback));
         p.addComponent(playButton);
-
-        Button networkButton = new Button("Join server", () -> mTerminalCallback.changeActiveScreen(new ServerLobbyScreen()));
-        p.addComponent(networkButton);
-
-        Button optionsButton = new Button("Options", () -> mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback)));
-        p.addComponent(optionsButton);
 
         Button loadGameButton = new Button("Load game", () -> {
             File gameFile = TerminalUtils.showFileChooserDialog(getTextGUI(), "Select saved game", "Open", new File("saved-games"));
@@ -117,12 +107,14 @@ public class MainMenuWindow extends BasicWindow {
         });
         p.addComponent(viewReplayButton);
 
-        Button loadNotationButton = new Button("Load notation", () -> {
-            LoadNotationDialog d = new LoadNotationDialog(mTerminalCallback, null);
-            d.setHints(TerminalThemeConstants.CENTERED_MODAL);
-            d.showLoadNotationDialog(getTextGUI());
-        });
-        p.addComponent(loadNotationButton);
+        Button optionsButton = new Button("Options", () -> mTerminalCallback.onMenuNavigation(new OptionsMenuWindow(mTerminalCallback)));
+        p.addComponent(optionsButton);
+
+        Button variantButton = new Button("Variant editor", () -> mTerminalCallback.changeActiveScreen(new VariantEditorScreen()));
+        p.addComponent(variantButton);
+
+        Button networkButton = new Button("Join server", () -> mTerminalCallback.changeActiveScreen(new ServerLobbyScreen()));
+        p.addComponent(networkButton);
 
         Button downloadFromPTO = new Button("Extras", () -> mTerminalCallback.onMenuNavigation(new OtherOperationsWindow(mTerminalCallback)));
         p.addComponent(downloadFromPTO);
