@@ -707,10 +707,36 @@ public class AiWorkspace extends Game {
             */
 
 
+            GameTreeNode leafNode = null;
             for (GameTreeNode node : bestPath) {
                 mUiCallback.statusText("\t" + node.getEnteringMove());
+                if(node.getBranches().size() == 0) leafNode = node;
             }
-            mUiCallback.statusText("End of best path scored " + bestMove.getValue());
+            mUiCallback.statusText("Best move scored " + bestMove.getValue());
+
+            if(leafNode != null && leafNode.getVictory() > GameTreeState.HIGHEST_NONTERMINAL_RESULT && Math.abs(bestMove.getValue()) < 5000) {
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Found an incorrect best path!");
+
+                int depth = 0;
+                for(GameTreeNode node : bestPath) {
+                    for(int i = 0; i < depth; i++) OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "  ");
+
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Node: " + node.getEnteringMoveSequence() + " value: " + node.getValue() + " children: " + node.getBranches().size() + " maximizing? " + node.isMaximizingNode());
+                    for(GameTreeNode child : node.getBranches()) {
+                        for(int i = 0; i < depth; i++) OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "  ");
+                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Child: " + child.getEnteringMove() + " value: " + child.getValue());
+                    }
+
+                    if(depth + 1 < bestPath.size()) {
+                        if(!node.getBestChild().getEnteringMove().softEquals(bestPath.get(depth + 1).getEnteringMove())) {
+                            for(int i = 0; i < depth; i++) OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "  ");
+                            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Next node in best path has entering move: " + bestPath.get(depth + 1).getEnteringMove() + " but our best child has: " + node.getBestChild().getEnteringMove());
+                        }
+                    }
+
+                    depth++;
+                }
+            }
 
             mUiCallback.statusText("Transpositions ignored because of repetitions: " + mRepetitionsIgnoreTranspositionTable);
             mUiCallback.statusText("Observed/effective branching factor: " + doubleFormat.format(observedBranching) + "/" + doubleFormat.format(Math.pow(nodes, 1d / mLastDepth)));
