@@ -580,12 +580,6 @@ public class GameTreeState extends GameState implements GameTreeNode {
         for(GameTreeNode node : successorStates) {
             if (workspace.mHorizonTime) break;
 
-            if (cutoff) {
-                // No need to remove cutoffs from branches--we won't be re-exploring them
-                // anyway
-                continue;
-            }
-
             // Node will be null in e.g. berserk tafl, where moves are legal
             // according to the movement rules, but not legal according to
             // special rules, like the berserk rule.
@@ -593,7 +587,13 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 continue;
             }
 
+            // One way or another, we've already looked at this move, and we won't need
+            // to in the other loop. (Either it's a cutoff to the new depth, and we can
+            // safely ignore it, or it's been re-explored to the new depth.)
             successorMoves.remove(node.getEnteringMove());
+            if (cutoff) {
+                continue;
+            }
 
             node.explore(currentMaxDepth, overallMaxDepth, mAlpha, mBeta, null, mContinuation);
             short evaluation = node.getValue();
