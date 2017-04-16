@@ -76,7 +76,12 @@ public class BoardWindow extends FocusableBasicWindow {
 
             @Override
             public void onMoveRequested(MoveRecord move) {
-                mCallback.handleInGameCommand("move " + move.start + " " + move.end);
+                if(mReplayGame != null) {
+                    mCallback.handleInGameCommand("var " + move.start + " " + move.end);
+                }
+                else {
+                    mCallback.handleInGameCommand("move " + move.start + " " + move.end);
+                }
             }
 
             @Override
