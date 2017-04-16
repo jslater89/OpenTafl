@@ -131,7 +131,7 @@ public class HumanReadableRulesPrinter {
 
                 String cString = "" + c;
                 if(!getValueForTag(otrString, "cenp").contains(cString)
-                        && getValueForTag(otrString, "cens").contains(cString)
+                        && !getValueForTag(otrString, "cens").contains(cString)
                         && !getValueForTag(otrString, "cenre").contains(cString)) {
                     allocatedTypes.add(c);
                     restrictedTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
@@ -278,7 +278,7 @@ public class HumanReadableRulesPrinter {
 
                 String cString = "" + c;
                 if(!getValueForTag(otrString, "aforp").contains(cString)
-                        && getValueForTag(otrString, "afors").contains(cString)
+                        && !getValueForTag(otrString, "afors").contains(cString)
                         && !getValueForTag(otrString, "aforre").contains(cString)) {
                     allocatedTypes.add(c);
                     restrictedTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
@@ -408,7 +408,7 @@ public class HumanReadableRulesPrinter {
 
                 String cString = "" + c;
                 if(!getValueForTag(otrString, "dforp").contains(cString)
-                        && getValueForTag(otrString, "dfors").contains(cString)
+                        && !getValueForTag(otrString, "dfors").contains(cString)
                         && !getValueForTag(otrString, "dforre").contains(cString)) {
                     allocatedTypes.add(c);
                     restrictedTaflmen[TaflmanCodes.getIndexForChar(c)] = true;
