@@ -291,6 +291,13 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 13. VERSION HISTORY -----------------------------------------------------------
+v0.4.6.2b (released 04/16/17):
+- Add support for using the keyboard UI to play variations in replays
+- Fix a bug where the 'rules' command would incorrectly describe movement rules
+  for pieces allowed neither to move through nor stop on a category of spaces
+- Fix a bug where the OpenTafl AI would report an incorrect path through the
+  game tree for a given node
+
 v0.4.6.1b (released 04/15/17):
 - Fix bug relating to loading built-in rules, along with associated crashes
 - Fix related bug concerning deleting rules and options menu crashes
