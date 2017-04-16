@@ -717,20 +717,26 @@ public class AiWorkspace extends Game {
             if(leafNode != null && leafNode.getVictory() > GameTreeState.HIGHEST_NONTERMINAL_RESULT && Math.abs(bestMove.getValue()) < 5000) {
                 OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Found an incorrect best path!");
 
-                int depth = 0;
-                for(GameTreeNode node : bestPath) {
+                GameTreeNode node = getTreeRoot();
+                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Root: " + node.getEnteringMoveSequence() + " value: " + node.getValue() + " children: " + node.getBranches().size() + " maximizing? " + node.isMaximizingNode());
+                for(GameTreeNode child : node.getBranches()) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Child: " + child.getEnteringMove() + " value: " + child.getValue());
+                }
+
+                int depth = 1;
+                for(GameTreeNode n : bestPath) {
                     for(int i = 0; i < depth; i++) OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "  ");
 
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Node: " + node.getEnteringMoveSequence() + " value: " + node.getValue() + " children: " + node.getBranches().size() + " maximizing? " + node.isMaximizingNode());
-                    for(GameTreeNode child : node.getBranches()) {
+                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Node: " + n.getEnteringMoveSequence() + " value: " + n.getValue() + " children: " + n.getBranches().size() + " maximizing? " + n.isMaximizingNode());
+                    for(GameTreeNode child : n.getBranches()) {
                         for(int i = 0; i < depth; i++) OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "  ");
                         OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Child: " + child.getEnteringMove() + " value: " + child.getValue());
                     }
 
                     if(depth + 1 < bestPath.size()) {
-                        if(!node.getBestChild().getEnteringMove().softEquals(bestPath.get(depth + 1).getEnteringMove())) {
+                        if(!n.getBestChild().getEnteringMove().softEquals(bestPath.get(depth).getEnteringMove())) {
                             for(int i = 0; i < depth; i++) OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "  ");
-                            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Next node in best path has entering move: " + bestPath.get(depth + 1).getEnteringMove() + " but our best child has: " + node.getBestChild().getEnteringMove());
+                            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Next node in best path has entering move: " + bestPath.get(depth).getEnteringMove() + " but our best child has: " + n.getBestChild().getEnteringMove());
                         }
                     }
 

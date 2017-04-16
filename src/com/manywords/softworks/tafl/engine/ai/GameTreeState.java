@@ -581,8 +581,8 @@ public class GameTreeState extends GameState implements GameTreeNode {
             if (workspace.mHorizonTime) break;
 
             if (cutoff) {
-                // Remove nodes which see cutoffs.
-                getBranches().remove(node);
+                // No need to remove cutoffs from branches--we won't be re-exploring them
+                // anyway
                 continue;
             }
 
