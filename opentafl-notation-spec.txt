@@ -216,8 +216,8 @@ Explanatory notes:
 		(threefold repetition) what should happen in the case of a threefold repetition?
 		if "w", the player forcing the repetition wins. If "l", the player forcing the
 		repetition loses (that is, the player who moves into the threefold-repeated board
-        state wins). If "d", the game is a draw (default). If "i", threefold repetitions
-        are ignored.
+		state wins). If "d", the game is a draw (default). If "i", threefold repetitions
+		are ignored.
 	ka: 
 		(king armed) does the king participate in captures? Defaults to "y" (yes).
 		If "a" (anvil-only), the king can be captured against, but cannot move to make a
@@ -314,9 +314,9 @@ Explanatory notes:
 		record from start to finish gives the board position from bottom to top,
 		which is difficult to visualize. The inverted position record is the
 		regular position record with its rows in reverse order, so that the first
-		row entry in the position record corresponds to the leftmost space in
-		rank N. Reading the inverted position record from start to finish presents
-		the board in standard left-to-right, top-to-bottom format.
+		row entry in the position record corresponds to the leftmost space of the
+		bottom-most row. Reading the inverted position record from left to right
+		gives the board state in left-to-right, bottom-to-top format.
 
 		For this reason, tafl engines which display space a1 at the bottom left
 		should create rules records for human consumption using the starti tag
