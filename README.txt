@@ -291,6 +291,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 13. VERSION HISTORY -----------------------------------------------------------
+v0.4.6.3b (released 04/18/17):
+- Fix bug where the king could be captured by shieldwall
+    - Per rules, the shieldwall should capture all other pieces but leave the
+      king alive
+
 v0.4.6.2b (released 04/16/17):
 - Add support for using the keyboard UI to play variations in replays
 - Fix a bug where the 'rules' command would incorrectly describe movement rules
