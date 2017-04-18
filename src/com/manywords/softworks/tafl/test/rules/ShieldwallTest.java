@@ -48,6 +48,13 @@ public class ShieldwallTest extends TaflTest {
 
         assert state.checkVictory() == GameState.DEFENDER_WIN;
         assert state.getPieceAt(5, 0) == Taflman.EMPTY;
+
+        state.makeMove(new MoveRecord(Coord.get("g2"), Coord.get("i2")));
+        state = game.getCurrentState();
+        RawTerminal.renderGameState(state);
+
+        assert state.getPieceAt(8, 2) != Taflman.EMPTY;
+        assert state.getPieceAt(8, 3) == Taflman.EMPTY;
     }
 
 }

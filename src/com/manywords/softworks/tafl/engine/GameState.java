@@ -359,8 +359,10 @@ public class GameState {
 
         if (capturingShieldwall) {
             for (Coord space : surroundedByShieldwall) {
-                Taflman.capturedBy(this, mBoard.getOccupier(space), potentialCapturer, destination, false);
-                captures.add(space);
+                if(Taflman.getPackedType(mBoard.getOccupier(space)) != Taflman.TYPE_KING) {
+                    Taflman.capturedBy(this, mBoard.getOccupier(space), potentialCapturer, destination, false);
+                    captures.add(space);
+                }
             }
         }
 

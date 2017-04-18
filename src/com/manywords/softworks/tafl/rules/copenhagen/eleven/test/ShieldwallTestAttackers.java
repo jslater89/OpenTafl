@@ -29,6 +29,11 @@ public class ShieldwallTestAttackers extends SeaBattle9Attackers {
         taflmen.add(new TaflmanImpl((byte) 6, Taflman.TYPE_TAFLMAN, Coord.get(7, 6), this, getBoard(), getBoard().getRules()));
         taflmen.add(new TaflmanImpl((byte) 7, Taflman.TYPE_TAFLMAN, Coord.get(7, 7), this, getBoard(), getBoard().getRules()));
 
+        taflmen.add(new TaflmanImpl((byte) 8, Taflman.TYPE_TAFLMAN, Coord.get(6, 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 9, Taflman.TYPE_TAFLMAN, Coord.get(7, 2), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 10, Taflman.TYPE_TAFLMAN, Coord.get(7, 3), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 11, Taflman.TYPE_TAFLMAN, Coord.get(8, 4), this, getBoard(), getBoard().getRules()));
+
         return createHolderListFromTaflmanList(taflmen);
     }
 
