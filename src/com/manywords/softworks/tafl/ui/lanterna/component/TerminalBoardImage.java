@@ -279,8 +279,8 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         TextCharacter left = new TextCharacter('<', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
         TextCharacter right = new TextCharacter('>', TerminalThemeConstants.WHITE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
 
-        TextCharacter dash = new TextCharacter('-', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
-        TextCharacter pipe = new TextCharacter('|', TerminalThemeConstants.BLUE, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter dash = new TextCharacter('-', TerminalThemeConstants.LTGRAY, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
+        TextCharacter pipe = new TextCharacter('|', TerminalThemeConstants.LTGRAY, TerminalThemeConstants.DKGRAY, TerminalThemeConstants.NO_SGRS);
 
         TextCharacter direction = circle;
         if(start.y < end.y) direction = up;
