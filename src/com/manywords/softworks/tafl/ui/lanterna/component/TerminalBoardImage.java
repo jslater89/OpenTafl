@@ -451,7 +451,7 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
             }
         }
 
-        if(mCurrentBoard != null) rerender(null, moves, dests, captures);
+        if(mCurrentBoard != null) rerender(null, dests, moves, captures);
         if(mCallback != null) mCallback.onFocusPositionChanged(mFocusPosition);
     }
 
