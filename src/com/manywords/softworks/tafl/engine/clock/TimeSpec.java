@@ -52,8 +52,13 @@ public class TimeSpec {
     }
 
     public String toHumanString() {
+        return toHumanString(false);
+    }
+
+    public String toHumanString(boolean increment) {
         int mainTimeSeconds = (int) mainTime / 1000;
         int overtimeSeconds = (int) overtimeTime / 1000;
+        int incrementSeconds = (int) incrementTime / 1000;
 
         int hours = mainTimeSeconds / 3600;
         int minutes = (mainTimeSeconds % 3600) / 60;
@@ -69,7 +74,22 @@ public class TimeSpec {
         s = (seconds >= 10 ? "" + seconds : "0" + seconds);
         String overtimeTime = hours + ":" + m + ":" + s;
 
-        String result = mainTime + " " + overtimeTime + "/" + overtimeCount;
+        String incrementTime = "";
+        if(increment) {
+            hours = incrementSeconds / 3600;
+            minutes = (incrementSeconds % 3600) / 60;
+            seconds = (incrementSeconds % 3600) % 60;
+            m = (minutes >= 10 ? "" + minutes : "0" + minutes);
+            s = (seconds >= 10 ? "" + seconds : "0" + seconds);
+
+            if(incrementSeconds > 0) incrementTime += " ";
+            if(hours > 0) incrementTime += hours + ":";
+            if(minutes > 0 || hours > 0) incrementTime += m + ":";
+            if(seconds > 0 || minutes > 0 || hours > 0) incrementTime += s;
+            if(!incrementTime.isEmpty()) incrementTime += "i";
+        }
+
+        String result = mainTime + " " + overtimeTime + "/" + overtimeCount + incrementTime;
         return result;
     }
 

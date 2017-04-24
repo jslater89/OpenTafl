@@ -8,7 +8,6 @@ import com.googlecode.lanterna.gui2.table.TableModel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.manywords.softworks.tafl.network.packet.GameInformation;
 import com.manywords.softworks.tafl.network.packet.pregame.JoinGamePacket;
-import com.manywords.softworks.tafl.network.packet.pregame.SpectateGamePacket;
 import com.manywords.softworks.tafl.ui.Ansi;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalThemeConstants;
@@ -79,7 +78,7 @@ public class GameListWindow extends BasicWindow {
         TableModel<String> model = new TableModel<>(COLUMNS);
         for(GameInformation g : mGameList) {
             String clockSetting = "Untimed";
-            if(g.clockSetting.isEnabled()) clockSetting = g.clockSetting.toHumanString();
+            if(g.clockSetting.isEnabled()) clockSetting = g.clockSetting.toHumanString(true);
             model.addRow(g.rulesName, g.attackerUsername, g.defenderUsername, clockSetting, g.started ? "Y" : "N", g.password ? "Y" : "N", g.loaded ? "Y" : "N", g.combineChat ? "Y" : "N", g.allowReplay ? "Y" : "N", "" + g.spectators);
         }
 

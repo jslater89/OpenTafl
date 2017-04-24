@@ -106,7 +106,7 @@ public class CreateGameDialog extends DialogWindow {
                 timeSpec = TimeSpec.parseMachineReadableString(timeControl, " ", 1000);
 
                 if(timeSpec != null && timeSpec.isEnabled()) {
-                    timeLabel.setText(timeSpec.toHumanString());
+                    timeLabel.setText(timeSpec.toHumanString(true));
                 }
             }
 
@@ -133,7 +133,7 @@ public class CreateGameDialog extends DialogWindow {
 
         timeSpec = TerminalSettings.timeSpec;
         if(timeSpec != null && timeSpec.isEnabled()) {
-            timeLabel.setText(timeSpec.toHumanString());
+            timeLabel.setText(timeSpec.toHumanString(true));
         }
         final Button timeButton = new Button("Clock settings", () -> {
             TimeEntryDialog d = new TimeEntryDialog("Clock settings");
@@ -145,7 +145,7 @@ public class CreateGameDialog extends DialogWindow {
             }
             else {
                 timeSpec = d.timeSpec;
-                timeLabel.setText(timeSpec.toHumanString());
+                timeLabel.setText(timeSpec.toHumanString(true));
             }
         });
 
