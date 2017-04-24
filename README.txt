@@ -291,6 +291,17 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 13. VERSION HISTORY -----------------------------------------------------------
+v0.4.6.4b (released 04/23/17):
+- Fix display bugs with board UI when keyboard-focused
+    - When a taflman is selected and the cursor is elsewhere, spaces on which
+      the taflman cannot stop will be rendered in light gray instead of dark
+      blue
+    - When the cursor is over an unselected taflman, spaces on which the
+      taflman cannot stop will be rendered as dashes (passable) instead of dots
+      (stoppable).
+- In the OpenTafl server lobby, display increment times for games which have
+  an increment time
+
 v0.4.6.3b (released 04/18/17):
 - Fix bug where the king could be captured by shieldwall
     - Per rules, the shieldwall should capture all other pieces but leave the
