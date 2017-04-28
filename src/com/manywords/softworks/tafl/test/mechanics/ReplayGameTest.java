@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test.mechanics;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -72,7 +72,7 @@ public class ReplayGameTest extends TaflTest {
                 lastMoveAddress = rgs.getMoveAddress();
             }
             else {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, lastMoveAddress.increment(rg, rgs) + "==" + rgs.getMoveAddress());
+                Log.println(Log.Level.CHATTY, lastMoveAddress.increment(rg, rgs) + "==" + rgs.getMoveAddress());
                 assert lastMoveAddress.increment(rg, rgs).equals(rgs.getMoveAddress());
                 lastMoveAddress = rgs.getMoveAddress();
             }
@@ -234,15 +234,15 @@ public class ReplayGameTest extends TaflTest {
 
         // Test some deletions in the main line of play
         assert rg.deleteVariation(MoveAddress.parseAddress("18a"));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, rg.getUncommentedHistoryString(false));
+        Log.println(Log.Level.CHATTY, rg.getUncommentedHistoryString(false));
         assert rg.getStateByAddress("18a") == null;
 
         assert rg.deleteVariation(MoveAddress.parseAddress("17b"));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, rg.getUncommentedHistoryString(false));
+        Log.println(Log.Level.CHATTY, rg.getUncommentedHistoryString(false));
         assert rg.getStateByAddress("18a") == null;
 
         assert rg.deleteVariation(MoveAddress.parseAddress("17a"));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, rg.getUncommentedHistoryString(false));
+        Log.println(Log.Level.CHATTY, rg.getUncommentedHistoryString(false));
         assert rg.getStateByAddress("18a") != null;
 
         /*

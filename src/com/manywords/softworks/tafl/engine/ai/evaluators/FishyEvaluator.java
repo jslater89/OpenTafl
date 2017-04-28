@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai.evaluators;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.rules.*;
@@ -752,7 +752,7 @@ public class FishyEvaluator implements Evaluator {
         debugString += "\n\nFinal evaluation " + value + "\n";
 
 
-        //OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, debugString);
+        //OpenTafl.print(OpenTafl.Level.CHATTY, debugString);
 
         // The sequence justifying this logic:
         // 1. getCurrentSide().isAttackingSide() explores moves.
@@ -769,46 +769,46 @@ public class FishyEvaluator implements Evaluator {
     }
 
     public boolean test() {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Heavy taflmen counts, values, defender/attacker");
+        Log.println(Log.Level.CHATTY, "Heavy taflmen counts, values, defender/attacker");
         Utilities.printArray(mHeavyTaflmanCount);
         Utilities.printArray(mHeavyTaflmanValue);
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Standard taflmen counts, values, defender/attacker");
+        Log.println(Log.Level.CHATTY, "Standard taflmen counts, values, defender/attacker");
         Utilities.printArray(mStandardTaflmanCount);
         Utilities.printArray(mStandardTaflmanValue);
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Light taflmen counts, values, defender/attacker");
+        Log.println(Log.Level.CHATTY, "Light taflmen counts, values, defender/attacker");
         Utilities.printArray(mLightTaflmanCount);
         Utilities.printArray(mLightTaflmanValue);
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
 
 
         return true;

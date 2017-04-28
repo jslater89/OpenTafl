@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.command.player.external.engine;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 
 import java.io.*;
 
@@ -42,7 +42,7 @@ public class CommunicationThread extends Thread {
             try {
                 logFileWriter = new FileWriter(logFile);
             } catch (IOException e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to open engine output log for writing");
+                Log.println(Log.Level.NORMAL, "Failed to open engine output log for writing");
                 log = false;
             }
         }
@@ -51,7 +51,7 @@ public class CommunicationThread extends Thread {
                 logFileWriter.flush();
                 logFileWriter.close();
             } catch (IOException e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to close engine log");
+                Log.println(Log.Level.NORMAL, "Failed to close engine log");
             }
         }
     }
@@ -69,11 +69,11 @@ public class CommunicationThread extends Thread {
                 output.write(command);
                 output.flush();
             } catch (IOException e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Exception writing command: " + e);
+                Log.println(Log.Level.NORMAL, "Exception writing command: " + e);
             }
         }
         else {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, new String(command));
+            Log.print(Log.Level.CHATTY, new String(command));
         }
     }
 
@@ -90,18 +90,18 @@ public class CommunicationThread extends Thread {
                     callback.onCommandReceived(command);
                 }
                 else {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "EOF in stream");
+                    Log.println(Log.Level.NORMAL, "EOF in stream");
                     if(process != null) {
                         process.waitFor();
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Other process ended with: " + process.exitValue());
+                        Log.println(Log.Level.CHATTY, "Other process ended with: " + process.exitValue());
                     }
                     running = false;
                 }
             } catch (IOException e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Exception reading command: " + e);
+                Log.println(Log.Level.NORMAL, "Exception reading command: " + e);
             } catch (InterruptedException e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Interrupted while waiting for stopped process exit");
-                OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
+                Log.println(Log.Level.CHATTY, "Interrupted while waiting for stopped process exit");
+                Log.stackTrace(Log.Level.CHATTY, e);
             }
         }
 
@@ -124,7 +124,7 @@ public class CommunicationThread extends Thread {
                 logFileWriter.write((sender ? "Sent: " : "Received: ") + new String(command));
                 logFileWriter.flush();
             } catch (IOException e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to write to engine log: " + e);
+                Log.println(Log.Level.NORMAL, "Failed to write to engine log: " + e);
             }
         }
     }

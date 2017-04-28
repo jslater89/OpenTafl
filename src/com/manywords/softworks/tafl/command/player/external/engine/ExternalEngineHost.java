@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.command.player.external.engine;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.GameState;
@@ -39,8 +39,8 @@ public class ExternalEngineHost {
             mOutboundPipe = new BufferedOutputStream(new PipedOutputStream(connectToOutput));
         }
         catch(IOException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Could not connect input streams");
-            OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
+            Log.println(Log.Level.SILENT, "Could not connect input streams");
+            Log.stackTrace(Log.Level.SILENT, e);
             System.exit(-1);
         }
 
@@ -61,7 +61,7 @@ public class ExternalEngineHost {
         ProcessBuilder b = new ProcessBuilder();
         b.directory(absoluteDirectory);
         b.command(commandLine);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, b.command());
+        Log.println(Log.Level.CHATTY, b.command());
 
         try {
             mExternalEngine = b.start();
@@ -72,8 +72,8 @@ public class ExternalEngineHost {
             mCommThread.start();
 
         } catch (IOException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to start: " + e);
-            OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+            Log.println(Log.Level.NORMAL, "Failed to start: " + e);
+            Log.stackTrace(Log.Level.NORMAL, e);
             System.exit(1);
         }
     }
@@ -322,7 +322,7 @@ public class ExternalEngineHost {
                         moves.add(record);
                     }
                     catch(NotationParseException e) {
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to parse analysis move record: " + e.toString());
+                        Log.println(Log.Level.NORMAL, "Failed to parse analysis move record: " + e.toString());
                     }
                 }
 
@@ -350,7 +350,7 @@ public class ExternalEngineHost {
     private void handleDumpCommand(String command) {
         command = command.replaceFirst("dump", "");
         command = command.replaceAll("XXXXX", "\n");
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, command);
+        Log.println(Log.Level.CHATTY, command);
     }
 
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
@@ -362,10 +362,10 @@ public class ExternalEngineHost {
 
             for(String cmd : commands) {
                 if(!cmd.startsWith("dump")) {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Host received: " + cmd);
+                    Log.println(Log.Level.CHATTY, "Host received: " + cmd);
                 }
                 else {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Host received dump command");
+                    Log.println(Log.Level.CHATTY, "Host received dump command");
                 }
 
                 if (cmd.startsWith("hello")) {

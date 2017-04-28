@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.server.thread;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 
 /**
  * Created by jay on 5/22/16.
@@ -29,8 +29,8 @@ public class ServerThread extends Thread {
                     task.run();
                 }
                 catch(Exception e) {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Encountered exception running task: " + task);
-                    OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+                    Log.println(Log.Level.NORMAL, "Encountered exception running task: " + task);
+                    Log.stackTrace(Log.Level.NORMAL, e);
                 }
             }
 

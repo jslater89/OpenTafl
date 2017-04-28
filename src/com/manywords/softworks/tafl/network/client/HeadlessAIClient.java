@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.client;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.command.CommandEngine;
 import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.ExternalEnginePlayer;
@@ -268,10 +268,10 @@ public class HeadlessAIClient {
         @Override
         public void onErrorReceived(String message) {
             mLastServerError = message;
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Received error: " + message);
+            Log.println(Log.Level.NORMAL, "Received error: " + message);
 
             if(mJoinGame && mCommandEngine == null) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Error joining game: quitting");
+                Log.println(Log.Level.SILENT, "Error joining game: quitting");
             }
         }
 
@@ -280,14 +280,14 @@ public class HeadlessAIClient {
             if(mJoinGame && mCommandEngine == null) {
                 boolean foundOpponent = false;
                 for(GameInformation game : games) {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, mOpponentUsername + "-" + game.attackerUsername);
+                    Log.println(Log.Level.CHATTY, mOpponentUsername + "-" + game.attackerUsername);
                     if(mOpponentUsername.equals(game.attackerUsername) || mOpponentUsername.equals(game.defenderUsername)) {
                         foundOpponent = true;
                         mAttackingSide = game.freeSideAttackers();
                         mClockSetting = game.clockSetting;
 
                         if(mClockSetting == null) {
-                            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Headless client can only play timed games.");
+                            Log.println(Log.Level.SILENT, "Headless client can only play timed games.");
                             mConnection.disconnect();
                         }
 

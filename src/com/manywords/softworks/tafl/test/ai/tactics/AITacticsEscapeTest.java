@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test.ai.tactics;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -13,7 +13,7 @@ import com.manywords.softworks.tafl.test.TaflTest;
 
 import java.util.List;
 
-import static com.manywords.softworks.tafl.OpenTafl.LogLevel.CHATTY;
+import static com.manywords.softworks.tafl.Log.Level.CHATTY;
 
 /**
  * Created by jay on 8/18/16.
@@ -22,7 +22,7 @@ public class AITacticsEscapeTest extends TaflTest {
 
     @Override
     public void statusText(String text) {
-        OpenTafl.logPrintln(CHATTY, text);
+        Log.println(CHATTY, text);
     }
 
     @Override

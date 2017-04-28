@@ -8,7 +8,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -314,7 +314,7 @@ public class ServerLobbyScreen extends MultiWindowLogicalScreen {
 
         @Override
         public void onHistoryReceived(List<DetailedMoveRecord> moves) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "History delivered to server lobby screen");
+            Log.println(Log.Level.NORMAL, "History delivered to server lobby screen");
         }
 
         @Override

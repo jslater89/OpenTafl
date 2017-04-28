@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.command.player.external.engine;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -353,10 +353,10 @@ public class ExternalEngineClient implements UiCallback {
             String[] commands = strCommand.split("\n");
 
             for(String cmd : commands) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Client received: " + cmd);
+                Log.println(Log.Level.CHATTY, "Client received: " + cmd);
                 if (cmd.startsWith("rules")) {
                     handleRulesCommand(cmd);
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Client view of rules: " + mRules.getOTRString(false));
+                    Log.println(Log.Level.CHATTY, "Client view of rules: " + mRules.getOTRString(false));
                 }
                 else if (cmd.startsWith("play")) {
                     handlePlayCommand(cmd);

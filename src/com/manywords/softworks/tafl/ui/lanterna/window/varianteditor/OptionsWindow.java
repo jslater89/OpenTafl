@@ -6,7 +6,7 @@ import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialog;
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
@@ -101,11 +101,11 @@ public class OptionsWindow extends FocusableBasicWindow {
                     }
                     catch (IOException e) {
                         MessageDialog.showMessageDialog(getTextGUI(), "Error", "Failed to read file");
-                        OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+                        Log.stackTrace(Log.Level.NORMAL, e);
                     }
                     catch (NotationParseException e) {
                         MessageDialog.showMessageDialog(getTextGUI(), "Error", "Failed to parse file");
-                        OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+                        Log.stackTrace(Log.Level.NORMAL, e);
                     }
                 }
                 else {

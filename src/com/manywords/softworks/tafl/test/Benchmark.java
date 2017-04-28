@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
 import com.manywords.softworks.tafl.rules.Variants;
@@ -40,7 +40,7 @@ public class Benchmark extends TaflTest {
 
     @Override
     public void statusText(String text) {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, text);
+        Log.println(Log.Level.CHATTY, text);
     }
 
     public void run() {
@@ -76,7 +76,7 @@ public class Benchmark extends TaflTest {
         size = w.getGameTreeSize(10);
         totalSize += size;
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Brandub 7: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(7));
+        Log.println(Log.Level.SILENT, "Brandub 7: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(7));
 
         // TABLUT --------------------------------
 
@@ -95,7 +95,7 @@ public class Benchmark extends TaflTest {
         size = w.getGameTreeSize(10);
         totalSize += size;
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Tablut 9: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(9));
+        Log.println(Log.Level.SILENT, "Tablut 9: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(9));
 
         // COPENHAGEN ----------------------------
         g = new Game(copenhagen, null);
@@ -113,7 +113,7 @@ public class Benchmark extends TaflTest {
         size = w.getGameTreeSize(10);
         totalSize += size;
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Copenhagen 11: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(11));
+        Log.println(Log.Level.SILENT, "Copenhagen 11: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(11));
 
         // TABLUT 15 -----------------------------
 
@@ -132,7 +132,7 @@ public class Benchmark extends TaflTest {
         size = w.getGameTreeSize(10);
         totalSize += size;
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Tablut 15: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(15));
+        Log.println(Log.Level.SILENT, "Tablut 15: finished in " + ((end - start) / 1000d) + " sec, searching " + size + " nodes to depth " + desiredDepths.get(15));
 
 //        System.out.println("************************");
 //        System.out.println("Final results: " +totalSize + " at " + totalSize / (double) ((TIME * 2) + (TIME * LONG_TEST_FACTOR * 2)) + "/sec");

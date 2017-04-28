@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.network.packet.NetworkPacket;
 import com.manywords.softworks.tafl.network.server.task.HandleClientCommunicationTask;
 import com.manywords.softworks.tafl.network.server.task.interval.GameListUpdateTask;
@@ -50,7 +50,7 @@ public class ServerClient {
         try {
             mClientWriter = new PrintWriter(new OutputStreamWriter(mClientSocket.getOutputStream()), true);
         } catch (IOException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to connect to client!");
+            Log.println(Log.Level.NORMAL, "Failed to connect to client!");
             mServer.onDisconnect(this);
         }
     }

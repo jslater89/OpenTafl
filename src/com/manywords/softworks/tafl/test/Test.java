@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.test.ai.*;
 import com.manywords.softworks.tafl.test.ai.tactics.AITacticsEscapeTest;
 import com.manywords.softworks.tafl.test.consistency.*;
@@ -92,19 +92,19 @@ public class Test {
 
         for (TaflTest test : tests) {
             try {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": STARTING");
+                Log.println(Log.Level.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": STARTING");
                 test.run();
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": PASSED");
+                Log.println(Log.Level.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": PASSED");
 
             } catch (AssertionError e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": FAILED");
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Assertion: " + e);
-                OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
+                Log.println(Log.Level.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": FAILED");
+                Log.println(Log.Level.SILENT, "Assertion: " + e);
+                Log.stackTrace(Log.Level.SILENT, e);
                 System.exit(1);
             } catch (Exception e) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": CRASHED");
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Exception: " + e);
-                OpenTafl.logStackTrace(OpenTafl.LogLevel.SILENT, e);
+                Log.println(Log.Level.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": CRASHED");
+                Log.println(Log.Level.SILENT, "Exception: " + e);
+                Log.stackTrace(Log.Level.SILENT, e);
                 System.exit(1);
             }
 

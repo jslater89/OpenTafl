@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -31,7 +31,7 @@ public class DummyTestServer {
                 mReadThread.start();
             }
         } catch (IOException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, e);
+            Log.println(Log.Level.CHATTY, e);
         } finally {
             try {
                 mServerSocket.close();

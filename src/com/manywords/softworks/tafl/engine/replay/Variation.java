@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.engine.replay;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +78,7 @@ public class Variation {
     }
 
     public void dumpTree() {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Vtion: " + mAddress);
+        Log.println(Log.Level.NORMAL, "Vtion: " + mAddress);
         for(ReplayGameState rgs : mVariationStates) {
             rgs.dumpTree();
         }

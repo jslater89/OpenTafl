@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.PasswordHasher;
@@ -77,9 +78,9 @@ public class NetworkServer {
         mPlayerDatabase.addUpdateTasks(mTickThread, mTaskQueue);
     }
 
-    public void chattyPrint(String message) { OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, message); }
+    public void chattyPrint(String message) { Log.println(Log.Level.CHATTY, message); }
 
-    public void standardPrint(String message) { OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, message); }
+    public void standardPrint(String message) { Log.println(Log.Level.NORMAL, message); }
 
     public void start() {
         startServer();

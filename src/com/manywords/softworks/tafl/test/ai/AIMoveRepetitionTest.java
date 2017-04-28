@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test.ai;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
@@ -15,7 +15,7 @@ public class AIMoveRepetitionTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, text);
+        Log.println(Log.Level.CHATTY, text);
     }
 
     @Override
@@ -74,11 +74,11 @@ public class AIMoveRepetitionTest extends TaflTest implements UiCallback {
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             int result = g.getCurrentState().makeMove(nextMove);
             //RawTerminal.renderGameState(g.getCurrentState());
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, (g.getCurrentSide().isAttackingSide() ? "Defenders " : " Attackers ") + "saw " + workspace.getTreeRoot().getBestPath().get(workspace.getTreeRoot().getBestPath().size() - 1).getEnteringMoveSequence());
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Value " + workspace.getTreeRoot().getValue()  + " Eval victory: " + workspace.getTreeRoot().getBestChild().getVictory() + " Real victory: " + g.getCurrentState().checkVictory());
+            Log.println(Log.Level.CHATTY, (g.getCurrentSide().isAttackingSide() ? "Defenders " : " Attackers ") + "saw " + workspace.getTreeRoot().getBestPath().get(workspace.getTreeRoot().getBestPath().size() - 1).getEnteringMoveSequence());
+            Log.println(Log.Level.CHATTY, "Value " + workspace.getTreeRoot().getValue()  + " Eval victory: " + workspace.getTreeRoot().getBestChild().getVictory() + " Real victory: " + g.getCurrentState().checkVictory());
 
             if(workspace.getTreeRoot().getValue() > Evaluator.DEFENDER_WIN) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "!!! AI failed to see that this is a defender win! !!!");
+                Log.println(Log.Level.CHATTY, "!!! AI failed to see that this is a defender win! !!!");
                 //workspace.getTreeRoot().printTree("");
             }
 

@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.notation.playtaflonline;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -36,7 +36,7 @@ public class PlayTaflOnlineJsonTranslator {
             return readJsonInputStream(bis);
         }
         catch (FileNotFoundException e) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.NORMAL, "Failed to read file: " + f);
+            Log.print(Log.Level.NORMAL, "Failed to read file: " + f);
         }
         finally {
             if(bis != null) try {
@@ -60,13 +60,13 @@ public class PlayTaflOnlineJsonTranslator {
         // Get starting layout
         String openTaflLayout = getLayoutForName(gameObject.getString(PTOConstants.KEY_LAYOUT));
         if(openTaflLayout == null) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Unknown layout: " + gameObject.getString(PTOConstants.KEY_LAYOUT));
+            Log.println(Log.Level.NORMAL, "Unknown layout: " + gameObject.getString(PTOConstants.KEY_LAYOUT));
         }
         else {
             openTaflLayout = openTaflLayout.replaceFirst("start\\:", "");
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, openTaflLayout);
+            Log.println(Log.Level.CHATTY, openTaflLayout);
             openTaflLayout = "starti:" + PositionSerializer.invertRecord(openTaflLayout);
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, openTaflLayout);
+            Log.println(Log.Level.CHATTY, openTaflLayout);
         }
 
         // Translate rules to OTNR
@@ -128,24 +128,24 @@ public class PlayTaflOnlineJsonTranslator {
 
         // Load rules, create game, set up some default tag values
         String otnrString = openTaflRules + openTaflLayout;
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Generated rules from JSON: " + otnrString);
+        Log.println(Log.Level.NORMAL, "Generated rules from JSON: " + otnrString);
 
         Rules r = null;
         try {
             r = RulesSerializer.loadRulesRecord(otnrString);
         }
         catch(NotationParseException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to load rules string: " + e.toString());
+            Log.println(Log.Level.NORMAL, "Failed to load rules string: " + e.toString());
             return null;
         }
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Generated rules re-serialized: " + RulesSerializer.getRulesRecord(r, true));
+        Log.println(Log.Level.CHATTY, "Generated rules re-serialized: " + RulesSerializer.getRulesRecord(r, true));
         Game g = new Game(r, null);
 
         // Apply moves
         for(MoveRecord m : moves) {
             int moveResult = g.getCurrentState().makeMove(m);
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Move: " + m + " Result: " + GameState.getStringForMoveResult(moveResult));
+            Log.println(Log.Level.CHATTY, "Move: " + m + " Result: " + GameState.getStringForMoveResult(moveResult));
         }
 
         g.setDefaultTags();

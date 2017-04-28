@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test.mechanics;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -66,17 +66,17 @@ public class ExternalEngineHostTest extends TaflTest implements UiCallback {
         }
 
         r.mRunning = false;
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Rules: " + r.mRulesResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Move: " + r.mMoveResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Error: " + r.mErrorResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Analyze: " + r.mAnalyzeResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Side: " + r.mSideResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Position: " + r.mPositionResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Clock: " + r.mClockResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Play: " + r.mPlayResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Opponent Move: " + r.mOpponentMoveResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Finish: " + r.mFinishResponse);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Goodbye: " + r.mGoodbyeResponse);
+        Log.println(Log.Level.CHATTY, "Rules: " + r.mRulesResponse);
+        Log.println(Log.Level.CHATTY, "Move: " + r.mMoveResponse);
+        Log.println(Log.Level.CHATTY, "Error: " + r.mErrorResponse);
+        Log.println(Log.Level.CHATTY, "Analyze: " + r.mAnalyzeResponse);
+        Log.println(Log.Level.CHATTY, "Side: " + r.mSideResponse);
+        Log.println(Log.Level.CHATTY, "Position: " + r.mPositionResponse);
+        Log.println(Log.Level.CHATTY, "Clock: " + r.mClockResponse);
+        Log.println(Log.Level.CHATTY, "Play: " + r.mPlayResponse);
+        Log.println(Log.Level.CHATTY, "Opponent Move: " + r.mOpponentMoveResponse);
+        Log.println(Log.Level.CHATTY, "Finish: " + r.mFinishResponse);
+        Log.println(Log.Level.CHATTY, "Goodbye: " + r.mGoodbyeResponse);
         assert r.didTestPass();
     }
 
@@ -136,7 +136,7 @@ public class ExternalEngineHostTest extends TaflTest implements UiCallback {
                     String[] commands = string.split("\n");
 
                     for(String command : commands) {
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Received command: " + command);
+                        Log.println(Log.Level.CHATTY, "Received command: " + command);
                         if(command.startsWith("rules dim:7 name:Brandub surf:n atkf:y ks:w cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/")) {
                             mRulesResponse = true;
                         }

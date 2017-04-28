@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
@@ -421,13 +421,13 @@ public class GameTreeState extends GameState implements GameTreeNode {
         // This is useful for debugging continuation search troubles, so I'm leaving it in for now.
 //        for(GameTreeNode child : getBranches()) {
 //            if(child.getValue() == Evaluator.INTENTIONALLY_UNVALUED) {
-//                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Siblings of mine: " + getEnteringMoveSequence());
+//                OpenTafl.println(OpenTafl.Level.CHATTY, "Siblings of mine: " + getEnteringMoveSequence());
 //                for(GameTreeNode sibling : getBranches()) {
 //                    int pathSize = GameTreeState.getPathStartingWithNode(sibling).size();
-//                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Sibling " + sibling.getEnteringMove() + " (" + pathSize + "): " + sibling.getValue() + (sibling.valueFromTransposition() ? "T" : ""));
+//                    OpenTafl.println(OpenTafl.Level.CHATTY, "Sibling " + sibling.getEnteringMove() + " (" + pathSize + "): " + sibling.getValue() + (sibling.valueFromTransposition() ? "T" : ""));
 //                }
-//                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Time? " + workspace.mContinuationTime + " " + workspace.mHorizonTime + " " + workspace.mNoTime);
-//                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Depths: " + mDepth + "/" + mCurrentMaxDepth + "/" + overallMaxDepth);
+//                OpenTafl.println(OpenTafl.Level.CHATTY, "Time? " + workspace.mContinuationTime + " " + workspace.mHorizonTime + " " + workspace.mNoTime);
+//                OpenTafl.println(OpenTafl.Level.CHATTY, "Depths: " + mDepth + "/" + mCurrentMaxDepth + "/" + overallMaxDepth);
 //                throw new IllegalStateException("Unvalued node snuck in!");
 //            }
 //        }
@@ -444,7 +444,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
 
             if(nextState.getLastMoveResult() < LOWEST_NONERROR_RESULT) {
                 RawTerminal.renderGameState(desiredState);
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Last move result: " + m + "(" +nodeToReplace.getEnteringMoveSequence() + ") " + GameState.getStringForMoveResult(nextState.getLastMoveResult()));
+                Log.println(Log.Level.NORMAL, "Last move result: " + m + "(" +nodeToReplace.getEnteringMoveSequence() + ") " + GameState.getStringForMoveResult(nextState.getLastMoveResult()));
                 throw new IllegalStateException("Illegal move somehow!");
             }
 
@@ -726,7 +726,7 @@ public class GameTreeState extends GameState implements GameTreeNode {
                 else {
                     setValue(workspace.evaluator.evaluate(GameTreeState.this, mCurrentMaxDepth, mDepth));
                 }
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
+                Log.println(Log.Level.NORMAL, "Warning: provisional evaluation for state at depth " + mDepth + " with " + mBranches.size() + " children");
             }
             MinimalGameTreeNode minifiedNode = new MinimalGameTreeNode(mParent, mDepth, mCurrentMaxDepth, mEnteringMove, mAlpha, mBeta, mValue, mValueFromTransposition, mBranches, getCurrentSide().isAttackingSide(), mZobristHash, mVictory, mGameLength);
             if (mParent != null) {

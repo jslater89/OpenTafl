@@ -10,8 +10,8 @@ import com.manywords.softworks.tafl.network.client.HeadlessAIClient;
 import com.manywords.softworks.tafl.network.server.NetworkServer;
 import com.manywords.softworks.tafl.notation.GameSerializer;
 import com.manywords.softworks.tafl.notation.playtaflonline.PlayTaflOnlineJsonTranslator;
-import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.rules.Coord;
+import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.test.Benchmark;
 import com.manywords.softworks.tafl.test.Test;
 import com.manywords.softworks.tafl.ui.AdvancedTerminal;
@@ -19,12 +19,12 @@ import com.manywords.softworks.tafl.ui.SwingWindow;
 import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 
 import java.awt.*;
-import java.io.*;
-import java.util.Date;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.manywords.softworks.tafl.OpenTafl.LogLevel.SILENT;
+import static com.manywords.softworks.tafl.Log.Level.SILENT;
 
 public class OpenTafl {
     private static enum Mode {
@@ -40,20 +40,10 @@ public class OpenTafl {
         READ_JSON, HELP
     }
 
-    public static enum LogLevel {
-        CHATTY,
-        NORMAL,
-        SILENT
-    }
-
     public static final String CURRENT_VERSION = "v0.4.6.4b";
     public static final int NETWORK_PROTOCOL_VERSION = 7;
 
     public static boolean devMode = false;
-    public static LogLevel logLevel = LogLevel.NORMAL;
-    private static final int LOG_BUFFER_SIZE = 1024 * 32;
-    private static final StringBuilder logBuffer = new StringBuilder(LOG_BUFFER_SIZE);
-    private static File logFile;
     private static Mode runMode = Mode.GRAPHICAL_TERMINAL;
 
     public static void main(String[] args) {
@@ -70,7 +60,7 @@ public class OpenTafl {
             }
             else if (arg.contains("--test") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.TEST;
-                logLevel = SILENT;
+                Log.level = SILENT;
             }
             else if (arg.contains("--window") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.WINDOW;
@@ -82,7 +72,7 @@ public class OpenTafl {
                 runMode = Mode.HEADLESS_AI;
             }
             else if(arg.contains("--benchmark") && runMode == Mode.GRAPHICAL_TERMINAL) {
-                logLevel = SILENT;
+                Log.level = SILENT;
                 runMode = Mode.BENCHMARK;
             }
             else if(arg.contains("--pto-json") && runMode == Mode.GRAPHICAL_TERMINAL) {
@@ -92,18 +82,18 @@ public class OpenTafl {
                 runMode = Mode.HELP;
             }
             else if(arg.contains("--dev") || arg.contains("--debug")) {
-                logLevel = LogLevel.CHATTY;
+                Log.level = Log.Level.CHATTY;
                 //runMode = Mode.DEBUG;
                 devMode = true;
             }
             else if (arg.contains("--chatty")) {
-                logLevel = LogLevel.CHATTY;
+                Log.level = Log.Level.CHATTY;
             }
             else if (arg.contains("--normal")) {
-                logLevel = LogLevel.NORMAL;
+                Log.level = Log.Level.NORMAL;
             }
             else if (arg.contains("--silent")) {
-                logLevel = SILENT;
+                Log.level = SILENT;
             }
         }
 
@@ -129,8 +119,8 @@ public class OpenTafl {
                     HeadlessAIClient client = HeadlessAIClient.startFromArgs(mapArgs);
                 }
                 catch(Exception e) {
-                    OpenTafl.logPrintln(SILENT, "Failed to start headless AI client with error: " + e);
-                    OpenTafl.logStackTrace(SILENT, e);
+                    Log.println(SILENT, "Failed to start headless AI client with error: " + e);
+                    Log.stackTrace(SILENT, e);
                 }
                 break;
             case WINDOW:
@@ -174,7 +164,7 @@ public class OpenTafl {
                     t = factory.createTerminal();
                     th = new AdvancedTerminal<>(t);
                 } catch (IOException e) {
-                    OpenTafl.logPrintln(SILENT, "Failed to start text terminal.");
+                    Log.println(SILENT, "Failed to start text terminal.");
                 }
 
                 //RawTerminal display = new RawTerminal();
@@ -188,7 +178,7 @@ public class OpenTafl {
                 Game g = PlayTaflOnlineJsonTranslator.readJsonFile(new File(filename));
 
                 if(g == null) {
-                    OpenTafl.logPrintln(SILENT, "Failed to load json file.");
+                    Log.println(SILENT, "Failed to load json file.");
                     System.exit(1);
                 }
                 else {
@@ -241,72 +231,6 @@ public class OpenTafl {
         return mapArgs;
     }
 
-    public static void logPrintln(LogLevel messageLevel, Object o) {
-        synchronized (logBuffer) {
-            internalLogPrint(messageLevel, o.toString());
-            internalLogPrint(messageLevel, "\n");
-        }
-    }
-
-    public static void logPrint(LogLevel messageLevel, Object o) {
-        synchronized (logBuffer) {
-            internalLogPrint(messageLevel, o.toString());
-        }
-    }
-
-    private static void internalLogPrint(LogLevel messageLevel, String s) {
-        synchronized (logBuffer) {
-            if (logLevel == LogLevel.CHATTY) {
-                // Incidental messages
-                System.out.print(s);
-                logBuffer.append(s);
-            } else if (logLevel == LogLevel.NORMAL && messageLevel != LogLevel.CHATTY) {
-                // Normal messages
-                System.out.print(s);
-                logBuffer.append(s);
-            } else if (messageLevel == SILENT) {
-                // Critical errors which should always be displayed
-                System.out.print(s);
-                logBuffer.append(s);
-            }
-
-
-            if (logBuffer.length() > (LOG_BUFFER_SIZE - 1024)) {
-                flushLog();
-            }
-        }
-    }
-
-    public static void logStackTrace(LogLevel messageLevel, Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        logPrintln(messageLevel, sw.toString());
-    }
-
-    private static void flushLog() {
-            new Thread("LogSaveThread") {
-                @Override
-                public void run() {
-                    synchronized (logBuffer) {
-                        unsafeFlushLog();
-                    }
-                }
-            }.start();
-    }
-
-    private static void unsafeFlushLog() {
-        if(logFile.exists() && logFile.canWrite()) {
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(logFile))) {
-                bw.append(logBuffer.toString());
-                bw.flush();
-                logBuffer.delete(0, logBuffer.length());
-            } catch (IOException e) {
-                logPrintln(LogLevel.NORMAL, "Failed to write to log file: " + e);
-            }
-        }
-    }
-
     private static void directoryCheck() {
         if(!new File("saved-games/replays").exists()) {
             new File("saved-games/replays").mkdirs();
@@ -332,11 +256,11 @@ public class OpenTafl {
 
     private static void setupLogging() {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-            logPrintln(SILENT, "Uncaught exception! This OpenTafl is running as " + runMode);
-            logPrintln(SILENT, "Exception in thread " + t.getName());
-            logPrintln(SILENT, "Exception: " + e);
-            logStackTrace(SILENT, e);
-            flushLog();
+            Log.println(SILENT, "Uncaught exception! This OpenTafl is running as " + runMode);
+            Log.println(SILENT, "Exception in thread " + t.getName());
+            Log.println(SILENT, "Exception: " + e);
+            Log.stackTrace(SILENT, e);
+            Log.flushLog();
 
             System.exit(1);
         });
@@ -345,45 +269,11 @@ public class OpenTafl {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                unsafeFlushLog();
+                Log.unsafeFlushLog();
             }
         });
 
-        logFile = new File("log", "lastrun.log");
-        if(logFile.exists()) { logFile.delete(); }
-
-        try {
-            logFile.createNewFile();
-            OpenTafl.logPrintln(SILENT, "OpenTafl " + CURRENT_VERSION + " log from " + new Date() + " on " + getComputerName());
-            OpenTafl.logPrintln(SILENT, "Java version: " + System.getProperty("java.version", "unknown version"));
-        } catch (IOException e) {
-            logPrintln(LogLevel.NORMAL, "Failed to create log file:" + e);
-        }
-    }
-
-    private static String getComputerName() {
-        Map<String, String> env = System.getenv();
-        if (env.containsKey("COMPUTERNAME"))
-            return env.get("COMPUTERNAME");
-        else if (env.containsKey("HOSTNAME"))
-            return env.get("HOSTNAME");
-        else if (new File ("/etc/hostname").exists()) {
-            String hostname = null;
-            try (BufferedReader br = new BufferedReader(new FileReader(new File("/etc/hostname")))) {
-                hostname = br.readLine();
-
-                if(hostname != null && !hostname.isEmpty()) {
-                    return hostname;
-                }
-                else {
-                    return "Unknown Computer";
-                }
-            } catch (Exception e) {
-                return "Unknown Computer";
-            }
-        }
-        else
-            return "Unknown Computer";
+        Log.setupFile();
     }
 
     private static void printHelpMessage() {

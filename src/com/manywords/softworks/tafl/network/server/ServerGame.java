@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.server;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.command.CommandEngine;
 import com.manywords.softworks.tafl.command.CommandResult;
 import com.manywords.softworks.tafl.command.player.Player;
@@ -14,7 +14,6 @@ import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.network.PasswordHasher;
 import com.manywords.softworks.tafl.network.packet.ingame.ClockUpdatePacket;
 import com.manywords.softworks.tafl.network.packet.ingame.GameEndedPacket;
-import com.manywords.softworks.tafl.network.packet.ingame.HistoryPacket;
 import com.manywords.softworks.tafl.network.packet.ingame.VictoryPacket;
 import com.manywords.softworks.tafl.network.packet.pregame.StartGamePacket;
 import com.manywords.softworks.tafl.network.packet.utility.ErrorPacket;
@@ -428,12 +427,12 @@ public class ServerGame {
 
         @Override
         public void statusText(String text) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Command engine status: " + text);
+            Log.println(Log.Level.CHATTY, "Command engine status: " + text);
         }
 
         @Override
         public void modalStatus(String title, String text) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Command engine status: " + title + " - " + text);
+            Log.println(Log.Level.CHATTY, "Command engine status: " + title + " - " + text);
         }
 
         @Override

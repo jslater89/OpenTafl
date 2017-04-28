@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test.ai;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
@@ -16,7 +16,7 @@ public class AIIncompleteContinuationTest extends TaflTest {
 
     @Override
     public void statusText(String text) {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, text);
+        Log.println(Log.Level.CHATTY, text);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AIIncompleteContinuationTest extends TaflTest {
 
         for(GameTreeNode child : root.getBranches()) {
             int pathSize = GameTreeState.getPathStartingWithNode(child).size();
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Child " + child.getEnteringMove() + " (" + pathSize + "): " + child.getValue() + (child.valueFromTransposition() ? "T" : ""));
+            Log.println(Log.Level.CHATTY, "Child " + child.getEnteringMove() + " (" + pathSize + "): " + child.getValue() + (child.valueFromTransposition() ? "T" : ""));
             assert child.getValue() != Evaluator.NO_VALUE;
             assert child.getValue() != Evaluator.INTENTIONALLY_UNVALUED;
             // TODO: figure out what this is supposed to be testing

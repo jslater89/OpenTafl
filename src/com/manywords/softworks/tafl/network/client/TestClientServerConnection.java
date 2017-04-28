@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.client;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
@@ -119,7 +119,7 @@ public class TestClientServerConnection extends ClientServerConnection {
             if(lastHistory != null) {
                 for (MoveRecord m : lastHistory) {
                     int result = game.getCurrentState().makeMove(m);
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Move result: " + result);
+                    Log.println(Log.Level.CHATTY, "Move result: " + result);
                 }
             }
 
@@ -130,11 +130,11 @@ public class TestClientServerConnection extends ClientServerConnection {
         public void onHistoryReceived(List<DetailedMoveRecord> moves) {
             lastHistory = moves;
 
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Moves: " + moves);
+            Log.println(Log.Level.CHATTY, "Moves: " + moves);
             if(game != null) {
                 for (MoveRecord m : moves) {
                     int result = game.getCurrentState().makeMove(m);
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Move result: " + result);
+                    Log.println(Log.Level.CHATTY, "Move result: " + result);
                 }
             }
         }

@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.network.client;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.network.packet.ingame.*;
 import com.manywords.softworks.tafl.network.packet.pregame.ClientListPacket;
@@ -76,7 +76,7 @@ public class ClientCommandParser {
             // Do nothing
         }
         else {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Unknown packet! " + data);
+            Log.println(Log.Level.NORMAL, "Unknown packet! " + data);
         }
     }
 }

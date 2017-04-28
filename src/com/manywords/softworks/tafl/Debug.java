@@ -22,9 +22,9 @@ public class Debug {
         PieceSquareTable table = new PieceSquareTable(r, null);
 
         table.logTable(0);
-        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "\n");
+        Log.print(Log.Level.CHATTY, "\n");
         table.logTable(1);
-        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "\n");
+        Log.print(Log.Level.CHATTY, "\n");
         table.logTable(2);
 
         if(args.containsKey("--engine")) {

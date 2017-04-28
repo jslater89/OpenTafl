@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test.consistency;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.GenericRules;
@@ -26,8 +26,8 @@ public class GenericRulesCopyTest extends TaflTest {
 
             overwrite = GenericRules.copyRules(magpie);
 
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "copied rules: " + RulesSerializer.getRulesRecord(overwrite, true));
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "orignl rules: " + RulesSerializer.getRulesRecord(magpie, true));
+            Log.println(Log.Level.CHATTY, "copied rules: " + RulesSerializer.getRulesRecord(overwrite, true));
+            Log.println(Log.Level.CHATTY, "orignl rules: " + RulesSerializer.getRulesRecord(magpie, true));
             assert RulesSerializer.rulesEqual(RulesSerializer.getRulesRecord(overwrite, true), RulesSerializer.getRulesRecord(magpie, true));
         }
         catch (NotationParseException e) {

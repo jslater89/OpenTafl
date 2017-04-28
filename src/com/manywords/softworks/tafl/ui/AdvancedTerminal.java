@@ -2,18 +2,15 @@ package com.manywords.softworks.tafl.ui;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
-import com.googlecode.lanterna.bundle.LanternaThemes;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.terminal.TerminalResizeListener;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.ui.lanterna.screen.MainMenuScreen;
 import com.manywords.softworks.tafl.ui.lanterna.screen.LogicalScreen;
-import com.manywords.softworks.tafl.ui.lanterna.settings.TerminalSettings;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalTheme;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowDecorationRenderer;
 import com.manywords.softworks.tafl.ui.lanterna.theme.TerminalWindowPostRenderer;
@@ -51,7 +48,7 @@ public class AdvancedTerminal<T extends Terminal> {
         }
         else {
             // No terminal output for on-the-terminal mode
-            OpenTafl.logLevel = OpenTafl.LogLevel.SILENT;
+            Log.level = Log.Level.SILENT;
             mRawMode = true;
         }
 
@@ -91,7 +88,7 @@ public class AdvancedTerminal<T extends Terminal> {
         try {
             return mTerminal.getTerminalSize();
         } catch (IOException e) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.SILENT, "Critical error getting terminal size");
+            Log.print(Log.Level.SILENT, "Critical error getting terminal size");
         }
         return null;
     }

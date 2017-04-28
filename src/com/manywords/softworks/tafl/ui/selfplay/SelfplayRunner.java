@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.ui.selfplay;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -145,7 +145,7 @@ public class SelfplayRunner {
                             fw.write(GameSerializer.getGameRecord(result.getGame(1), true));
                             fw.flush();
                         } catch (IOException e) {
-                            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to write selfplay result");
+                            Log.println(Log.Level.NORMAL, "Failed to write selfplay result");
                         }
                     }
 
@@ -155,7 +155,7 @@ public class SelfplayRunner {
                         fw.write(tourneySummary);
                         fw.flush();
                     } catch (IOException e) {
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to write selfplay summary");
+                        Log.println(Log.Level.NORMAL, "Failed to write selfplay summary");
                     }
                 }
             }
@@ -175,32 +175,32 @@ public class SelfplayRunner {
         mCurrentMatch = new MatchResult();
 
         mCurrentMatch.setEngines(mFirstEngineSpec, mSecondEngineSpec);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Running match " + (mMatchResults.size() + 1) + "/" + mMatchCount + " between " + mFirstEngineSpec.toString() + " and " + mSecondEngineSpec.toString());
+        Log.println(Log.Level.NORMAL, "Running match " + (mMatchResults.size() + 1) + "/" + mMatchCount + " between " + mFirstEngineSpec.toString() + " and " + mSecondEngineSpec.toString());
         TerminalSettings.attackerEngineSpec = mFirstEngineSpec;
         TerminalSettings.defenderEngineSpec = mSecondEngineSpec;
 
 
         // This is a blocking call (sets this as the UI thread), so when it returns, the game
         // is over.
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Running game 1");
+        Log.println(Log.Level.CHATTY, "Running game 1");
         TerminalUtils.startGame(mHost.getTextGUI(), mHost.getTerminalCallback());
 
         while(mLastGame == null) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
+                Log.stackTrace(Log.Level.CHATTY, e);
             }
         }
 
         mCurrentMatch.setGame(0, mLastGame);
         mLastGame = null;
         if(mCurrentMatch.getGame(0).getCurrentState().checkVictory() == GameState.ATTACKER_WIN) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, mFirstEngineSpec.toString() + " wins game 1");
+            Log.println(Log.Level.NORMAL, mFirstEngineSpec.toString() + " wins game 1");
             mCurrentMatch.setWinner(0, mFirstEngineSpec);
         }
         else if(mCurrentMatch.getGame(0).getCurrentState().checkVictory() == GameState.DEFENDER_WIN) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, mSecondEngineSpec.toString() + " wins game 1");
+            Log.println(Log.Level.NORMAL, mSecondEngineSpec.toString() + " wins game 1");
             mCurrentMatch.setWinner(0, mSecondEngineSpec);
         }
 
@@ -208,25 +208,25 @@ public class SelfplayRunner {
         TerminalSettings.defenderEngineSpec = mFirstEngineSpec;
 
         // Same blocking call.
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Running game 2");
+        Log.println(Log.Level.CHATTY, "Running game 2");
         TerminalUtils.startGame(mHost.getTextGUI(), mHost.getTerminalCallback());
 
         while(mLastGame == null) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
+                Log.stackTrace(Log.Level.CHATTY, e);
             }
         }
 
         mCurrentMatch.setGame(1, mLastGame);
         mLastGame = null;
         if(mCurrentMatch.getGame(1).getCurrentState().checkVictory() == GameState.ATTACKER_WIN) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, mSecondEngineSpec.toString() + " wins game 2");
+            Log.println(Log.Level.NORMAL, mSecondEngineSpec.toString() + " wins game 2");
             mCurrentMatch.setWinner(1, mSecondEngineSpec);
         }
         else if(mCurrentMatch.getGame(1).getCurrentState().checkVictory() == GameState.DEFENDER_WIN) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, mFirstEngineSpec.toString() + " wins game 2");
+            Log.println(Log.Level.NORMAL, mFirstEngineSpec.toString() + " wins game 2");
             mCurrentMatch.setWinner(1, mFirstEngineSpec);
         }
 

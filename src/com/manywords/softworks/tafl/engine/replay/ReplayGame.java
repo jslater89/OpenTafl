@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.engine.replay;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.command.CommandParser;
 import com.manywords.softworks.tafl.engine.*;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
@@ -122,22 +122,22 @@ public class ReplayGame {
                         variationStates.add(inVariation);
                     }
                     else {
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Failed to apply move: " + m + " with result " + state.getLastMoveResult());
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Variation container address: " + container.address);
-                        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Root state address: " + inVariation.getMoveAddress());
+                        Log.println(Log.Level.SILENT, "Failed to apply move: " + m + " with result " + state.getLastMoveResult());
+                        Log.println(Log.Level.NORMAL, "Variation container address: " + container.address);
+                        Log.println(Log.Level.NORMAL, "Root state address: " + inVariation.getMoveAddress());
                         break;
                     }
                 }
             }
             else {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Failed to find root for variation container: " + container);
+                Log.println(Log.Level.SILENT, "Failed to find root for variation container: " + container);
             }
         }
 
         mMoveHistory = movesToPlay;
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Created replay game with moves: " + mMoveHistory);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "And variations: " + variationsToPlay);
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Game history after load: " + mGame.getHistory());
+        Log.println(Log.Level.CHATTY, "Created replay game with moves: " + mMoveHistory);
+        Log.println(Log.Level.CHATTY, "And variations: " + variationsToPlay);
+        Log.println(Log.Level.CHATTY, "Game history after load: " + mGame.getHistory());
         setCurrentState((ReplayGameState) mGame.getHistory().get(0));
 
         setupFirstStatesList();
@@ -179,7 +179,7 @@ public class ReplayGame {
             }
         }
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "mode/prestart/start " + mMode + "/" + mPuzzlePrestart + "/" + mPuzzleStart);
+        Log.println(Log.Level.CHATTY, "mode/prestart/start " + mMode + "/" + mPuzzlePrestart + "/" + mPuzzleStart);
     }
 
     /**

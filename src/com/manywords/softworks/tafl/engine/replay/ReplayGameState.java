@@ -1,16 +1,14 @@
 package com.manywords.softworks.tafl.engine.replay;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by jay on 7/30/16.
@@ -171,7 +169,7 @@ public class ReplayGameState extends GameState {
             }
             else {
                 Variation v = new Variation(this, mMoveAddress.nextVariation(mReplayGame, this, mVariations.size() + 1), nextState);
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Making new variation from address " + getMoveAddress() + " with address: " + v.getAddress());
+                Log.println(Log.Level.CHATTY, "Making new variation from address " + getMoveAddress() + " with address: " + v.getAddress());
                 mVariations.add(v);
                 nextState.setVariationParent(this, v);
             }
@@ -182,8 +180,8 @@ public class ReplayGameState extends GameState {
             }
         }
         else {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Failed to apply move " + move);
-            OpenTafl.logPrintln(OpenTafl.LogLevel.SILENT, "Result: " + nextState.getLastMoveResult() + " " + GameState.getStringForMoveResult(nextState.getLastMoveResult()));
+            Log.println(Log.Level.SILENT, "Failed to apply move " + move);
+            Log.println(Log.Level.SILENT, "Result: " + nextState.getLastMoveResult() + " " + GameState.getStringForMoveResult(nextState.getLastMoveResult()));
         }
 
         return nextState;
@@ -300,10 +298,10 @@ public class ReplayGameState extends GameState {
 
         int index = mVariations.indexOf(v);
         if(!mVariations.remove(v)) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to delete variation " + moveAddress);
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Variation address: " + moveAddress + " Variation: " + v);
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "This address: " + getMoveAddress() + " This variations: " + getVariations());
-            OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, new Exception());
+            Log.println(Log.Level.NORMAL, "Failed to delete variation " + moveAddress);
+            Log.println(Log.Level.CHATTY, "Variation address: " + moveAddress + " Variation: " + v);
+            Log.println(Log.Level.CHATTY, "This address: " + getMoveAddress() + " This variations: " + getVariations());
+            Log.stackTrace(Log.Level.CHATTY, new Exception());
             return false;
         }
 
@@ -345,7 +343,7 @@ public class ReplayGameState extends GameState {
     }
 
     public void dumpTree() {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "State: " + mMoveAddress + " " + getEnteringMove());
+        Log.println(Log.Level.NORMAL, "State: " + mMoveAddress + " " + getEnteringMove());
         for(int i = 0; i < mVariations.size(); i++) {
             mVariations.get(i).dumpTree();
         }

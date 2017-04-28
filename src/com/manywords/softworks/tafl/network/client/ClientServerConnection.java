@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.network.client;
 
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.command.player.NetworkClientPlayer;
 import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
@@ -96,11 +97,11 @@ public class ClientServerConnection {
     }
 
     void chattyPrint(String message) {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, message);
+        Log.println(Log.Level.CHATTY, message);
     }
 
     void standardPrint(String message) {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, message);
+        Log.println(Log.Level.NORMAL, message);
     }
 
     /**/
@@ -271,7 +272,7 @@ public class ClientServerConnection {
                     }
                     catch(Exception e) {
                         chattyPrint("Encountered exception reading from server: ");
-                        OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
+                        Log.stackTrace(Log.Level.CHATTY, e);
                     }
                 }
             }

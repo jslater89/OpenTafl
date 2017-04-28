@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.engine;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -86,56 +86,56 @@ public class Utilities {
             return s;
         }
         catch (UnsupportedFlavorException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Unable to get text data from the clipboard");
+            Log.println(Log.Level.NORMAL, "Unable to get text data from the clipboard");
         }
         catch (IOException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Unable to get text data from the clipboard");
+            Log.println(Log.Level.NORMAL, "Unable to get text data from the clipboard");
         }
         return "";
     }
 
     public static void printArray(short[] array) {
-        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "[");
+        Log.print(Log.Level.CHATTY, "[");
 
         if(array.length > 0) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[0]);
+            Log.print(Log.Level.CHATTY, array[0]);
         }
 
         for(int i = 1; i < array.length; i++) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, ",");
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[i]);
+            Log.print(Log.Level.CHATTY, ",");
+            Log.print(Log.Level.CHATTY, array[i]);
         }
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "]");
+        Log.println(Log.Level.CHATTY, "]");
     }
 
     public static void printArray(int[] array) {
-        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "[");
+        Log.print(Log.Level.CHATTY, "[");
 
         if(array.length > 0) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[0]);
+            Log.print(Log.Level.CHATTY, array[0]);
         }
 
         for(int i = 1; i < array.length; i++) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, ",");
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[i]);
+            Log.print(Log.Level.CHATTY, ",");
+            Log.print(Log.Level.CHATTY, array[i]);
         }
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "]");
+        Log.println(Log.Level.CHATTY, "]");
     }
 
     public static void printArray(Object[] array) {
-        OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "[");
+        Log.print(Log.Level.CHATTY, "[");
 
         if(array.length > 0) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[0]);
+            Log.print(Log.Level.CHATTY, array[0]);
         }
 
         for(int i = 1; i < array.length; i++) {
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, ",");
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, array[i]);
+            Log.print(Log.Level.CHATTY, ",");
+            Log.print(Log.Level.CHATTY, array[i]);
         }
 
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "]");
+        Log.println(Log.Level.CHATTY, "]");
     }
 }

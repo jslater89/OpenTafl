@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test.ai;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -15,7 +15,7 @@ public class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest {
 
     @Override
     public void statusText(String text) {
-        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, text);
+        Log.println(Log.Level.CHATTY, text);
     }
 
     @Override

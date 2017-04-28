@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.command;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.command.player.ExternalEnginePlayer;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.external.engine.ExternalEngineHost;
@@ -537,7 +537,7 @@ public class CommandEngine {
             ReplayGameState result = mReplay.makeVariation(record);
             int moveResult = result.getLastMoveResult();
 
-            OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Variation result: " + moveResult);
+            Log.println(Log.Level.CHATTY, "Variation result: " + moveResult);
             if(moveResult < GameState.LOWEST_NONERROR_RESULT) {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, GameState.getStringForMoveResult(moveResult), moveResult);
             }

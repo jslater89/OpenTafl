@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.ui.AbstractUiCallback;
 
 public abstract class TaflTest extends AbstractUiCallback {
@@ -12,7 +12,7 @@ public abstract class TaflTest extends AbstractUiCallback {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            OpenTafl.logStackTrace(OpenTafl.LogLevel.CHATTY, e);
+            Log.stackTrace(Log.Level.CHATTY, e);
         }
     }
 

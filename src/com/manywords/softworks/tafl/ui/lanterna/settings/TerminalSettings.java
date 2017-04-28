@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.ui.lanterna.settings;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.command.player.Player;
 import com.manywords.softworks.tafl.command.player.external.engine.EngineSpec;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
@@ -103,7 +103,7 @@ public class TerminalSettings {
         }
         catch(IOException e) {
             // Unable to save everything, so delete the file and return null;
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "IOException saving settings: " + e);
+            Log.println(Log.Level.NORMAL, "IOException saving settings: " + e);
             f.delete();
             return null;
         }
@@ -115,7 +115,7 @@ public class TerminalSettings {
         File f = new File(SETTINGS_PATH);
         try {
             if(!f.exists()) {
-                OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "No settings file exists");
+                Log.println(Log.Level.NORMAL, "No settings file exists");
                 return;
             }
             Wini ini = new Wini(f);
@@ -159,7 +159,7 @@ public class TerminalSettings {
             timeSpec = ts;
         }
         catch(IOException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "IOException: " + e);
+            Log.println(Log.Level.NORMAL, "IOException: " + e);
             // Don't really care if we can't load everything.
             // Use defaults otherwise.
         }

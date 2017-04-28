@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.test.consistency;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.TaflmanMoveCache;
@@ -77,7 +77,7 @@ public class RulesSerializerConsistencyTest extends TaflTest {
                 char taflman2 = s2.getPieceAt(space.x, space.y);
                 Coord space2 = Taflman.getCurrentSpace(s2, taflman2);
 
-                OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, "Considering taflmen at " + space + "/" + space2);
+                Log.println(Log.Level.CHATTY, "Considering taflmen at " + space + "/" + space2);
 
                 assert taflman2 != Taflman.EMPTY;
 

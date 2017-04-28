@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.engine.ai.evaluators;
 
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -99,10 +99,10 @@ public class PieceSquareTable {
             }
         }
 
-//        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, centerSpaces);
-//        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, crucialSpaces);
-//        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, gutterSpaces);
-//        OpenTafl.logPrintln(OpenTafl.LogLevel.CHATTY, cornerSpaces);
+//        OpenTafl.println(OpenTafl.Level.CHATTY, centerSpaces);
+//        OpenTafl.println(OpenTafl.Level.CHATTY, crucialSpaces);
+//        OpenTafl.println(OpenTafl.Level.CHATTY, gutterSpaces);
+//        OpenTafl.println(OpenTafl.Level.CHATTY, cornerSpaces);
 
         setValues(dimension, hasCorners, gutterSize, crucialSize, centerSpaces, centerCutouts, crucialSpaces, gutterSpaces, cornerSpaces);
         mirrorValues(dimension);
@@ -239,9 +239,9 @@ public class PieceSquareTable {
     public void logTable(int type) {
         for(int y = 0; y < mRules.boardSize; y++) {
             for(int x = 0; x < mRules.boardSize; x++) {
-                OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, String.format("%+.2f ", mTable[type][y * mRules.boardSize + x]));
+                Log.print(Log.Level.CHATTY, String.format("%+.2f ", mTable[type][y * mRules.boardSize + x]));
             }
-            OpenTafl.logPrint(OpenTafl.LogLevel.CHATTY, "\n");
+            Log.print(Log.Level.CHATTY, "\n");
         }
     }
 

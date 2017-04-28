@@ -1,5 +1,6 @@
 package com.manywords.softworks.tafl.rules;
 
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
@@ -126,13 +127,13 @@ public class Variants {
                     addRules(rules, true);
                 }
                 catch(NotationParseException e) {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to load rules: " + e);
+                    Log.println(Log.Level.NORMAL, "Failed to load rules: " + e);
                 }
             }
         } catch (FileNotFoundException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Couldn't read file: not found");
+            Log.println(Log.Level.NORMAL, "Couldn't read file: not found");
         } catch (IOException e) {
-            OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Couldn't read file: read error");
+            Log.println(Log.Level.NORMAL, "Couldn't read file: read error");
         }
     }
 
@@ -186,7 +187,7 @@ public class Variants {
             w.flush();
             w.close();
         } catch (IOException e) {
-            OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+            Log.stackTrace(Log.Level.NORMAL, e);
         }
     }
 }

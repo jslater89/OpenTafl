@@ -7,7 +7,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.manywords.softworks.tafl.OpenTafl;
+import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
@@ -468,8 +468,8 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
                     w.close();
                 }
                 catch (IOException e) {
-                    OpenTafl.logPrintln(OpenTafl.LogLevel.NORMAL, "Failed to write user rules file: " + e);
-                    OpenTafl.logStackTrace(OpenTafl.LogLevel.NORMAL, e);
+                    Log.println(Log.Level.NORMAL, "Failed to write user rules file: " + e);
+                    Log.stackTrace(Log.Level.NORMAL, e);
                 }
             }
 
