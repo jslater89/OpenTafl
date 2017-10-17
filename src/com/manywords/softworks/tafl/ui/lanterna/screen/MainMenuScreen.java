@@ -70,7 +70,7 @@ public class MainMenuScreen extends LogicalScreen {
 
         @Override
         public void changeActiveScreen(LogicalScreen screen) {
-            Log.println(Log.Level.CHATTY, "Changing screen");
+            Log.println(Log.Level.VERBOSE, "Changing screen");
             mTerminal.changeActiveScreen(screen);
         }
     }

@@ -78,7 +78,7 @@ public class NetworkServer {
         mPlayerDatabase.addUpdateTasks(mTickThread, mTaskQueue);
     }
 
-    public void chattyPrint(String message) { Log.println(Log.Level.CHATTY, message); }
+    public void chattyPrint(String message) { Log.println(Log.Level.VERBOSE, message); }
 
     public void standardPrint(String message) { Log.println(Log.Level.NORMAL, message); }
 

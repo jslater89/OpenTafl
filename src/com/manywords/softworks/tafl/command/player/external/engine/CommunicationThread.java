@@ -73,7 +73,7 @@ public class CommunicationThread extends Thread {
             }
         }
         else {
-            Log.print(Log.Level.CHATTY, new String(command));
+            Log.print(Log.Level.VERBOSE, new String(command));
         }
     }
 
@@ -93,15 +93,15 @@ public class CommunicationThread extends Thread {
                     Log.println(Log.Level.NORMAL, "EOF in stream");
                     if(process != null) {
                         process.waitFor();
-                        Log.println(Log.Level.CHATTY, "Other process ended with: " + process.exitValue());
+                        Log.println(Log.Level.VERBOSE, "Other process ended with: " + process.exitValue());
                     }
                     running = false;
                 }
             } catch (IOException e) {
                 Log.println(Log.Level.NORMAL, "Exception reading command: " + e);
             } catch (InterruptedException e) {
-                Log.println(Log.Level.CHATTY, "Interrupted while waiting for stopped process exit");
-                Log.stackTrace(Log.Level.CHATTY, e);
+                Log.println(Log.Level.VERBOSE, "Interrupted while waiting for stopped process exit");
+                Log.stackTrace(Log.Level.VERBOSE, e);
             }
         }
 

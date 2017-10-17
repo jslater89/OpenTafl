@@ -122,7 +122,7 @@ public class ReplayGame {
                         variationStates.add(inVariation);
                     }
                     else {
-                        Log.println(Log.Level.SILENT, "Failed to apply move: " + m + " with result " + state.getLastMoveResult());
+                        Log.println(Log.Level.CRITICAL, "Failed to apply move: " + m + " with result " + state.getLastMoveResult());
                         Log.println(Log.Level.NORMAL, "Variation container address: " + container.address);
                         Log.println(Log.Level.NORMAL, "Root state address: " + inVariation.getMoveAddress());
                         break;
@@ -130,14 +130,14 @@ public class ReplayGame {
                 }
             }
             else {
-                Log.println(Log.Level.SILENT, "Failed to find root for variation container: " + container);
+                Log.println(Log.Level.CRITICAL, "Failed to find root for variation container: " + container);
             }
         }
 
         mMoveHistory = movesToPlay;
-        Log.println(Log.Level.CHATTY, "Created replay game with moves: " + mMoveHistory);
-        Log.println(Log.Level.CHATTY, "And variations: " + variationsToPlay);
-        Log.println(Log.Level.CHATTY, "Game history after load: " + mGame.getHistory());
+        Log.println(Log.Level.VERBOSE, "Created replay game with moves: " + mMoveHistory);
+        Log.println(Log.Level.VERBOSE, "And variations: " + variationsToPlay);
+        Log.println(Log.Level.VERBOSE, "Game history after load: " + mGame.getHistory());
         setCurrentState((ReplayGameState) mGame.getHistory().get(0));
 
         setupFirstStatesList();
@@ -179,7 +179,7 @@ public class ReplayGame {
             }
         }
 
-        Log.println(Log.Level.CHATTY, "mode/prestart/start " + mMode + "/" + mPuzzlePrestart + "/" + mPuzzleStart);
+        Log.println(Log.Level.VERBOSE, "mode/prestart/start " + mMode + "/" + mPuzzlePrestart + "/" + mPuzzleStart);
     }
 
     /**

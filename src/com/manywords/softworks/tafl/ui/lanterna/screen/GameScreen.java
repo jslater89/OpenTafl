@@ -299,14 +299,14 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 // Shut down the players so they don't clutter us
                 mCommandEngine.shutdown();
 
-                Log.println(Log.Level.CHATTY, "Removing windows");
+                Log.println(Log.Level.VERBOSE, "Removing windows");
                 mBoardWindow.close();
-                Log.println(Log.Level.CHATTY, "Removed board");
+                Log.println(Log.Level.VERBOSE, "Removed board");
                 mStatusWindow.close();
-                Log.println(Log.Level.CHATTY, "Removed status");
+                Log.println(Log.Level.VERBOSE, "Removed status");
                 mCommandWindow.close();
-                Log.println(Log.Level.CHATTY, "Removed command");
-                Log.println(Log.Level.CHATTY, "Removed windows");
+                Log.println(Log.Level.VERBOSE, "Removed command");
+                Log.println(Log.Level.VERBOSE, "Removed windows");
             });
 
             Log.println(Log.Level.NORMAL, "Started selfplay window thread");
@@ -408,15 +408,15 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 mCommandEngine = null;
             }
 
-            Log.println(Log.Level.CHATTY, "Starting command engine thread");
+            Log.println(Log.Level.VERBOSE, "Starting command engine thread");
             startCommandEngineThread(g);
 
             while(mCommandEngine == null) {
                 try {
-                    Log.println(Log.Level.CHATTY, "Waiting...");
+                    Log.println(Log.Level.VERBOSE, "Waiting...");
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    Log.stackTrace(Log.Level.CHATTY, e);
+                    Log.stackTrace(Log.Level.VERBOSE, e);
                 }
             }
 
@@ -441,12 +441,12 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
                         Player attacker, defender;
 
-                        Log.println(Log.Level.CHATTY, "Network player role: " + networkPlayer.getGameRole());
+                        Log.println(Log.Level.VERBOSE, "Network player role: " + networkPlayer.getGameRole());
 
                         // Wait for the game joining to finish.
                         while(networkPlayer.getGameRole() == GameRole.OUT_OF_GAME) {
                             try {
-                                Log.println(Log.Level.CHATTY, "Waiting for other player role");
+                                Log.println(Log.Level.VERBOSE, "Waiting for other player role");
                                 Thread.sleep(100);
                             } catch (InterruptedException e) {
                                 // doesn't matter
@@ -545,10 +545,10 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 }
                 else if(lastPlayer instanceof LocalAi) {
                     LocalAi lastAi = (LocalAi) lastPlayer;
-                    Log.println(Log.Level.CHATTY, lastAi.getWorkspace().dumpEvaluationFor(0));
+                    Log.println(Log.Level.VERBOSE, lastAi.getWorkspace().dumpEvaluationFor(0));
                 }
                 else {
-                    Log.println(Log.Level.CHATTY, "Last player not external engine");
+                    Log.println(Log.Level.VERBOSE, "Last player not external engine");
                 }
                 return;
             }
@@ -556,7 +556,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
                 FishyEvaluator.debug = true;
                 AiWorkspace.evaluator.initialize(mGame.getRules());
                 AiWorkspace.evaluator.evaluate(mGame.getCurrentState(), 0, 0);
-                Log.println(Log.Level.CHATTY, FishyEvaluator.debugString);
+                Log.println(Log.Level.VERBOSE, FishyEvaluator.debugString);
                 FishyEvaluator.debug = false;
                 return;
             }
@@ -1060,7 +1060,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
 
         @Override
         public void onServerMoveReceived(MoveRecord move) {
-            Log.println(Log.Level.CHATTY, "Game screen received spectator move: " + move);
+            Log.println(Log.Level.VERBOSE, "Game screen received spectator move: " + move);
             mCommandEngine.getCurrentPlayer().onMoveDecided(move);
             TerminalUtils.runOnUiThread(mGui, () -> mBoardWindow.renderGame());
         }

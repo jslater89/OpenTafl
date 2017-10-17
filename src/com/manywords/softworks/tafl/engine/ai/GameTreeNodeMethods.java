@@ -96,16 +96,16 @@ public class GameTreeNodeMethods {
         }
 
         if(bestMove != null && bestMove.getValue() == Evaluator.NO_VALUE) {
-            Log.println(Log.Level.SILENT, "Chose an unvalued node as the best move!");
-            Log.println(Log.Level.SILENT, "Entering path: " + root.getEnteringMoveSequence());
-            Log.println(Log.Level.SILENT, "Best move: " + bestMove.getEnteringMove());
-            Log.println(Log.Level.SILENT, "Best move has children? " + bestMove.getBranches());
-            Log.println(Log.Level.SILENT, "Reported evaluation: " + bestMove.getValue());
-            Log.println(Log.Level.SILENT, "Best move is a TT hit? " + AiWorkspace.transpositionTable.getData(bestMove.getZobrist()));
+            Log.println(Log.Level.CRITICAL, "Chose an unvalued node as the best move!");
+            Log.println(Log.Level.CRITICAL, "Entering path: " + root.getEnteringMoveSequence());
+            Log.println(Log.Level.CRITICAL, "Best move: " + bestMove.getEnteringMove());
+            Log.println(Log.Level.CRITICAL, "Best move has children? " + bestMove.getBranches());
+            Log.println(Log.Level.CRITICAL, "Reported evaluation: " + bestMove.getValue());
+            Log.println(Log.Level.CRITICAL, "Best move is a TT hit? " + AiWorkspace.transpositionTable.getData(bestMove.getZobrist()));
             GameTreeState state = GameTreeState.getStateForNode(root.getRootNode(), root);
-            Log.println(Log.Level.SILENT, "Actual evaluation: " + new FishyEvaluator().evaluate(state, state.mCurrentMaxDepth, state.getDepth()));
+            Log.println(Log.Level.CRITICAL, "Actual evaluation: " + new FishyEvaluator().evaluate(state, state.mCurrentMaxDepth, state.getDepth()));
             RawTerminal.renderGameState(state);
-            Log.println(Log.Level.SILENT, state.getPasteableRulesString());
+            Log.println(Log.Level.CRITICAL, state.getPasteableRulesString());
             throw new IllegalStateException();
         }
 

@@ -169,7 +169,7 @@ public class ReplayGameState extends GameState {
             }
             else {
                 Variation v = new Variation(this, mMoveAddress.nextVariation(mReplayGame, this, mVariations.size() + 1), nextState);
-                Log.println(Log.Level.CHATTY, "Making new variation from address " + getMoveAddress() + " with address: " + v.getAddress());
+                Log.println(Log.Level.VERBOSE, "Making new variation from address " + getMoveAddress() + " with address: " + v.getAddress());
                 mVariations.add(v);
                 nextState.setVariationParent(this, v);
             }
@@ -180,8 +180,8 @@ public class ReplayGameState extends GameState {
             }
         }
         else {
-            Log.println(Log.Level.SILENT, "Failed to apply move " + move);
-            Log.println(Log.Level.SILENT, "Result: " + nextState.getLastMoveResult() + " " + GameState.getStringForMoveResult(nextState.getLastMoveResult()));
+            Log.println(Log.Level.CRITICAL, "Failed to apply move " + move);
+            Log.println(Log.Level.CRITICAL, "Result: " + nextState.getLastMoveResult() + " " + GameState.getStringForMoveResult(nextState.getLastMoveResult()));
         }
 
         return nextState;
@@ -299,9 +299,9 @@ public class ReplayGameState extends GameState {
         int index = mVariations.indexOf(v);
         if(!mVariations.remove(v)) {
             Log.println(Log.Level.NORMAL, "Failed to delete variation " + moveAddress);
-            Log.println(Log.Level.CHATTY, "Variation address: " + moveAddress + " Variation: " + v);
-            Log.println(Log.Level.CHATTY, "This address: " + getMoveAddress() + " This variations: " + getVariations());
-            Log.stackTrace(Log.Level.CHATTY, new Exception());
+            Log.println(Log.Level.VERBOSE, "Variation address: " + moveAddress + " Variation: " + v);
+            Log.println(Log.Level.VERBOSE, "This address: " + getMoveAddress() + " This variations: " + getVariations());
+            Log.stackTrace(Log.Level.VERBOSE, new Exception());
             return false;
         }
 

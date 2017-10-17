@@ -66,17 +66,17 @@ public class ExternalEngineHostTest extends TaflTest implements UiCallback {
         }
 
         r.mRunning = false;
-        Log.println(Log.Level.CHATTY, "Rules: " + r.mRulesResponse);
-        Log.println(Log.Level.CHATTY, "Move: " + r.mMoveResponse);
-        Log.println(Log.Level.CHATTY, "Error: " + r.mErrorResponse);
-        Log.println(Log.Level.CHATTY, "Analyze: " + r.mAnalyzeResponse);
-        Log.println(Log.Level.CHATTY, "Side: " + r.mSideResponse);
-        Log.println(Log.Level.CHATTY, "Position: " + r.mPositionResponse);
-        Log.println(Log.Level.CHATTY, "Clock: " + r.mClockResponse);
-        Log.println(Log.Level.CHATTY, "Play: " + r.mPlayResponse);
-        Log.println(Log.Level.CHATTY, "Opponent Move: " + r.mOpponentMoveResponse);
-        Log.println(Log.Level.CHATTY, "Finish: " + r.mFinishResponse);
-        Log.println(Log.Level.CHATTY, "Goodbye: " + r.mGoodbyeResponse);
+        Log.println(Log.Level.VERBOSE, "Rules: " + r.mRulesResponse);
+        Log.println(Log.Level.VERBOSE, "Move: " + r.mMoveResponse);
+        Log.println(Log.Level.VERBOSE, "Error: " + r.mErrorResponse);
+        Log.println(Log.Level.VERBOSE, "Analyze: " + r.mAnalyzeResponse);
+        Log.println(Log.Level.VERBOSE, "Side: " + r.mSideResponse);
+        Log.println(Log.Level.VERBOSE, "Position: " + r.mPositionResponse);
+        Log.println(Log.Level.VERBOSE, "Clock: " + r.mClockResponse);
+        Log.println(Log.Level.VERBOSE, "Play: " + r.mPlayResponse);
+        Log.println(Log.Level.VERBOSE, "Opponent Move: " + r.mOpponentMoveResponse);
+        Log.println(Log.Level.VERBOSE, "Finish: " + r.mFinishResponse);
+        Log.println(Log.Level.VERBOSE, "Goodbye: " + r.mGoodbyeResponse);
         assert r.didTestPass();
     }
 
@@ -136,7 +136,7 @@ public class ExternalEngineHostTest extends TaflTest implements UiCallback {
                     String[] commands = string.split("\n");
 
                     for(String command : commands) {
-                        Log.println(Log.Level.CHATTY, "Received command: " + command);
+                        Log.println(Log.Level.VERBOSE, "Received command: " + command);
                         if(command.startsWith("rules dim:7 name:Brandub surf:n atkf:y ks:w cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/")) {
                             mRulesResponse = true;
                         }

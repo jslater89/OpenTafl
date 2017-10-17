@@ -72,7 +72,7 @@ public class ReplayGameTest extends TaflTest {
                 lastMoveAddress = rgs.getMoveAddress();
             }
             else {
-                Log.println(Log.Level.CHATTY, lastMoveAddress.increment(rg, rgs) + "==" + rgs.getMoveAddress());
+                Log.println(Log.Level.VERBOSE, lastMoveAddress.increment(rg, rgs) + "==" + rgs.getMoveAddress());
                 assert lastMoveAddress.increment(rg, rgs).equals(rgs.getMoveAddress());
                 lastMoveAddress = rgs.getMoveAddress();
             }
@@ -234,15 +234,15 @@ public class ReplayGameTest extends TaflTest {
 
         // Test some deletions in the main line of play
         assert rg.deleteVariation(MoveAddress.parseAddress("18a"));
-        Log.println(Log.Level.CHATTY, rg.getUncommentedHistoryString(false));
+        Log.println(Log.Level.VERBOSE, rg.getUncommentedHistoryString(false));
         assert rg.getStateByAddress("18a") == null;
 
         assert rg.deleteVariation(MoveAddress.parseAddress("17b"));
-        Log.println(Log.Level.CHATTY, rg.getUncommentedHistoryString(false));
+        Log.println(Log.Level.VERBOSE, rg.getUncommentedHistoryString(false));
         assert rg.getStateByAddress("18a") == null;
 
         assert rg.deleteVariation(MoveAddress.parseAddress("17a"));
-        Log.println(Log.Level.CHATTY, rg.getUncommentedHistoryString(false));
+        Log.println(Log.Level.VERBOSE, rg.getUncommentedHistoryString(false));
         assert rg.getStateByAddress("18a") != null;
 
         /*

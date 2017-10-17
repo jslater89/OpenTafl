@@ -48,7 +48,7 @@ public class AdvancedTerminal<T extends Terminal> {
         }
         else {
             // No terminal output for on-the-terminal mode
-            Log.level = Log.Level.SILENT;
+            Log.level = Log.Level.CRITICAL;
             mRawMode = true;
         }
 
@@ -88,7 +88,7 @@ public class AdvancedTerminal<T extends Terminal> {
         try {
             return mTerminal.getTerminalSize();
         } catch (IOException e) {
-            Log.print(Log.Level.SILENT, "Critical error getting terminal size");
+            Log.print(Log.Level.CRITICAL, "Critical error getting terminal size");
         }
         return null;
     }

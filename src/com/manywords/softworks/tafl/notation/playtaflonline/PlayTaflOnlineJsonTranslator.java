@@ -64,9 +64,9 @@ public class PlayTaflOnlineJsonTranslator {
         }
         else {
             openTaflLayout = openTaflLayout.replaceFirst("start\\:", "");
-            Log.println(Log.Level.CHATTY, openTaflLayout);
+            Log.println(Log.Level.VERBOSE, openTaflLayout);
             openTaflLayout = "starti:" + PositionSerializer.invertRecord(openTaflLayout);
-            Log.println(Log.Level.CHATTY, openTaflLayout);
+            Log.println(Log.Level.VERBOSE, openTaflLayout);
         }
 
         // Translate rules to OTNR
@@ -139,13 +139,13 @@ public class PlayTaflOnlineJsonTranslator {
             return null;
         }
 
-        Log.println(Log.Level.CHATTY, "Generated rules re-serialized: " + RulesSerializer.getRulesRecord(r, true));
+        Log.println(Log.Level.VERBOSE, "Generated rules re-serialized: " + RulesSerializer.getRulesRecord(r, true));
         Game g = new Game(r, null);
 
         // Apply moves
         for(MoveRecord m : moves) {
             int moveResult = g.getCurrentState().makeMove(m);
-            Log.println(Log.Level.CHATTY, "Move: " + m + " Result: " + GameState.getStringForMoveResult(moveResult));
+            Log.println(Log.Level.VERBOSE, "Move: " + m + " Result: " + GameState.getStringForMoveResult(moveResult));
         }
 
         g.setDefaultTags();

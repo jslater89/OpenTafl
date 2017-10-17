@@ -15,7 +15,7 @@ public class AIMoveRepetitionTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
-        Log.println(Log.Level.CHATTY, text);
+        Log.println(Log.Level.VERBOSE, text);
     }
 
     @Override
@@ -74,11 +74,11 @@ public class AIMoveRepetitionTest extends TaflTest implements UiCallback {
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             int result = g.getCurrentState().makeMove(nextMove);
             //RawTerminal.renderGameState(g.getCurrentState());
-            Log.println(Log.Level.CHATTY, (g.getCurrentSide().isAttackingSide() ? "Defenders " : " Attackers ") + "saw " + workspace.getTreeRoot().getBestPath().get(workspace.getTreeRoot().getBestPath().size() - 1).getEnteringMoveSequence());
-            Log.println(Log.Level.CHATTY, "Value " + workspace.getTreeRoot().getValue()  + " Eval victory: " + workspace.getTreeRoot().getBestChild().getVictory() + " Real victory: " + g.getCurrentState().checkVictory());
+            Log.println(Log.Level.VERBOSE, (g.getCurrentSide().isAttackingSide() ? "Defenders " : " Attackers ") + "saw " + workspace.getTreeRoot().getBestPath().get(workspace.getTreeRoot().getBestPath().size() - 1).getEnteringMoveSequence());
+            Log.println(Log.Level.VERBOSE, "Value " + workspace.getTreeRoot().getValue()  + " Eval victory: " + workspace.getTreeRoot().getBestChild().getVictory() + " Real victory: " + g.getCurrentState().checkVictory());
 
             if(workspace.getTreeRoot().getValue() > Evaluator.DEFENDER_WIN) {
-                Log.println(Log.Level.CHATTY, "!!! AI failed to see that this is a defender win! !!!");
+                Log.println(Log.Level.VERBOSE, "!!! AI failed to see that this is a defender win! !!!");
                 //workspace.getTreeRoot().printTree("");
             }
 

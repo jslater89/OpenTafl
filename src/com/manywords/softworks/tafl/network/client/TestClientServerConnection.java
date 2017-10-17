@@ -119,7 +119,7 @@ public class TestClientServerConnection extends ClientServerConnection {
             if(lastHistory != null) {
                 for (MoveRecord m : lastHistory) {
                     int result = game.getCurrentState().makeMove(m);
-                    Log.println(Log.Level.CHATTY, "Move result: " + result);
+                    Log.println(Log.Level.VERBOSE, "Move result: " + result);
                 }
             }
 
@@ -130,11 +130,11 @@ public class TestClientServerConnection extends ClientServerConnection {
         public void onHistoryReceived(List<DetailedMoveRecord> moves) {
             lastHistory = moves;
 
-            Log.println(Log.Level.CHATTY, "Moves: " + moves);
+            Log.println(Log.Level.VERBOSE, "Moves: " + moves);
             if(game != null) {
                 for (MoveRecord m : moves) {
                     int result = game.getCurrentState().makeMove(m);
-                    Log.println(Log.Level.CHATTY, "Move result: " + result);
+                    Log.println(Log.Level.VERBOSE, "Move result: " + result);
                 }
             }
         }

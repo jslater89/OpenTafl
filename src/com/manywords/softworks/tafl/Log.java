@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Date;
 import java.util.Map;
 
-import static com.manywords.softworks.tafl.Log.Level.SILENT;
+import static com.manywords.softworks.tafl.Log.Level.CRITICAL;
 
 /**
  * Created by jay on 4/28/17.
@@ -21,8 +21,8 @@ public class Log {
 
         try {
             Log.logFile.createNewFile();
-            Log.println(SILENT, "OpenTafl " + OpenTafl.CURRENT_VERSION + " log from " + new Date() + " on " + getComputerName());
-            Log.println(SILENT, "Java version: " + System.getProperty("java.version", "unknown version"));
+            Log.println(CRITICAL, "OpenTafl " + OpenTafl.CURRENT_VERSION + " log from " + new Date() + " on " + getComputerName());
+            Log.println(CRITICAL, "Java version: " + System.getProperty("java.version", "unknown version"));
         } catch (IOException e) {
             Log.println(Log.Level.NORMAL, "Failed to create log file:" + e);
         }
@@ -43,15 +43,15 @@ public class Log {
 
     private static void internalLogPrint(Level messageLevel, String s) {
         synchronized (logBuffer) {
-            if (level == Level.CHATTY) {
+            if (level == Level.VERBOSE) {
                 // Incidental messages
                 System.out.print(s);
                 logBuffer.append(s);
-            } else if (level == Level.NORMAL && messageLevel != Level.CHATTY) {
+            } else if (level == Level.NORMAL && messageLevel != Level.VERBOSE) {
                 // Normal messages
                 System.out.print(s);
                 logBuffer.append(s);
-            } else if (messageLevel == SILENT) {
+            } else if (messageLevel == CRITICAL) {
                 // Critical errors which should always be displayed
                 System.out.print(s);
                 logBuffer.append(s);
@@ -120,8 +120,8 @@ public class Log {
     }
 
     public static enum Level {
-        CHATTY,
+        VERBOSE,
         NORMAL,
-        SILENT
+        CRITICAL
     }
 }

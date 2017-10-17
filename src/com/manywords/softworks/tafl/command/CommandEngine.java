@@ -537,7 +537,7 @@ public class CommandEngine {
             ReplayGameState result = mReplay.makeVariation(record);
             int moveResult = result.getLastMoveResult();
 
-            Log.println(Log.Level.CHATTY, "Variation result: " + moveResult);
+            Log.println(Log.Level.VERBOSE, "Variation result: " + moveResult);
             if(moveResult < GameState.LOWEST_NONERROR_RESULT) {
                 return new CommandResult(Command.Type.VARIATION, CommandResult.FAIL, GameState.getStringForMoveResult(moveResult), moveResult);
             }

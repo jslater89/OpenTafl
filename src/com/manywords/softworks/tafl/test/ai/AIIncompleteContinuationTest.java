@@ -16,7 +16,7 @@ public class AIIncompleteContinuationTest extends TaflTest {
 
     @Override
     public void statusText(String text) {
-        Log.println(Log.Level.CHATTY, text);
+        Log.println(Log.Level.VERBOSE, text);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AIIncompleteContinuationTest extends TaflTest {
 
         for(GameTreeNode child : root.getBranches()) {
             int pathSize = GameTreeState.getPathStartingWithNode(child).size();
-            Log.println(Log.Level.CHATTY, "Child " + child.getEnteringMove() + " (" + pathSize + "): " + child.getValue() + (child.valueFromTransposition() ? "T" : ""));
+            Log.println(Log.Level.VERBOSE, "Child " + child.getEnteringMove() + " (" + pathSize + "): " + child.getValue() + (child.valueFromTransposition() ? "T" : ""));
             assert child.getValue() != Evaluator.NO_VALUE;
             assert child.getValue() != Evaluator.INTENTIONALLY_UNVALUED;
             // TODO: figure out what this is supposed to be testing

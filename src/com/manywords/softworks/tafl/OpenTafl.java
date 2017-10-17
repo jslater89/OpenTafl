@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.manywords.softworks.tafl.Log.Level.SILENT;
+import static com.manywords.softworks.tafl.Log.Level.CRITICAL;
 
 public class OpenTafl {
     private static enum Mode {
@@ -60,7 +60,7 @@ public class OpenTafl {
             }
             else if (arg.contains("--test") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.TEST;
-                Log.level = SILENT;
+                Log.level = CRITICAL;
             }
             else if (arg.contains("--window") && runMode == Mode.GRAPHICAL_TERMINAL) {
                 runMode = Mode.WINDOW;
@@ -72,7 +72,7 @@ public class OpenTafl {
                 runMode = Mode.HEADLESS_AI;
             }
             else if(arg.contains("--benchmark") && runMode == Mode.GRAPHICAL_TERMINAL) {
-                Log.level = SILENT;
+                Log.level = CRITICAL;
                 runMode = Mode.BENCHMARK;
             }
             else if(arg.contains("--pto-json") && runMode == Mode.GRAPHICAL_TERMINAL) {
@@ -82,18 +82,18 @@ public class OpenTafl {
                 runMode = Mode.HELP;
             }
             else if(arg.contains("--dev") || arg.contains("--debug")) {
-                Log.level = Log.Level.CHATTY;
+                Log.level = Log.Level.VERBOSE;
                 //runMode = Mode.DEBUG;
                 devMode = true;
             }
             else if (arg.contains("--chatty")) {
-                Log.level = Log.Level.CHATTY;
+                Log.level = Log.Level.VERBOSE;
             }
             else if (arg.contains("--normal")) {
                 Log.level = Log.Level.NORMAL;
             }
             else if (arg.contains("--silent")) {
-                Log.level = SILENT;
+                Log.level = CRITICAL;
             }
         }
 
@@ -119,8 +119,8 @@ public class OpenTafl {
                     HeadlessAIClient client = HeadlessAIClient.startFromArgs(mapArgs);
                 }
                 catch(Exception e) {
-                    Log.println(SILENT, "Failed to start headless AI client with error: " + e);
-                    Log.stackTrace(SILENT, e);
+                    Log.println(CRITICAL, "Failed to start headless AI client with error: " + e);
+                    Log.stackTrace(CRITICAL, e);
                 }
                 break;
             case WINDOW:
@@ -164,7 +164,7 @@ public class OpenTafl {
                     t = factory.createTerminal();
                     th = new AdvancedTerminal<>(t);
                 } catch (IOException e) {
-                    Log.println(SILENT, "Failed to start text terminal.");
+                    Log.println(CRITICAL, "Failed to start text terminal.");
                 }
 
                 //RawTerminal display = new RawTerminal();
@@ -178,7 +178,7 @@ public class OpenTafl {
                 Game g = PlayTaflOnlineJsonTranslator.readJsonFile(new File(filename));
 
                 if(g == null) {
-                    Log.println(SILENT, "Failed to load json file.");
+                    Log.println(CRITICAL, "Failed to load json file.");
                     System.exit(1);
                 }
                 else {
@@ -256,10 +256,10 @@ public class OpenTafl {
 
     private static void setupLogging() {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-            Log.println(SILENT, "Uncaught exception! This OpenTafl is running as " + runMode);
-            Log.println(SILENT, "Exception in thread " + t.getName());
-            Log.println(SILENT, "Exception: " + e);
-            Log.stackTrace(SILENT, e);
+            Log.println(CRITICAL, "Uncaught exception! This OpenTafl is running as " + runMode);
+            Log.println(CRITICAL, "Exception in thread " + t.getName());
+            Log.println(CRITICAL, "Exception: " + e);
+            Log.stackTrace(CRITICAL, e);
             Log.flushLog();
 
             System.exit(1);

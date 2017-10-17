@@ -47,7 +47,7 @@ public class StatusWindow extends BasicWindow {
     }
 
     public void addStatus(String text) {
-        Log.println(Log.Level.CHATTY, "Got status line: " + text);
+        Log.println(Log.Level.VERBOSE, "Got status line: " + text);
         mTextDisplay.addLine(text);
     }
 

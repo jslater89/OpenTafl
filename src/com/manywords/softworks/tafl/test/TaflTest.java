@@ -12,7 +12,7 @@ public abstract class TaflTest extends AbstractUiCallback {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            Log.stackTrace(Log.Level.CHATTY, e);
+            Log.stackTrace(Log.Level.VERBOSE, e);
         }
     }
 

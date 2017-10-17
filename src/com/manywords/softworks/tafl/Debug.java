@@ -22,9 +22,9 @@ public class Debug {
         PieceSquareTable table = new PieceSquareTable(r, null);
 
         table.logTable(0);
-        Log.print(Log.Level.CHATTY, "\n");
+        Log.print(Log.Level.VERBOSE, "\n");
         table.logTable(1);
-        Log.print(Log.Level.CHATTY, "\n");
+        Log.print(Log.Level.VERBOSE, "\n");
         table.logTable(2);
 
         if(args.containsKey("--engine")) {

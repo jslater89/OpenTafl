@@ -39,8 +39,8 @@ public class ExternalEngineHost {
             mOutboundPipe = new BufferedOutputStream(new PipedOutputStream(connectToOutput));
         }
         catch(IOException e) {
-            Log.println(Log.Level.SILENT, "Could not connect input streams");
-            Log.stackTrace(Log.Level.SILENT, e);
+            Log.println(Log.Level.CRITICAL, "Could not connect input streams");
+            Log.stackTrace(Log.Level.CRITICAL, e);
             System.exit(-1);
         }
 
@@ -61,7 +61,7 @@ public class ExternalEngineHost {
         ProcessBuilder b = new ProcessBuilder();
         b.directory(absoluteDirectory);
         b.command(commandLine);
-        Log.println(Log.Level.CHATTY, b.command());
+        Log.println(Log.Level.VERBOSE, b.command());
 
         try {
             mExternalEngine = b.start();
@@ -350,7 +350,7 @@ public class ExternalEngineHost {
     private void handleDumpCommand(String command) {
         command = command.replaceFirst("dump", "");
         command = command.replaceAll("XXXXX", "\n");
-        Log.println(Log.Level.CHATTY, command);
+        Log.println(Log.Level.VERBOSE, command);
     }
 
     private class CommCallback implements CommunicationThread.CommunicationThreadCallback {
@@ -362,10 +362,10 @@ public class ExternalEngineHost {
 
             for(String cmd : commands) {
                 if(!cmd.startsWith("dump")) {
-                    Log.println(Log.Level.CHATTY, "Host received: " + cmd);
+                    Log.println(Log.Level.VERBOSE, "Host received: " + cmd);
                 }
                 else {
-                    Log.println(Log.Level.CHATTY, "Host received dump command");
+                    Log.println(Log.Level.VERBOSE, "Host received dump command");
                 }
 
                 if (cmd.startsWith("hello")) {

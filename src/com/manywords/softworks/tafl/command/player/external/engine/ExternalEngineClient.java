@@ -353,10 +353,10 @@ public class ExternalEngineClient implements UiCallback {
             String[] commands = strCommand.split("\n");
 
             for(String cmd : commands) {
-                Log.println(Log.Level.CHATTY, "Client received: " + cmd);
+                Log.println(Log.Level.VERBOSE, "Client received: " + cmd);
                 if (cmd.startsWith("rules")) {
                     handleRulesCommand(cmd);
-                    Log.println(Log.Level.CHATTY, "Client view of rules: " + mRules.getOTRString(false));
+                    Log.println(Log.Level.VERBOSE, "Client view of rules: " + mRules.getOTRString(false));
                 }
                 else if (cmd.startsWith("play")) {
                     handlePlayCommand(cmd);

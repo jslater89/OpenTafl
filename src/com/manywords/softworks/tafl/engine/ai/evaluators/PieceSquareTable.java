@@ -99,10 +99,10 @@ public class PieceSquareTable {
             }
         }
 
-//        OpenTafl.println(OpenTafl.Level.CHATTY, centerSpaces);
-//        OpenTafl.println(OpenTafl.Level.CHATTY, crucialSpaces);
-//        OpenTafl.println(OpenTafl.Level.CHATTY, gutterSpaces);
-//        OpenTafl.println(OpenTafl.Level.CHATTY, cornerSpaces);
+//        OpenTafl.println(OpenTafl.Level.VERBOSE, centerSpaces);
+//        OpenTafl.println(OpenTafl.Level.VERBOSE, crucialSpaces);
+//        OpenTafl.println(OpenTafl.Level.VERBOSE, gutterSpaces);
+//        OpenTafl.println(OpenTafl.Level.VERBOSE, cornerSpaces);
 
         setValues(dimension, hasCorners, gutterSize, crucialSize, centerSpaces, centerCutouts, crucialSpaces, gutterSpaces, cornerSpaces);
         mirrorValues(dimension);
@@ -239,9 +239,9 @@ public class PieceSquareTable {
     public void logTable(int type) {
         for(int y = 0; y < mRules.boardSize; y++) {
             for(int x = 0; x < mRules.boardSize; x++) {
-                Log.print(Log.Level.CHATTY, String.format("%+.2f ", mTable[type][y * mRules.boardSize + x]));
+                Log.print(Log.Level.VERBOSE, String.format("%+.2f ", mTable[type][y * mRules.boardSize + x]));
             }
-            Log.print(Log.Level.CHATTY, "\n");
+            Log.print(Log.Level.VERBOSE, "\n");
         }
     }
 

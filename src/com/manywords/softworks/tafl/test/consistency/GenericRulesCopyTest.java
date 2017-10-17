@@ -26,8 +26,8 @@ public class GenericRulesCopyTest extends TaflTest {
 
             overwrite = GenericRules.copyRules(magpie);
 
-            Log.println(Log.Level.CHATTY, "copied rules: " + RulesSerializer.getRulesRecord(overwrite, true));
-            Log.println(Log.Level.CHATTY, "orignl rules: " + RulesSerializer.getRulesRecord(magpie, true));
+            Log.println(Log.Level.VERBOSE, "copied rules: " + RulesSerializer.getRulesRecord(overwrite, true));
+            Log.println(Log.Level.VERBOSE, "orignl rules: " + RulesSerializer.getRulesRecord(magpie, true));
             assert RulesSerializer.rulesEqual(RulesSerializer.getRulesRecord(overwrite, true), RulesSerializer.getRulesRecord(magpie, true));
         }
         catch (NotationParseException e) {

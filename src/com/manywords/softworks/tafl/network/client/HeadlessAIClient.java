@@ -271,7 +271,7 @@ public class HeadlessAIClient {
             Log.println(Log.Level.NORMAL, "Received error: " + message);
 
             if(mJoinGame && mCommandEngine == null) {
-                Log.println(Log.Level.SILENT, "Error joining game: quitting");
+                Log.println(Log.Level.CRITICAL, "Error joining game: quitting");
             }
         }
 
@@ -280,14 +280,14 @@ public class HeadlessAIClient {
             if(mJoinGame && mCommandEngine == null) {
                 boolean foundOpponent = false;
                 for(GameInformation game : games) {
-                    Log.println(Log.Level.CHATTY, mOpponentUsername + "-" + game.attackerUsername);
+                    Log.println(Log.Level.VERBOSE, mOpponentUsername + "-" + game.attackerUsername);
                     if(mOpponentUsername.equals(game.attackerUsername) || mOpponentUsername.equals(game.defenderUsername)) {
                         foundOpponent = true;
                         mAttackingSide = game.freeSideAttackers();
                         mClockSetting = game.clockSetting;
 
                         if(mClockSetting == null) {
-                            Log.println(Log.Level.SILENT, "Headless client can only play timed games.");
+                            Log.println(Log.Level.CRITICAL, "Headless client can only play timed games.");
                             mConnection.disconnect();
                         }
 

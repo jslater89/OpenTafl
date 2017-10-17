@@ -92,19 +92,19 @@ public class Test {
 
         for (TaflTest test : tests) {
             try {
-                Log.println(Log.Level.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": STARTING");
+                Log.println(Log.Level.CRITICAL, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": STARTING");
                 test.run();
-                Log.println(Log.Level.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": PASSED");
+                Log.println(Log.Level.CRITICAL, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": PASSED");
 
             } catch (AssertionError e) {
-                Log.println(Log.Level.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": FAILED");
-                Log.println(Log.Level.SILENT, "Assertion: " + e);
-                Log.stackTrace(Log.Level.SILENT, e);
+                Log.println(Log.Level.CRITICAL, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": FAILED");
+                Log.println(Log.Level.CRITICAL, "Assertion: " + e);
+                Log.stackTrace(Log.Level.CRITICAL, e);
                 System.exit(1);
             } catch (Exception e) {
-                Log.println(Log.Level.SILENT, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": CRASHED");
-                Log.println(Log.Level.SILENT, "Exception: " + e);
-                Log.stackTrace(Log.Level.SILENT, e);
+                Log.println(Log.Level.CRITICAL, Ansi.UNDERLINE + test.getClass().getSimpleName() + Ansi.UNDERLINE_OFF + ": CRASHED");
+                Log.println(Log.Level.CRITICAL, "Exception: " + e);
+                Log.stackTrace(Log.Level.CRITICAL, e);
                 System.exit(1);
             }
 

@@ -77,7 +77,7 @@ public class RulesSerializerConsistencyTest extends TaflTest {
                 char taflman2 = s2.getPieceAt(space.x, space.y);
                 Coord space2 = Taflman.getCurrentSpace(s2, taflman2);
 
-                Log.println(Log.Level.CHATTY, "Considering taflmen at " + space + "/" + space2);
+                Log.println(Log.Level.VERBOSE, "Considering taflmen at " + space + "/" + space2);
 
                 assert taflman2 != Taflman.EMPTY;
 

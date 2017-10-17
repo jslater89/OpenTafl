@@ -752,7 +752,7 @@ public class FishyEvaluator implements Evaluator {
         debugString += "\n\nFinal evaluation " + value + "\n";
 
 
-        //OpenTafl.print(OpenTafl.Level.CHATTY, debugString);
+        //OpenTafl.print(OpenTafl.Level.VERBOSE, debugString);
 
         // The sequence justifying this logic:
         // 1. getCurrentSide().isAttackingSide() explores moves.
@@ -769,46 +769,46 @@ public class FishyEvaluator implements Evaluator {
     }
 
     public boolean test() {
-        Log.println(Log.Level.CHATTY, "Heavy taflmen counts, values, defender/attacker");
+        Log.println(Log.Level.VERBOSE, "Heavy taflmen counts, values, defender/attacker");
         Utilities.printArray(mHeavyTaflmanCount);
         Utilities.printArray(mHeavyTaflmanValue);
 
-        Log.println(Log.Level.CHATTY, "Standard taflmen counts, values, defender/attacker");
+        Log.println(Log.Level.VERBOSE, "Standard taflmen counts, values, defender/attacker");
         Utilities.printArray(mStandardTaflmanCount);
         Utilities.printArray(mStandardTaflmanValue);
 
-        Log.println(Log.Level.CHATTY, "Light taflmen counts, values, defender/attacker");
+        Log.println(Log.Level.VERBOSE, "Light taflmen counts, values, defender/attacker");
         Utilities.printArray(mLightTaflmanCount);
         Utilities.printArray(mLightTaflmanValue);
 
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
 
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(DEFENDER, KING_FREEDOM_INDEX, 1));
 
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
-        Log.println(Log.Level.CHATTY, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
+        Log.println(Log.Level.VERBOSE, "Defender, 1 taflman, KING_FREEDOM: " + changeEvaluation(ATTACKER, KING_FREEDOM_INDEX, 1));
 
 
         return true;

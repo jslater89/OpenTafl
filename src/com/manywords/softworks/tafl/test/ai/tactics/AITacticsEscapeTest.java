@@ -13,7 +13,7 @@ import com.manywords.softworks.tafl.test.TaflTest;
 
 import java.util.List;
 
-import static com.manywords.softworks.tafl.Log.Level.CHATTY;
+import static com.manywords.softworks.tafl.Log.Level.VERBOSE;
 
 /**
  * Created by jay on 8/18/16.
@@ -22,7 +22,7 @@ public class AITacticsEscapeTest extends TaflTest {
 
     @Override
     public void statusText(String text) {
-        Log.println(CHATTY, text);
+        Log.println(VERBOSE, text);
     }
 
     @Override

@@ -427,12 +427,12 @@ public class ServerGame {
 
         @Override
         public void statusText(String text) {
-            Log.println(Log.Level.CHATTY, "Command engine status: " + text);
+            Log.println(Log.Level.VERBOSE, "Command engine status: " + text);
         }
 
         @Override
         public void modalStatus(String title, String text) {
-            Log.println(Log.Level.CHATTY, "Command engine status: " + title + " - " + text);
+            Log.println(Log.Level.VERBOSE, "Command engine status: " + title + " - " + text);
         }
 
         @Override

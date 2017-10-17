@@ -31,7 +31,7 @@ public class DummyTestServer {
                 mReadThread.start();
             }
         } catch (IOException e) {
-            Log.println(Log.Level.CHATTY, e);
+            Log.println(Log.Level.VERBOSE, e);
         } finally {
             try {
                 mServerSocket.close();

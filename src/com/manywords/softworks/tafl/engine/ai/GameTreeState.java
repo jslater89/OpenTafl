@@ -421,13 +421,13 @@ public class GameTreeState extends GameState implements GameTreeNode {
         // This is useful for debugging continuation search troubles, so I'm leaving it in for now.
 //        for(GameTreeNode child : getBranches()) {
 //            if(child.getValue() == Evaluator.INTENTIONALLY_UNVALUED) {
-//                OpenTafl.println(OpenTafl.Level.CHATTY, "Siblings of mine: " + getEnteringMoveSequence());
+//                OpenTafl.println(OpenTafl.Level.VERBOSE, "Siblings of mine: " + getEnteringMoveSequence());
 //                for(GameTreeNode sibling : getBranches()) {
 //                    int pathSize = GameTreeState.getPathStartingWithNode(sibling).size();
-//                    OpenTafl.println(OpenTafl.Level.CHATTY, "Sibling " + sibling.getEnteringMove() + " (" + pathSize + "): " + sibling.getValue() + (sibling.valueFromTransposition() ? "T" : ""));
+//                    OpenTafl.println(OpenTafl.Level.VERBOSE, "Sibling " + sibling.getEnteringMove() + " (" + pathSize + "): " + sibling.getValue() + (sibling.valueFromTransposition() ? "T" : ""));
 //                }
-//                OpenTafl.println(OpenTafl.Level.CHATTY, "Time? " + workspace.mContinuationTime + " " + workspace.mHorizonTime + " " + workspace.mNoTime);
-//                OpenTafl.println(OpenTafl.Level.CHATTY, "Depths: " + mDepth + "/" + mCurrentMaxDepth + "/" + overallMaxDepth);
+//                OpenTafl.println(OpenTafl.Level.VERBOSE, "Time? " + workspace.mContinuationTime + " " + workspace.mHorizonTime + " " + workspace.mNoTime);
+//                OpenTafl.println(OpenTafl.Level.VERBOSE, "Depths: " + mDepth + "/" + mCurrentMaxDepth + "/" + overallMaxDepth);
 //                throw new IllegalStateException("Unvalued node snuck in!");
 //            }
 //        }

@@ -97,7 +97,7 @@ public class ClientServerConnection {
     }
 
     void chattyPrint(String message) {
-        Log.println(Log.Level.CHATTY, message);
+        Log.println(Log.Level.VERBOSE, message);
     }
 
     void standardPrint(String message) {
@@ -272,7 +272,7 @@ public class ClientServerConnection {
                     }
                     catch(Exception e) {
                         chattyPrint("Encountered exception reading from server: ");
-                        Log.stackTrace(Log.Level.CHATTY, e);
+                        Log.stackTrace(Log.Level.VERBOSE, e);
                     }
                 }
             }

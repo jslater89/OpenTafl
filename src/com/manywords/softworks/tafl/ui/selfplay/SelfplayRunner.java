@@ -182,14 +182,14 @@ public class SelfplayRunner {
 
         // This is a blocking call (sets this as the UI thread), so when it returns, the game
         // is over.
-        Log.println(Log.Level.CHATTY, "Running game 1");
+        Log.println(Log.Level.VERBOSE, "Running game 1");
         TerminalUtils.startGame(mHost.getTextGUI(), mHost.getTerminalCallback());
 
         while(mLastGame == null) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                Log.stackTrace(Log.Level.CHATTY, e);
+                Log.stackTrace(Log.Level.VERBOSE, e);
             }
         }
 
@@ -208,14 +208,14 @@ public class SelfplayRunner {
         TerminalSettings.defenderEngineSpec = mFirstEngineSpec;
 
         // Same blocking call.
-        Log.println(Log.Level.CHATTY, "Running game 2");
+        Log.println(Log.Level.VERBOSE, "Running game 2");
         TerminalUtils.startGame(mHost.getTextGUI(), mHost.getTerminalCallback());
 
         while(mLastGame == null) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                Log.stackTrace(Log.Level.CHATTY, e);
+                Log.stackTrace(Log.Level.VERBOSE, e);
             }
         }
 

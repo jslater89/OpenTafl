@@ -95,47 +95,47 @@ public class Utilities {
     }
 
     public static void printArray(short[] array) {
-        Log.print(Log.Level.CHATTY, "[");
+        Log.print(Log.Level.VERBOSE, "[");
 
         if(array.length > 0) {
-            Log.print(Log.Level.CHATTY, array[0]);
+            Log.print(Log.Level.VERBOSE, array[0]);
         }
 
         for(int i = 1; i < array.length; i++) {
-            Log.print(Log.Level.CHATTY, ",");
-            Log.print(Log.Level.CHATTY, array[i]);
+            Log.print(Log.Level.VERBOSE, ",");
+            Log.print(Log.Level.VERBOSE, array[i]);
         }
 
-        Log.println(Log.Level.CHATTY, "]");
+        Log.println(Log.Level.VERBOSE, "]");
     }
 
     public static void printArray(int[] array) {
-        Log.print(Log.Level.CHATTY, "[");
+        Log.print(Log.Level.VERBOSE, "[");
 
         if(array.length > 0) {
-            Log.print(Log.Level.CHATTY, array[0]);
+            Log.print(Log.Level.VERBOSE, array[0]);
         }
 
         for(int i = 1; i < array.length; i++) {
-            Log.print(Log.Level.CHATTY, ",");
-            Log.print(Log.Level.CHATTY, array[i]);
+            Log.print(Log.Level.VERBOSE, ",");
+            Log.print(Log.Level.VERBOSE, array[i]);
         }
 
-        Log.println(Log.Level.CHATTY, "]");
+        Log.println(Log.Level.VERBOSE, "]");
     }
 
     public static void printArray(Object[] array) {
-        Log.print(Log.Level.CHATTY, "[");
+        Log.print(Log.Level.VERBOSE, "[");
 
         if(array.length > 0) {
-            Log.print(Log.Level.CHATTY, array[0]);
+            Log.print(Log.Level.VERBOSE, array[0]);
         }
 
         for(int i = 1; i < array.length; i++) {
-            Log.print(Log.Level.CHATTY, ",");
-            Log.print(Log.Level.CHATTY, array[i]);
+            Log.print(Log.Level.VERBOSE, ",");
+            Log.print(Log.Level.VERBOSE, array[i]);
         }
 
-        Log.println(Log.Level.CHATTY, "]");
+        Log.println(Log.Level.VERBOSE, "]");
     }
 }

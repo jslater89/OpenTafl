@@ -42,7 +42,7 @@ public class AICertainKingCaptureTest extends TaflTest implements UiCallback {
 
     @Override
     public void statusText(String text) {
-        Log.println(Log.Level.CHATTY, text);
+        Log.println(Log.Level.VERBOSE, text);
     }
 
     @Override
