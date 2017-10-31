@@ -497,6 +497,10 @@ public class HumanReadableRulesPrinter {
                     if(isAttacking && r.getAttackers().hasKnights()) rules += "Attacking knights move up to " + speedLimitString;
                     else if(!isAttacking && r.getDefenders().hasKnights()) rules += "Defending knights move up to " + speedLimitString;
                 }
+                else if(taflmanType == Taflman.TYPE_MERCENARY) {
+                    if(isAttacking && r.getAttackers().hasMercenaries()) rules += "Attacking mercenaries move up to " + speedLimitString;
+                    else if(!isAttacking && r.getDefenders().hasMercenaries()) rules += "Defending mercenaries move up to " + speedLimitString;
+                }
                 else {
                     side = Character.toUpperCase(side.charAt(0)) + side.substring(1);
                     rules += side + " taflmen move " + speedLimitString;
@@ -597,6 +601,11 @@ public class HumanReadableRulesPrinter {
                     "the defenders win.\n\n";
         }
 
+        if(r.allowLinnaeanCaptures()) {
+            rules += ruleNumber++ + ". Linnaean captures are enabled. If the king is on the throne, and surrounded on three sides by attackers, " +
+                    "the attackers may capture a defender on the king's fourth side against the throne.\n\n";
+        }
+
         if(r.getBerserkMode() != Rules.BERSERK_NONE) {
             rules += ruleNumber++ + ". The berserk rule is in effect. ";
             if(r.getBerserkMode() == Rules.BERSERK_ANY_MOVE) {
@@ -634,6 +643,16 @@ public class HumanReadableRulesPrinter {
                     "Two commanders or knights may not capture the king while the king " +
                     "is on the throne, nor may one commander or knight capture the king against the throne while the king " +
                     "is adjacent to the throne.\n\n";
+        }
+
+        if(r.getAttackers().hasMercenaries() || r.getDefenders().hasMercenaries()) {
+            rules += ruleNumber++ + ". Mercenaries are a special piece, marked by the 'm' symbol. When captured, a mercenary is not removed from the game. " +
+                    "Instead, the piece changes sides. A captured attacking mercenary becomes a defender; a captured defending mercenary becomes an attacker. ";
+            if(r.getMercenaryJumpMode() != Taflman.JUMP_NONE) {
+                rules += getJumpModeString("mercenary", r.getMercenaryJumpMode());
+            }
+
+            rules += "\n\n";
         }
 
         if(r.getKingJumpMode() != Taflman.JUMP_NONE) {
@@ -755,6 +774,14 @@ public class HumanReadableRulesPrinter {
         if(!r.getDefenders().hasCommanders()) {
             spec = spec.replaceAll("C", "");
         }
+
+        if(!r.getAttackers().hasMercenaries()) {
+            spec = spec.replaceAll("m", "");
+        }
+        if(!r.getDefenders().hasMercenaries()) {
+            spec = spec.replaceAll("M", "");
+        }
+
         spec = spec.replaceAll("k", "");
 
         if(spec.equals("")) {
@@ -786,6 +813,10 @@ public class HumanReadableRulesPrinter {
                 case 'N':
                 case 'n':
                     taflmenString += "knights";
+                    break;
+                case 'M':
+                case 'm':
+                    taflmenString += "mercenaries";
                     break;
                 case 'K':
                 case 'k':
