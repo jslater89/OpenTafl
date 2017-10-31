@@ -17,10 +17,15 @@ public class TaflmanCoordMap {
     private final byte mAttackers;
     private final byte mDefenders;
 
-    public TaflmanCoordMap(int dimension, byte attackers, byte defenders) {
-        this.mSize = (byte)(attackers + defenders);
-        this.mAttackers = attackers;
-        this.mDefenders = defenders;
+    public TaflmanCoordMap(int dimension, int attackers, int defenders) {
+        this.mSize = (short)(attackers + defenders);
+
+        if(mSize > 254) {
+            throw new IllegalStateException("Too many taflmen");
+        }
+        
+        this.mAttackers = (byte) attackers;
+        this.mDefenders = (byte) defenders;
         this.mDimension = dimension;
         mTaflmen = new char[mSize];
         mCoords = new char[mSize];
@@ -54,7 +59,9 @@ public class TaflmanCoordMap {
         if(taflman == Taflman.EMPTY) return null;
 
         char taflmanSide = Taflman.getPackedSide(taflman);
-        byte taflmanId = Taflman.getPackedId(taflman);
+        byte originalId = Taflman.getPackedId(taflman);
+        short taflmanId = originalId;
+        if(taflmanId < 0) taflmanId += 256;
 
         char entry = mTaflmen[taflmanId];
         char coord = mCoords[taflmanId];
@@ -62,7 +69,7 @@ public class TaflmanCoordMap {
         char entrySide = Taflman.getPackedSide(entry);
         byte entryId = Taflman.getPackedId(entry);
 
-        if(coord != (char) -1 && taflmanSide == entrySide && taflmanId == entryId) {
+        if(coord != (char) -1 && taflmanSide == entrySide && originalId == entryId) {
             return Coord.getCoordForIndex(mDimension, coord);
         }
         else {
@@ -75,13 +82,16 @@ public class TaflmanCoordMap {
     }
 
     public char getTaflman(int c) {
-        byte index = mTaflmanIndexByCoord[c];
-        if(index != -1) return mTaflmen[index];
+        short index = mTaflmanIndexByCoord[c];
+        if(index < -1) index += 256;
+
+        if(index > -1) return mTaflmen[index];
         else return Taflman.EMPTY;
     }
 
     public void remove(char taflman) {
-        byte taflmanId = Taflman.getPackedId(taflman);
+        short taflmanId = Taflman.getPackedId(taflman);
+        if(taflmanId < 0) taflmanId += 256;
 
         char coord = mCoords[taflmanId];
 
@@ -91,14 +101,15 @@ public class TaflmanCoordMap {
     }
 
     public void put(char taflman, Coord space) {
-        char taflmanSide = Taflman.getPackedSide(taflman);
-        byte taflmanId = Taflman.getPackedId(taflman);
+        byte originalId = Taflman.getPackedId(taflman);
+        short index = originalId;
+        if(index < 0) index += 256;
 
         char coord = (char) Coord.getIndex(mDimension, space);
-        char oldCoord = mCoords[taflmanId];
-        mCoords[taflmanId] = coord;
-        mTaflmen[taflmanId] = taflman;
-        mTaflmanIndexByCoord[coord] = (byte) taflmanId;
+        char oldCoord = mCoords[index];
+        mCoords[index] = coord;
+        mTaflmen[index] = taflman;
+        mTaflmanIndexByCoord[coord] = originalId;
 
         if(oldCoord != (char) -1) {
             mTaflmanIndexByCoord[oldCoord] = (byte) -1;

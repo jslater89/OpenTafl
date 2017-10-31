@@ -167,6 +167,13 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
 
 
     private void cycleTaflmanType(Coord location, char taflman) {
+        if(mAttackers.getStartingTaflmen().size() + mDefenders.getStartingTaflmen().size() + (taflman == Taflman.EMPTY ? 1 : 0) > 254) {
+            cycleFocus(FOCUS_BACKWARD);
+            MessageDialog.showMessageDialog(mGui, "Too many taflmen", "OpenTafl supports at most 254 taflmen per game.");
+            cycleFocus(FOCUS_FORWARD);
+            return;
+        }
+
         char newTaflman = Taflman.EMPTY;
         char packedSide = Taflman.getPackedSide(taflman);
         if(taflman == Taflman.EMPTY) {
@@ -324,7 +331,6 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
             currentId += 1;
         }
 
-        currentId = 0;
         for(Side.TaflmanHolder t : mAttackers.getStartingTaflmen()) {
             char packed = Taflman.EMPTY;
             packed |= Taflman.getPackedSide(t.packed);
@@ -361,7 +367,6 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
                     case 'p':
                         char taflman = mStartingBoard.getOccupier(location);
                         cycleTaflmanType(location, taflman);
-
                         break;
                     case 't':
                         cycleSpaceType(location);
@@ -451,6 +456,10 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
             mRulesWindow.updateRules(mRules);
 
             // TODO: check rules for consistency
+            if(mRules.howManyAttackers() + mRules.howManyDefenders() > 255) {
+                MessageDialog.showMessageDialog(mGui, "Invalid rules", "OpenTafl does not support rules with more than 255 taflmen total.");
+                return;
+            }
 
             File f = TerminalUtils.showFileChooserDialog(mGui, "Save rule set", "Save", new File("user-rules"));
 

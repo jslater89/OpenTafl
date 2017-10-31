@@ -58,6 +58,7 @@ public class TaflmanCoordListMap {
 
     public List<Coord> get(char taflman) {
         int index = Taflman.getPackedId(taflman);
+        if(index < 0) index += 256;
         if(mDirty[index]) return null;
 
         char[] coords = mEntries[index].coords;
@@ -79,6 +80,8 @@ public class TaflmanCoordListMap {
 
     public void remove(char taflman) {
         int index = Taflman.getPackedId(taflman);
+        if(index < 0) index += 256;
+
         mEntries[index].coords = new char[0];
         mTaflmen[index] = Taflman.EMPTY;
         mDirty[index] = false;
@@ -86,6 +89,8 @@ public class TaflmanCoordListMap {
 
     public void put(char taflman, List<Coord> spaces) {
         int index = Taflman.getPackedId(taflman);
+        if(index < 0) index += 256;
+
         char[] coords = new char[spaces.size()];
 
         int i = 0;

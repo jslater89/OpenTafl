@@ -228,6 +228,10 @@ public class Coord {
     }
 
     public static Coord getCoordForIndex(int dimension, int i) {
+        if(i % dimension == 3449 || i / dimension == 3449) {
+            System.out.println(i);
+            System.out.println(dimension);
+        }
         return Coord.get(i % dimension, i / dimension);
     }
 

@@ -456,7 +456,7 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
     }
 
     @Override
-    public Interactable.Result handleKeyStroke(KeyStroke s) {
+    public synchronized Interactable.Result handleKeyStroke(KeyStroke s) {
         Interactable.Result r = Interactable.Result.UNHANDLED;
         if(s.getKeyType() == KeyType.ArrowDown || (s.getKeyType() == KeyType.Character && s.getCharacter() == 's')) {
             mFocusPosition = mFocusPosition.offset(boardDimension, 0, -1);

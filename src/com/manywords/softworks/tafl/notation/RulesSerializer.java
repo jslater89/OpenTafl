@@ -285,6 +285,10 @@ public class RulesSerializer {
             throw new NotationParseException(-1, "", "No start or starti records");
         }
 
+        if(startingTaflmen.get(0).size() + startingTaflmen.get(1).size() > 254) {
+            throw new NotationParseException(-1, "", "OpenTafl does not support rules with more than 254 taflmen.");
+        }
+
         Board board = new GenericBoard(boardDimension);
         Side attackers = new GenericSide(board, true, startingTaflmen.get(0));
         //System.out.println(attackers.getStartingTaflmen());

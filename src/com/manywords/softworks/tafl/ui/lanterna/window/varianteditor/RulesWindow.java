@@ -26,6 +26,7 @@ public class RulesWindow extends FocusableBasicWindow {
     private CheckBox mSurroundingCheckBox;
     private CheckBox mAttackersFirstCheckBox;
     private CheckBox mEdgeFortEscapeCheckBox;
+    private CheckBox mLinnaeanCaptureCheckBox;
 
     private RadioBoxList<String> mThreefoldResultRadio;
     private String[] mThreefoldResultModes = {"Draw", "Win", "Loss", "None"};
@@ -88,6 +89,9 @@ public class RulesWindow extends FocusableBasicWindow {
 
         mEdgeFortEscapeCheckBox = new CheckBox("Edge fort escape?");
         secondRow.addComponent(mEdgeFortEscapeCheckBox);
+
+        mLinnaeanCaptureCheckBox = new CheckBox("Linnaean capture?");
+        secondRow.addComponent(mLinnaeanCaptureCheckBox);
 
         p.addComponent(secondRow);
         p.addComponent(TerminalUtils.newSpacer());
@@ -227,6 +231,7 @@ public class RulesWindow extends FocusableBasicWindow {
         rules.setAttackersFirst(mAttackersFirstCheckBox.isChecked());
         rules.setEdgeFortEscape(mEdgeFortEscapeCheckBox.isChecked());
         rules.setShieldwallFlankingRequired(mShieldwallFlankingCheckBox.isChecked());
+        rules.setLinnaeanCapture(mLinnaeanCaptureCheckBox.isChecked());
 
         // Radios
         rules.setEscapeType(escapeStringToType(mEscapeRadio.getCheckedItem()));
@@ -286,6 +291,7 @@ public class RulesWindow extends FocusableBasicWindow {
         mAttackersFirstCheckBox.setChecked(rules.getStartingSide().isAttackingSide());
         mEdgeFortEscapeCheckBox.setChecked(rules.allowEdgeFortEscapes());
         mShieldwallFlankingCheckBox.setChecked(rules.allowFlankingShieldwallCapturesOnly());
+        mLinnaeanCaptureCheckBox.setChecked(rules.allowLinnaeanCaptures());
 
         // Radios
         mEscapeRadio.setCheckedItemIndex(escapeTypeToIndex(rules.getEscapeType()));

@@ -104,7 +104,7 @@ public class OptionsWindow extends FocusableBasicWindow {
                         Log.stackTrace(Log.Level.NORMAL, e);
                     }
                     catch (NotationParseException e) {
-                        MessageDialog.showMessageDialog(getTextGUI(), "Error", "Failed to parse file");
+                        MessageDialog.showMessageDialog(getTextGUI(), "Error", "Failed to parse file: " + e.getMessage());
                         Log.stackTrace(Log.Level.NORMAL, e);
                     }
                 }

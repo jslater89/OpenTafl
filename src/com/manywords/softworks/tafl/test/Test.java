@@ -19,6 +19,7 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
+        tests.add(new TaflmanCoordMapTest());
 
         // Mechanics tests
         tests.add(new RepetitionHashTableTest());
