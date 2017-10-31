@@ -24,19 +24,19 @@ public class SimpleVictoryTestDefenders extends SeaBattle9Defenders {
     public List<TaflmanHolder> generateTaflmen() {
         ArrayList<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(9);
 
-        taflmen.add(new King((byte) 0, Coord.get(4, 4), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new King((byte) 4, Coord.get(4, 4), this, getBoard(), getBoard().getRules()));
 
         int x = 4;
         int y = 4;
 
         //taflmen.add(new TaflmanImpl((byte) 0, Taflman.TYPE_TAFLMAN, Coord.get(x, y+1), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 1, Taflman.TYPE_TAFLMAN, Coord.get(x + 1, y + 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 5, Taflman.TYPE_TAFLMAN, Coord.get(x + 1, y + 1), this, getBoard(), getBoard().getRules()));
         //taflmen.add(new TaflmanImpl((byte) 0, Taflman.TYPE_TAFLMAN, Coord.get(x, y-1), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 2, Taflman.TYPE_TAFLMAN, Coord.get(x - 1, y - 1), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 3, Taflman.TYPE_TAFLMAN, Coord.get(x + 1, y - 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 6, Taflman.TYPE_TAFLMAN, Coord.get(x - 1, y - 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 7, Taflman.TYPE_TAFLMAN, Coord.get(x + 1, y - 1), this, getBoard(), getBoard().getRules()));
         //taflmen.add(new TaflmanImpl((byte) 0, Taflman.TYPE_TAFLMAN, Coord.get(x+1, y), this, getBoard(), getBoard().getRules()));
         //taflmen.add(new TaflmanImpl((byte) 0, Taflman.TYPE_TAFLMAN, Coord.get(x-1, y), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 4, Taflman.TYPE_TAFLMAN, Coord.get(x - 1, y + 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 8, Taflman.TYPE_TAFLMAN, Coord.get(x - 1, y + 1), this, getBoard(), getBoard().getRules()));
 
         return createHolderListFromTaflmanList(taflmen);
     }

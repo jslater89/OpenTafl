@@ -24,7 +24,7 @@ public class EncirclementTestDefenders extends SeaBattle9Defenders {
     public List<TaflmanHolder> generateTaflmen() {
         ArrayList<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(9);
 
-        taflmen.add(new King((byte) 0, Coord.get(4, 6), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new King((byte) 9, Coord.get(4, 6), this, getBoard(), getBoard().getRules()));
 
         int x = 4;
         int y = 4;
@@ -36,7 +36,7 @@ public class EncirclementTestDefenders extends SeaBattle9Defenders {
         //taflmen.add(new TaflmanImpl((byte) 0, Taflman.TYPE_TAFLMAN, Coord.get(x+1, y-1), this, getBoard(), getBoard().getRules()));
         //taflmen.add(new TaflmanImpl((byte) 0, Taflman.TYPE_TAFLMAN, Coord.get(x+1, y), this, getBoard(), getBoard().getRules()));
         //taflmen.add(new TaflmanImpl((byte) 0, Taflman.TYPE_TAFLMAN, Coord.get(x-1, y), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 1, Taflman.TYPE_TAFLMAN, Coord.get(3, 6), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 10, Taflman.TYPE_TAFLMAN, Coord.get(3, 6), this, getBoard(), getBoard().getRules()));
 
         return createHolderListFromTaflmanList(taflmen);
     }

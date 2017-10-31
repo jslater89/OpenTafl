@@ -39,6 +39,7 @@ public class RulesWindow extends FocusableBasicWindow {
     private RadioBoxList<String> mKingJumpRadio;
     private RadioBoxList<String> mKnightJumpRadio;
     private RadioBoxList<String> mCommanderJumpRadio;
+    private RadioBoxList<String> mMercenaryJumpRadio;
 
     private RadioBoxList<String> mShieldwallModeRadio;
     private String[] mShieldwallModes = {"None", "Weak", "Strong"};
@@ -150,6 +151,15 @@ public class RulesWindow extends FocusableBasicWindow {
         p.addComponent(fifthRow);
         p.addComponent(TerminalUtils.newSpacer());
 
+        Panel fifthAndAHalfRow = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        fifthAndAHalfRow.addComponent(new Label("Mercenary Jumps?"));
+        mMercenaryJumpRadio = new RadioBoxList<>();
+        addItems(mMercenaryJumpRadio, mJumpModes);
+        fifthAndAHalfRow.addComponent(mMercenaryJumpRadio);
+
+        p.addComponent(fifthAndAHalfRow);
+        p.addComponent(TerminalUtils.newSpacer());
+
         Panel sixthRow = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
         mSpeedLimitsButton = new Button("Speed limits", () -> {
@@ -227,6 +237,7 @@ public class RulesWindow extends FocusableBasicWindow {
         rules.setKingJumpMode(jumpStringToType(mKingJumpRadio.getCheckedItem()));
         rules.setKnightJumpMode(jumpStringToType(mKnightJumpRadio.getCheckedItem()));
         rules.setCommanderJumpMode(jumpStringToType(mCommanderJumpRadio.getCheckedItem()));
+        rules.setMercenaryJumpMode(jumpStringToType(mMercenaryJumpRadio.getCheckedItem()));
 
         rules.setShieldwallMode(shieldwallStringToType(mShieldwallModeRadio.getCheckedItem()));
         rules.setBerserkMode(berserkStringToType(mBerserkRadio.getCheckedItem()));
@@ -285,6 +296,7 @@ public class RulesWindow extends FocusableBasicWindow {
         mKingJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getKingJumpMode()));
         mKnightJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getKnightJumpMode()));
         mCommanderJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getCommanderJumpMode()));
+        mMercenaryJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getMercenaryJumpMode()));
 
         mShieldwallModeRadio.setCheckedItemIndex(shieldwallTypeToIndex(rules.allowShieldWallCaptures()));
         mBerserkRadio.setCheckedItemIndex(berserkTypeToindex(rules.getBerserkMode()));

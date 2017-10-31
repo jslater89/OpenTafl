@@ -57,11 +57,7 @@ public class TaflmanCoordListMap {
     public short size() { return mSize; }
 
     public List<Coord> get(char taflman) {
-        char taflmanSide = Taflman.getPackedSide(taflman);
-        byte taflmanId = Taflman.getPackedId(taflman);
-
-        // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
-        int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
+        int index = Taflman.getPackedId(taflman);
         if(mDirty[index]) return null;
 
         char[] coords = mEntries[index].coords;
@@ -82,22 +78,14 @@ public class TaflmanCoordListMap {
     }
 
     public void remove(char taflman) {
-        char taflmanSide = Taflman.getPackedSide(taflman);
-        byte taflmanId = Taflman.getPackedId(taflman);
-
-        // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
-        int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
+        int index = Taflman.getPackedId(taflman);
         mEntries[index].coords = new char[0];
         mTaflmen[index] = Taflman.EMPTY;
         mDirty[index] = false;
     }
 
     public void put(char taflman, List<Coord> spaces) {
-        char taflmanSide = Taflman.getPackedSide(taflman);
-        byte taflmanId = Taflman.getPackedId(taflman);
-
-        // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
-        int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
+        int index = Taflman.getPackedId(taflman);
         char[] coords = new char[spaces.size()];
 
         int i = 0;

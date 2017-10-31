@@ -42,12 +42,12 @@ public class Brandub7Defenders extends Side {
         int x = 3;
         int y = 3;
 
-        taflmen.add(new King((byte) 0, Coord.get(x, y), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new King((byte) 8, Coord.get(x, y), this, getBoard(), getBoard().getRules()));
 
-        taflmen.add(new TaflmanImpl((byte) 1, Taflman.TYPE_TAFLMAN, Coord.get(x, y + 1), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 2, Taflman.TYPE_TAFLMAN, Coord.get(x, y - 1), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 3, Taflman.TYPE_TAFLMAN, Coord.get(x + 1, y), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 4, Taflman.TYPE_TAFLMAN, Coord.get(x - 1, y), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 9, Taflman.TYPE_TAFLMAN, Coord.get(x, y + 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 10, Taflman.TYPE_TAFLMAN, Coord.get(x, y - 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 11, Taflman.TYPE_TAFLMAN, Coord.get(x + 1, y), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 12, Taflman.TYPE_TAFLMAN, Coord.get(x - 1, y), this, getBoard(), getBoard().getRules()));
 
         return createHolderListFromTaflmanList(taflmen);
     }

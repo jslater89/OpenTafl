@@ -48,10 +48,10 @@ public class CommanderCaptureKingTestDefenders extends Side {
         List<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(13);
 
         // 5,5 is center
-        taflmen.add(new King((byte) 0, Coord.get(5, 5), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new King((byte) 4, Coord.get(5, 5), this, getBoard(), getBoard().getRules()));
 
         // Adjacent spaces to 5,5
-        taflmen.add(new Knight((byte) 1, Coord.get(4, 4), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new Knight((byte) 5, Coord.get(4, 4), this, getBoard(), getBoard().getRules()));
 
         // The 'point spaces'
 

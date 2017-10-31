@@ -70,7 +70,7 @@ public abstract class Side {
     public final List<TaflmanHolder> createHolderListFromTaflmanList(List<TaflmanImpl> taflmen) {
         List<TaflmanHolder> map = new ArrayList<TaflmanHolder>(taflmen.size());
         for (TaflmanImpl t : taflmen) {
-            map.add(t.getImplId(), new TaflmanHolder(Taflman.encode(t), t.getStartingSpace()));
+            map.add(new TaflmanHolder(Taflman.encode(t), t.getStartingSpace()));
         }
 
         if (taflmen.size() != map.size()) {

@@ -4,8 +4,6 @@ import com.manywords.softworks.tafl.engine.Utilities;
 import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Taflman;
 
-import java.util.List;
-
 /**
  * Created by jay on 1/7/16.
  */
@@ -58,10 +56,8 @@ public class TaflmanCoordMap {
         char taflmanSide = Taflman.getPackedSide(taflman);
         byte taflmanId = Taflman.getPackedId(taflman);
 
-        // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
-        int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
-        char entry = mTaflmen[index];
-        char coord = mCoords[index];
+        char entry = mTaflmen[taflmanId];
+        char coord = mCoords[taflmanId];
 
         char entrySide = Taflman.getPackedSide(entry);
         byte entryId = Taflman.getPackedId(entry);
@@ -85,15 +81,12 @@ public class TaflmanCoordMap {
     }
 
     public void remove(char taflman) {
-        char taflmanSide = Taflman.getPackedSide(taflman);
         byte taflmanId = Taflman.getPackedId(taflman);
 
-        // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
-        int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
-        char coord = mCoords[index];
+        char coord = mCoords[taflmanId];
 
-        mCoords[index] = (char) -1;
-        mTaflmen[index] = Taflman.EMPTY;
+        mCoords[taflmanId] = (char) -1;
+        mTaflmen[taflmanId] = Taflman.EMPTY;
         mTaflmanIndexByCoord[coord] = (byte) -1;
     }
 
@@ -101,13 +94,11 @@ public class TaflmanCoordMap {
         char taflmanSide = Taflman.getPackedSide(taflman);
         byte taflmanId = Taflman.getPackedId(taflman);
 
-        // Index: 0 to mDefenders - 1 for defenders, mDefenders - size for attackers;
-        int index = taflmanId + (taflmanSide > 0 ? mDefenders : 0);
         char coord = (char) Coord.getIndex(mDimension, space);
-        char oldCoord = mCoords[index];
-        mCoords[index] = coord;
-        mTaflmen[index] = taflman;
-        mTaflmanIndexByCoord[coord] = (byte) index;
+        char oldCoord = mCoords[taflmanId];
+        mCoords[taflmanId] = coord;
+        mTaflmen[taflmanId] = taflman;
+        mTaflmanIndexByCoord[coord] = (byte) taflmanId;
 
         if(oldCoord != (char) -1) {
             mTaflmanIndexByCoord[oldCoord] = (byte) -1;
