@@ -30,6 +30,11 @@ public class CenterKingCaptureDefenders extends Tablut9Defenders {
     }
 
     @Override
+    public boolean hasMercenaries() {
+        return false;
+    }
+
+    @Override
     public boolean hasCommanders() {
         return false;
     }

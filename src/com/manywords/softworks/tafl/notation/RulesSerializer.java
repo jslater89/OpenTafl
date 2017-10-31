@@ -73,6 +73,7 @@ public class RulesSerializer {
         map.put("sw", "n");
         map.put("swf", "y");
         map.put("efe", "n");
+        map.put("linc", "n");
         map.put("ber", "n");
 
         defaults = map;
@@ -238,6 +239,10 @@ public class RulesSerializer {
             otnrString += "efe:y ";
         }
 
+        if(rules.allowLinnaeanCaptures()) {
+            otnrString += "linc:y ";
+        }
+
         if(rules.getBerserkMode() != Rules.BERSERK_NONE) {
             otnrString += "ber:" + getStringForBerserkMode(rules.getBerserkMode()) + " ";
         }
@@ -301,6 +306,7 @@ public class RulesSerializer {
         if(config.containsKey("sw")) rules.setShieldwallMode(getShieldwallModeForString(config.get("sw")));
         if(config.containsKey("swf")) rules.setShieldwallFlankingRequired(getBooleanForString(config.get("swf")));
         if(config.containsKey("efe")) rules.setEdgeFortEscape(getBooleanForString(config.get("efe")));
+        if(config.containsKey("linc")) rules.setLinnaeanCapture(getBooleanForString(config.get("linc")));
         if(config.containsKey("ber")) rules.setBerserkMode(getBerserkModeForString(config.get("ber")));
 
         if(config.containsKey("spd")) {

@@ -181,6 +181,11 @@ public class Brandub extends Rules {
     }
 
     @Override
+    public boolean allowLinnaeanCaptures() {
+        return false;
+    }
+
+    @Override
     public int getEscapeType() {
         // Corner escapes only.
         return Rules.CORNERS;

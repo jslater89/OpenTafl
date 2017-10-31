@@ -173,6 +173,11 @@ public class Tablut extends Rules {
     }
 
     @Override
+    public boolean allowLinnaeanCaptures() {
+        return true;
+    }
+
+    @Override
     public int getEscapeType() {
         return Rules.EDGES;
     }

@@ -69,6 +69,7 @@ public class GenericRules extends Rules {
     private int mShieldwallMode = NO_SHIELDWALL;
     private boolean mShieldwallFlankingRequired = true;
     private boolean mEdgeFortEscape = false;
+    private boolean mLinnaeanCapture = false;
     private int mBerserkMode = BERSERK_NONE;
     private int mSpeedLimitMode = SPEED_LIMITS_NONE;
     private int[] mSpeedLimits = new int[TAFLMAN_TYPE_COUNT];
@@ -154,6 +155,8 @@ public class GenericRules extends Rules {
     public void setEdgeFortEscape(boolean edgeFortEscape) {
         mEdgeFortEscape = edgeFortEscape;
     }
+    
+    public void setLinnaeanCapture(boolean linnaeanCapture) { mLinnaeanCapture = linnaeanCapture; }
 
     public void setBerserkMode(int berserkMode) {
         mBerserkMode = berserkMode;
@@ -486,6 +489,11 @@ public class GenericRules extends Rules {
     }
 
     @Override
+    public boolean allowLinnaeanCaptures() {
+        return mLinnaeanCapture;
+    }
+
+    @Override
     public int getEscapeType() {
         return mEscapeType;
     }
@@ -540,6 +548,7 @@ public class GenericRules extends Rules {
         mShieldwallMode = from.allowShieldWallCaptures();
         mShieldwallFlankingRequired = from.allowFlankingShieldwallCapturesOnly();
         mEdgeFortEscape = from.allowEdgeFortEscapes();
+        mLinnaeanCapture = from.allowLinnaeanCaptures();
         mBerserkMode = from.getBerserkMode();
         mSpeedLimitMode = from.getSpeedLimitMode();
         mSpeedLimits = new int[TAFLMAN_TYPE_COUNT];

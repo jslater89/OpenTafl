@@ -130,6 +130,11 @@ public class Tawlbwrdd extends Rules {
     }
 
     @Override
+    public boolean allowLinnaeanCaptures() {
+        return false;
+    }
+
+    @Override
     public int getEscapeType() {
         // Escape only at the corners.
         return Rules.EDGES;

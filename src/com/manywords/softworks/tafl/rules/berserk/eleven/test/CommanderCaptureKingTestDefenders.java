@@ -30,6 +30,11 @@ public class CommanderCaptureKingTestDefenders extends Side {
     }
 
     @Override
+    public boolean hasMercenaries() {
+        return false;
+    }
+
+    @Override
     public boolean hasCommanders() {
         return false;
     }

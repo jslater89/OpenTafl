@@ -16,6 +16,11 @@ public class ShieldwallTestDefenders extends SeaBattle9Defenders {
         super(board, taflmen);
     }
 
+    @Override
+    public boolean hasMercenaries() {
+        return false;
+    }
+
     public List<TaflmanHolder> generateTaflmen() {
         ArrayList<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(9);
 

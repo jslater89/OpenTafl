@@ -87,9 +87,12 @@ public class RulesSerializerConsistencyTest extends TaflTest {
                 assert Taflman.getAllowableDestinations(s, taflman).equals(Taflman.getAllowableDestinations(s2, taflman2));
             }
 
-            String mercenaryRulesRecord = "dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n mj:r cenh: cenhe: start:/3t3/3m3/3T3/ttTKTtt/3T3/2Tm3/3t3/";
+            String mercenaryRulesRecord = "dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n mj:r cenh: cenhe: linc:y start:/3t3/3m3/3T3/ttTKTtt/3T3/2Tm3/3t3/";
             rules = RulesSerializer.loadRulesRecord(mercenaryRulesRecord);
             rules2 = rules.getOTRString(false);
+
+            assert rules.getMercenaryJumpMode() == Taflman.JUMP_RESTRICTED;
+            assert rules.allowLinnaeanCaptures();
 
             assert rules2.equals(mercenaryRulesRecord);
         }

@@ -392,6 +392,14 @@ public abstract class Rules {
     public static final int EDGES = 0;
 
     /**
+     * Whether to allow Linnaean captures. If the attackers surround
+     * the king on the throne on three sides and a defender occupies the fourth
+     * side, the attackers may capture the defender against the throne.
+     * @return
+     */
+    public abstract boolean allowLinnaeanCaptures();
+
+    /**
      * The usual victory condition.
      *
      * @return

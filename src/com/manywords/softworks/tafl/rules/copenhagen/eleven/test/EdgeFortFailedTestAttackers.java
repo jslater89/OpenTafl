@@ -16,6 +16,11 @@ public class EdgeFortFailedTestAttackers extends SeaBattle9Attackers {
     }
 
     @Override
+    public boolean hasMercenaries() {
+        return false;
+    }
+
+    @Override
     public List<TaflmanHolder> generateTaflmen() {
         ArrayList<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(9);
 

@@ -220,6 +220,11 @@ public class FotevikenTablut extends Rules {
     }
 
     @Override
+    public boolean allowLinnaeanCaptures() {
+        return false;
+    }
+
+    @Override
     public int getEscapeType() {
         return Rules.EDGES;
     }
