@@ -23,6 +23,7 @@ public class Taflman {
     public static final char TYPE_COMMANDER = 512;
     public static final char TYPE_KNIGHT = 256 + 512;
     public static final char TYPE_KING = 1024;
+    public static final char TYPE_MERCENARY = 1024 + 256;
 
     public static final char SIDE_ATTACKERS = 2048;
     public static final char SIDE_DEFENDERS = 0;
@@ -32,13 +33,15 @@ public class Taflman {
 
     public static final char[] ALL_TAFLMAN_TYPES = new char[] {
             TYPE_TAFLMAN | SIDE_ATTACKERS,
-            TYPE_TAFLMAN | SIDE_DEFENDERS,
             TYPE_COMMANDER | SIDE_ATTACKERS,
-            TYPE_COMMANDER | SIDE_DEFENDERS,
             TYPE_KNIGHT | SIDE_ATTACKERS,
-            TYPE_KNIGHT | SIDE_DEFENDERS,
             TYPE_KING | SIDE_ATTACKERS,
-            TYPE_KING | SIDE_DEFENDERS
+            TYPE_MERCENARY | SIDE_ATTACKERS,
+            TYPE_TAFLMAN | SIDE_DEFENDERS,
+            TYPE_COMMANDER | SIDE_DEFENDERS,
+            TYPE_KNIGHT | SIDE_DEFENDERS,
+            TYPE_KING | SIDE_DEFENDERS,
+            TYPE_MERCENARY | SIDE_DEFENDERS
     };
 
     public static char encode(TaflmanImpl taflman) {
@@ -50,6 +53,7 @@ public class Taflman {
 
         } else if (taflman.isKnight()) packedTaflman = (char) (packedTaflman | TYPE_KNIGHT);
         else if (taflman.isCommander()) packedTaflman = (char) (packedTaflman | TYPE_COMMANDER);
+        else if (taflman.isMercenary()) packedTaflman = (char) (packedTaflman | TYPE_MERCENARY);
         else packedTaflman = (char) (packedTaflman | TYPE_TAFLMAN);
 
         if (taflman.getSide().isAttackingSide()) {
@@ -111,6 +115,10 @@ public class Taflman {
 
     public static boolean isCommander(char taflman) {
         return (char) (getPackedType(taflman) & TYPE_MASK) == TYPE_COMMANDER;
+    }
+
+    public static boolean isMercenary(char taflman) {
+        return (char) (getPackedType(taflman) & TYPE_MERCENARY) == TYPE_MERCENARY;
     }
 
     /**
@@ -722,7 +730,23 @@ public class Taflman {
      * @return
      */
     public static boolean capturedBy(GameState state, char taflman, char capturer, Coord capturingMove, boolean byJump) {
+        Coord originalSpace = null;
+        if(isMercenary(taflman)) {
+            originalSpace = Taflman.getCurrentSpace(state, taflman);
+        }
+
         getBoard(state).unsetOccupier(taflman);
+
+        if(isMercenary(taflman)) {
+            char newTaflman = taflman;
+            if(Taflman.getPackedSide(newTaflman) == Taflman.SIDE_ATTACKERS) {
+                newTaflman = (char)(newTaflman & ~Taflman.SIDE_ATTACKERS);
+            }
+            else {
+                newTaflman = (char)(newTaflman & Taflman.SIDE_ATTACKERS);
+            }
+            getBoard(state).setOccupier(originalSpace, newTaflman);
+        }
         return true;
     }
 
@@ -754,6 +778,7 @@ public class Taflman {
         if (isKing(taflman)) return r.getKingJumpMode();
         else if (isKnight(taflman)) return r.getKnightJumpMode();
         else if (isCommander(taflman)) return r.getCommanderJumpMode();
+        else if (isMercenary(taflman)) return r.getMercenaryJumpMode();
         else return JUMP_NONE;
     }
 
@@ -776,6 +801,7 @@ public class Taflman {
         if (isKing(taflman)) symbol = "+";
         if (isCommander(taflman)) symbol = "o";
         if (isKnight(taflman)) symbol = "?";
+        if (isMercenary(taflman)) symbol = "m";
 
         if(size == 1) return symbol;
         else if(size == 2) return symbol + symbol;
@@ -790,6 +816,7 @@ public class Taflman {
         if(isKing(taflman)) symbol = "k";
         else if(isCommander(taflman)) symbol = "c";
         else if(isKnight(taflman)) symbol = "n";
+        else if(isMercenary(taflman)) symbol = "m";
         else symbol = "t";
 
         if(getPackedSide(taflman) == SIDE_ATTACKERS) symbol = symbol.toLowerCase();

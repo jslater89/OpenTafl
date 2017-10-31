@@ -38,6 +38,7 @@ public class Test {
         tests.add(new GenericRulesCopyTest());
 
         // Rules tests
+        tests.add(new MercenarySideSwitchTest());
         tests.add(new KingHammerAnvilTest());
         tests.add(new KingUnsafeAgainstBoardEdgeTest());
         tests.add(new SpeedLimitTest());

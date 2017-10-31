@@ -58,7 +58,7 @@ public class RulesSerializerConsistencyTest extends TaflTest {
 
             assert RulesSerializer.rulesEqual(rules1, rules2);
 
-            Rules r = RulesSerializer.loadRulesRecord("rules dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/");
+            Rules r = RulesSerializer.loadRulesRecord("dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n cenh: cenhe: start:/3t3/3t3/3T3/ttTKTtt/3T3/3t3/3t3/");
             Rules r2 = Brandub.newBrandub7();
 
             Game g = new Game(r, null);
@@ -86,6 +86,12 @@ public class RulesSerializerConsistencyTest extends TaflTest {
 
                 assert Taflman.getAllowableDestinations(s, taflman).equals(Taflman.getAllowableDestinations(s2, taflman2));
             }
+
+            String mercenaryRulesRecord = "dim:7 name:Brandub surf:n atkf:y ks:w nj:n cj:n mj:r cenh: cenhe: start:/3t3/3m3/3T3/ttTKTtt/3T3/2Tm3/3t3/";
+            rules = RulesSerializer.loadRulesRecord(mercenaryRulesRecord);
+            rules2 = rules.getOTRString(false);
+
+            assert rules2.equals(mercenaryRulesRecord);
         }
         catch(NotationParseException e) {
             assert false;

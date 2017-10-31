@@ -29,15 +29,17 @@ import com.manywords.softworks.tafl.rules.Taflman;
  */
 public class TaflmanCodes {
     public static final int count = Rules.TAFLMAN_TYPE_COUNT;
-    public static final char[] inverse = {'t', 'c', 'n', 'k', 'T', 'C', 'N', 'K'};
+    public static final char[] inverse = {'t', 'c', 'n', 'k', 'm', 'T', 'C', 'N', 'K', 'M'};
     public static final int t = 0;
     public static final int c = 1;
     public static final int n = 2;
     public static final int k = 3;
-    public static final int T = 4;
-    public static final int C = 5;
-    public static final int N = 6;
-    public static final int K = 7;
+    public static final int m = 4;
+    public static final int T = 5;
+    public static final int C = 6;
+    public static final int N = 7;
+    public static final int K = 8;
+    public static final int M = 9;
 
     public static int getIndexForChar(char ch) {
         switch(ch) {
@@ -49,6 +51,8 @@ public class TaflmanCodes {
                 return n;
             case 'k':
                 return k;
+            case 'm':
+                return m;
             case 'T':
                 return T;
             case 'C':
@@ -57,6 +61,8 @@ public class TaflmanCodes {
                 return N;
             case 'K':
                 return K;
+            case 'M':
+                return M;
             default:
                 throw new IllegalArgumentException("Bad character code");
         }
@@ -79,6 +85,7 @@ public class TaflmanCodes {
             case 'C': typeFlag = Taflman.TYPE_COMMANDER; break;
             case 'N': typeFlag = Taflman.TYPE_KNIGHT; break;
             case 'K': typeFlag = Taflman.TYPE_KING; break;
+            case 'M': typeFlag = Taflman.TYPE_MERCENARY; break;
             default: typeFlag = Taflman.TYPE_TAFLMAN;
         }
 
@@ -87,7 +94,7 @@ public class TaflmanCodes {
 
     public static int getIndexForTaflmanChar(char taflman) {
         boolean attacker = Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS;
-        int index = (attacker ? 0 : 4);
+        int index = (attacker ? 0 : 5);
 
         switch(Taflman.getPackedType(taflman)) {
             // TYPE_TAFLMAN: index += 0
@@ -100,6 +107,8 @@ public class TaflmanCodes {
             case Taflman.TYPE_KING:
                 index += 3;
                 break;
+            case Taflman.TYPE_MERCENARY:
+                index += 4;
         }
 
         return index;
@@ -107,8 +116,6 @@ public class TaflmanCodes {
 
     public static String getTaflmanNameForTaflman(char taflman, boolean plural) {
         String taflmanType = "taflman";
-
-        char typeFlag = Taflman.getPackedType(taflman);
 
         switch(Taflman.getPackedType(taflman)) {
             // TYPE_TAFLMAN: index += 0
@@ -121,12 +128,16 @@ public class TaflmanCodes {
             case Taflman.TYPE_KING:
                 taflmanType = "king";
                 break;
+            case Taflman.TYPE_MERCENARY:
+                taflmanType = "mercenary";
+                break;
         }
 
         if(plural) {
             taflmanType += "s";
 
             if(taflmanType.equals("taflmans")) taflmanType = "taflmen";
+            if(taflmanType.equals("mercenarys")) taflmanType = "mercenaries";
         }
 
         return taflmanType;

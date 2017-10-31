@@ -36,6 +36,11 @@ public class Magpie extends Brandub {
     }
 
     @Override
+    public int getMercenaryJumpMode() {
+        return Taflman.JUMP_NONE;
+    }
+
+    @Override
     public String getName() {
         return "Magpie";
     }

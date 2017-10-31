@@ -126,6 +126,10 @@ public class RulesSerializer {
             otnrString += "cj:" + getStringForJumpMode(rules.getCommanderJumpMode()) + " ";
         }
 
+        if(rules.getMercenaryJumpMode() != Taflman.JUMP_NONE) {
+            otnrString += "mj:" + getStringForJumpMode(rules.getMercenaryJumpMode()) + " ";
+        }
+
         Set<Coord> corners = rules.getCornerSpaces();
         if(!corners.equals(getDefaultCorners(rules.boardSize))) {
             String cornersString = "cor:";
@@ -293,6 +297,7 @@ public class RulesSerializer {
         if(config.containsKey("kj")) rules.setKingJumpMode(getJumpModeForString(config.get("kj")));
         if(config.containsKey("nj")) rules.setKnightJumpMode(getJumpModeForString(config.get("nj")));
         if(config.containsKey("cj")) rules.setCommanderJumpMode(getJumpModeForString(config.get("cj")));
+        if(config.containsKey("mj")) rules.setMercenaryJumpMode(getJumpModeForString(config.get("mj")));
         if(config.containsKey("sw")) rules.setShieldwallMode(getShieldwallModeForString(config.get("sw")));
         if(config.containsKey("swf")) rules.setShieldwallFlankingRequired(getBooleanForString(config.get("swf")));
         if(config.containsKey("efe")) rules.setEdgeFortEscape(getBooleanForString(config.get("efe")));
@@ -548,9 +553,13 @@ public class RulesSerializer {
 
     public static TaflmanSpeedHolder getTaflmanSpeedsForString(String speedString) {
         String[] speedStrings = speedString.split(",");
+
+        // legacy holder is for pre-mercenary saved games
         TaflmanSpeedHolder holder = new TaflmanSpeedHolder();
+        TaflmanSpeedHolder legacyHolder = new TaflmanSpeedHolder();
 
         holder.speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length];
+        legacyHolder.speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length - 2];
 
         if(speedStrings.length == 0) {
             Arrays.fill(holder.speeds, -1);
@@ -577,6 +586,15 @@ public class RulesSerializer {
             }
 
             holder.mode = Rules.SPEED_LIMITS_BY_TYPE;
+        }
+        else if(speedStrings.length == legacyHolder.speeds.length) {
+            for(int i = 0; i < legacyHolder.speeds.length; i++) {
+                int speed = Integer.parseInt(speedStrings[i]);
+                legacyHolder.speeds[i] = speed;
+            }
+            legacyHolder.mode = Rules.SPEED_LIMITS_BY_TYPE;
+
+            return legacyHolder;
         }
         else {
             throw new IllegalArgumentException("Invalid speed limit string: " + speedString);

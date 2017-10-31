@@ -94,6 +94,11 @@ public class Tablut extends Rules {
     }
 
     @Override
+    public int getMercenaryJumpMode() {
+        return Taflman.JUMP_NONE;
+    }
+
+    @Override
     public boolean canSideJump(Side side) {
         return false;
     }

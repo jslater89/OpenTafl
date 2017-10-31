@@ -306,6 +306,8 @@ public abstract class Rules {
 
     public abstract int getCommanderJumpMode();
 
+    public abstract int getMercenaryJumpMode();
+
     public abstract boolean canSideJump(Side side);
 
     public abstract int howManyAttackers();
