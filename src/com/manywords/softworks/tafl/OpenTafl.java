@@ -40,7 +40,7 @@ public class OpenTafl {
         READ_JSON, HELP
     }
 
-    public static final String CURRENT_VERSION = "v0.4.6.4b";
+    public static final String CURRENT_VERSION = "v0.4.7.0b";
     public static final int NETWORK_PROTOCOL_VERSION = 7;
 
     public static boolean devMode = false;
@@ -302,7 +302,7 @@ public class OpenTafl {
         System.out.println();
         System.out.println("The following flags apply to all modes: ");
         System.out.println();
-        System.out.println("--chatty: print extra debug messages");
+        System.out.println("--verbose: print extra debug messages");
         System.out.println("--silent: print no messages");
     }
 }

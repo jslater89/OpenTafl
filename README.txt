@@ -291,6 +291,15 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 13. VERSION HISTORY -----------------------------------------------------------
+v0.4.7.0b (released 11/1/17):
+- Add mercenary taflmen, which switch sides when captured
+- Add Linnaean capture
+    - If a defender is next to the king, who is on the throne and surrounded
+      on the other three sides by attackers, the defender may be captured
+      against the throne
+- Fix some crashes and bugs in variant editor relating to very large numbers
+  of taflmen
+
 v0.4.6.4b (released 04/23/17):
 - Fix display bugs with board UI when keyboard-focused
     - When a taflman is selected and the cursor is elsewhere, spaces on which
