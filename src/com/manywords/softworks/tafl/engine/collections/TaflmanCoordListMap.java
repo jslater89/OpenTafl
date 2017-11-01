@@ -17,13 +17,13 @@ public class TaflmanCoordListMap {
 
     private final int mDimension;
     private final short mSize;
-    private final byte mAttackers;
-    private final byte mDefenders;
+    private final short mAttackers;
+    private final short mDefenders;
 
-    public TaflmanCoordListMap(int dimension, byte attackers, byte defenders) {
-        this.mSize = (byte)(attackers + defenders);
-        this.mAttackers = attackers;
-        this.mDefenders = defenders;
+    public TaflmanCoordListMap(int dimension, int attackers, int defenders) {
+        this.mSize = (short)(attackers + defenders);
+        this.mAttackers = (short) attackers;
+        this.mDefenders = (short) defenders;
         mDimension = dimension;
         mTaflmen = new char[mSize];
         mEntries = new TableEntry[mSize];

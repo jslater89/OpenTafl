@@ -14,8 +14,8 @@ public class TaflmanCoordMap {
 
     private final int mDimension;
     private final short mSize;
-    private final byte mAttackers;
-    private final byte mDefenders;
+    private final short mAttackers;
+    private final short mDefenders;
 
     public TaflmanCoordMap(int dimension, int attackers, int defenders) {
         this.mSize = (short)(attackers + defenders);
@@ -24,8 +24,8 @@ public class TaflmanCoordMap {
             throw new IllegalStateException("Too many taflmen");
         }
         
-        this.mAttackers = (byte) attackers;
-        this.mDefenders = (byte) defenders;
+        this.mAttackers = (short) attackers;
+        this.mDefenders = (short) defenders;
         this.mDimension = dimension;
         mTaflmen = new char[mSize];
         mCoords = new char[mSize];
