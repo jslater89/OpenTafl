@@ -97,6 +97,11 @@ public class Brandub extends Rules {
     }
 
     @Override
+    public int getMercenaryJumpMode() {
+        return Taflman.JUMP_NONE;
+    }
+
+    @Override
     public boolean canSideJump(Side side) {
         return false;
     }
@@ -172,6 +177,11 @@ public class Brandub extends Rules {
     @Override
     public boolean allowEdgeFortEscapes() {
         // No edge escape captures.
+        return false;
+    }
+
+    @Override
+    public boolean allowLinnaeanCaptures() {
         return false;
     }
 

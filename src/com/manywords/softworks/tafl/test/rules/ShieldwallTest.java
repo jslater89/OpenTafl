@@ -8,7 +8,6 @@ import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
 import com.manywords.softworks.tafl.test.TaflTest;
-import com.manywords.softworks.tafl.ui.RawTerminal;
 
 public class ShieldwallTest extends TaflTest {
 
@@ -51,7 +50,7 @@ public class ShieldwallTest extends TaflTest {
 
         state.makeMove(new MoveRecord(Coord.get("g2"), Coord.get("i2")));
         state = game.getCurrentState();
-        RawTerminal.renderGameState(state);
+        //RawTerminal.renderGameState(state);
 
         assert state.getPieceAt(8, 2) != Taflman.EMPTY;
         assert state.getPieceAt(8, 3) == Taflman.EMPTY;

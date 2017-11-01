@@ -26,6 +26,11 @@ public class AICertainKingCaptureTestDefenders extends Side {
     }
 
     @Override
+    public boolean hasMercenaries() {
+        return false;
+    }
+
+    @Override
     public boolean hasCommanders() {
         return false;
     }
@@ -37,8 +42,8 @@ public class AICertainKingCaptureTestDefenders extends Side {
         int x = 3;
         int y = 3;
 
-        taflmen.add(new King((byte) 0, Coord.get(2, 0), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 1, Taflman.TYPE_TAFLMAN, Coord.get(4, 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new King((byte) 3, Coord.get(2, 0), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 4, Taflman.TYPE_TAFLMAN, Coord.get(4, 1), this, getBoard(), getBoard().getRules()));
 
         return createHolderListFromTaflmanList(taflmen);
     }

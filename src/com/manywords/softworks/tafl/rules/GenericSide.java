@@ -10,6 +10,7 @@ public class GenericSide extends Side {
     private List<TaflmanHolder> mStartingTaflmen;
     private boolean mCommanders = false;
     private boolean mKnights = false;
+    private boolean mMercenaries = false;
 
     public GenericSide(Board b, boolean isAttackingSide) {
         super(b);
@@ -29,6 +30,9 @@ public class GenericSide extends Side {
             if(Taflman.getPackedType(taflman) == Taflman.TYPE_KNIGHT) {
                 mKnights = true;
             }
+            if(Taflman.getPackedType(taflman) == Taflman.TYPE_MERCENARY) {
+                mMercenaries = true;
+            }
         }
     }
 
@@ -45,6 +49,11 @@ public class GenericSide extends Side {
     @Override
     public boolean hasKnights() {
         return mKnights;
+    }
+
+    @Override
+    public boolean hasMercenaries() {
+        return mMercenaries;
     }
 
     @Override

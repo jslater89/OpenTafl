@@ -37,6 +37,8 @@ public abstract class Side {
 
     public abstract boolean hasKnights();
 
+    public abstract boolean hasMercenaries();
+
     public abstract Side deepCopy(Board board);
 
     public abstract List<TaflmanHolder> generateTaflmen();
@@ -68,7 +70,7 @@ public abstract class Side {
     public final List<TaflmanHolder> createHolderListFromTaflmanList(List<TaflmanImpl> taflmen) {
         List<TaflmanHolder> map = new ArrayList<TaflmanHolder>(taflmen.size());
         for (TaflmanImpl t : taflmen) {
-            map.add(t.getImplId(), new TaflmanHolder(Taflman.encode(t), t.getStartingSpace()));
+            map.add(new TaflmanHolder(Taflman.encode(t), t.getStartingSpace()));
         }
 
         if (taflmen.size() != map.size()) {

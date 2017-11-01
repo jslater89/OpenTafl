@@ -43,6 +43,7 @@ public class DetailedMoveRecord extends MoveRecord {
     private static final byte COMMANDER = 2;
     private static final byte KNIGHT = 1 + 2;
     private static final byte KING = 4;
+    private static final byte MERCENARY = 4 + 1;
 
     private static final byte SIDE_MASK = 8; // bit 4
     private static final byte ATTACKERS = 8;
@@ -164,6 +165,9 @@ public class DetailedMoveRecord extends MoveRecord {
             case Taflman.TYPE_KING:
                 typeFlag = KING;
                 break;
+            case Taflman.TYPE_MERCENARY:
+                typeFlag = MERCENARY;
+                break;
         }
 
         return typeFlag;
@@ -190,6 +194,7 @@ public class DetailedMoveRecord extends MoveRecord {
         if(taflmanType == COMMANDER) taflmanChar = TaflmanCodes.inverse[TaflmanCodes.c];
         else if(taflmanType == KNIGHT) taflmanChar = TaflmanCodes.inverse[TaflmanCodes.n];
         else if(taflmanType == KING) taflmanChar = TaflmanCodes.inverse[TaflmanCodes.k];
+        else if(taflmanType == MERCENARY) taflmanChar = TaflmanCodes.inverse[TaflmanCodes.m];
         else taflmanChar = 0;
 
         if(taflmanChar != 0) {

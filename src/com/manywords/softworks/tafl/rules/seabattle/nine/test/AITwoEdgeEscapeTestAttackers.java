@@ -15,6 +15,11 @@ public class AITwoEdgeEscapeTestAttackers extends SeaBattle9Attackers {
         super(board, taflmen);
     }
 
+    @Override
+    public boolean hasMercenaries() {
+        return false;
+    }
+
     public List<TaflmanHolder> generateTaflmen() {
         ArrayList<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(9);
 

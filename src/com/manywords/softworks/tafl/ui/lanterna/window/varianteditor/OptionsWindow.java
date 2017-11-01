@@ -104,7 +104,7 @@ public class OptionsWindow extends FocusableBasicWindow {
                         Log.stackTrace(Log.Level.NORMAL, e);
                     }
                     catch (NotationParseException e) {
-                        MessageDialog.showMessageDialog(getTextGUI(), "Error", "Failed to parse file");
+                        MessageDialog.showMessageDialog(getTextGUI(), "Error", "Failed to parse file: " + e.getMessage());
                         Log.stackTrace(Log.Level.NORMAL, e);
                     }
                 }
@@ -203,6 +203,9 @@ public class OptionsWindow extends FocusableBasicWindow {
                     case Taflman.TYPE_COMMANDER:
                         status += "commander";
                         break;
+                    case Taflman.TYPE_MERCENARY:
+                        status += "mercenary";
+                        break;
                     default:
                         status += "taflman";
                 }
@@ -257,6 +260,10 @@ public class OptionsWindow extends FocusableBasicWindow {
                     "\n\n" +
                     "Edge fort escape: if checked, the king may escape if he has at least one potential " +
                     "move while surrounded by an invincible fort against the edge of the board." +
+                    "\n\n" +
+                    "Linnaean capture: if checked, a defender adjacent to the king while the king is on" +
+                    "the throne and the king is surrounded on the other three sides by attackers may be" +
+                    "captured against the throne." +
                     "\n\n" +
                     "Shieldwall captures: whether to allow Copenhagen-style shieldwall captures. Weak shieldwalls " +
                     "must be capped on both sides by a taflman. Strong shieldwalls may be capped by corners." +

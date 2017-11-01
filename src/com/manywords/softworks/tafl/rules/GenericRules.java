@@ -65,9 +65,11 @@ public class GenericRules extends Rules {
     private int mKingJumpMode = Taflman.JUMP_NONE;
     private int mCommanderJumpMode = Taflman.JUMP_STANDARD;
     private int mKnightJumpMode = Taflman.JUMP_CAPTURE;
+    private int mMercenaryJumpMode = Taflman.JUMP_NONE;
     private int mShieldwallMode = NO_SHIELDWALL;
     private boolean mShieldwallFlankingRequired = true;
     private boolean mEdgeFortEscape = false;
+    private boolean mLinnaeanCapture = false;
     private int mBerserkMode = BERSERK_NONE;
     private int mSpeedLimitMode = SPEED_LIMITS_NONE;
     private int[] mSpeedLimits = new int[TAFLMAN_TYPE_COUNT];
@@ -111,6 +113,11 @@ public class GenericRules extends Rules {
         reevaluateJumps();
     }
 
+    public void setMercenaryJumpMode(int mercenaryJumpMode) {
+        mMercenaryJumpMode = mercenaryJumpMode;
+        reevaluateJumps();
+    }
+
     private void reevaluateJumps() {
         mDefendersJump = false;
 
@@ -122,6 +129,9 @@ public class GenericRules extends Rules {
         }
         else if(mKingJumpMode != Taflman.JUMP_NONE) {
             mDefendersJump = true;
+        }
+        else if(mDefenderMercenaries && mMercenaryJumpMode != Taflman.JUMP_NONE) {
+
         }
 
         mAttackersJump = false;
@@ -145,6 +155,8 @@ public class GenericRules extends Rules {
     public void setEdgeFortEscape(boolean edgeFortEscape) {
         mEdgeFortEscape = edgeFortEscape;
     }
+    
+    public void setLinnaeanCapture(boolean linnaeanCapture) { mLinnaeanCapture = linnaeanCapture; }
 
     public void setBerserkMode(int berserkMode) {
         mBerserkMode = berserkMode;
@@ -195,7 +207,15 @@ public class GenericRules extends Rules {
             mSpeedLimitMode = SPEED_LIMITS_BY_TYPE;
         }
 
-        mSpeedLimits = speeds;
+        // If this is a pre-mercenary speed thing
+        if(speeds.length == 8) {
+            mSpeedLimits = new int[10];
+            System.arraycopy(speeds, 0, mSpeedLimits, 0, 4);
+            System.arraycopy(speeds, 4, mSpeedLimits, 5, 4);
+        }
+        else {
+            mSpeedLimits = speeds;
+        }
     }
 
     public int[] getSpeedLimits() {
@@ -246,6 +266,8 @@ public class GenericRules extends Rules {
     private boolean mDefenderCommanders;
     private boolean mAttackerKnights;
     private boolean mDefenderKnights;
+    private boolean mAttackerMercenaries;
+    private boolean mDefenderMercenaries;
 
     public void setBoard(Board b) {
         mBoard = b;
@@ -280,6 +302,11 @@ public class GenericRules extends Rules {
     @Override
     public int getCommanderJumpMode() {
         return mCommanderJumpMode;
+    }
+
+    @Override
+    public int getMercenaryJumpMode() {
+        return mMercenaryJumpMode;
     }
 
     @Override
@@ -462,6 +489,11 @@ public class GenericRules extends Rules {
     }
 
     @Override
+    public boolean allowLinnaeanCaptures() {
+        return mLinnaeanCapture;
+    }
+
+    @Override
     public int getEscapeType() {
         return mEscapeType;
     }
@@ -516,6 +548,7 @@ public class GenericRules extends Rules {
         mShieldwallMode = from.allowShieldWallCaptures();
         mShieldwallFlankingRequired = from.allowFlankingShieldwallCapturesOnly();
         mEdgeFortEscape = from.allowEdgeFortEscapes();
+        mLinnaeanCapture = from.allowLinnaeanCaptures();
         mBerserkMode = from.getBerserkMode();
         mSpeedLimitMode = from.getSpeedLimitMode();
         mSpeedLimits = new int[TAFLMAN_TYPE_COUNT];
@@ -545,6 +578,9 @@ public class GenericRules extends Rules {
             taflman = Taflman.TYPE_KING | Taflman.SIDE_ATTACKERS;
             mSpeedLimits[TaflmanCodes.k] = from.getTaflmanSpeedLimit(taflman);
 
+            taflman = Taflman.TYPE_MERCENARY | Taflman.SIDE_ATTACKERS;
+            mSpeedLimits[TaflmanCodes.m] = from.getTaflmanSpeedLimit(taflman);
+
             taflman = Taflman.TYPE_TAFLMAN | Taflman.SIDE_DEFENDERS;
             mSpeedLimits[TaflmanCodes.T] = from.getTaflmanSpeedLimit(taflman);
 
@@ -556,6 +592,9 @@ public class GenericRules extends Rules {
 
             taflman = Taflman.TYPE_KING | Taflman.SIDE_DEFENDERS;
             mSpeedLimits[TaflmanCodes.K] = from.getTaflmanSpeedLimit(taflman);
+
+            taflman = Taflman.TYPE_MERCENARY | Taflman.SIDE_DEFENDERS;
+            mSpeedLimits[TaflmanCodes.M] = from.getTaflmanSpeedLimit(taflman);
         }
 
         System.arraycopy(from.centerPassableFor, 0, centerPassableFor, 0, centerPassableFor.length);

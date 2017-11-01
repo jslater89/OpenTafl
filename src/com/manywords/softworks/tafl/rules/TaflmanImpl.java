@@ -34,18 +34,23 @@ public class TaflmanImpl extends Taflman {
     }
 
     public boolean isKing() {
-        // This is a bog-standard tafl piece.
+        // This is a king.
         return (char) (mType & TYPE_KING) == TYPE_KING;
     }
 
     public boolean isKnight() {
-        // This is a bog-standard tafl piece.
+        // This is a bog-standard tafl piece, who does jump capturing.
         return (char) (mType & TYPE_KNIGHT) == TYPE_KNIGHT;
     }
 
     public boolean isCommander() {
-        // This is a bog-standard tafl piece.
+        // This is a commander, who does non-capture jumping.
         return (char) (mType & TYPE_COMMANDER) == TYPE_COMMANDER;
+    }
+
+    public boolean isMercenary() {
+        // This is a mercenary, who flipflops.
+        return (char) (mType & TYPE_MERCENARY) == TYPE_MERCENARY;
     }
 
     public Side getSide() {

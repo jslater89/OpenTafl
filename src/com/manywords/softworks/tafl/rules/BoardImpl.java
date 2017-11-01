@@ -31,8 +31,8 @@ public abstract class BoardImpl extends Board {
     }
 
     private void initializeTaflmanLocations(Side attackers, Side defenders) {
-        byte defenderCount = (byte) defenders.getStartingTaflmen().size();
-        byte attackerCount = (byte) attackers.getStartingTaflmen().size();
+        short defenderCount = (short) defenders.getStartingTaflmen().size();
+        short attackerCount = (short) attackers.getStartingTaflmen().size();
         mCachedTaflmanLocations = new TaflmanCoordMap(getBoardDimension(), attackerCount, defenderCount);
 
         for(Side.TaflmanHolder t : attackers.getStartingTaflmen()) {

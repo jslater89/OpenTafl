@@ -87,8 +87,7 @@ public class PositionSerializer {
 
         char[][] board = new char[rows.size()][rows.size()];
 
-        int currentAttackerId = 0;
-        int currentDefenderId = 0;
+        int currentId = 0;
 
         int currentRow = 0;
         for (String row : rows) {
@@ -118,11 +117,11 @@ public class PositionSerializer {
 
                     if (Character.isUpperCase(c)) {
                         side = Taflman.SIDE_DEFENDERS;
-                        id = (char) currentDefenderId++;
+                        id = (char) currentId++;
                     }
                     else {
                         side = Taflman.SIDE_ATTACKERS;
-                        id = (char) currentAttackerId++;
+                        id = (char) currentId++;
                     }
 
                     type = TaflmanCodes.getTaflmanTypeForCode(c);

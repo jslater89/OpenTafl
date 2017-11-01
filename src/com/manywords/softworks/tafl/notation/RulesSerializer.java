@@ -73,6 +73,7 @@ public class RulesSerializer {
         map.put("sw", "n");
         map.put("swf", "y");
         map.put("efe", "n");
+        map.put("linc", "n");
         map.put("ber", "n");
 
         defaults = map;
@@ -124,6 +125,10 @@ public class RulesSerializer {
 
         if(rules.getCommanderJumpMode() != Taflman.JUMP_STANDARD) {
             otnrString += "cj:" + getStringForJumpMode(rules.getCommanderJumpMode()) + " ";
+        }
+
+        if(rules.getMercenaryJumpMode() != Taflman.JUMP_NONE) {
+            otnrString += "mj:" + getStringForJumpMode(rules.getMercenaryJumpMode()) + " ";
         }
 
         Set<Coord> corners = rules.getCornerSpaces();
@@ -234,6 +239,10 @@ public class RulesSerializer {
             otnrString += "efe:y ";
         }
 
+        if(rules.allowLinnaeanCaptures()) {
+            otnrString += "linc:y ";
+        }
+
         if(rules.getBerserkMode() != Rules.BERSERK_NONE) {
             otnrString += "ber:" + getStringForBerserkMode(rules.getBerserkMode()) + " ";
         }
@@ -276,6 +285,10 @@ public class RulesSerializer {
             throw new NotationParseException(-1, "", "No start or starti records");
         }
 
+        if(startingTaflmen.get(0).size() + startingTaflmen.get(1).size() > 254) {
+            throw new NotationParseException(-1, "", "OpenTafl does not support rules with more than 254 taflmen.");
+        }
+
         Board board = new GenericBoard(boardDimension);
         Side attackers = new GenericSide(board, true, startingTaflmen.get(0));
         //System.out.println(attackers.getStartingTaflmen());
@@ -293,9 +306,11 @@ public class RulesSerializer {
         if(config.containsKey("kj")) rules.setKingJumpMode(getJumpModeForString(config.get("kj")));
         if(config.containsKey("nj")) rules.setKnightJumpMode(getJumpModeForString(config.get("nj")));
         if(config.containsKey("cj")) rules.setCommanderJumpMode(getJumpModeForString(config.get("cj")));
+        if(config.containsKey("mj")) rules.setMercenaryJumpMode(getJumpModeForString(config.get("mj")));
         if(config.containsKey("sw")) rules.setShieldwallMode(getShieldwallModeForString(config.get("sw")));
         if(config.containsKey("swf")) rules.setShieldwallFlankingRequired(getBooleanForString(config.get("swf")));
         if(config.containsKey("efe")) rules.setEdgeFortEscape(getBooleanForString(config.get("efe")));
+        if(config.containsKey("linc")) rules.setLinnaeanCapture(getBooleanForString(config.get("linc")));
         if(config.containsKey("ber")) rules.setBerserkMode(getBerserkModeForString(config.get("ber")));
 
         if(config.containsKey("spd")) {
@@ -548,9 +563,13 @@ public class RulesSerializer {
 
     public static TaflmanSpeedHolder getTaflmanSpeedsForString(String speedString) {
         String[] speedStrings = speedString.split(",");
+
+        // legacy holder is for pre-mercenary saved games
         TaflmanSpeedHolder holder = new TaflmanSpeedHolder();
+        TaflmanSpeedHolder legacyHolder = new TaflmanSpeedHolder();
 
         holder.speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length];
+        legacyHolder.speeds = new int[Taflman.ALL_TAFLMAN_TYPES.length - 2];
 
         if(speedStrings.length == 0) {
             Arrays.fill(holder.speeds, -1);
@@ -577,6 +596,15 @@ public class RulesSerializer {
             }
 
             holder.mode = Rules.SPEED_LIMITS_BY_TYPE;
+        }
+        else if(speedStrings.length == legacyHolder.speeds.length) {
+            for(int i = 0; i < legacyHolder.speeds.length; i++) {
+                int speed = Integer.parseInt(speedStrings[i]);
+                legacyHolder.speeds[i] = speed;
+            }
+            legacyHolder.mode = Rules.SPEED_LIMITS_BY_TYPE;
+
+            return legacyHolder;
         }
         else {
             throw new IllegalArgumentException("Invalid speed limit string: " + speedString);

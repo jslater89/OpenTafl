@@ -27,21 +27,28 @@ public class KingHammerAnvilTest extends TaflTest {
 
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
+        //RawTerminal.renderGameState(state);
+
         state.setCurrentSide(state.getDefenders());
         state.makeMove(new MoveRecord(Coord.get(4, 4), Coord.get(0, 4)));
 
         state = game.getCurrentState();
+        //RawTerminal.renderGameState(state);
+
         assert state.getPieceAt(0, 3) != Taflman.EMPTY;
 
         state.setCurrentSide(state.getDefenders());
         state.makeMove(new MoveRecord(Coord.get(0, 2), Coord.get(1, 2)));
 
         state = game.getCurrentState();
+        //RawTerminal.renderGameState(state);
 
         state.setCurrentSide(state.getDefenders());
         state.makeMove(new MoveRecord(Coord.get(1, 2), Coord.get(0, 2)));
 
         state = game.getCurrentState();
+        //RawTerminal.renderGameState(state);
+
         assert state.getPieceAt(0, 3) == Taflman.EMPTY;
 
         rules = Fetlar.newFetlarTest();

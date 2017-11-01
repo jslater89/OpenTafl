@@ -29,9 +29,11 @@ public class SpeedLimitDialog extends DialogWindow {
         container.addComponent(TerminalUtils.newSpacer());
 
         Panel p = new Panel();
-        p.setLayoutManager(new GridLayout(5));
+        p.setLayoutManager(new GridLayout(6));
 
         mSpeedLimitInputs = new TextBox[] {
+                new TextBox(new TerminalSize(3, 1)),
+                new TextBox(new TerminalSize(3, 1)),
                 new TextBox(new TerminalSize(3, 1)),
                 new TextBox(new TerminalSize(3, 1)),
                 new TextBox(new TerminalSize(3, 1)),
@@ -52,18 +54,21 @@ public class SpeedLimitDialog extends DialogWindow {
         p.addComponent(new Label("Commander"));
         p.addComponent(new Label("Knight"));
         p.addComponent(new Label("King"));
+        p.addComponent(new Label("Mercenary"));
 
         p.addComponent(new Label("Attacker"));
         p.addComponent(mSpeedLimitInputs[0]);
         p.addComponent(mSpeedLimitInputs[1]);
         p.addComponent(mSpeedLimitInputs[2]);
         p.addComponent(mSpeedLimitInputs[3]);
+        p.addComponent(mSpeedLimitInputs[4]);
 
         p.addComponent(new Label("Defender"));
-        p.addComponent(mSpeedLimitInputs[4]);
         p.addComponent(mSpeedLimitInputs[5]);
         p.addComponent(mSpeedLimitInputs[6]);
         p.addComponent(mSpeedLimitInputs[7]);
+        p.addComponent(mSpeedLimitInputs[8]);
+        p.addComponent(mSpeedLimitInputs[9]);
 
         container.addComponent(p);
 

@@ -19,6 +19,7 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
+        tests.add(new TaflmanCoordMapTest());
 
         // Mechanics tests
         tests.add(new RepetitionHashTableTest());
@@ -38,6 +39,8 @@ public class Test {
         tests.add(new GenericRulesCopyTest());
 
         // Rules tests
+        tests.add(new LinnaeanCaptureTest());
+        tests.add(new MercenarySideSwitchTest());
         tests.add(new KingHammerAnvilTest());
         tests.add(new KingUnsafeAgainstBoardEdgeTest());
         tests.add(new SpeedLimitTest());

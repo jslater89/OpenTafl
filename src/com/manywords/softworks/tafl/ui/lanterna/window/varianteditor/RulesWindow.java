@@ -26,6 +26,7 @@ public class RulesWindow extends FocusableBasicWindow {
     private CheckBox mSurroundingCheckBox;
     private CheckBox mAttackersFirstCheckBox;
     private CheckBox mEdgeFortEscapeCheckBox;
+    private CheckBox mLinnaeanCaptureCheckBox;
 
     private RadioBoxList<String> mThreefoldResultRadio;
     private String[] mThreefoldResultModes = {"Draw", "Win", "Loss", "None"};
@@ -39,6 +40,7 @@ public class RulesWindow extends FocusableBasicWindow {
     private RadioBoxList<String> mKingJumpRadio;
     private RadioBoxList<String> mKnightJumpRadio;
     private RadioBoxList<String> mCommanderJumpRadio;
+    private RadioBoxList<String> mMercenaryJumpRadio;
 
     private RadioBoxList<String> mShieldwallModeRadio;
     private String[] mShieldwallModes = {"None", "Weak", "Strong"};
@@ -87,6 +89,9 @@ public class RulesWindow extends FocusableBasicWindow {
 
         mEdgeFortEscapeCheckBox = new CheckBox("Edge fort escape?");
         secondRow.addComponent(mEdgeFortEscapeCheckBox);
+
+        mLinnaeanCaptureCheckBox = new CheckBox("Linnaean capture?");
+        secondRow.addComponent(mLinnaeanCaptureCheckBox);
 
         p.addComponent(secondRow);
         p.addComponent(TerminalUtils.newSpacer());
@@ -148,6 +153,15 @@ public class RulesWindow extends FocusableBasicWindow {
         fifthRow.addComponent(mCommanderJumpRadio);
 
         p.addComponent(fifthRow);
+        p.addComponent(TerminalUtils.newSpacer());
+
+        Panel fifthAndAHalfRow = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        fifthAndAHalfRow.addComponent(new Label("Mercenary Jumps?"));
+        mMercenaryJumpRadio = new RadioBoxList<>();
+        addItems(mMercenaryJumpRadio, mJumpModes);
+        fifthAndAHalfRow.addComponent(mMercenaryJumpRadio);
+
+        p.addComponent(fifthAndAHalfRow);
         p.addComponent(TerminalUtils.newSpacer());
 
         Panel sixthRow = new Panel(new LinearLayout(Direction.HORIZONTAL));
@@ -217,6 +231,7 @@ public class RulesWindow extends FocusableBasicWindow {
         rules.setAttackersFirst(mAttackersFirstCheckBox.isChecked());
         rules.setEdgeFortEscape(mEdgeFortEscapeCheckBox.isChecked());
         rules.setShieldwallFlankingRequired(mShieldwallFlankingCheckBox.isChecked());
+        rules.setLinnaeanCapture(mLinnaeanCaptureCheckBox.isChecked());
 
         // Radios
         rules.setEscapeType(escapeStringToType(mEscapeRadio.getCheckedItem()));
@@ -227,6 +242,7 @@ public class RulesWindow extends FocusableBasicWindow {
         rules.setKingJumpMode(jumpStringToType(mKingJumpRadio.getCheckedItem()));
         rules.setKnightJumpMode(jumpStringToType(mKnightJumpRadio.getCheckedItem()));
         rules.setCommanderJumpMode(jumpStringToType(mCommanderJumpRadio.getCheckedItem()));
+        rules.setMercenaryJumpMode(jumpStringToType(mMercenaryJumpRadio.getCheckedItem()));
 
         rules.setShieldwallMode(shieldwallStringToType(mShieldwallModeRadio.getCheckedItem()));
         rules.setBerserkMode(berserkStringToType(mBerserkRadio.getCheckedItem()));
@@ -275,6 +291,7 @@ public class RulesWindow extends FocusableBasicWindow {
         mAttackersFirstCheckBox.setChecked(rules.getStartingSide().isAttackingSide());
         mEdgeFortEscapeCheckBox.setChecked(rules.allowEdgeFortEscapes());
         mShieldwallFlankingCheckBox.setChecked(rules.allowFlankingShieldwallCapturesOnly());
+        mLinnaeanCaptureCheckBox.setChecked(rules.allowLinnaeanCaptures());
 
         // Radios
         mEscapeRadio.setCheckedItemIndex(escapeTypeToIndex(rules.getEscapeType()));
@@ -285,6 +302,7 @@ public class RulesWindow extends FocusableBasicWindow {
         mKingJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getKingJumpMode()));
         mKnightJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getKnightJumpMode()));
         mCommanderJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getCommanderJumpMode()));
+        mMercenaryJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getMercenaryJumpMode()));
 
         mShieldwallModeRadio.setCheckedItemIndex(shieldwallTypeToIndex(rules.allowShieldWallCaptures()));
         mBerserkRadio.setCheckedItemIndex(berserkTypeToindex(rules.getBerserkMode()));

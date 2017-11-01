@@ -31,8 +31,18 @@ public class Magpie extends Brandub {
     }
 
     @Override
+    public boolean allowLinnaeanCaptures() {
+        return false;
+    }
+
+    @Override
     public int getKingStrengthMode() {
         return KING_MIDDLEWEIGHT;
+    }
+
+    @Override
+    public int getMercenaryJumpMode() {
+        return Taflman.JUMP_NONE;
     }
 
     @Override

@@ -318,6 +318,18 @@ public class GameState {
                 }
             }
 
+            if (getBoard().getRules().allowLinnaeanCaptures() && Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS) {
+                Coord linnaeanCaptureCoord = checkLinnaeanCapture(destination);
+
+                if(linnaeanCaptureCoord != null) {
+                    char occupier = mBoard.getOccupier(linnaeanCaptureCoord);
+                    if(occupier != Taflman.EMPTY) {
+                        Taflman.capturedBy(nextState, occupier, taflman, destination, false);
+                        captures.add(linnaeanCaptureCoord);
+                    }
+                }
+            }
+
             nextState.mEnteringMove = move;
             mExitingMove = move;
 
@@ -477,6 +489,59 @@ public class GameState {
         }
 
         return GOOD_MOVE; // i.e. no win
+    }
+
+    private Coord checkLinnaeanCapture(Coord endSpace) {
+        // A move might be a Linnaean capture if:
+        // 1. Ending space is adjacent to a space adjacent to the throne.
+        // 2. The king is on the throne.
+        // 3. The target space is occupied by a defender.
+        // 4. The remaining three king-adjacent spaces are occupied by
+        //    attackers.
+
+        int center = getBoard().getBoardDimension() / 2;
+
+        // If it isn't the Linnaean space in the +x or +y directions...
+        if(!(endSpace.x == center && endSpace.y == center + 2 || endSpace.y == center && endSpace.x == center + 2)) {
+            // And it isn't the Linnaean space in the -x or -y directions...
+            if(!(endSpace.x == center && endSpace.y == center - 2 || endSpace.y == center && endSpace.x == center - 2)) {
+                // Then it can't be a Linnaean capture.
+                return null;
+            }
+        }
+
+        Coord throne = Coord.get(center, center);
+
+        // Can't be a Linnaean capture if the king isn't on the throne
+        if(Taflman.getPackedType(getPieceAt(center,center)) != Taflman.TYPE_KING) {
+            return null;
+        }
+
+        List<Coord> interveningSpaces = Coord.getInterveningSpaces(getBoard().getBoardDimension(), throne, endSpace);
+
+        if(interveningSpaces.size() != 1) {
+            throw new IllegalStateException("Impossible Linnaean space passed checks");
+        }
+
+        Coord targetSpace = Coord.getInterveningSpaces(getBoard().getBoardDimension(), throne, endSpace).get(0);
+
+        // Can't be a Linnaean capture if the target space isn't occupied by a defender
+        if(Taflman.getPackedSide(getBoard().getOccupier(targetSpace)) != Taflman.SIDE_DEFENDERS) {
+            return null;
+        }
+
+        List<Character> neighbors = getBoard().getAdjacentNeighbors(throne);
+        int neighborCount = 0;
+        for(char neighbor : neighbors) {
+            if(Taflman.getPackedSide(neighbor) == Taflman.SIDE_ATTACKERS) neighborCount++;
+        }
+
+        // Can't be a Linnaean capture if the king is not otherwise surrounded by attackers
+        if(neighborCount < 3) {
+            return null;
+        }
+
+        return targetSpace;
     }
 
     private boolean checkEdgeFortEscape() {

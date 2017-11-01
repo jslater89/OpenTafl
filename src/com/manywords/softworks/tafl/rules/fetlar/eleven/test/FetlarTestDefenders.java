@@ -26,6 +26,11 @@ public class FetlarTestDefenders extends Side {
     }
 
     @Override
+    public boolean hasMercenaries() {
+        return false;
+    }
+
+    @Override
     public boolean hasCommanders() {
         return false;
     }
@@ -39,21 +44,21 @@ public class FetlarTestDefenders extends Side {
         List<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(13);
 
         // 5,5 is center
-        taflmen.add(new King((byte) 0, Coord.get(0, 2), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new King((byte) 18, Coord.get(0, 2), this, getBoard(), getBoard().getRules()));
 
         // Adjacent spaces to 5,5
-        taflmen.add(new TaflmanImpl((byte) 1, Taflman.TYPE_TAFLMAN, Coord.get(5, 6), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 2, Taflman.TYPE_TAFLMAN, Coord.get(6, 5), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 3, Taflman.TYPE_TAFLMAN, Coord.get(4, 5), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 4, Taflman.TYPE_TAFLMAN, Coord.get(4, 6), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 5, Taflman.TYPE_TAFLMAN, Coord.get(6, 4), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 6, Taflman.TYPE_TAFLMAN, Coord.get(6, 6), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 7, Taflman.TYPE_TAFLMAN, Coord.get(4, 4), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 19, Taflman.TYPE_TAFLMAN, Coord.get(5, 6), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 20, Taflman.TYPE_TAFLMAN, Coord.get(6, 5), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 21, Taflman.TYPE_TAFLMAN, Coord.get(4, 5), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 22, Taflman.TYPE_TAFLMAN, Coord.get(4, 6), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 23, Taflman.TYPE_TAFLMAN, Coord.get(6, 4), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 24, Taflman.TYPE_TAFLMAN, Coord.get(6, 6), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 25, Taflman.TYPE_TAFLMAN, Coord.get(4, 4), this, getBoard(), getBoard().getRules()));
 
         // The 'point spaces'
-        taflmen.add(new TaflmanImpl((byte) 8, Taflman.TYPE_TAFLMAN, Coord.get(5, 7), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 9, Taflman.TYPE_TAFLMAN, Coord.get(7, 5), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 10, Taflman.TYPE_TAFLMAN, Coord.get(3, 5), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 26, Taflman.TYPE_TAFLMAN, Coord.get(5, 7), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 27, Taflman.TYPE_TAFLMAN, Coord.get(7, 5), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 28, Taflman.TYPE_TAFLMAN, Coord.get(3, 5), this, getBoard(), getBoard().getRules()));
 
         return createHolderListFromTaflmanList(taflmen);
     }

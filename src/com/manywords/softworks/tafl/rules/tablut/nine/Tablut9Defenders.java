@@ -26,6 +26,11 @@ public class Tablut9Defenders extends Side {
     }
 
     @Override
+    public boolean hasMercenaries() {
+        return false;
+    }
+
+    @Override
     public boolean hasCommanders() {
         return false;
     }
@@ -36,16 +41,16 @@ public class Tablut9Defenders extends Side {
         int x = 4;
         int y = 4;
 
-        taflmen.add(new King((byte) 0, Coord.get(x, y), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new King((byte) 16, Coord.get(x, y), this, getBoard(), getBoard().getRules()));
 
-        taflmen.add(new TaflmanImpl((byte) 1, Taflman.TYPE_TAFLMAN, Coord.get(x, y + 1), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 2, Taflman.TYPE_TAFLMAN, Coord.get(x, y + 2), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 3, Taflman.TYPE_TAFLMAN, Coord.get(x, y - 1), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 4, Taflman.TYPE_TAFLMAN, Coord.get(x, y - 2), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 5, Taflman.TYPE_TAFLMAN, Coord.get(x + 2, y), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 6, Taflman.TYPE_TAFLMAN, Coord.get(x + 1, y), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 7, Taflman.TYPE_TAFLMAN, Coord.get(x - 1, y), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 8, Taflman.TYPE_TAFLMAN, Coord.get(x - 2, y), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 17, Taflman.TYPE_TAFLMAN, Coord.get(x, y + 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 18, Taflman.TYPE_TAFLMAN, Coord.get(x, y + 2), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 19, Taflman.TYPE_TAFLMAN, Coord.get(x, y - 1), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 20, Taflman.TYPE_TAFLMAN, Coord.get(x, y - 2), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 21, Taflman.TYPE_TAFLMAN, Coord.get(x + 2, y), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 22, Taflman.TYPE_TAFLMAN, Coord.get(x + 1, y), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 23, Taflman.TYPE_TAFLMAN, Coord.get(x - 1, y), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 24, Taflman.TYPE_TAFLMAN, Coord.get(x - 2, y), this, getBoard(), getBoard().getRules()));
 
         return createHolderListFromTaflmanList(taflmen);
     }

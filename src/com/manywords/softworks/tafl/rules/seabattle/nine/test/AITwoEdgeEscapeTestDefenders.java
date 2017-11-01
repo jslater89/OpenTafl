@@ -16,11 +16,16 @@ public class AITwoEdgeEscapeTestDefenders extends SeaBattle9Defenders {
         super(board, taflmen);
     }
 
+    @Override
+    public boolean hasMercenaries() {
+        return false;
+    }
+
     public List<TaflmanHolder> generateTaflmen() {
         ArrayList<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(9);
 
-        taflmen.add(new King((byte) 0, Coord.get(2, 2), this, getBoard(), getBoard().getRules()));
-        taflmen.add(new TaflmanImpl((byte) 1, Taflman.TYPE_TAFLMAN, Coord.get(5, 5), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new King((byte) 3, Coord.get(2, 2), this, getBoard(), getBoard().getRules()));
+        taflmen.add(new TaflmanImpl((byte) 4, Taflman.TYPE_TAFLMAN, Coord.get(5, 5), this, getBoard(), getBoard().getRules()));
 
         return createHolderListFromTaflmanList(taflmen);
     }
