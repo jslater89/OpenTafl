@@ -46,13 +46,15 @@ public class SpacePropertiesDialog extends DialogWindow {
 
         setupCheckBoxes();
 
-        Panel p = new Panel(new GridLayout(9));
+        Panel p = new Panel(new GridLayout(11));
 
         p.addComponent(TerminalUtils.newSpacer());
         p.addComponent(new Label("Attacker"));
         p.addComponent(new Label("Attacker"));
         p.addComponent(new Label("Attacker"));
         p.addComponent(new Label("Attacker"));
+        p.addComponent(new Label("Attacker"));
+        p.addComponent(new Label("Defender"));
         p.addComponent(new Label("Defender"));
         p.addComponent(new Label("Defender"));
         p.addComponent(new Label("Defender"));
@@ -63,10 +65,12 @@ public class SpacePropertiesDialog extends DialogWindow {
         p.addComponent(new Label("Commander"));
         p.addComponent(new Label("Knight"));
         p.addComponent(new Label("King"));
+        p.addComponent(new Label("Mercenary"));
         p.addComponent(new Label("Taflman"));
         p.addComponent(new Label("Commander"));
         p.addComponent(new Label("Knight"));
         p.addComponent(new Label("King"));
+        p.addComponent(new Label("Mercenary"));
 
         p.addComponent(new Label("Passable"));
         for(CheckBox checkBox : mPassableCheckBoxes) p.addComponent(checkBox);
@@ -125,12 +129,16 @@ public class SpacePropertiesDialog extends DialogWindow {
                 new CheckBox(""),
                 new CheckBox(""),
                 new CheckBox(""),
+                new CheckBox(""),
+                new CheckBox(""),
         };
         for(int i = 0; i < passable.length; i++) {
             mPassableCheckBoxes[i].setChecked(passable[i]);
         }
 
         mStoppableCheckBoxes = new CheckBox[] {
+                new CheckBox(""),
+                new CheckBox(""),
                 new CheckBox(""),
                 new CheckBox(""),
                 new CheckBox(""),
@@ -153,6 +161,8 @@ public class SpacePropertiesDialog extends DialogWindow {
                 new CheckBox(""),
                 new CheckBox(""),
                 new CheckBox(""),
+                new CheckBox(""),
+                new CheckBox(""),
         };
         for(int i = 0; i < hostile.length; i++) {
             mHostileCheckBoxes[i].setChecked(hostile[i]);
@@ -167,12 +177,16 @@ public class SpacePropertiesDialog extends DialogWindow {
                 new CheckBox(""),
                 new CheckBox(""),
                 new CheckBox(""),
+                new CheckBox(""),
+                new CheckBox(""),
         };
         for(int i = 0; i < reenterable.length; i++) {
             mReenterableCheckBoxes[i].setChecked(reenterable[i]);
         }
 
         mHostileEmptyCheckBoxes = new CheckBox[] {
+                new CheckBox(""),
+                new CheckBox(""),
                 new CheckBox(""),
                 new CheckBox(""),
                 new CheckBox(""),

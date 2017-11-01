@@ -743,8 +743,9 @@ public class Taflman {
                 newTaflman = (char)(newTaflman & ~Taflman.SIDE_ATTACKERS);
             }
             else {
-                newTaflman = (char)(newTaflman & Taflman.SIDE_ATTACKERS);
+                newTaflman = (char)(newTaflman | Taflman.SIDE_ATTACKERS);
             }
+
             getBoard(state).setOccupier(originalSpace, newTaflman);
         }
         return true;
