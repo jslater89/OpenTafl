@@ -86,7 +86,7 @@ public class OpenTafl {
                 //runMode = Mode.DEBUG;
                 devMode = true;
             }
-            else if (arg.contains("--chatty")) {
+            else if (arg.contains("--verbose")) {
                 Log.level = Log.Level.VERBOSE;
             }
             else if (arg.contains("--normal")) {
