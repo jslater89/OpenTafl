@@ -63,7 +63,7 @@ public class OptionsWindow extends FocusableBasicWindow {
             if(newSize != null) {
                 int size = newSize.intValue();
                 if(size % 2 != 1) size += 1;
-                size = Math.max(5, Math.min(17, size));
+                size = Math.max(5, Math.min(19, size));
                 mHost.newLayout(size);
             }
         });
