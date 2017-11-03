@@ -48,27 +48,27 @@ public class RulesSerializer {
 
         map.put("spd", "-1");
 
-        map.put("corh", "tcnkTCNK");
-        map.put("cenh", "tcnk");
-        map.put("cenhe", "tcnkTCNK");
-        map.put("aforh", "TCNK");
-        map.put("dforh", "tcnk");
+        map.put("corh", "tcnkmTCNKM");
+        map.put("cenh", "tcnkm");
+        map.put("cenhe", "tcnkmTCNKM");
+        map.put("aforh", "TCNKM");
+        map.put("dforh", "tcnkm");
 
         // Most rulesets don't have impassable spaces.
         map.put("corp", "K");
-        map.put("cenp", "tcnkTCNK");
-        map.put("aforp", "tcnkTCNK");
-        map.put("dforp", "tcnkTCNK");
+        map.put("cenp", "tcnkmTCNKM");
+        map.put("aforp", "tcnkmTCNKM");
+        map.put("dforp", "tcnkmTCNKM");
 
         map.put("cors", "K");
         map.put("cens", "K");
-        map.put("afors", "tcnkTCNK");
-        map.put("dfors", "TCNK");
+        map.put("afors", "tcnkmTCNKM");
+        map.put("dfors", "TCNKM");
 
-        map.put("corre", "tcnkTCNK");
-        map.put("cenre", "tcnkTCNK");
-        map.put("aforre", "tcnkTCNK");
-        map.put("dforre", "tcnkTCNK");
+        map.put("corre", "tcnkmTCNKM");
+        map.put("cenre", "tcnkmTCNKM");
+        map.put("aforre", "tcnkmTCNKM");
+        map.put("dforre", "tcnkmTCNKM");
 
         map.put("sw", "n");
         map.put("swf", "y");

@@ -144,6 +144,8 @@ are present only for organizational purposes.
 	[<"aforp:"><piece-type-list>] [<"dforp:"><piece-type-list>]
 	[<"cors:"><piece-type-list>] [<"cens:"><piece-type-list>]
 	[<"afors:"><piece-type-list>] [<"dfors:"><piece-type-list>]
+	[<"cenre:"><piece-type-list>] [<"corre:"><piece-type-list>]
+	[<"aforre:"><piece-type-list>] [<"dforre:"><piece-type-list>]
 
 	# These rules concern shieldwall and edge fort formations.
 	[<"sw:"><shieldwall-mode>] [<"swf:"><yes-no>] [<"efe:"><yes-no>]
@@ -175,10 +177,11 @@ are present only for organizational purposes.
 		king-mode:
 			"s": strong
 			"c": strong on or adjacent to center, weak elsewhere
-			"w": weak everywheret
+			"m": middleweight
+			"w": weak everywhere
 		jump-type:
 			"n": no jumps
-			"r": restricted jumps: only to  or from center, corners, or 
+			"r": restricted jumps: only to or from center, corners, or 
 			     friendly fortresses
 			"j": jump over enemy pieces: no capturing
 			"c": jump over enemy pieces: capturing
@@ -187,7 +190,8 @@ are present only for organizational purposes.
 		piece-type-list:
 			[<taflman-symbol>]...
 
-			The preferred order is 'tcnkmTCNKM'.
+			Ordering has no semantic meaning, but the preferred order 
+			is 'tcnkmTCNKM'.
 		shieldwall-mode:
 			"n": no shieldwall capture
 			"w": weak shieldwalls, corners may not close a shieldwall position
@@ -232,7 +236,8 @@ Explanatory notes:
 		Defaults to "s" (strong). If "w", the king need only be surrounded on two sides.
 		If "c", the king is strong on or adjacent to the throne, but weak elsewhere on
 		the board. If "m", the king is strong, but can be captured against the board
-		edge.
+		edge. (More precisely, the king is captured if all spaces adjacent to him are
+		hostile.)
 
 		"y" is equivalent to "s", and "n" is equivalent to "w", for backward
 		compatibility.
@@ -242,6 +247,8 @@ Explanatory notes:
 		(knight jump) can the knight jump? Defaults to "c" (capturing jumps).
 	cj: 
 		(commander jump) can the commander jump? Defaults to "j" (non-capturing jumps).
+	mj:
+		(mercenary jump) can the mercenary jump? Defaults to "n" (no).
 	spd:
 		(speed limits) the speed limit for the game. Defaults to "-1", no speed limit
 		for any piece. Several options are available: a single number will set the
@@ -250,8 +257,8 @@ Explanatory notes:
 		separated by commas, will set the speed limits for each piece type individually,
 		in standard tcnkmTCNKM order.
 
-		Old saved games may have eight entries in the speed limits list. New saved games
-		must have ten, to include the recently-added mercenaries.
+		If the speed limits list is only eight items long, the items apply to taflmen,
+		commanders, knights, and kings, ignoring mercenaries, for backwards compatibility.
 
 		e.g.:
 		spd:-1 - no speed limit
@@ -272,33 +279,43 @@ Explanatory notes:
 		(defender fortresses) as attacker fortresses.
 	corh:
 		(corner hostile to...) a list of piece types to which the corner spaces are
-		hostile. Defaults to "tcnkTCNK" (all pieces).
+		hostile. Defaults to "tcnkmTCNKM" (all pieces).
 	cenh:
-		as corh. Defaults to "tcnk" (all attacking pieces).
+		as corh. Defaults to "tcnkm" (all attacking pieces).
 	cenhe:
-		(center hostile when empty) as corh. Defaults to "tcnkTCNK" (all pieces).
+		(center hostile when empty) as corh. Defaults to "tcnkmTCNKM" (all pieces).
 	aforh:
-		as corh. Defaults to "TCNK" (all defending pieces).
+		as corh. Defaults to "TCNKM" (all defending pieces).
 	dforh:
-		as corh. Defaults to "tcnk" (all attacking pieces).
+		as corh. Defaults to "tcnkm" (all attacking pieces).
 	corp:
 		(corner passable by...) a list of piece types which can move through the corner
 		spaces. Defaults to "K" (king only).
 	cenp:
-		as corp. Defaults to "tcnkTCNK" (all pieces).
+		as corp. Defaults to "tcnkmTCNKM" (all pieces).
 	aforp:
-		as corp. Defaults to "tcnkTCNK" (all pieces).
+		as corp. Defaults to "tcnkmTCNKM" (all pieces).
 	dforp:
-		as corp. Defaults to "TCNK" (all defending pieces).
+		as corp. Defaults to "TCNKM" (all defending pieces).
 	cors:
 		(can stop on corner...) a list of piece types which can stop on the corner
 		spaces. Defaults to "K" (king only).
 	cens:
 		as cors. Defaults to "K" (king only).
 	afors:
-		as cors. Defaults to "tcnkTCNK" (all pieces).
+		as cors. Defaults to "tcnkmTCNKM" (all pieces).
 	dfors:
-		as cors. Defaults to "TCNK" (all defending pieces).
+		as cors. Defaults to "TCNKM" (all defending pieces).
+	corre:
+		(can re-enter corner; i.e. enter corner from outside) a list of piece types
+		which can enter the corner spaces when starting on a non-corner space. Defaults
+		to "tcnkmTCNKM" (all pieces).
+	cenre:
+		as corre. Defaults to "tcnkmTCNKM" (all pieces).
+	aforre:
+		as corre. Defaults to "tcnkmTCNKM" (all pieces).
+	dforre:
+		as corre. Defaults to "tcnkmTCNKM" (all pieces).
 	sw:
 		(shieldwall mode) Defaults to "n" (none).
 	swf:
@@ -317,8 +334,10 @@ Explanatory notes:
 	ber:
 		(berserk mode) Defaults to "n" (none).
 	starting-position:
-		must be present.
+		must be present if inverted-starting-position is not.
 	inverted-starting-position:
+		must be present if starting-position is not.
+
 		Ordinary position records start counting at a1, moving from left to right
 		and from rank 1 to rank N. Under the ordinary convention, where the space
 		labeled a1 is at the bottom left, this means that reading the position
