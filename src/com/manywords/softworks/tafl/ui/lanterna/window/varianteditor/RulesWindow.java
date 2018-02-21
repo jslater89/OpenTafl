@@ -156,7 +156,7 @@ public class RulesWindow extends FocusableBasicWindow {
         p.addComponent(TerminalUtils.newSpacer());
 
         Panel fifthAndAHalfRow = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        fifthAndAHalfRow.addComponent(new Label("Mercenary Jumps?"));
+        fifthAndAHalfRow.addComponent(new Label("Mercenary jumps?"));
         mMercenaryJumpRadio = new RadioBoxList<>();
         addItems(mMercenaryJumpRadio, mJumpModes);
         fifthAndAHalfRow.addComponent(mMercenaryJumpRadio);
