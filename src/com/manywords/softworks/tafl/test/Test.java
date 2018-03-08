@@ -19,14 +19,16 @@ public class Test {
         List<TaflTest> tests = new ArrayList<TaflTest>();
 
         // Initial tests (debug only)
-        tests.add(new TaflmanCoordMapTest());
+
 
         // Mechanics tests
+        tests.add(new TaflmanCoordMapTest());
         tests.add(new RepetitionHashTableTest());
         tests.add(new MoveRecordRotationMirrorTest());
         tests.add(new MoveAddressTest());
         tests.add(new ReplayGameTest());
         tests.add(new KingMissingPositionRecordTest());
+        tests.add(new RulesPrinterCrashTest());
 
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());

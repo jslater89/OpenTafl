@@ -6,9 +6,7 @@ import com.manywords.softworks.tafl.rules.Coord;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Taflman;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -744,21 +742,37 @@ public class HumanReadableRulesPrinter {
         }
     }
 
+    private static boolean validateTaflmanPattern(String spec) {
+        Pattern taflmanSpecChars = Pattern.compile("\\s*[tcnkmTCNKM]*\\s*");
+        if(!taflmanSpecChars.matcher(spec).matches()) return false;
+
+        Map<Character, Integer> counts = new HashMap<>();
+
+        for(char c : spec.toCharArray()) {
+            counts.put(c, counts.getOrDefault(c, 0) + 1);
+        }
+
+        for(int i : counts.values()) {
+            if(i > 1) return false;
+        }
+
+        return true;
+    }
+
     private static String getTaflmanTypeStringFromSpec(Rules r, boolean attackingSide, String spec) {
-        Pattern taflmanSpecPattern = Pattern.compile("\\s*t?c?n?k?T?C?N?K?\\s*");
-        if(!taflmanSpecPattern.matcher(spec).matches()) throw new IllegalArgumentException("Bad taflman spec");
+        if(!validateTaflmanPattern(spec)) throw new IllegalArgumentException("Bad taflman spec");
 
         String taflmenString = (attackingSide ? "attacking " : "defending ");
 
-        if(spec.equals("tcnkTCNK")) {
+        if(spec.equals("tcnkmTCNKM")) {
             return "all " + (attackingSide ? "attacking" : "defending") + " taflmen";
         }
 
         if(attackingSide) {
-            spec = spec.replaceAll("[TCNK]", "");
+            spec = spec.replaceAll("[TCNKM]", "");
         }
         else {
-            spec = spec.replaceAll("[tcnk]", "");
+            spec = spec.replaceAll("[tcnkm]", "");
         }
 
         if(!r.getAttackers().hasKnights()) {
