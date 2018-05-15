@@ -509,7 +509,7 @@ public class HumanReadableRulesPrinter {
         }
 
         boolean kingWeak = r.getKingStrengthMode() == Rules.KING_WEAK || (r.getKingStrengthMode() == Rules.KING_STRONG_CENTER && centers.size() == 0);
-        rules += ruleNumber++ + ". Taflmen" + (kingWeak ? ", except for the king, " : " ") + "are captured when an " +
+        rules += ruleNumber++ + ". Taflmen" + (!kingWeak ? ", except for the king, " : " ") + "are captured when an " +
                 "opponent's move surrounds a taflman on two sides, along a row or a column, with hostile taflmen or spaces. " +
                 "Taflmen are only captured if the opponent's move closes the trap. A taflman may therefore safely move in between two enemy taflmen, or " +
                 "an enemy taflman and a hostile space. Captured taflmen are removed from the game. ";
