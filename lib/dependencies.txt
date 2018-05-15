@@ -1,6 +1,6 @@
 ini4j 0.5.4
 jline-2.1.3
-special lanterna: build from https://github.com/jslater89/lanterna until next
-lanterna release
+special lanterna: built from https://github.com/jslater89/lanterna (should be
+refactored to use official lanterna, but I haven't gotten there yet)
 
 (See build.gradle for the always-up-to-date list of dependencies)
