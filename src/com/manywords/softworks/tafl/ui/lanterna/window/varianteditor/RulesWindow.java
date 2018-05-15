@@ -360,7 +360,7 @@ public class RulesWindow extends FocusableBasicWindow {
     private int threefoldStringToType(String threefold) {
         if("draw".equals(threefold.toLowerCase())) return Rules.THIRD_REPETITION_DRAWS;
         else if("win".equals(threefold.toLowerCase())) return Rules.THIRD_REPETITION_WINS;
-        else if("loss".equals(threefold.toLowerCase())) return Rules.THIRD_REPETITION_DRAWS;
+        else if("loss".equals(threefold.toLowerCase())) return Rules.THIRD_REPETITION_LOSES;
         else return Rules.THIRD_REPETITION_IGNORED;
     }
 

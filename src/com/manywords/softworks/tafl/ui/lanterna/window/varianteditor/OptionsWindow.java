@@ -273,7 +273,7 @@ public class OptionsWindow extends FocusableBasicWindow {
                     "\n\n" +
                     "Threefold result: the result when a a board position is repeated for the third time. 'Win' and " +
                     "'Loss' mean that the player who made the move to enter the repeated board position wins or loses, " +
-                    "respectively." +
+                    "respectively. Set to 'Win' for 'the aggressor loses'." +
                     "\n\n" +
                     "King strength: how difficult the king is to capture. A strong king must be surrounded on four " +
                     "sides by hostile spaces. A (strong) center king is strong when adjacent to a center space, and " +
