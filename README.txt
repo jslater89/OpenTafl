@@ -291,6 +291,11 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 13. VERSION HISTORY -----------------------------------------------------------
+v0.4.7.2b (released 05/18/18):
+- Fix error in human-readable rules for weak kings
+- Fix bug in variant editor where selecting threefold loss created rules
+  with threefold draw
+
 v0.4.7.1b (released 03/07/18):
 - Fix crash bug in 'rules' command output
 
