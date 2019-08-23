@@ -346,8 +346,8 @@ Explanatory notes:
 		which is difficult to visualize. The inverted position record is the
 		regular position record with its rows in reverse order, so that the first
 		row entry in the position record corresponds to the leftmost space of the
-		bottom-most row. Reading the inverted position record from left to right
-		gives the board state in left-to-right, bottom-to-top format.
+		topmost row. Reading the inverted position record from left to right
+		gives the board state in left-to-right, top-to-bottom format.
 
 		For this reason, tafl engines which display space a1 at the bottom left
 		should create rules records for human consumption using the starti tag
