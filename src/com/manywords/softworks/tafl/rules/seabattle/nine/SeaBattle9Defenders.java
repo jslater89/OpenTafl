@@ -35,6 +35,11 @@ public class SeaBattle9Defenders extends Side {
         return false;
     }
 
+    @Override
+    public boolean hasGuards() {
+        return false;
+    }
+
     public List<TaflmanHolder> generateTaflmen() {
         ArrayList<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(9);
 

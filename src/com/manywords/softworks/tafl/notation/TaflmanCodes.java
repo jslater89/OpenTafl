@@ -29,17 +29,19 @@ import com.manywords.softworks.tafl.rules.Taflman;
  */
 public class TaflmanCodes {
     public static final int count = Rules.TAFLMAN_TYPE_COUNT;
-    public static final char[] inverse = {'t', 'c', 'n', 'k', 'm', 'T', 'C', 'N', 'K', 'M'};
+    public static final char[] inverse = {'t', 'c', 'n', 'k', 'm', 'g', 'T', 'C', 'N', 'K', 'M', 'G'};
     public static final int t = 0;
     public static final int c = 1;
     public static final int n = 2;
     public static final int k = 3;
     public static final int m = 4;
-    public static final int T = 5;
-    public static final int C = 6;
-    public static final int N = 7;
-    public static final int K = 8;
-    public static final int M = 9;
+    public static final int g = 5;
+    public static final int T = 6;
+    public static final int C = 7;
+    public static final int N = 8;
+    public static final int K = 9;
+    public static final int M = 10;
+    public static final int G = 11;
 
     public static int getIndexForChar(char ch) {
         switch(ch) {
@@ -86,6 +88,7 @@ public class TaflmanCodes {
             case 'N': typeFlag = Taflman.TYPE_KNIGHT; break;
             case 'K': typeFlag = Taflman.TYPE_KING; break;
             case 'M': typeFlag = Taflman.TYPE_MERCENARY; break;
+            case 'G': typeFlag = Taflman.TYPE_GUARD; break;
             default: typeFlag = Taflman.TYPE_TAFLMAN;
         }
 
@@ -94,7 +97,7 @@ public class TaflmanCodes {
 
     public static int getIndexForTaflmanChar(char taflman) {
         boolean attacker = Taflman.getPackedSide(taflman) == Taflman.SIDE_ATTACKERS;
-        int index = (attacker ? 0 : 5);
+        int index = (attacker ? 0 : Taflman.TYPES_BY_PIECE);
 
         switch(Taflman.getPackedType(taflman)) {
             // TYPE_TAFLMAN: index += 0
@@ -109,6 +112,10 @@ public class TaflmanCodes {
                 break;
             case Taflman.TYPE_MERCENARY:
                 index += 4;
+                break;
+            case Taflman.TYPE_GUARD:
+                index += 5;
+                break;
         }
 
         return index;
@@ -131,6 +138,8 @@ public class TaflmanCodes {
             case Taflman.TYPE_MERCENARY:
                 taflmanType = "mercenary";
                 break;
+            case Taflman.TYPE_GUARD:
+                taflmanType = "guard";
         }
 
         if(plural) {

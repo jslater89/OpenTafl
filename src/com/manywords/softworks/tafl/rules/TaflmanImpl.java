@@ -53,6 +53,11 @@ public class TaflmanImpl extends Taflman {
         return (char) (mType & TYPE_MERCENARY) == TYPE_MERCENARY;
     }
 
+    public boolean isGuard() {
+        // This is a guard, who doesn't capture and can't be captured.
+        return (char) (mType & TYPE_GUARD) == TYPE_GUARD;
+    }
+
     public Side getSide() {
         return mSide;
     }

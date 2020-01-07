@@ -39,6 +39,8 @@ public abstract class Side {
 
     public abstract boolean hasMercenaries();
 
+    public abstract boolean hasGuards();
+
     public abstract Side deepCopy(Board board);
 
     public abstract List<TaflmanHolder> generateTaflmen();

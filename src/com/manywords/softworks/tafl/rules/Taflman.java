@@ -17,13 +17,12 @@ public class Taflman {
     public static final char SIDE_MASK = 2048; // One bit
     public static final char DEVELOPED_MASK = 4096; // One bit
 
-    public static final int COUNT_TYPES = 4;
-
     public static final char TYPE_TAFLMAN = 256;
     public static final char TYPE_COMMANDER = 512;
     public static final char TYPE_KNIGHT = 256 + 512;
     public static final char TYPE_KING = 1024;
     public static final char TYPE_MERCENARY = 1024 + 256;
+    public static final char TYPE_GUARD = 1024 + 512;
 
     public static final char SIDE_ATTACKERS = 2048;
     public static final char SIDE_DEFENDERS = 0;
@@ -37,12 +36,17 @@ public class Taflman {
             TYPE_KNIGHT | SIDE_ATTACKERS,
             TYPE_KING | SIDE_ATTACKERS,
             TYPE_MERCENARY | SIDE_ATTACKERS,
+            TYPE_GUARD | SIDE_ATTACKERS,
             TYPE_TAFLMAN | SIDE_DEFENDERS,
             TYPE_COMMANDER | SIDE_DEFENDERS,
             TYPE_KNIGHT | SIDE_DEFENDERS,
             TYPE_KING | SIDE_DEFENDERS,
-            TYPE_MERCENARY | SIDE_DEFENDERS
+            TYPE_MERCENARY | SIDE_DEFENDERS,
+            TYPE_GUARD | SIDE_DEFENDERS,
     };
+    public static final int TYPES_BY_PIECE_AND_SIDE = ALL_TAFLMAN_TYPES.length;
+    public static final int TYPES_BY_PIECE = ALL_TAFLMAN_TYPES.length / 2;
+
 
     public static char encode(TaflmanImpl taflman) {
         char packedTaflman = 0;
@@ -54,6 +58,7 @@ public class Taflman {
         } else if (taflman.isKnight()) packedTaflman = (char) (packedTaflman | TYPE_KNIGHT);
         else if (taflman.isCommander()) packedTaflman = (char) (packedTaflman | TYPE_COMMANDER);
         else if (taflman.isMercenary()) packedTaflman = (char) (packedTaflman | TYPE_MERCENARY);
+        else if (taflman.isGuard()) packedTaflman = (char) (packedTaflman | TYPE_GUARD);
         else packedTaflman = (char) (packedTaflman | TYPE_TAFLMAN);
 
         if (taflman.getSide().isAttackingSide()) {
@@ -119,6 +124,10 @@ public class Taflman {
 
     public static boolean isMercenary(char taflman) {
         return (char) (getPackedType(taflman) & TYPE_MERCENARY) == TYPE_MERCENARY;
+    }
+
+    public static boolean isGuard(char taflman) {
+        return (char) (getPackedType(taflman) & TYPE_GUARD) == TYPE_GUARD;
     }
 
     /**
@@ -210,9 +219,7 @@ public class Taflman {
         List<Coord> capturingMoves = new ArrayList<Coord>(5);
 
         if (getJumpMode(rules, taflman) == Taflman.JUMP_CAPTURE) {
-            for (Coord jump : getJumpsFrom(state, taflman, start)) {
-                capturingMoves.add(jump);
-            }
+            capturingMoves.addAll(getJumpsFrom(state, taflman, start));
         }
 
         for (Coord move : moves) {
@@ -522,6 +529,11 @@ public class Taflman {
             }
         }
 
+        // Guards can't capture or be captured.
+        if (Taflman.isGuard(taflman) || Taflman.isGuard(capturer)) {
+            return false;
+        }
+
         // If the capturing piece is an unarmed king, don't check anything
         // else.
         if (Taflman.isKing(capturer)
@@ -803,6 +815,7 @@ public class Taflman {
         if (isCommander(taflman)) symbol = "o";
         if (isKnight(taflman)) symbol = "?";
         if (isMercenary(taflman)) symbol = "m";
+        if (isGuard(taflman)) symbol = "g";
 
         if(size == 1) return symbol;
         else if(size == 2) return symbol + symbol;

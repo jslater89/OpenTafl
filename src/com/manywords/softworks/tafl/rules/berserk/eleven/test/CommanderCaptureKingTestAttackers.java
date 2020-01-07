@@ -40,6 +40,11 @@ public class CommanderCaptureKingTestAttackers extends Side {
     }
 
     @Override
+    public boolean hasGuards() {
+        return false;
+    }
+
+    @Override
     public Side deepCopy(Board board) {
         return new CommanderCaptureKingTestAttackers(board, getStartingTaflmen());
     }

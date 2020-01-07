@@ -206,6 +206,8 @@ public class OptionsWindow extends FocusableBasicWindow {
                     case Taflman.TYPE_MERCENARY:
                         status += "mercenary";
                         break;
+                    case Taflman.TYPE_GUARD:
+                        status += "guard";
                     default:
                         status += "taflman";
                 }

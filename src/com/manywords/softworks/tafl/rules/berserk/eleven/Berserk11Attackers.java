@@ -36,6 +36,11 @@ public class Berserk11Attackers extends Side {
     }
 
     @Override
+    public boolean hasGuards() {
+        return false;
+    }
+
+    @Override
     public Side deepCopy(Board board) {
         return new Berserk11Attackers(board, getStartingTaflmen());
     }

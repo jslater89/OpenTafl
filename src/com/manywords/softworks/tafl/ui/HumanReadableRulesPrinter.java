@@ -499,6 +499,10 @@ public class HumanReadableRulesPrinter {
                     if(isAttacking && r.getAttackers().hasMercenaries()) rules += "Attacking mercenaries move up to " + speedLimitString;
                     else if(!isAttacking && r.getDefenders().hasMercenaries()) rules += "Defending mercenaries move up to " + speedLimitString;
                 }
+                else if(taflmanType == Taflman.TYPE_GUARD) {
+                    if(isAttacking && r.getAttackers().hasGuards()) rules += "Attacking guards move up to " + speedLimitString;
+                    else if(!isAttacking && r.getDefenders().hasGuards()) rules += "Defending guards move up to " + speedLimitString;
+                }
                 else {
                     side = Character.toUpperCase(side.charAt(0)) + side.substring(1);
                     rules += side + " taflmen move " + speedLimitString;
@@ -653,6 +657,18 @@ public class HumanReadableRulesPrinter {
             rules += "\n\n";
         }
 
+        if(r.getAttackers().hasGuards() || r.getDefenders().hasGuards()) {
+            rules += ruleNumber++ + ". Guards are a special piece, marked by the 'g' symbol. Guards can neither participate in captures nor be captured " +
+                    "themselves.";
+
+            if(r.allowLinnaeanCaptures()) {
+                rules += " If a guard is next to the king on his throne, the attacker may not take either piece by Linnaean capture.";
+            }
+            if(r.allowShieldWallCaptures() >= Rules.WEAK_SHIELDWALL) {
+                rules += " Guards may not close a shieldwall capture, nor can they be taken by shieldwall capture.";
+            }
+        }
+
         if(r.getKingJumpMode() != Taflman.JUMP_NONE) {
             rules += ruleNumber++ + ". " + getJumpModeString("king", r.getKingJumpMode());
             rules += "\n\n";
@@ -764,15 +780,15 @@ public class HumanReadableRulesPrinter {
 
         String taflmenString = (attackingSide ? "attacking " : "defending ");
 
-        if(spec.equals("tcnkmTCNKM")) {
+        if(spec.equals("tcnkmgTCNKMG")) {
             return "all " + (attackingSide ? "attacking" : "defending") + " taflmen";
         }
 
         if(attackingSide) {
-            spec = spec.replaceAll("[TCNKM]", "");
+            spec = spec.replaceAll("[TCNKMG]", "");
         }
         else {
-            spec = spec.replaceAll("[tcnkm]", "");
+            spec = spec.replaceAll("[tcnkmg]", "");
         }
 
         if(!r.getAttackers().hasKnights()) {
@@ -794,6 +810,13 @@ public class HumanReadableRulesPrinter {
         }
         if(!r.getDefenders().hasMercenaries()) {
             spec = spec.replaceAll("M", "");
+        }
+
+        if(!r.getAttackers().hasGuards()) {
+            spec = spec.replaceAll("g", "");
+        }
+        if(!r.getDefenders().hasGuards()) {
+            spec = spec.replaceAll("G", "");
         }
 
         spec = spec.replaceAll("k", "");

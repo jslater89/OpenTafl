@@ -128,6 +128,11 @@ public class Copenhagen extends Rules {
     }
 
     @Override
+    public int getGuardJumpMode() {
+        return Taflman.JUMP_NONE;
+    }
+
+    @Override
     public boolean canSideJump(Side side) {
         return false;
     }

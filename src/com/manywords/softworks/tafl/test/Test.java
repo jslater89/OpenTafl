@@ -26,7 +26,6 @@ public class Test {
         tests.add(new RepetitionHashTableTest());
         tests.add(new MoveRecordRotationMirrorTest());
         tests.add(new MoveAddressTest());
-        tests.add(new ReplayGameTest());
         tests.add(new KingMissingPositionRecordTest());
         tests.add(new RulesPrinterCrashTest());
 
@@ -39,6 +38,7 @@ public class Test {
         tests.add(new NetworkPacketConsistencyTests());
         tests.add(new BerserkHistoryDuplicationTest());
         tests.add(new GenericRulesCopyTest());
+        tests.add(new ReplayGameTest());
 
         // Rules tests
         tests.add(new LinnaeanCaptureTest());

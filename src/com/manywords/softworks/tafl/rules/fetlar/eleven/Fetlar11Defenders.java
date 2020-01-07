@@ -36,6 +36,11 @@ public class Fetlar11Defenders extends Side {
     }
 
     @Override
+    public boolean hasGuards() {
+        return false;
+    }
+
+    @Override
     public Side deepCopy(Board board) {
         return new Fetlar11Defenders(board, getStartingTaflmen());
     }

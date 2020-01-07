@@ -5,7 +5,7 @@ import com.manywords.softworks.tafl.notation.RulesSerializer;
 import java.util.*;
 
 public abstract class Rules {
-    public static final int TAFLMAN_TYPE_COUNT = Taflman.ALL_TAFLMAN_TYPES.length;
+    public static final int TAFLMAN_TYPE_COUNT = Taflman.TYPES_BY_PIECE_AND_SIDE;
 
     public final int boardSize;
 
@@ -307,6 +307,8 @@ public abstract class Rules {
     public abstract int getCommanderJumpMode();
 
     public abstract int getMercenaryJumpMode();
+
+    public abstract int getGuardJumpMode();
 
     public abstract boolean canSideJump(Side side);
 

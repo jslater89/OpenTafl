@@ -94,6 +94,8 @@ public class RulesSerializerConsistencyTest extends TaflTest {
             assert rules.getMercenaryJumpMode() == Taflman.JUMP_RESTRICTED;
             assert rules.allowLinnaeanCaptures();
 
+            println(mercenaryRulesRecord);
+            println(rules2);
             assert rules2.equals(mercenaryRulesRecord);
         }
         catch(NotationParseException e) {

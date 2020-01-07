@@ -36,6 +36,11 @@ public class Tawlbwrdd11Defenders extends Side {
     }
 
     @Override
+    public boolean hasGuards() {
+        return false;
+    }
+
+    @Override
     public Side deepCopy(Board board) {
         return new Tawlbwrdd11Defenders(board, getStartingTaflmen());
     }

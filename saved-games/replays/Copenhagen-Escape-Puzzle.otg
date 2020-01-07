@@ -1,0 +1,68 @@
+[date:2017.04.15]
+[result:?]
+[compiler:OpenTafl]
+[rules:dim:7 name:CopenhagenPuzzle atkf:y tfr:w cor:g7, cen:b2, sw:s efe:y starti:/tt2T2/1t2K2/2tt3/6t/3TTt1/4Tt1/4Tt1/]
+
+1. f3-f6 e7-d7 
+[|]
+
+2. f6-g6 Ke6-e7 
+[|]
+
+2a.1.1a. d5-f5 Ke6-e7 
+[|]
+
+2a.1.2a. f6-f7 Ke7-e6 
+[|]
+
+2a.1.3a. f5-f6 Ke6-e7xf7 
+[|]
+
+2a.1.4a. f6-f7 Ke7-e6 
+[|]
+
+2a.1.5a. g4-g6 Ke6-e7xf7 
+[|]
+
+2a.1.6a. f2-f7 Ke7-e5 
+[|]
+
+2a.1.7a. b6-f6 Ke5-e7xf7 
+[|]
+
+2a.1.8a. f6-f7 Ke7-e5 
+[|]
+
+2a.1.9a. f1-f6 Ke5-e7xf7 
+[|]
+
+2a.1.10a. f6-f7 Ke7-e5 
+[|]
+
+2a.1.11a. c5-c6 Ke5-e7xf7 
+[|]
+
+2a.1.12a. c6-f6 Ke7-g7 
+[|]
+
+3. f2-f7 Ke7-e5 
+[|]
+
+4. g4-g5 Ke5-e7xf7 
+[|]
+
+5. f1-f7 Ke7-e6 
+[|]
+
+6. g6-f6 Ke6-e7xf7 
+[|]
+
+7. f6-f7 Ke7-e6 
+[|]
+
+8. g5-g6 Ke6-e7xf7 
+[|]
+
+9. d5-f5 Ke7-g7 
+[|]
+

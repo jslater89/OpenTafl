@@ -36,6 +36,11 @@ public class Copenhagen11Defenders extends Side {
     }
 
     @Override
+    public boolean hasGuards() {
+        return false;
+    }
+
+    @Override
     public Side deepCopy(Board board) {
         return new Copenhagen11Defenders(board, getStartingTaflmen());
     }

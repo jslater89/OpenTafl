@@ -362,6 +362,11 @@ public class GameState {
             }
         }
 
+        // Guards can't close a shieldwall capture.
+        if(Taflman.isGuard(potentialCapturer)) {
+            return captures;
+        }
+
         boolean capturingShieldwall = true;
         for (Coord space : surroundedByShieldwall) {
             if (mBoard.getOccupier(space) == Taflman.EMPTY || Taflman.getPackedSide(mBoard.getOccupier(space)) == Taflman.getPackedSide(potentialCapturer)) {
@@ -371,7 +376,9 @@ public class GameState {
 
         if (capturingShieldwall) {
             for (Coord space : surroundedByShieldwall) {
-                if(Taflman.getPackedType(mBoard.getOccupier(space)) != Taflman.TYPE_KING) {
+                char occupier = mBoard.getOccupier(space);
+                char type = Taflman.getPackedType(occupier);
+                if(type != Taflman.TYPE_KING && type != Taflman.TYPE_GUARD) {
                     Taflman.capturedBy(this, mBoard.getOccupier(space), potentialCapturer, destination, false);
                     captures.add(space);
                 }
@@ -526,9 +533,13 @@ public class GameState {
         Coord targetSpace = Coord.getInterveningSpaces(getBoard().getBoardDimension(), throne, endSpace).get(0);
 
         // Can't be a Linnaean capture if the target space isn't occupied by a defender
-        if(Taflman.getPackedSide(getBoard().getOccupier(targetSpace)) != Taflman.SIDE_DEFENDERS) {
+        char target = getBoard().getOccupier(targetSpace);
+        if(Taflman.getPackedSide(target) != Taflman.SIDE_DEFENDERS) {
             return null;
         }
+
+        // Can't be a Linnaean capture if the target space is occupied by an uncapturable guard
+        if(Taflman.isGuard(target)) return null;
 
         List<Character> neighbors = getBoard().getAdjacentNeighbors(throne);
         int neighborCount = 0;
@@ -719,7 +730,7 @@ public class GameState {
                 break;
         }
         if (Taflman.getPackedSide(taflman) > 0) {
-            typeIndex += Taflman.COUNT_TYPES;
+            typeIndex += Taflman.TYPES_BY_PIECE;
         }
 
         return typeIndex;

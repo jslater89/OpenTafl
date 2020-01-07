@@ -2,6 +2,12 @@ Tafl To-Do
 
 v0.4.x features:
 
+Guard additions:
+1. Rules string documentation
+2. Tests for guard/merc jump rules consistency
+3. Tests for guard functionality
+
+
 AI stuff:
 0. Evaluation function work: underpins all further heuristics work
 3. Leaf states not being minified

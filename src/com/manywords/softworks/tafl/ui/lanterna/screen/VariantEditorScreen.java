@@ -192,6 +192,9 @@ public class VariantEditorScreen extends MultiWindowLogicalScreen {
                     newTaflman |= Taflman.TYPE_MERCENARY;
                     break;
                 case Taflman.TYPE_MERCENARY:
+                    newTaflman |= Taflman.TYPE_GUARD;
+                    break;
+                case Taflman.TYPE_GUARD:
                     newTaflman |= Taflman.TYPE_KNIGHT;
                     break;
                 case Taflman.TYPE_KNIGHT:

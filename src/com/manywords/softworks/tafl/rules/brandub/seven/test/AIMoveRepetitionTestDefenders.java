@@ -36,6 +36,11 @@ public class AIMoveRepetitionTestDefenders extends Side {
     }
 
     @Override
+    public boolean hasGuards() {
+        return false;
+    }
+
+    @Override
     public List<TaflmanHolder> generateTaflmen() {
         List<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(9);
 

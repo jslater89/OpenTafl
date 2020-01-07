@@ -44,6 +44,7 @@ public class DetailedMoveRecord extends MoveRecord {
     private static final byte KNIGHT = 1 + 2;
     private static final byte KING = 4;
     private static final byte MERCENARY = 4 + 1;
+    private static final byte GUARD = 4 + 2;
 
     private static final byte SIDE_MASK = 8; // bit 4
     private static final byte ATTACKERS = 8;
@@ -167,6 +168,9 @@ public class DetailedMoveRecord extends MoveRecord {
                 break;
             case Taflman.TYPE_MERCENARY:
                 typeFlag = MERCENARY;
+                break;
+            case Taflman.TYPE_GUARD:
+                typeFlag = GUARD;
                 break;
         }
 

@@ -35,6 +35,11 @@ public class FetlarTestAttackers extends Side {
     }
 
     @Override
+    public boolean hasGuards() {
+        return false;
+    }
+
+    @Override
     public Side deepCopy(Board board) {
         return new FetlarTestAttackers(board, getStartingTaflmen());
     }

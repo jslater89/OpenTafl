@@ -35,6 +35,11 @@ public class Tablut9Attackers extends Side {
         return false;
     }
 
+    @Override
+    public boolean hasGuards() {
+        return false;
+    }
+
     public List<TaflmanHolder> generateTaflmen() {
         ArrayList<TaflmanImpl> taflmen = new ArrayList<TaflmanImpl>(12);
 
