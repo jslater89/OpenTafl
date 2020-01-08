@@ -243,6 +243,7 @@ public class Taflman {
         List<Coord> allowableDestinations = getAllowableDestinationsFrom(state, taflman, getCurrentSpace(state, taflman));
 
         state.setCachedAllowableDestinationsForTaflman(taflman, allowableDestinations);
+
         return allowableDestinations;
     }
 

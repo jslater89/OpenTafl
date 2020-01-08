@@ -20,6 +20,7 @@ Copyright 2015 Jay Slater
 
 package com.manywords.softworks.tafl.notation;
 
+import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.rules.*;
@@ -136,6 +137,9 @@ public class PositionSerializer {
                 currentRow++;
             }
             catch(Exception e) {
+                if(OpenTafl.devMode) {
+                    e.printStackTrace();
+                }
                 throw new NotationParseException(currentRow, row, "Failed to parse row: " + e.toString());
             }
         }

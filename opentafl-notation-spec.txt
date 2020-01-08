@@ -24,6 +24,7 @@ horizontally.
 	empty-space-count: count of empty spaces since row start or last taflman.
 	taflman-symbol: one of the following strings, defenders uppercase, attackers
 	lowercase.
+		"g": guard (neither captures nor can be captured)
 		"m": mercenary/variegated man
 		"k": king
 		"n": knight (berserk)
@@ -191,7 +192,7 @@ are present only for organizational purposes.
 			[<taflman-symbol>]...
 
 			Ordering has no semantic meaning, but the preferred order 
-			is 'tcnkmTCNKM'.
+			is 'tcnkmgTCNKMG'.
 		shieldwall-mode:
 			"n": no shieldwall capture
 			"w": weak shieldwalls, corners may not close a shieldwall position
@@ -250,6 +251,8 @@ Explanatory notes:
 		(commander jump) can the commander jump? Defaults to "j" (non-capturing jumps).
 	mj:
 		(mercenary jump) can the mercenary jump? Defaults to "n" (no).
+	gj:
+		(guard jump) can the guard jump? Defaults to "n" (no).
 	spd:
 		(speed limits) the speed limit for the game. Defaults to "-1", no speed limit
 		for any piece. Several options are available: a single number will set the
@@ -265,7 +268,10 @@ Explanatory notes:
 		spd:-1 - no speed limit
 		spd:4 - all pieces move up to 4 spaces per turn
 		spd:3,4 - attackers move up to 3 spaces, defenders move up to 4 spaces
-		spd:1,1,1,1,1,1,1,2 - all pieces but the king move 1 space per turn, king moves 2
+		spd:1,1,1,1,1,1,1,1,1,1,1,2 - all pieces but the king move 1 space per turn,
+			king moves 2. Speed arrays of length 8 and 10 are also accepted, leaving
+			out entries for mercenaries and guards, for backward compatibility with
+			earlier versions of OpenTafl.
 	cor: 
 		(corner spaces) a list of spaces to treat as corner spaces, useful for e.g. alea
 		evangelii with larger corner forts. Defaults to "default": the four physical

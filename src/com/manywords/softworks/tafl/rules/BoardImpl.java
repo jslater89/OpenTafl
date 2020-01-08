@@ -208,15 +208,13 @@ public abstract class BoardImpl extends Board {
         boolean isHostile = getRules().isSpaceHostileToSide(this, space, Taflman.getSide(getState(), taflman));
         if (occupier != 0 && Taflman.getPackedSide(occupier) != Taflman.getPackedSide(taflman)) {
 
-            // The exception is if the hostile piece is a king, and that king
-            // is unarmed.
+            // The exceptions are if the hostile piece is a king, and that king
+            // is unarmed, or if that piece is a guard.
             if (Taflman.isKing(occupier)
                     && getRules().getKingArmedMode() != Rules.KING_ARMED
                     && getRules().getKingArmedMode() != Rules.KING_ANVIL_ONLY) {
                 return isHostile;
-            } else {
-                return true;
-            }
+            } else return !Taflman.isGuard(occupier);
         }
 
         // If this space isn't naturally hostile, then this isn't a hostile space.
