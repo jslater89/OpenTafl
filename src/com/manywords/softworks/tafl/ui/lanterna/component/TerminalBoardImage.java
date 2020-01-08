@@ -106,9 +106,10 @@ public class TerminalBoardImage extends BasicTextImage implements SimpleInteract
         clearSpaces();
         renderSpecialSpaces(mCurrentBoard.getRules());
 
+        Coord referenceSpace = highlight != null ? highlight : mFocusPosition;
         if(allowableMoves != null) renderAllowableMoves(allowableMoves);
-        if(allowableDestinations != null) renderAllowableDestinations(highlight, allowableDestinations);
-        if(captureSpaces != null) renderCapturingMoves(highlight, captureSpaces);
+        if(allowableDestinations != null) renderAllowableDestinations(referenceSpace, allowableDestinations);
+        if(captureSpaces != null) renderCapturingMoves(referenceSpace, captureSpaces);
         if(highlight != null) renderHighlight(highlight);
 
         if(mFocused) {
