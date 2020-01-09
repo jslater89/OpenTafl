@@ -52,7 +52,3 @@ task updaterUpdater(type: Jar) {
     }
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '5.6.4'
-}

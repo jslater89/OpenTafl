@@ -291,6 +291,10 @@ http://manywords.press/other-stuff/opentafl/opentafl-notation-spec.txt (notation
 
 
 13. VERSION HISTORY -----------------------------------------------------------
+v0.4.8.0b (released 01/09/20):
+- Add the guard piece type, which can neither be captured nor take part in captures
+- Bug prophylaxis
+
 v0.4.7.2b (released 05/18/18):
 - Fix error in human-readable rules for weak kings
 - Fix bug in variant editor where selecting threefold loss created rules
