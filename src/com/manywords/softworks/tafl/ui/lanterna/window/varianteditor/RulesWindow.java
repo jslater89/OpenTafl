@@ -41,6 +41,7 @@ public class RulesWindow extends FocusableBasicWindow {
     private RadioBoxList<String> mKnightJumpRadio;
     private RadioBoxList<String> mCommanderJumpRadio;
     private RadioBoxList<String> mMercenaryJumpRadio;
+    private RadioBoxList<String> mGuardJumpRadio;
 
     private RadioBoxList<String> mShieldwallModeRadio;
     private String[] mShieldwallModes = {"None", "Weak", "Strong"};
@@ -161,6 +162,11 @@ public class RulesWindow extends FocusableBasicWindow {
         addItems(mMercenaryJumpRadio, mJumpModes);
         fifthAndAHalfRow.addComponent(mMercenaryJumpRadio);
 
+        fifthAndAHalfRow.addComponent(new Label("Guard jumps?"));
+        mGuardJumpRadio = new RadioBoxList<>();
+        addItems(mGuardJumpRadio, mJumpModes);
+        fifthAndAHalfRow.addComponent(mGuardJumpRadio);
+
         p.addComponent(fifthAndAHalfRow);
         p.addComponent(TerminalUtils.newSpacer());
 
@@ -243,6 +249,7 @@ public class RulesWindow extends FocusableBasicWindow {
         rules.setKnightJumpMode(jumpStringToType(mKnightJumpRadio.getCheckedItem()));
         rules.setCommanderJumpMode(jumpStringToType(mCommanderJumpRadio.getCheckedItem()));
         rules.setMercenaryJumpMode(jumpStringToType(mMercenaryJumpRadio.getCheckedItem()));
+        rules.setGuardJumpMode(jumpStringToType(mGuardJumpRadio.getCheckedItem()));
 
         rules.setShieldwallMode(shieldwallStringToType(mShieldwallModeRadio.getCheckedItem()));
         rules.setBerserkMode(berserkStringToType(mBerserkRadio.getCheckedItem()));
@@ -303,6 +310,7 @@ public class RulesWindow extends FocusableBasicWindow {
         mKnightJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getKnightJumpMode()));
         mCommanderJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getCommanderJumpMode()));
         mMercenaryJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getMercenaryJumpMode()));
+        mGuardJumpRadio.setCheckedItemIndex(jumpTypeToIndex(rules.getGuardJumpMode()));
 
         mShieldwallModeRadio.setCheckedItemIndex(shieldwallTypeToIndex(rules.allowShieldWallCaptures()));
         mBerserkRadio.setCheckedItemIndex(berserkTypeToindex(rules.getBerserkMode()));
