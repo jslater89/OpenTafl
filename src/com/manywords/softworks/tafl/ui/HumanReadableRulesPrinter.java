@@ -18,8 +18,8 @@ public class HumanReadableRulesPrinter {
         String otrString = r.getOTRString(false);
         int ruleNumber = 1;
 
-        rules += "The tafl games are a collection of Norse board games dating to the Viking age and earlier. They were commonly played in " +
-                "the time before chess arrived in Northern Europe in the 1100s. All tafl games have a few features in common: they are played " +
+        rules += "The tafl games are a collection of Norse board games dating to the Viking age and earlier. They were commonly played up until " +
+                "the 1100s, when chess arrived in Northern Europe. All tafl games have a few features in common: they are played " +
                 "on square boards of odd-numbered size, with asymmetric forces. The defenders, or the king's side, start in the center of the " +
                 "board, and have escape as their objective: the king must reach either an edge space or a corner space, depending on the rules " +
                 "in question. The attackers, or the besieging side, start around the edges of the board, and must prevent the king's escape. The " +
@@ -665,7 +665,8 @@ public class HumanReadableRulesPrinter {
                 rules += " If a guard is next to the king on his throne, the attacker may not take either piece by Linnaean capture.";
             }
             if(r.allowShieldWallCaptures() >= Rules.WEAK_SHIELDWALL) {
-                rules += " Guards may not close a shieldwall capture, nor can they be taken by shieldwall capture.";
+                rules += " Guards may not close a shieldwall capture (though they may be part of a shieldwall capture if another " +
+                        "piece closes the shieldwall), nor can they be taken by shieldwall capture.";
             }
         }
 
