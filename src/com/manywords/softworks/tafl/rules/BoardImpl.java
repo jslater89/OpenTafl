@@ -267,7 +267,7 @@ public abstract class BoardImpl extends Board {
                 // for consideration and haven't already been considered.
                 List<Coord> neighbors = getAdjacentSpaces(consider);
                 for (Coord neighbor : neighbors) {
-                    if (!considered.contains(neighbor) && !toExplore.contains(neighbor)) {
+                    if (!considered.contains(neighbor)) {
                         toExplore.add(neighbor);
                     }
                 }

@@ -27,6 +27,7 @@ public class Test {
         tests.add(new MoveAddressTest());
         tests.add(new KingMissingPositionRecordTest());
         tests.add(new RulesPrinterCrashTest());
+        tests.add(new HasPieceTypeAndCanJumpTest());
 
         // Consistency tests
         tests.add(new GameSerializerConsistencyTest());
