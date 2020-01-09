@@ -94,9 +94,17 @@ public class RulesSerializerConsistencyTest extends TaflTest {
             assert rules.getMercenaryJumpMode() == Taflman.JUMP_RESTRICTED;
             assert rules.allowLinnaeanCaptures();
 
-            println(mercenaryRulesRecord);
-            println(rules2);
+            //println(mercenaryRulesRecord);
+            //println(rules2);
             assert rules2.equals(mercenaryRulesRecord);
+
+            String guardTestRules = "dim:7 name:Guard_Test atkf:y sw:s linc:y starti:/3tT2/1tG3t/3tt2/t1tKG1t/3tt2/1TTG3/1tt4/";
+            rules = RulesSerializer.loadRulesRecord(guardTestRules);
+            rules2 = rules.getOTRString(true);
+
+            //println(guardTestRules);
+            //println(rules2);
+            assert rules2.equals(guardTestRules);
         }
         catch(NotationParseException e) {
             assert false;

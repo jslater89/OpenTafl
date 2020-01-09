@@ -20,7 +20,6 @@ public class Test {
 
         // Initial tests (debug only)
 
-
         // Mechanics tests
         tests.add(new TaflmanCoordMapTest());
         tests.add(new RepetitionHashTableTest());
@@ -42,6 +41,7 @@ public class Test {
 
         // Rules tests
         tests.add(new LinnaeanCaptureTest());
+        tests.add(new GuardTest());
         tests.add(new MercenarySideSwitchTest());
         tests.add(new KingHammerAnvilTest());
         tests.add(new KingUnsafeAgainstBoardEdgeTest());
