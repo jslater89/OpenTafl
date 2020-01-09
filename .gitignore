@@ -27,10 +27,10 @@ rules-dump.otr
 
 /*.otg
 /*.json
-/lib/.*.jar
-/saved-games/.*
-/user-rules/.*
-/engines/.*
-/build/.*
-/.gradle.*
-/server/.*
+/lib/*.jar
+/saved-games/*
+/user-rules/*
+/engines/*
+/build/*
+/.gradle*
+/server/*
