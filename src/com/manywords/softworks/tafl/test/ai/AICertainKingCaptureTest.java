@@ -6,7 +6,7 @@ import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
 import com.manywords.softworks.tafl.test.TaflTest;
 import com.manywords.softworks.tafl.ui.UiCallback;
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.FishyWorkspace;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.Side;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
@@ -77,14 +77,14 @@ public class AICertainKingCaptureTest extends TaflTest implements UiCallback {
 
     @Override
     public void run() {
-        AiWorkspace.resetTranspositionTable();
+        FishyWorkspace.resetTranspositionTable();
 
         Rules rules = Brandub.newAiCertainKingCaptureTest();
         Game game = new Game(rules, null);
         GameState state = game.getCurrentState();
 
         //RawTerminal.renderGameState(state);
-        AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
+        FishyWorkspace workspace = new FishyWorkspace(this, game, state, 5);
         //workspace.chatty = true;
         workspace.explore(5);
 

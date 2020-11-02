@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.engine;
 
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
+import com.manywords.softworks.tafl.engine.ai.AbstractAiWorkspace;
 import com.manywords.softworks.tafl.engine.clock.GameClock;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.collections.RepetitionHashTable;
@@ -33,13 +33,14 @@ public class Game {
         public static final String POSITION = "position";
     }
     public Game(long[][][] zobristTable, List<GameState> history, RepetitionHashTable repetitions) {
-        if (!(this instanceof AiWorkspace)) {
+        if (!(this instanceof AbstractAiWorkspace)) {
             throw new IllegalArgumentException("Empty constructor is only for AiWorkspace!");
         }
 
         mZobristConstants = zobristTable;
         mHistory = history;
 
+        // TODO
         // AiWorkspace undoes everything it does to this, so we don't need to instantiate a new one. Technically.
         mRepetitions = repetitions;
     }

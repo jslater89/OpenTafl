@@ -21,8 +21,8 @@ import com.manywords.softworks.tafl.engine.DetailedMoveRecord;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
-import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.FishyWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.AlphaBetaGameTreeState;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.engine.replay.ReplayGame;
@@ -522,7 +522,7 @@ public class GameScreen extends LogicalScreen implements UiCallback {
         @Override
         public void handleInGameCommand(String command) {
             if(command.startsWith("dumptree")) {
-                AiWorkspace w = GameTreeState.workspace;
+                FishyWorkspace w = AlphaBetaGameTreeState.workspace;
                 if(w != null) {
                     w.getTreeRoot().printTree("");
                 }
@@ -554,8 +554,8 @@ public class GameScreen extends LogicalScreen implements UiCallback {
             }
             else if(command.startsWith("dumpcureval")) {
                 FishyEvaluator.debug = true;
-                AiWorkspace.evaluator.initialize(mGame.getRules());
-                AiWorkspace.evaluator.evaluate(mGame.getCurrentState(), 0, 0);
+                FishyWorkspace.evaluator.initialize(mGame.getRules());
+                FishyWorkspace.evaluator.evaluate(mGame.getCurrentState(), 0, 0);
                 Log.println(Log.Level.VERBOSE, FishyEvaluator.debugString);
                 FishyEvaluator.debug = false;
                 return;

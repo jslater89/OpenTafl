@@ -2,14 +2,15 @@ package com.manywords.softworks.tafl.command.player;
 
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
-import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
+import com.manywords.softworks.tafl.engine.ai.AbstractAiWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.FishyWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.AlphaBetaGameTreeNode;
 import com.manywords.softworks.tafl.ui.UiCallback;
 
 public class LocalAi extends Player {
     private PlayerCallback mCallback;
     private UiWorkerThread mWorker;
-    private AiWorkspace mWorkspace;
+    private AbstractAiWorkspace mWorkspace;
     @Override
     public void setCallback(PlayerCallback c) {
         mCallback = c;
@@ -30,14 +31,14 @@ public class LocalAi extends Player {
 
             @Override
             public void run() {
-                mWorkspace = new AiWorkspace(ui, game, game.getCurrentState(), 50);
+                mWorkspace = new FishyWorkspace(ui, game, game.getCurrentState(), 50);
                 mWorkspace.chatty = true;
 
                 mWorkspace.explore(thinkTime);
                 //while(!mWorkspace.isThreadPoolIdle()) { continue; }
                 mWorkspace.stopExploring();
 
-                GameTreeNode bestMove = mWorkspace.getTreeRoot().getBestChild();
+                AlphaBetaGameTreeNode bestMove = mWorkspace.getTreeRoot().getBestChild();
                 onMoveDecided(bestMove.getRootMove());
                 mWorkspace.printSearchStats();
             }
@@ -45,7 +46,7 @@ public class LocalAi extends Player {
         mWorker.start();
     }
 
-    public AiWorkspace getWorkspace() {
+    public AbstractAiWorkspace getWorkspace() {
         return mWorkspace;
     }
 

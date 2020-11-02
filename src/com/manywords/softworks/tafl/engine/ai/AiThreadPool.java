@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-class AiThreadPool {
+public class AiThreadPool {
     private int mThreadCount;
     private List<WorkerThread> mThreads = new ArrayList<WorkerThread>();
     private LinkedList<Runnable> mQueue = new LinkedList<Runnable>();

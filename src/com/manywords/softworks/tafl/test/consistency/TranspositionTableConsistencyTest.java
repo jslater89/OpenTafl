@@ -4,6 +4,7 @@ import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.XorshiftRandom;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.TranspositionTable;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.copenhagen.Copenhagen;
@@ -65,7 +66,7 @@ public class TranspositionTableConsistencyTest extends TaflTest {
 
         assert entryDepth == depth;
         assert entryAge == age;
-        assert entryValue == Evaluator.ATTACKER_WIN;
+        assert entryValue == FishyEvaluator.ATTACKER_WIN;
     }
 
 }

@@ -4,7 +4,7 @@ import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.FishyWorkspace;
 import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -20,7 +20,7 @@ public class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest {
 
     @Override
     public void run() {
-        AiWorkspace.resetTranspositionTable();
+        FishyWorkspace.resetTranspositionTable();
         Rules rules = SeaBattle.newAiTwoEdgeEscapeTest();
         String rulesString = RulesSerializer.getRulesRecord(rules, false);
 
@@ -41,7 +41,7 @@ public class AITwoEdgeEscapeAndRulesLoadingTest extends TaflTest {
 
 
         //RawTerminal.renderGameState(state);
-        AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
+        FishyWorkspace workspace = new FishyWorkspace(this, game, state, 5);
         workspace.chatty = true;
         workspace.explore(5);
         MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();

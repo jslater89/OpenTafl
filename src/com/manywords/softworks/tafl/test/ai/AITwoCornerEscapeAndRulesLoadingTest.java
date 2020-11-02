@@ -3,8 +3,8 @@ package com.manywords.softworks.tafl.test.ai;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
-import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.FishyWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.AlphaBetaGameTreeNode;
 import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -16,7 +16,7 @@ import java.util.List;
 public class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest {
     @Override
     public void run() {
-        AiWorkspace.resetTranspositionTable();
+        FishyWorkspace.resetTranspositionTable();
 
         Rules rules = Brandub.newAiTwoCornerEscapeTest();
         String rulesString = RulesSerializer.getRulesRecord(rules, false);
@@ -43,12 +43,12 @@ public class AITwoCornerEscapeAndRulesLoadingTest extends TaflTest {
             }
 
             //RawTerminal.renderGameState(state);
-            AiWorkspace workspace = new AiWorkspace(this, game, state, 5);
+            FishyWorkspace workspace = new FishyWorkspace(this, game, state, 5);
             //workspace.chatty = true;
             workspace.explore(5);
             MoveRecord nextMove = workspace.getTreeRoot().getBestChild().getEnteringMove();
             value = workspace.getTreeRoot().getBestChild().getValue();
-            List<GameTreeNode> path = workspace.getTreeRoot().getBestPath();
+            List<AlphaBetaGameTreeNode> path = workspace.getTreeRoot().getBestPath();
 
             workspace.printSearchStats();
 

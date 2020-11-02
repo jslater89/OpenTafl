@@ -2,7 +2,7 @@ package com.manywords.softworks.tafl.test;
 
 import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.FishyWorkspace;
 import com.manywords.softworks.tafl.rules.Variants;
 import com.manywords.softworks.tafl.rules.Rules;
 import com.manywords.softworks.tafl.rules.brandub.Brandub;
@@ -49,7 +49,7 @@ public class Benchmark extends TaflTest {
         Rules copenhagen = Copenhagen.newCopenhagen11();
         Rules tablut15 = Variants.rulesForNameAndDimension("Tablut", 15);
         Game g;
-        AiWorkspace w;
+        FishyWorkspace w;
         int size = 0, totalSize = 0;
         long start = 0, end = 0, total = 0;
 
@@ -62,7 +62,7 @@ public class Benchmark extends TaflTest {
         // BRANDUB -------------------------------
 
         g = new Game(brandub, null);
-        w = new AiWorkspace(this, g, g.getCurrentState(), 10);
+        w = new FishyWorkspace(this, g, g.getCurrentState(), 10);
 
         w.setMaxDepth(desiredDepths.get(7));
         w.allowContinuation(false);
@@ -81,7 +81,7 @@ public class Benchmark extends TaflTest {
         // TABLUT --------------------------------
 
         g = new Game(tablut, null);
-        w = new AiWorkspace(this, g, g.getCurrentState(), 10);
+        w = new FishyWorkspace(this, g, g.getCurrentState(), 10);
 
         w.setMaxDepth(desiredDepths.get(9));
         w.allowContinuation(false);
@@ -99,7 +99,7 @@ public class Benchmark extends TaflTest {
 
         // COPENHAGEN ----------------------------
         g = new Game(copenhagen, null);
-        w = new AiWorkspace(this, g, g.getCurrentState(), 10);
+        w = new FishyWorkspace(this, g, g.getCurrentState(), 10);
 
         w.setMaxDepth(desiredDepths.get(11));
         w.allowContinuation(false);
@@ -118,7 +118,7 @@ public class Benchmark extends TaflTest {
         // TABLUT 15 -----------------------------
 
         g = new Game(tablut15, null);
-        w = new AiWorkspace(this, g, g.getCurrentState(), 10);
+        w = new FishyWorkspace(this, g, g.getCurrentState(), 10);
 
         w.setMaxDepth(desiredDepths.get(15));
         w.allowContinuation(false);

@@ -4,9 +4,10 @@ import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
-import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
-import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.engine.ai.AbstractAiWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.FishyWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.AlphaBetaGameTreeNode;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.AlphaBetaGameTreeState;
 import com.manywords.softworks.tafl.engine.clock.TimeSpec;
 import com.manywords.softworks.tafl.notation.MoveSerializer;
 import com.manywords.softworks.tafl.notation.NotationParseException;
@@ -34,7 +35,7 @@ public class ExternalEngineClient implements UiCallback {
         instance.start();
     }
 
-    public AiWorkspace mWorkspace;
+    public AbstractAiWorkspace mWorkspace;
     public CommunicationThread mCommThread;
     public CommunicationThread.CommunicationThreadCallback mCommCallback;
 
@@ -128,13 +129,15 @@ public class ExternalEngineClient implements UiCallback {
             mIsAttackingSide = false;
         }
 
-        mWorkspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), mTranspositionTableSize);
-        mWorkspace.allowIterativeDeepening(mEngineDeepening);
-        mWorkspace.allowContinuation(mEngineContinuation);
-        mWorkspace.allowHorizon(mEngineHorizon);
-        mWorkspace.allowMoveOrdering(mEngineMoveOrdering);
-        mWorkspace.allowTranspositionTable(mEngineTranspositionTable ? AiWorkspace.TRANSPOSITION_TABLE_ON : AiWorkspace.TRANSPOSITION_TABLE_OFF);
-        mWorkspace.allowKillerMoves(mEngineKillerMove);
+        // TODO: if classical
+        FishyWorkspace w = new FishyWorkspace(this, mGame, mGame.getCurrentState(), mTranspositionTableSize);
+        w.allowIterativeDeepening(mEngineDeepening);
+        w.allowContinuation(mEngineContinuation);
+        w.allowHorizon(mEngineHorizon);
+        w.allowMoveOrdering(mEngineMoveOrdering);
+        w.allowTranspositionTable(mEngineTranspositionTable ? FishyWorkspace.TRANSPOSITION_TABLE_ON : FishyWorkspace.TRANSPOSITION_TABLE_OFF);
+        w.allowKillerMoves(mEngineKillerMove);
+        mWorkspace = w;
 
         if(mClockLength != null) mWorkspace.setTimeRemaining(mClockLength, (mIsAttackingSide ? mAttackerClock : mDefenderClock));
 
@@ -151,7 +154,7 @@ public class ExternalEngineClient implements UiCallback {
                 mWorkspace.chatty = true;
                 mWorkspace.explore(TerminalSettings.aiThinkTime);
                 mWorkspace.stopExploring();
-                GameTreeNode bestMove = mWorkspace.getTreeRoot().getBestChild();
+                AlphaBetaGameTreeNode bestMove = mWorkspace.getTreeRoot().getBestChild();
                 sendMoveCommand(bestMove.getEnteringMove());
                 mGame.getCurrentState().makeMove(bestMove.getEnteringMove());
                 //RawTerminal.renderGameState(mGame.getCurrentState());
@@ -174,7 +177,7 @@ public class ExternalEngineClient implements UiCallback {
             System.out.println("Bad arg in dump");
         }
 
-        AiWorkspace w = GameTreeState.workspace;
+        FishyWorkspace w = AlphaBetaGameTreeState.workspace;
 
         if(w != null) {
             String debugString = w.dumpEvaluationFor(child);
@@ -255,7 +258,7 @@ public class ExternalEngineClient implements UiCallback {
 
         final int moves = Integer.parseInt(commandParts[0]);
         final int time = Integer.parseInt(commandParts[1]);
-        final AiWorkspace workspace = new AiWorkspace(this, mGame, mGame.getCurrentState(), 50);
+        final FishyWorkspace workspace = new FishyWorkspace(this, mGame, mGame.getCurrentState(), 50);
 
         if(mClockLength != null) workspace.setTimeRemaining(mClockLength, (mIsAttackingSide ? mAttackerClock : mDefenderClock));
 
@@ -272,7 +275,7 @@ public class ExternalEngineClient implements UiCallback {
                 workspace.explore(time);
                 workspace.stopExploring();
 
-                List<GameTreeNode> bestNodes = new ArrayList<>(moves);
+                List<AlphaBetaGameTreeNode> bestNodes = new ArrayList<>(moves);
                 for(int i = 0; i < moves; i++) {
                     bestNodes.add(workspace.getTreeRoot().getNthChild(i));
                 }
@@ -314,12 +317,12 @@ public class ExternalEngineClient implements UiCallback {
         mCommThread.sendCommand(command.getBytes(Charset.forName("US-ASCII")));
     }
 
-    private void sendAnalysisCommand(AiWorkspace workspace, List<GameTreeNode> bestNodes) {
+    private void sendAnalysisCommand(FishyWorkspace workspace, List<AlphaBetaGameTreeNode> bestNodes) {
         String command = "analysis " + bestNodes.size();
 
-        for(GameTreeNode node : bestNodes) {
+        for(AlphaBetaGameTreeNode node : bestNodes) {
             String moveList = " ";
-            for(GameTreeNode pathNode : GameTreeState.getPathStartingWithNode(node)) {
+            for(AlphaBetaGameTreeNode pathNode : AlphaBetaGameTreeState.getPathStartingWithNode(node)) {
                 moveList += "|" + pathNode.getEnteringMove();
             }
             moveList = moveList.replaceFirst("\\|", "");

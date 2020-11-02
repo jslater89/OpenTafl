@@ -4,9 +4,10 @@ import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
-import com.manywords.softworks.tafl.engine.ai.GameTreeNode;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.FishyWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.AlphaBetaGameTreeNode;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -36,12 +37,12 @@ public class AISearchEquivalenceTest extends TaflTest {
         }
 
         MoveRecord move = null;
-        short bestValue = Evaluator.NO_VALUE;
+        short bestValue = FishyEvaluator.NO_VALUE;
         List<MoveRecord> equivalentMoves = new ArrayList<>();
         List<MoveRecord> localEquivalentMoves = new ArrayList<>();
 
-        AiWorkspace tempWorkspace;
-        GameTreeNode bestChild;
+        FishyWorkspace tempWorkspace;
+        AlphaBetaGameTreeNode bestChild;
 
         // 0. MINIMAX STRAIGHT UP --------------------------------------------------------------------------------------
         Game g = new Game(r, null);
@@ -49,7 +50,7 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         //RawTerminal.renderGameState(state);
 
-        AiWorkspace workspaceStraightMinimax = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        FishyWorkspace workspaceStraightMinimax = new FishyWorkspace(this, g, g.getCurrentState(), 5);
         workspaceStraightMinimax.chatty = true;
         workspaceStraightMinimax.setMaxDepth(3);
 
@@ -57,7 +58,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         workspaceStraightMinimax.allowIterativeDeepening(false);
         workspaceStraightMinimax.allowContinuation(false);
         workspaceStraightMinimax.allowHorizon(false);
-        workspaceStraightMinimax.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
+        workspaceStraightMinimax.allowTranspositionTable(FishyWorkspace.TRANSPOSITION_TABLE_OFF);
         workspaceStraightMinimax.allowKillerMoves(false);
         workspaceStraightMinimax.allowMoveOrdering(false);
         workspaceStraightMinimax.allowHistoryTable(false);
@@ -70,21 +71,21 @@ public class AISearchEquivalenceTest extends TaflTest {
         move = workspaceStraightMinimax.getTreeRoot().getBestChild().getEnteringMove();
         bestValue = workspaceStraightMinimax.getTreeRoot().getBestChild().getValue();
 
-        for(GameTreeNode n : workspaceStraightMinimax.getTreeRoot().getBranches()) {
+        for(AlphaBetaGameTreeNode n : workspaceStraightMinimax.getTreeRoot().getBranches()) {
             if(n.getValue() == bestValue) equivalentMoves.add(n.getEnteringMove());
         }
         Log.println(Log.Level.NORMAL, "0. Straight minimax move: " + move + " value: " + bestValue);
         Log.println(Log.Level.NORMAL, "0. " + equivalentMoves.size() + " equivalent moves (including best): " + equivalentMoves);
 
         // 1. NO FEATURES, JUST THE MOVE -------------------------------------------------------------------------------
-        AiWorkspace workspaceNoOptimizations = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        FishyWorkspace workspaceNoOptimizations = new FishyWorkspace(this, g, g.getCurrentState(), 5);
         workspaceNoOptimizations.chatty = true;
         workspaceNoOptimizations.setMaxDepth(3);
 
         workspaceNoOptimizations.allowIterativeDeepening(false);
         workspaceNoOptimizations.allowContinuation(false);
         workspaceNoOptimizations.allowHorizon(false);
-        workspaceNoOptimizations.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
+        workspaceNoOptimizations.allowTranspositionTable(FishyWorkspace.TRANSPOSITION_TABLE_OFF);
         workspaceNoOptimizations.allowKillerMoves(false);
         workspaceNoOptimizations.allowMoveOrdering(false);
         workspaceNoOptimizations.allowHistoryTable(false);
@@ -95,7 +96,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         //workspaceNoOptimizations.getTreeRoot().printTree("T1: ");
 
         localEquivalentMoves.clear();
-        for(GameTreeNode n : workspaceNoOptimizations.getTreeRoot().getBranches()) {
+        for(AlphaBetaGameTreeNode n : workspaceNoOptimizations.getTreeRoot().getBranches()) {
             if(n.getValue() == workspaceNoOptimizations.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
         }
 
@@ -108,14 +109,14 @@ public class AISearchEquivalenceTest extends TaflTest {
         }
 
         //2. MOVE ORDERING ---------------------------------------------------------------------------------------------
-        AiWorkspace workspaceOrdering = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        FishyWorkspace workspaceOrdering = new FishyWorkspace(this, g, g.getCurrentState(), 5);
         workspaceOrdering.chatty = true;
         workspaceOrdering.setMaxDepth(3);
 
         workspaceOrdering.allowIterativeDeepening(false);
         workspaceOrdering.allowContinuation(false);
         workspaceOrdering.allowHorizon(false);
-        workspaceOrdering.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
+        workspaceOrdering.allowTranspositionTable(FishyWorkspace.TRANSPOSITION_TABLE_OFF);
         workspaceOrdering.allowKillerMoves(false);
         workspaceOrdering.allowMoveOrdering(true);
         workspaceOrdering.allowHistoryTable(false);
@@ -126,7 +127,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         //workspaceOrdering.getTreeRoot().printTree("T2: ");
 
         localEquivalentMoves.clear();
-        for(GameTreeNode n : workspaceOrdering.getTreeRoot().getBranches()) {
+        for(AlphaBetaGameTreeNode n : workspaceOrdering.getTreeRoot().getBranches()) {
             if(n.getValue() == workspaceOrdering.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
         }
 
@@ -139,14 +140,14 @@ public class AISearchEquivalenceTest extends TaflTest {
         }
 
         //3. BENCHMARK DEPTH-5 ALPHA-BETA ONLY SEARCH ------------------------------------------------------------------
-        AiWorkspace workspaceAlphabetaBenchmark = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        FishyWorkspace workspaceAlphabetaBenchmark = new FishyWorkspace(this, g, g.getCurrentState(), 5);
         workspaceAlphabetaBenchmark.chatty = true;
         workspaceAlphabetaBenchmark.setMaxDepth(5);
 
         workspaceAlphabetaBenchmark.allowIterativeDeepening(false);
         workspaceAlphabetaBenchmark.allowContinuation(false);
         workspaceAlphabetaBenchmark.allowHorizon(false);
-        workspaceAlphabetaBenchmark.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
+        workspaceAlphabetaBenchmark.allowTranspositionTable(FishyWorkspace.TRANSPOSITION_TABLE_OFF);
         workspaceAlphabetaBenchmark.allowKillerMoves(false);
         workspaceAlphabetaBenchmark.allowMoveOrdering(false);
 
@@ -159,7 +160,7 @@ public class AISearchEquivalenceTest extends TaflTest {
         bestValue = workspaceAlphabetaBenchmark.getTreeRoot().getBestChild().getValue();
 
         equivalentMoves.clear();
-        for(GameTreeNode n : workspaceAlphabetaBenchmark.getTreeRoot().getBranches()) {
+        for(AlphaBetaGameTreeNode n : workspaceAlphabetaBenchmark.getTreeRoot().getBranches()) {
             if(n.getValue() == bestValue) equivalentMoves.add(n.getEnteringMove());
         }
 
@@ -167,14 +168,14 @@ public class AISearchEquivalenceTest extends TaflTest {
         Log.println(Log.Level.NORMAL, "3. " + equivalentMoves.size() + " equivalent moves (including best): " + equivalentMoves);
 
         //4. HISTORY TABLE SEARCH --------------------------------------------------------------------------------------
-        AiWorkspace workspaceHistoryOrdering = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        FishyWorkspace workspaceHistoryOrdering = new FishyWorkspace(this, g, g.getCurrentState(), 5);
         workspaceHistoryOrdering.chatty = true;
         workspaceHistoryOrdering.setMaxDepth(5);
 
         workspaceHistoryOrdering.allowIterativeDeepening(false);
         workspaceHistoryOrdering.allowContinuation(false);
         workspaceHistoryOrdering.allowHorizon(false);
-        workspaceHistoryOrdering.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_OFF);
+        workspaceHistoryOrdering.allowTranspositionTable(FishyWorkspace.TRANSPOSITION_TABLE_OFF);
         workspaceHistoryOrdering.allowKillerMoves(false);
         workspaceHistoryOrdering.allowMoveOrdering(true);
         workspaceHistoryOrdering.allowHistoryTable(true);
@@ -185,7 +186,7 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         tempWorkspace = workspaceHistoryOrdering;
         localEquivalentMoves.clear();
-        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+        for(AlphaBetaGameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
             if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
         }
 
@@ -223,14 +224,14 @@ public class AISearchEquivalenceTest extends TaflTest {
 //        assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //6. TRANSPOSITION SEARCH (FIXED DEPTH) ------------------------------------------------------------------------
-        AiWorkspace workspaceTranspositionFixed = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        FishyWorkspace workspaceTranspositionFixed = new FishyWorkspace(this, g, g.getCurrentState(), 5);
         workspaceTranspositionFixed.chatty = true;
         workspaceTranspositionFixed.setMaxDepth(5);
 
         workspaceTranspositionFixed.allowIterativeDeepening(false);
         workspaceTranspositionFixed.allowContinuation(false);
         workspaceTranspositionFixed.allowHorizon(false);
-        workspaceTranspositionFixed.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_EXACT_ONLY);
+        workspaceTranspositionFixed.allowTranspositionTable(FishyWorkspace.TRANSPOSITION_TABLE_EXACT_ONLY);
         workspaceTranspositionFixed.allowKillerMoves(false);
         workspaceTranspositionFixed.allowMoveOrdering(true);
 
@@ -240,7 +241,7 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         tempWorkspace = workspaceTranspositionFixed;
         localEquivalentMoves.clear();
-        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+        for(AlphaBetaGameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
             if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
         }
 
@@ -250,14 +251,14 @@ public class AISearchEquivalenceTest extends TaflTest {
         assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //7. TRANSPOSITION SEARCH (ANY DEPTH) --------------------------------------------------------------------------
-        AiWorkspace workspaceTranspositionAny = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        FishyWorkspace workspaceTranspositionAny = new FishyWorkspace(this, g, g.getCurrentState(), 5);
         workspaceTranspositionAny.chatty = true;
         workspaceTranspositionAny.setMaxDepth(5);
 
         workspaceTranspositionAny.allowIterativeDeepening(false);
         workspaceTranspositionAny.allowContinuation(false);
         workspaceTranspositionAny.allowHorizon(false);
-        workspaceTranspositionAny.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_ON);
+        workspaceTranspositionAny.allowTranspositionTable(FishyWorkspace.TRANSPOSITION_TABLE_ON);
         workspaceTranspositionAny.allowKillerMoves(false);
         workspaceTranspositionAny.allowMoveOrdering(true);
 
@@ -267,7 +268,7 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         tempWorkspace = workspaceTranspositionAny;
         localEquivalentMoves.clear();
-        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+        for(AlphaBetaGameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
             if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
         }
 
@@ -277,14 +278,14 @@ public class AISearchEquivalenceTest extends TaflTest {
         assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //8. ALL BUT ORDERING ------------------------------------------------------------------------------------------
-        AiWorkspace workspaceAllButOrdering = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        FishyWorkspace workspaceAllButOrdering = new FishyWorkspace(this, g, g.getCurrentState(), 5);
         workspaceAllButOrdering.chatty = true;
         workspaceAllButOrdering.setMaxDepth(5);
 
         workspaceAllButOrdering.allowIterativeDeepening(true);
         workspaceAllButOrdering.allowContinuation(false);
         workspaceAllButOrdering.allowHorizon(false);
-        workspaceAllButOrdering.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_ON);
+        workspaceAllButOrdering.allowTranspositionTable(FishyWorkspace.TRANSPOSITION_TABLE_ON);
         workspaceAllButOrdering.allowKillerMoves(true);
         workspaceAllButOrdering.allowMoveOrdering(false);
 
@@ -294,7 +295,7 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         tempWorkspace = workspaceAllButOrdering;
         localEquivalentMoves.clear();
-        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+        for(AlphaBetaGameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
             if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
         }
 
@@ -304,14 +305,14 @@ public class AISearchEquivalenceTest extends TaflTest {
         assert isMoveEquivalent(bestChild.getEnteringMove(), equivalentMoves);
 
         //9. WORKSPACE EVERYTHING --------------------------------------------------------------------------------------
-        AiWorkspace workspaceEverything = new AiWorkspace(this, g, g.getCurrentState(), 5);
+        FishyWorkspace workspaceEverything = new FishyWorkspace(this, g, g.getCurrentState(), 5);
         workspaceEverything.chatty = true;
         workspaceEverything.setMaxDepth(5);
 
         workspaceEverything.allowIterativeDeepening(true);
         workspaceEverything.allowContinuation(false);
         workspaceEverything.allowHorizon(false);
-        workspaceEverything.allowTranspositionTable(AiWorkspace.TRANSPOSITION_TABLE_ON);
+        workspaceEverything.allowTranspositionTable(FishyWorkspace.TRANSPOSITION_TABLE_ON);
         workspaceEverything.allowKillerMoves(true);
         workspaceEverything.allowMoveOrdering(true);
 
@@ -321,7 +322,7 @@ public class AISearchEquivalenceTest extends TaflTest {
 
         tempWorkspace = workspaceEverything;
         localEquivalentMoves.clear();
-        for(GameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
+        for(AlphaBetaGameTreeNode n : tempWorkspace.getTreeRoot().getBranches()) {
             if(n.getValue() == tempWorkspace.getTreeRoot().getBestChild().getValue()) localEquivalentMoves.add(n.getEnteringMove());
         }
 

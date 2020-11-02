@@ -1,6 +1,6 @@
 package com.manywords.softworks.tafl.engine;
 
-import com.manywords.softworks.tafl.engine.ai.GameTreeState;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.AlphaBetaGameTreeState;
 import com.manywords.softworks.tafl.notation.PositionSerializer;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.*;
@@ -300,7 +300,7 @@ public class GameState {
         else {
             GameState nextState = new GameState(this);
 
-            boolean detailed = !(this instanceof GameTreeState);
+            boolean detailed = !(this instanceof AlphaBetaGameTreeState);
             MoveRecord move = Taflman.moveTo(nextState, taflman, destination, detailed);
             List<Coord> captures = move.captures;
 

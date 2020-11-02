@@ -2,6 +2,7 @@ package com.manywords.softworks.tafl.engine.ai.tables;
 
 import com.manywords.softworks.tafl.OpenTafl;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 
 /**
  * Created by jay on 12/16/15.
@@ -63,8 +64,8 @@ public class TranspositionTable {
     public void putValue(long zobrist, short value, int dataDepthOfSearch, int gameLength) {
         if(mRequestedSize == 0) return;
         // Make winning paths not path-dependent
-        if(value > Evaluator.ATTACKER_WIN) value = Evaluator.ATTACKER_WIN;
-        if(value < Evaluator.DEFENDER_WIN) value = Evaluator.DEFENDER_WIN;
+        if(value > FishyEvaluator.ATTACKER_WIN) value = FishyEvaluator.ATTACKER_WIN;
+        if(value < FishyEvaluator.DEFENDER_WIN) value = FishyEvaluator.DEFENDER_WIN;
         mInsertQueries++;
 
         int index = (Math.abs((int)(zobrist % mArraySize)));
@@ -90,11 +91,11 @@ public class TranspositionTable {
     }
 
     public short getValue(long zobrist, int minDepthOfSearch, int gameLength) {
-        if(mRequestedSize == 0) return Evaluator.NO_VALUE;
+        if(mRequestedSize == 0) return FishyEvaluator.NO_VALUE;
         mTableQueries++;
 
         int index = (Math.abs((int)(zobrist % mArraySize)));
-        if(mZobristTable[index] != zobrist) return Evaluator.NO_VALUE;
+        if(mZobristTable[index] != zobrist) return FishyEvaluator.NO_VALUE;
 
         long data = mDataTable[index];
         byte entryDepthOfSearch = (byte)((data & DEPTH_MASK) >>> DEPTH_SHIFT);
@@ -102,11 +103,11 @@ public class TranspositionTable {
         short age = (short)((data & AGE_MASK) >>> AGE_SHIFT);
         if(gameLength - age > DISCARD_AFTER_PLIES) {
             mZobristTable[index] = 0;
-            return Evaluator.NO_VALUE;
+            return FishyEvaluator.NO_VALUE;
         }
 
-        if (mExact && entryDepthOfSearch != minDepthOfSearch) return Evaluator.NO_VALUE;
-        if (!mExact && entryDepthOfSearch < minDepthOfSearch) return Evaluator.NO_VALUE;
+        if (mExact && entryDepthOfSearch != minDepthOfSearch) return FishyEvaluator.NO_VALUE;
+        if (!mExact && entryDepthOfSearch < minDepthOfSearch) return FishyEvaluator.NO_VALUE;
         else {
             mTableHits++;
             return (short)((data & EVAL_MASK));
@@ -115,7 +116,7 @@ public class TranspositionTable {
 
     public long getData(long zobrist) {
         int index = (Math.abs((int)(zobrist % mArraySize)));
-        if(mZobristTable[index] != zobrist) return Evaluator.NO_VALUE;
+        if(mZobristTable[index] != zobrist) return FishyEvaluator.NO_VALUE;
 
         return mDataTable[index];
     }

@@ -18,6 +18,10 @@ import static com.manywords.softworks.tafl.rules.Taflman.EMPTY;
  * Created by jay on 12/24/15.
  */
 public class FishyEvaluator implements Evaluator {
+    public static final short NO_VALUE = -11541;
+    public static final short INTENTIONALLY_UNVALUED = -11542;
+    public static final short ATTACKER_WIN = 5050;
+    public static final short DEFENDER_WIN = -5050;
     // Debug options
     private static int debugId = 0;
     public static boolean debug = false;
@@ -269,12 +273,12 @@ public class FishyEvaluator implements Evaluator {
 
         if (victory == GameState.ATTACKER_WIN) {
             if (debug) debugString += "Attacker win at depth " + depth + "/" + remainingDepth + "\n";
-            value = (short)(Evaluator.ATTACKER_WIN + (500 * (remainingDepth + 1)));
+            value = (short)(FishyEvaluator.ATTACKER_WIN + (500 * (remainingDepth + 1)));
             if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
         } else if (victory == GameState.DEFENDER_WIN) {
             if (debug) debugString += "Defender win at depth " + depth + "/" + remainingDepth + "\n";
-            value = (short)(Evaluator.DEFENDER_WIN - (500 * (remainingDepth + 1)));
+            value = (short)(FishyEvaluator.DEFENDER_WIN - (500 * (remainingDepth + 1)));
             if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
             return value;
         } else if (victory == GameState.DRAW) {
@@ -425,7 +429,7 @@ public class FishyEvaluator implements Evaluator {
         if (mEdgeEscape) {
             if (kingEdges >= 2) {
                 if (debug) debugString += "Defender win--two ways to an edge\n";
-                value = (short)(Evaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
+                value = (short)(FishyEvaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
                 if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
                 return value;
             }
@@ -436,7 +440,7 @@ public class FishyEvaluator implements Evaluator {
         } else if (mCornerEscape) {
             if (kingCorners >= 2) {
                 if (debug) debugString += "Defender win--two ways to a corner\n";
-                value = (short)(Evaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
+                value = (short)(FishyEvaluator.DEFENDER_WIN - (250 * (remainingDepth + 1)));
                 if (debug) printDebug(value, state.getCurrentSide().isAttackingSide(), depth);
                 return value;
             }

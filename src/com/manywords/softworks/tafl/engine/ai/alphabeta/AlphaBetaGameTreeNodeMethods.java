@@ -1,4 +1,4 @@
-package com.manywords.softworks.tafl.engine.ai;
+package com.manywords.softworks.tafl.engine.ai.alphabeta;
 
 import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.MoveRecord;
@@ -12,9 +12,8 @@ import java.util.List;
 /**
  * Created by jay on 2/19/16.
  */
-// TODO: refactor GameTreeState and MinimalGameTreeNode shared code to here, with an arg of type GameTreeNode
-public class GameTreeNodeMethods {
-    public static void revalueParent(GameTreeNode n, int depthOfObservation) {
+public class AlphaBetaGameTreeNodeMethods {
+    public static void revalueParent(AlphaBetaGameTreeNode n, int depthOfObservation) {
         if(n.getParentNode() != null) {
             if (n.getParentNode().isMaximizingNode()) {
                 n.getParentNode().setValue((short) Math.max(n.getParentNode().getValue(), n.getValue()));
@@ -27,14 +26,14 @@ public class GameTreeNodeMethods {
         }
     }
 
-    public static void printChildEvaluations(GameTreeNode n) {
-        for(GameTreeNode child : n.getBranches()) {
+    public static void printChildEvaluations(AlphaBetaGameTreeNode n) {
+        for(AlphaBetaGameTreeNode child : n.getBranches()) {
             Log.println(Log.Level.NORMAL, child.getEnteringMove() + " " + child.getDepth() + "d " + child.getValue());
         }
     }
 
-    public static List<List<MoveRecord>> getAllEnteringSequences(GameTreeNode thisNode) {
-        List<GameTreeNode> branches = thisNode.getBranches();
+    public static List<List<MoveRecord>> getAllEnteringSequences(AlphaBetaGameTreeNode thisNode) {
+        List<AlphaBetaGameTreeNode> branches = thisNode.getBranches();
 
         if(branches.size() == 0) {
             List<MoveRecord> enteringSequence = thisNode.getEnteringMoveSequence();
@@ -44,7 +43,7 @@ public class GameTreeNodeMethods {
         }
         else {
             List<List<MoveRecord>> enteringSequences = new ArrayList<>();
-            for(GameTreeNode n : branches) {
+            for(AlphaBetaGameTreeNode n : branches) {
                 List<List<MoveRecord>> childEnteringSequences = getAllEnteringSequences(n);
 
                 enteringSequences.addAll(childEnteringSequences);
@@ -54,23 +53,23 @@ public class GameTreeNodeMethods {
         }
     }
 
-    public static GameTreeNode getChildForPath(GameTreeNode root, List<MoveRecord> path) {
+    public static AlphaBetaGameTreeNode getChildForPath(AlphaBetaGameTreeNode root, List<MoveRecord> path) {
         if(path.size() == 0) return root;
 
         MoveRecord nextMove = path.remove(0);
 
-        for(GameTreeNode branch : root.getBranches()) {
+        for(AlphaBetaGameTreeNode branch : root.getBranches()) {
             if(nextMove.equals(branch.getEnteringMove())) return getChildForPath(branch, path);
         }
 
         return null;
     }
 
-    public static GameTreeNode getBestChild(GameTreeNode root) {
-        if (root.getDepth() > 0 && root.getVictory() != GameTreeState.GOOD_MOVE) return null;
+    public static AlphaBetaGameTreeNode getBestChild(AlphaBetaGameTreeNode root) {
+        if (root.getDepth() > 0 && root.getVictory() != AlphaBetaGameTreeState.GOOD_MOVE) return null;
 
-        GameTreeNode bestMove = null;
-        for (GameTreeNode child : root.getBranches()) {
+        AlphaBetaGameTreeNode bestMove = null;
+        for (AlphaBetaGameTreeNode child : root.getBranches()) {
             if (bestMove == null) {
                 bestMove = child;
                 continue;
@@ -95,14 +94,14 @@ public class GameTreeNodeMethods {
             }
         }
 
-        if(bestMove != null && bestMove.getValue() == Evaluator.NO_VALUE) {
+        if(bestMove != null && bestMove.getValue() == FishyEvaluator.NO_VALUE) {
             Log.println(Log.Level.CRITICAL, "Chose an unvalued node as the best move!");
             Log.println(Log.Level.CRITICAL, "Entering path: " + root.getEnteringMoveSequence());
             Log.println(Log.Level.CRITICAL, "Best move: " + bestMove.getEnteringMove());
             Log.println(Log.Level.CRITICAL, "Best move has children? " + bestMove.getBranches());
             Log.println(Log.Level.CRITICAL, "Reported evaluation: " + bestMove.getValue());
-            Log.println(Log.Level.CRITICAL, "Best move is a TT hit? " + AiWorkspace.transpositionTable.getData(bestMove.getZobrist()));
-            GameTreeState state = GameTreeState.getStateForNode(root.getRootNode(), root);
+            Log.println(Log.Level.CRITICAL, "Best move is a TT hit? " + FishyWorkspace.transpositionTable.getData(bestMove.getZobrist()));
+            AlphaBetaGameTreeState state = AlphaBetaGameTreeState.getStateForNode(root.getRootNode(), root);
             Log.println(Log.Level.CRITICAL, "Actual evaluation: " + new FishyEvaluator().evaluate(state, state.mCurrentMaxDepth, state.getDepth()));
             RawTerminal.renderGameState(state);
             Log.println(Log.Level.CRITICAL, state.getPasteableRulesString());

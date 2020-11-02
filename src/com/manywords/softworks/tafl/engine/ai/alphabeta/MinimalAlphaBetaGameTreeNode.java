@@ -1,28 +1,29 @@
-package com.manywords.softworks.tafl.engine.ai;
+package com.manywords.softworks.tafl.engine.ai.alphabeta;
 
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.engine.ai.AiThreadPool;
+import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.ui.RawTerminal;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MinimalGameTreeNode implements GameTreeNode {
-    public GameTreeNode mParent;
+public class MinimalAlphaBetaGameTreeNode implements AlphaBetaGameTreeNode {
+    public AlphaBetaGameTreeNode mParent;
     public final int mDepth;
     public final MoveRecord mEnteringMove;
     public short mAlpha;
     public short mBeta;
     public short mValue;
-    public final List<GameTreeNode> mBranches;
+    public final List<AlphaBetaGameTreeNode> mBranches;
     public final boolean mCurrentSideAttackers;
     public final long mZobrist;
     public final int mVictory;
     public final int mGameLength;
     public final boolean mValueFromTransposition;
 
-    public MinimalGameTreeNode(GameTreeNode root, int depth, int maxDepth, MoveRecord enteringMove, short alpha, short beta, short evaluation, boolean valueFromTransposition, List<GameTreeNode> branches, boolean currentSideAttackers, long zobrist, int victory, int gameLength) {
+    public MinimalAlphaBetaGameTreeNode(AlphaBetaGameTreeNode root, int depth, int maxDepth, MoveRecord enteringMove, short alpha, short beta, short evaluation, boolean valueFromTransposition, List<AlphaBetaGameTreeNode> branches, boolean currentSideAttackers, long zobrist, int victory, int gameLength) {
         mParent = root;
         mDepth = depth;
         mEnteringMove = enteringMove;
@@ -36,11 +37,11 @@ public class MinimalGameTreeNode implements GameTreeNode {
         mValueFromTransposition = valueFromTransposition;
 
         // This is a leaf
-        if (evaluation != Evaluator.NO_VALUE) {
+        if (evaluation != FishyEvaluator.NO_VALUE) {
             mValue = evaluation;
         } else { // This is a branch
-            if(root instanceof GameTreeState) {
-                RawTerminal.renderGameState((GameTreeState) root);
+            if(root instanceof AlphaBetaGameTreeState) {
+                RawTerminal.renderGameState((AlphaBetaGameTreeState) root);
             }
             throw new IllegalStateException("MinimalGameTreeNode created for unvalued state");
         }
@@ -78,9 +79,9 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     @Override
-    public GameTreeNode explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation) {
+    public AlphaBetaGameTreeNode explore(int currentMaxDepth, int overallMaxDepth, short alpha, short beta, AiThreadPool threadPool, boolean continuation) {
         // First, we have to get a full game tree state for this node:
-        GameTreeState thisState = GameTreeState.getStateForNode(getRootNode(), this);
+        AlphaBetaGameTreeState thisState = AlphaBetaGameTreeState.getStateForNode(getRootNode(), this);
         return thisState.explore(currentMaxDepth, overallMaxDepth, alpha, beta, threadPool, continuation);
     }
 
@@ -102,7 +103,7 @@ public class MinimalGameTreeNode implements GameTreeNode {
         List<MoveRecord> moves = new ArrayList<MoveRecord>(mDepth);
 
         moves.add(getEnteringMove());
-        GameTreeNode parent = getParentNode();
+        AlphaBetaGameTreeNode parent = getParentNode();
 
         while (parent != null && parent.getEnteringMove() != null) {
             moves.add(parent.getEnteringMove());
@@ -115,17 +116,17 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     @Override
-    public GameTreeNode getChildForPath(List<MoveRecord> moves) {
-        return GameTreeNodeMethods.getChildForPath(this, moves);
+    public AlphaBetaGameTreeNode getChildForPath(List<MoveRecord> moves) {
+        return AlphaBetaGameTreeNodeMethods.getChildForPath(this, moves);
     }
 
     @Override
-    public GameTreeState getRootNode() {
+    public AlphaBetaGameTreeState getRootNode() {
         if (mParent == null) throw new IllegalStateException("MinimalGameTreeNode has no parent!");
 
-        GameTreeNode state = mParent;
+        AlphaBetaGameTreeNode state = mParent;
         while (true) {
-            if (state.getParentNode() == null) return (GameTreeState) state;
+            if (state.getParentNode() == null) return (AlphaBetaGameTreeState) state;
             else state = state.getParentNode();
         }
     }
@@ -136,17 +137,17 @@ public class MinimalGameTreeNode implements GameTreeNode {
     }
 
     @Override
-    public GameTreeNode getParentNode() {
+    public AlphaBetaGameTreeNode getParentNode() {
         return mParent;
     }
 
-    public GameTreeNode getBestChild() {
-        return GameTreeNodeMethods.getBestChild(this);
+    public AlphaBetaGameTreeNode getBestChild() {
+        return AlphaBetaGameTreeNodeMethods.getBestChild(this);
     }
 
     @Override
     public List<List<MoveRecord>> getAllEnteringSequences() {
-        return GameTreeNodeMethods.getAllEnteringSequences(this);
+        return AlphaBetaGameTreeNodeMethods.getAllEnteringSequences(this);
     }
 
     public int getDepth() {
@@ -161,11 +162,11 @@ public class MinimalGameTreeNode implements GameTreeNode {
         return mVictory;
     }
 
-    public void replaceChild(GameTreeNode oldNode, GameTreeNode newNode) {
+    public void replaceChild(AlphaBetaGameTreeNode oldNode, AlphaBetaGameTreeNode newNode) {
         mBranches.set(mBranches.indexOf(oldNode), newNode);
     }
 
-    public void setParent(GameTreeNode newParent) {
+    public void setParent(AlphaBetaGameTreeNode newParent) {
         mParent = newParent;
     }
 
@@ -173,7 +174,7 @@ public class MinimalGameTreeNode implements GameTreeNode {
         if(getDepth() == depth) return 1;
 
         int total = 0;
-        for (GameTreeNode node : mBranches) {
+        for (AlphaBetaGameTreeNode node : mBranches) {
             total += node.countChildren(depth);
         }
 
@@ -191,16 +192,16 @@ public class MinimalGameTreeNode implements GameTreeNode {
 
     @Override
     public void revalueParent(int depthOfObservation) {
-        GameTreeNodeMethods.revalueParent(this, depthOfObservation);
+        AlphaBetaGameTreeNodeMethods.revalueParent(this, depthOfObservation);
     }
 
     @Override
-    public List<GameTreeNode> getBranches() {
+    public List<AlphaBetaGameTreeNode> getBranches() {
         return mBranches;
     }
 
     @Override
     public void printChildEvaluations() {
-        GameTreeNodeMethods.printChildEvaluations(this);
+        AlphaBetaGameTreeNodeMethods.printChildEvaluations(this);
     }
 }

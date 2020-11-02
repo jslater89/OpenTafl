@@ -1,9 +1,11 @@
-package com.manywords.softworks.tafl.engine.ai;
+package com.manywords.softworks.tafl.engine.ai.alphabeta;
 
 import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.GameState;
 import com.manywords.softworks.tafl.engine.MoveRecord;
+import com.manywords.softworks.tafl.engine.ai.AiThreadPool;
+import com.manywords.softworks.tafl.engine.ai.ClassicalAiWorkspace;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
 import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.engine.ai.tables.HistoryTable;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class AiWorkspace extends Game {
+public class FishyWorkspace extends ClassicalAiWorkspace {
     private static final long POST_SEARCH_PAD = 500;
 
     private static String lastRulesString = "";
@@ -36,9 +38,9 @@ public class AiWorkspace extends Game {
     private Game mGame;
     private TimeSpec mClockLength;
     private TimeSpec mTimeRemaining;
-    private GameTreeState mStartingState;
-    private GameTreeState mPreviousStartingState;
-    private GameTreeNode mBestStatePreHorizon;
+    private AlphaBetaGameTreeState mStartingState;
+    private AlphaBetaGameTreeState mPreviousStartingState;
+    private AlphaBetaGameTreeNode mBestStatePreHorizon;
 
     public long[] mAlphaCutoffs;
     public long[] mAlphaCutoffDistances;
@@ -93,11 +95,8 @@ public class AiWorkspace extends Game {
     private GameState mOriginalStartingState;
     private UiCallback mUiCallback;
 
-    public boolean chatty = Log.level == Log.Level.VERBOSE;
-    public boolean silent = Log.level == Log.Level.CRITICAL;
-
-    public AiWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
-        super(startingGame.mZobristConstants, startingGame.getHistory(), startingGame.getRepetitions());
+    public FishyWorkspace(UiCallback ui, Game startingGame, GameState startingState, int transpositionTableSize) {
+        super(ui, startingGame, startingState);
         mPrepStartTime = System.currentTimeMillis();
 
         evaluator.initialize(startingGame.getRules());
@@ -235,11 +234,6 @@ public class AiWorkspace extends Game {
 
     public boolean isHistoryTableAllowed() {
         return mUseHistoryTable;
-    }
-
-    public void setTimeRemaining(TimeSpec length, TimeSpec entry) {
-        mClockLength = length;
-        mTimeRemaining = entry;
     }
 
     public void crashStop() {
@@ -437,7 +431,7 @@ public class AiWorkspace extends Game {
         int depth;
         int treeSizePreExtension = 0;
 
-        GameTreeState.workspace = this;
+        AlphaBetaGameTreeState.workspace = this;
 
         // Do the main search
         depth = 1;
@@ -457,7 +451,7 @@ public class AiWorkspace extends Game {
                 mBetaCutoffDistances = new long[mMaxDepth];
 
                 long start = System.currentTimeMillis();
-                mStartingState = new GameTreeState(this, new GameState(mOriginalStartingState));
+                mStartingState = new AlphaBetaGameTreeState(this, new GameState(mOriginalStartingState));
                 mStartingState.explore(depth, mMaxDepth, Short.MIN_VALUE, Short.MAX_VALUE, mThreadPool, false);
                 long finish = System.currentTimeMillis();
 
@@ -623,9 +617,9 @@ public class AiWorkspace extends Game {
                     boolean certainVictory = true;
                     int horizonOptions = getTreeRoot().getBranches().size();
 
-                    for (GameTreeNode branch : getTreeRoot().getBranches()) {
-                        List<GameTreeNode> nodes = GameTreeState.getPathStartingWithNode(branch);
-                        GameTreeNode n = nodes.get(nodes.size() - 1);
+                    for (AlphaBetaGameTreeNode branch : getTreeRoot().getBranches()) {
+                        List<AlphaBetaGameTreeNode> nodes = AlphaBetaGameTreeState.getPathStartingWithNode(branch);
+                        AlphaBetaGameTreeNode n = nodes.get(nodes.size() - 1);
                         if (n.getVictory() == GameState.GOOD_MOVE) {
                             short oldValue = n.getValue();
                             n.explore(currentHorizonDepth, continuationDepth, n.getAlpha(), n.getBeta(), mThreadPool, false);
@@ -691,10 +685,10 @@ public class AiWorkspace extends Game {
 
 
             mUiCallback.statusText("Finding best state...");
-            GameTreeNode bestMove = getTreeRoot().getBestChild();
+            AlphaBetaGameTreeNode bestMove = getTreeRoot().getBestChild();
             mUiCallback.statusText("Best move: " + bestMove.getRootMove() + " with path...");
 
-            List<GameTreeNode> bestPath = getTreeRoot().getBestPath();
+            List<AlphaBetaGameTreeNode> bestPath = getTreeRoot().getBestPath();
 
             /* Saving this: handy for debugging issues with searches not getting to the bottom of trees
             for(GameTreeNode child : getTreeRoot().getBranches()) {
@@ -707,28 +701,28 @@ public class AiWorkspace extends Game {
             */
 
 
-            GameTreeNode leafNode = null;
-            for (GameTreeNode node : bestPath) {
+            AlphaBetaGameTreeNode leafNode = null;
+            for (AlphaBetaGameTreeNode node : bestPath) {
                 mUiCallback.statusText("\t" + node.getEnteringMove());
                 if(node.getBranches().size() == 0) leafNode = node;
             }
             mUiCallback.statusText("Best move scored " + bestMove.getValue());
 
-            if(leafNode != null && leafNode.getVictory() > GameTreeState.HIGHEST_NONTERMINAL_RESULT && Math.abs(bestMove.getValue()) < 5000) {
+            if(leafNode != null && leafNode.getVictory() > AlphaBetaGameTreeState.HIGHEST_NONTERMINAL_RESULT && Math.abs(bestMove.getValue()) < 5000) {
                 Log.println(Log.Level.VERBOSE, "Found an incorrect best path!");
 
-                GameTreeNode node = getTreeRoot();
+                AlphaBetaGameTreeNode node = getTreeRoot();
                 Log.println(Log.Level.VERBOSE, "Root: " + node.getEnteringMoveSequence() + " value: " + node.getValue() + " children: " + node.getBranches().size() + " maximizing? " + node.isMaximizingNode());
-                for(GameTreeNode child : node.getBranches()) {
+                for(AlphaBetaGameTreeNode child : node.getBranches()) {
                     Log.println(Log.Level.VERBOSE, "Child: " + child.getEnteringMove() + " value: " + child.getValue());
                 }
 
                 int depth = 1;
-                for(GameTreeNode n : bestPath) {
+                for(AlphaBetaGameTreeNode n : bestPath) {
                     for(int i = 0; i < depth; i++) Log.print(Log.Level.VERBOSE, "  ");
 
                     Log.println(Log.Level.VERBOSE, "Node: " + n.getEnteringMoveSequence() + " value: " + n.getValue() + " children: " + n.getBranches().size() + " maximizing? " + n.isMaximizingNode());
-                    for(GameTreeNode child : n.getBranches()) {
+                    for(AlphaBetaGameTreeNode child : n.getBranches()) {
                         for(int i = 0; i < depth; i++) Log.print(Log.Level.VERBOSE, "  ");
                         Log.println(Log.Level.VERBOSE, "Child: " + child.getEnteringMove() + " value: " + child.getValue());
                     }
@@ -757,7 +751,7 @@ public class AiWorkspace extends Game {
     public String dumpEvaluationFor(int childIndex) {
         ((FishyEvaluator) evaluator).debug = true;
 
-        GameTreeNode node = getTreeRoot().getNthChild(childIndex);
+        AlphaBetaGameTreeNode node = getTreeRoot().getNthChild(childIndex);
 
         int depth = 0;
         for(int i = 0; i < getTreeRoot().getBranches().size(); i++) {
@@ -766,7 +760,7 @@ public class AiWorkspace extends Game {
             }
         }
 
-        List<GameTreeNode> sequence = new ArrayList<>();
+        List<AlphaBetaGameTreeNode> sequence = new ArrayList<>();
         while(node != null) {
             sequence.add(node);
             node = node.getBestChild();
@@ -774,15 +768,15 @@ public class AiWorkspace extends Game {
 
         String debugString = "";
         FishyEvaluator e = (FishyEvaluator) evaluator;
-        for(GameTreeNode n: sequence) {
-            if(n instanceof MinimalGameTreeNode) {
-                GameTreeState s = GameTreeState.getStateForNode(getTreeRoot(), (MinimalGameTreeNode) n);
+        for(AlphaBetaGameTreeNode n: sequence) {
+            if(n instanceof MinimalAlphaBetaGameTreeNode) {
+                AlphaBetaGameTreeState s = AlphaBetaGameTreeState.getStateForNode(getTreeRoot(), (MinimalAlphaBetaGameTreeNode) n);
                 s.mCurrentMaxDepth = depth;
                 evaluator.evaluate(s, s.mCurrentMaxDepth, s.mDepth);
-                debugString += e.debugString + "\n-------------------------------------------\n";
+                debugString += FishyEvaluator.debugString + "\n-------------------------------------------\n";
             }
             else {
-                GameTreeState s = (GameTreeState) n;
+                AlphaBetaGameTreeState s = (AlphaBetaGameTreeState) n;
                 s.mCurrentMaxDepth = depth;
                 evaluator.evaluate(s, s.mCurrentMaxDepth, s.mDepth);
                 debugString += e.debugString + "\n-------------------------------------------\n";
@@ -803,7 +797,7 @@ public class AiWorkspace extends Game {
         return mThreadPool.checkFinished();
     }
 
-    public GameTreeState getTreeRoot() {
+    public AlphaBetaGameTreeState getTreeRoot() {
         return mStartingState;
     }
 

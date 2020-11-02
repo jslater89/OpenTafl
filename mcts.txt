@@ -1,0 +1,17 @@
+1. UCT/UCB1 to choose when nodes are explored. (i.e., when selecting, use node with highest value)
+2. KDV to choose when nodes are unexplored
+3. Nodes still have sides—attacker node is attacker wins/trials, defender node is defender wins/trials.
+
+Reaching a new leaf saves all its direct branches (as minimal nodes?), playouts don't.
+
+Threads work on the same game tree. Try locking when backpropagating?
+
+Process:
+1. Start at root minified node.
+2. Check UCT/UCB1 values of all child nodes.
+3. Choose child node.
+4. Repeat 1-3 until selected node has no children.
+5. Generate all children for node. Select one by KDV, minify others.
+6. Play out from selected node, to max depth of N plies, using KDV to weight moves.
+7. At N plies, use ratio of current KDV to starting position KDV as fractional win/loss, if no win/loss attained; draw 0.5. A defender fractional win of e.g. 0.7 means an attacker fractional win of 0.3. If somehow >1, call it attacker win.
+8. Backpropagate wins/trials, adding to each node in the path to root node. Wins/trials vars should be volatile, updates to them maybe wrapped by a synchronized block.

@@ -3,8 +3,9 @@ package com.manywords.softworks.tafl.test.ai;
 import com.manywords.softworks.tafl.Log;
 import com.manywords.softworks.tafl.engine.Game;
 import com.manywords.softworks.tafl.engine.MoveRecord;
-import com.manywords.softworks.tafl.engine.ai.AiWorkspace;
+import com.manywords.softworks.tafl.engine.ai.alphabeta.FishyWorkspace;
 import com.manywords.softworks.tafl.engine.ai.evaluators.Evaluator;
+import com.manywords.softworks.tafl.engine.ai.evaluators.FishyEvaluator;
 import com.manywords.softworks.tafl.notation.NotationParseException;
 import com.manywords.softworks.tafl.notation.RulesSerializer;
 import com.manywords.softworks.tafl.rules.Rules;
@@ -20,7 +21,7 @@ public class AIMoveRepetitionTest extends TaflTest implements UiCallback {
 
     @Override
     public void run() {
-        AiWorkspace.resetTranspositionTable();
+        FishyWorkspace.resetTranspositionTable();
 
         Rules rules = null;
         try {
@@ -33,11 +34,11 @@ public class AIMoveRepetitionTest extends TaflTest implements UiCallback {
         Game g = new Game(rules, this);
         //RawTerminal.renderGameState(g.getCurrentState());
 
-        AiWorkspace workspace = new AiWorkspace(this, g, g.getCurrentState(), 0);
+        FishyWorkspace workspace = new FishyWorkspace(this, g, g.getCurrentState(), 0);
         workspace.explore(5);
         workspace.printSearchStats();
 
-        assert workspace.getTreeRoot().getValue() >= Evaluator.ATTACKER_WIN;
+        assert workspace.getTreeRoot().getValue() >= FishyEvaluator.ATTACKER_WIN;
 
         try {
             rules = RulesSerializer.loadRulesRecord("dim:7 name:Brandub surf:n atkf:n ks:w tfr:w cor:a1 corh: cenh: cenhe: dfor:c1,c2,c3,c4,b4,a4 dforp: dfors: dforh: start:/7/t6/K6/7/7/7/");
@@ -49,11 +50,11 @@ public class AIMoveRepetitionTest extends TaflTest implements UiCallback {
         g = new Game(rules, this);
         //RawTerminal.renderGameState(g.getCurrentState());
 
-        workspace = new AiWorkspace(this, g, g.getCurrentState(), 0);
+        workspace = new FishyWorkspace(this, g, g.getCurrentState(), 0);
         workspace.explore(5);
         workspace.printSearchStats();
 
-        assert workspace.getTreeRoot().getValue() <= Evaluator.DEFENDER_WIN;
+        assert workspace.getTreeRoot().getValue() <= FishyEvaluator.DEFENDER_WIN;
 
         try {
             rules = RulesSerializer.loadRulesRecord("dim:7 name:Brandub surf:n atkf:n ks:w tfr:w cor:a1,b1 corh: cenh: cenhe: dfor:c1,c2,c3,c4,b4,a4 dforp: dfors: dforh: start:/7/t6/K6/7/7/7/");
@@ -65,7 +66,7 @@ public class AIMoveRepetitionTest extends TaflTest implements UiCallback {
         //RawTerminal.renderGameState(g.getCurrentState());
 
         for(int i = 0; i < 8; i++) {
-            workspace = new AiWorkspace(this, g, g.getCurrentState(), 0);
+            workspace = new FishyWorkspace(this, g, g.getCurrentState(), 0);
             workspace.allowContinuation(false);
             workspace.allowHorizon(false);
             workspace.setMaxDepth(8);
@@ -77,7 +78,7 @@ public class AIMoveRepetitionTest extends TaflTest implements UiCallback {
             Log.println(Log.Level.VERBOSE, (g.getCurrentSide().isAttackingSide() ? "Defenders " : " Attackers ") + "saw " + workspace.getTreeRoot().getBestPath().get(workspace.getTreeRoot().getBestPath().size() - 1).getEnteringMoveSequence());
             Log.println(Log.Level.VERBOSE, "Value " + workspace.getTreeRoot().getValue()  + " Eval victory: " + workspace.getTreeRoot().getBestChild().getVictory() + " Real victory: " + g.getCurrentState().checkVictory());
 
-            if(workspace.getTreeRoot().getValue() > Evaluator.DEFENDER_WIN) {
+            if(workspace.getTreeRoot().getValue() > FishyEvaluator.DEFENDER_WIN) {
                 Log.println(Log.Level.VERBOSE, "!!! AI failed to see that this is a defender win! !!!");
                 //workspace.getTreeRoot().printTree("");
             }
